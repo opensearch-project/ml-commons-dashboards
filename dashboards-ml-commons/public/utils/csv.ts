@@ -25,7 +25,6 @@ type Input_data = {
 export const parseFile = (file: File, callback: (a: ParseResult<unknown>) => void) => {
     Papa.parse(file, {
         complete: function (results) {
-            console.log("Parsing complete:", results);
             callback(results)
         },
         error: function (err) {
@@ -37,7 +36,6 @@ export const parseFile = (file: File, callback: (a: ParseResult<unknown>) => voi
 
 export const transToInputData = (data: Array<any>, cols: number[]) => {
     const columns = cols.sort((a, b) => a - b)
-    console.log('columns', columns);
     const input_data: Input_data = { column_metas: [], rows: [] }
     input_data.column_metas = [{ name: "d0", column_type: "DOUBLE" }, {
         column_type: "DOUBLE",
