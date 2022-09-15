@@ -18,7 +18,6 @@ export const useIndexPatterns = (data?: DataPublicPluginStart) => {
             try {
                 const ids = await data.indexPatterns.getIds(true);
                 const patterns = await Promise.all(ids.map((id) => data.indexPatterns.get(id)));
-                console.log('patterns', patterns)
                 setIndexPatterns(patterns);
             } catch (e) {
                 setError(e as Error);

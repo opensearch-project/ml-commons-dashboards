@@ -15,18 +15,20 @@ import {
     EuiPageHeader,
     EuiFilePicker,
     EuiRadioGroup,
-    EuiText
+    EuiText,
 } from '@elastic/eui';
 import { SUPPORTED_ALGOS } from '../../../common/algo'
 import { APIProvider } from '../../apis/api_provider';
 import { ComponentsCommonProps } from '../app'
-import { trainSuccessNotification, trainFailNotification } from '../../utils/notification'
+// import { trainSuccessNotification, trainFailNotification } from '../../utils/notification'
 import { parseFile, transToInputData } from '../../../public/utils'
 import { ParsedResult } from '../data/parse_result';
 import { QueryField, type Query } from '../data/query_field';
 import { useIndexPatterns } from '../../hooks'
 import { type DataSource } from '../../apis/train'
 import './index.scss'
+import { TrainResult } from './train_result'
+
 
 import { type ALGOS } from '../../../common/'
 
@@ -34,6 +36,11 @@ interface Props extends ComponentsCommonProps {
 
 }
 
+export interface TrainingResult {
+    status: 'success' | 'fail' | ''
+    id?: string
+    message?: string
+}
 
 export const Train = ({ notifications, data }: Props) => {
     const [selectedAlgo, setSelectedAlgo] = useState<ALGOS>('kmeans')
@@ -45,6 +52,8 @@ export const Train = ({ notifications, data }: Props) => {
     const { indexPatterns } = useIndexPatterns(data);
     const [selectedFields, setSelectedFields] = useState<Record<string, string[]>>({})
     const [query, setQuery] = useState<Query>()
+    const [trainingResult, setTrainingResult] = useState<TrainingResult>({ status: '' })
+
 
 
     const [parsedData, setParsedData] = useState({
@@ -84,6 +93,7 @@ export const Train = ({ notifications, data }: Props) => {
 
 
     const handleBuild = useCallback(async (e) => {
+        setTrainingResult({ status: "", id: '', message: '' })
         setIsLoading(true);
         e.preventDefault();
         const input_data = transToInputData(parsedData.data, selectedCols);
@@ -93,9 +103,11 @@ export const Train = ({ notifications, data }: Props) => {
             result = await APIProvider.getAPI('train').train(body)
             const { status, model_id, message } = result;
             if (status === "COMPLETED") {
-                trainSuccessNotification(notifications, model_id);
+                setTrainingResult({ status: "success", id: model_id })
+                // trainSuccessNotification(notifications, model_id);
             } else if (message) {
-                trainFailNotification(notifications, message)
+                setTrainingResult({ status: "fail", message })
+                // trainFailNotification(notifications, message)
             }
         } catch (e) {
             console.log('error', e)
@@ -206,6 +218,7 @@ export const Train = ({ notifications, data }: Props) => {
                 <EuiButton color="primary" fill onClick={handleBuild} isLoading={isLoading}>
                     Build Model
                 </EuiButton>
+                <TrainResult trainingResult={trainingResult} />
             </div>
         </>
     );

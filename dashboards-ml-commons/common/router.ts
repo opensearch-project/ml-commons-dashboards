@@ -27,7 +27,7 @@ export const ROUTES = [
   {
     path: routerPaths.predict,
     Component: Predict,
-    label: 'Prediction',
+    label: 'Predict',
     icon: 'regressionJob',
   },
   {
