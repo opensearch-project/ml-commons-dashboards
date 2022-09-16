@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
 
 import { TaskSearchItem } from '../../apis/task';
@@ -6,8 +6,13 @@ import { CoreStart } from '../../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
 import { TaskTable } from './task_table';
 import { TaskListFilter, TaskListFilterValue } from './task_list_filter';
+import {
+  TaskConfirmDeleteModal,
+  TaskConfirmDeleteModalInstance,
+} from './task_confirm_delete_modal';
 
 export function TaskList({ notifications }: { notifications: CoreStart['notifications'] }) {
+  const taskDeleteConfirmModalRef = useRef<TaskConfirmDeleteModalInstance>(null);
   const [tasks, setTasks] = useState<TaskSearchItem[]>([]);
   const [totalTaskCounts, setTotalTaskCounts] = useState<number>();
   const [params, setParams] = useState<
@@ -68,6 +73,10 @@ export function TaskList({ notifications }: { notifications: CoreStart['notifica
     setParams((prevParams) => ({ ...prevParams, ...filter }));
   }, []);
 
+  const handleTaskDelete = useCallback((id: string) => {
+    taskDeleteConfirmModalRef.current?.show(id);
+  }, []);
+
   useEffect(() => {
     loadByParams().then((payload) => {
       setTasks(payload.data);
@@ -96,9 +105,10 @@ export function TaskList({ notifications }: { notifications: CoreStart['notifica
       <TaskTable
         tasks={tasks}
         pagination={pagination}
-        onTaskDeleted={handleTaskDeleted}
+        onTaskDelete={handleTaskDelete}
         onPaginationChange={handlePaginationChange}
       />
+      <TaskConfirmDeleteModal ref={taskDeleteConfirmModalRef} onDeleted={handleTaskDeleted} />
     </EuiPanel>
   );
 }
