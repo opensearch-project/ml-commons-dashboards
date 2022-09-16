@@ -26,3 +26,21 @@ export interface MLServices extends CoreStart {
   data: DataPublicPluginStart;
   history: History;
 }
+
+
+type Column_meta = {
+  name: string,
+  column_type: string
+}
+
+export type Row = {
+  column_type: string
+  value: number | string | boolean
+}
+
+export type Rows = { values: Array<Row> }
+
+export type Input_data = {
+  column_metas: Array<Column_meta>
+  rows: Array<Rows>
+}

@@ -4,23 +4,9 @@
  */
 
 import Papa, { ParseResult } from 'papaparse'
+import { type Input_data, Rows } from '../types'
 
-type Column_meta = {
-    name: string,
-    column_type: string
-}
-
-type Row = {
-    column_type: string
-    value: number | string
-}
-
-type Rows = { values: Array<Row> }
-
-type Input_data = {
-    column_metas: Array<Column_meta>
-    rows: Array<Rows>
-}
+const MAX_DISPLAY_COLUMN_LENGTH = 150
 
 export const parseFile = (file: File, callback: (a: ParseResult<unknown>) => void) => {
     Papa.parse(file, {
@@ -41,18 +27,6 @@ export const transToInputData = (data: Array<any>, cols: number[]) => {
         column_type: "DOUBLE",
         name: "d1"
     }]
-
-    // input_data.rows = data.map((item: any) => {
-    //     const res: Rows = { values: [] }
-    //     columns.forEach((i: number) => {
-    //         const row = {
-    //             column_type: "DOUBLE",
-    //             value: item[i] ? Number(item[i]) : 0
-    //         }
-    //         res.values.push(row)
-    //     })
-    //     return res
-    // })
     for (const item of data) {
         const res: Rows = { values: [] }
         columns.forEach((i: number) => {
@@ -68,4 +42,23 @@ export const transToInputData = (data: Array<any>, cols: number[]) => {
         }
     }
     return input_data
+}
+
+export const convertPredictionToTable = (data: Input_data) => {
+    const { column_metas, rows } = data
+    const rows_length = rows.length > MAX_DISPLAY_COLUMN_LENGTH ? MAX_DISPLAY_COLUMN_LENGTH : rows.length;
+    const columns = column_metas.map(item => ({
+        field: item.name,
+        name: item.name
+    }))
+    const items = []
+    for (let i = 0; i <= rows_length; i++) {
+        const item: Record<string, string | number | boolean> = {}
+        rows[i].values.forEach((_, index) => {
+            const key = column_metas[index].name, value = rows[i].values[index].value;
+            item[key] = value;
+        })
+        items.push(item)
+    }
+    return { columns, items }
 }
