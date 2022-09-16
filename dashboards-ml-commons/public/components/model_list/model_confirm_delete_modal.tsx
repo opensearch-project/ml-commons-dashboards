@@ -77,7 +77,7 @@ export const ModelConfirmDeleteModal = React.forwardRef<
 
   return (
     <EuiConfirmModal
-      title="Confirm Delete?"
+      title="Are you sure delete this model?"
       cancelButtonText="Cancel"
       confirmButtonText="Confirm"
       onCancel={handleCancel}
