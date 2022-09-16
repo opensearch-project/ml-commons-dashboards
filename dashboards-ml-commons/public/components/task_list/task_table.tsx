@@ -1,8 +1,7 @@
 import React, { useMemo, useCallback, useRef } from 'react';
-import { EuiBasicTable } from '@elastic/eui';
+import { CustomItemAction, EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
 
 import { TaskSearchItem } from '../../apis/task';
-import { TaskDeleteButton } from './task_delete_button';
 import { renderTime } from '../../utils';
 
 export function TaskTable(props: {
@@ -13,13 +12,11 @@ export function TaskTable(props: {
     totalRecords: number | undefined;
   };
   onPaginationChange: (pagination: { currentPage: number; pageSize: number }) => void;
-  onTaskDeleted: () => void;
+  onTaskDelete: (id: string) => void;
 }) {
-  const { tasks, onPaginationChange, onTaskDeleted } = props;
+  const { tasks, onPaginationChange, onTaskDelete } = props;
   const onPaginationChangeRef = useRef(onPaginationChange);
   onPaginationChangeRef.current = onPaginationChange;
-  const onTaskDeletedRef = useRef(onTaskDeleted);
-  onTaskDeletedRef.current = onTaskDeleted;
 
   const columns = useMemo(
     () => [
@@ -55,12 +52,23 @@ export function TaskTable(props: {
       },
       {
         name: 'Actions',
-        field: 'id',
-        width: '130px',
-        render: (id: string) => <TaskDeleteButton id={id} onDeleted={onTaskDeleted} />,
+        actions: [
+          {
+            render: ({ id }) => (
+              <EuiButtonIcon
+                iconType="trash"
+                color="danger"
+                onClick={(e: { stopPropagation: () => void }) => {
+                  e.stopPropagation();
+                  onTaskDelete(id);
+                }}
+              />
+            ),
+          } as CustomItemAction<TaskSearchItem>,
+        ],
       },
     ],
-    [onTaskDeleted]
+    [onTaskDelete]
   );
 
   const pagination = useMemo(
