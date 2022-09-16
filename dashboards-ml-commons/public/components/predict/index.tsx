@@ -19,15 +19,29 @@ import { useIndexPatterns } from '../../hooks'
 import './index.scss'
 import { type PredictResponse } from '../../apis/predict'
 import { useParams } from "react-router-dom";
-
-interface Props extends ComponentsCommonProps {
-
-}
+import { type Input_data } from '../../types'
+import { PredictResult } from './predict_result'
+interface Props extends ComponentsCommonProps { }
 
 interface SelectedModel {
     id: string,
     algo: string
 }
+
+export type IPredictResult =
+    | {
+        status: 'success',
+        overview: {
+            rows: number
+            columns: number
+        }
+        data: Input_data
+    } | {
+        status: 'fail',
+        message: string
+    } | {
+        status: ''
+    }
 
 export const Predict = ({ data }: Props) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +51,7 @@ export const Predict = ({ data }: Props) => {
     const [selectedFields, setSelectedFields] = useState<Record<string, string[]>>({})
     const { indexPatterns } = useIndexPatterns(data);
     const [query, setQuery] = useState<Query>()
+    const [predictResult, setPredictResult] = useState<IPredictResult>({ status: '' })
 
     const handlePredict = useCallback(async () => {
         setIsLoading(true);
@@ -46,11 +61,24 @@ export const Predict = ({ data }: Props) => {
                     query,
                     fields: selectedFields
                 }, selectModel.algo, selectModel.id) as PredictResponse;
-            const { prediction_result, status } = result;
+            const { prediction_result, status, message } = result;
             if (status === 'COMPLETED' && prediction_result) {
+                setPredictResult({
+                    status: 'success',
+                    overview: {
+                        rows: prediction_result?.rows?.length ?? 0,
+                        columns: prediction_result?.column_metas?.length ?? 0
+                    },
+                    data: prediction_result
+                })
+            } else if (message) {
+                setPredictResult({
+                    status: 'fail',
+                    message
+                })
             }
         } catch (err) {
-            console.error('err', err)
+            console.error('predict err', err)
         }
         setIsLoading(false);
 
@@ -100,6 +128,7 @@ export const Predict = ({ data }: Props) => {
                 <EuiButton type="submit" fill onClick={handlePredict} isLoading={isLoading}>
                     Predict
                 </EuiButton>
+                <PredictResult {...predictResult} />
             </div>
         </>
 

@@ -9,10 +9,10 @@ type Body = {
 
 export type PredictResponse = {
     status: string
-    prediction_result: {
+    prediction_result?: {
         column_metas: Array<{
             name: string,
-            column: string
+            column_type: string
         }>,
         rows: Array<{
             values: Array<{
@@ -21,6 +21,7 @@ export type PredictResponse = {
             }>
         }>
     }
+    message?: string
 }
 
 export class Predict {
