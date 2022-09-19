@@ -7,21 +7,17 @@
 import React, { useCallback, useState } from 'react';
 import {
     EuiButton,
-    EuiFormRow,
     EuiTitle,
     EuiSelect,
     EuiSpacer,
     EuiPageHeader,
-    EuiFilePicker,
     EuiRadioGroup,
-    EuiText,
 } from '@elastic/eui';
 import { SUPPORTED_ALGOS, ALGOS } from '../../../common/algo'
 import { APIProvider } from '../../apis/api_provider';
 import { ComponentsCommonProps } from '../app'
-import { parseFile, transToInputData } from '../../../public/utils'
-import { ParsedResult } from '../data/parse_result';
-import { QueryField, type Query } from '../data/query_field';
+import { transToInputData } from '../../../public/utils'
+import { ParsedResult, QueryField, type Query, UploadFile } from '../data';
 import { useIndexPatterns } from '../../hooks'
 import { type DataSource } from '../../apis/train'
 import './index.scss'
@@ -42,7 +38,6 @@ export const Train = ({ data }: Props) => {
     const [selectedAlgo, setSelectedAlgo] = useState<ALGOS>('kmeans')
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCols, setSelectedCols] = useState<number[]>([])
-    const [files, setFiles] = useState([{}])
     const [dataSource, setDataSource] = useState<DataSource>('upload')
     const { indexPatterns } = useIndexPatterns(data);
     const [selectedFields, setSelectedFields] = useState<Record<string, string[]>>({})
@@ -64,45 +59,12 @@ export const Train = ({ data }: Props) => {
         data: []
     });
 
-    const onChange = (files) => {
-        setFiles(files.length > 0 ? Array.from(files) : []);
-        setParsedData({
-            data: []
-        })
-        if (files[0]) {
-            parseFile(files[0], (data) => {
-                setParsedData(data);
-            })
-        }
-
-    };
-
     const handleSelectAlgo = (algo: ALGOS) => {
         setSelectedAlgo(algo);
         setParams(generateDefaultParams(algo))
     };
 
-    const renderFiles = () => {
-        if (files.length > 0) {
-            return (
-                <ul>
-                    {files.map((file, i) => (
-                        <li key={i}>
-                            <strong>{file.name}</strong> ({file.size} bytes)
-                        </li>
-                    ))}
-                </ul>
-            );
-        } else {
-            return (
-                <p>Add some files to see a demo of retrieving from the FileList</p>
-            );
-        }
-    };
-
-
     const handleBuild = useCallback(async (e) => {
-        console.log('params', params)
         setTrainingResult({ status: "", id: '', message: '' })
         setIsLoading(true);
         e.preventDefault();
@@ -164,18 +126,7 @@ export const Train = ({ data }: Props) => {
                 {
                     dataSource === 'upload' ? (
                         <>
-                            <EuiFormRow label="File picker" fullWidth>
-                                <EuiFilePicker
-                                    initialPromptText="upload CSV or JSON data"
-                                    display='large'
-                                    onChange={onChange}
-                                    fullWidth
-                                />
-                            </EuiFormRow>
-                            <EuiText>
-                                <h5>Files attached</h5>
-                                {renderFiles()}
-                            </EuiText>
+                            <UploadFile updateParsedData={setParsedData} />
                             {
                                 parsedData?.data?.length > 0 ? <ParsedResult data={parsedData.data} selectedCols={selectedCols} onChangeSelectedCols={setSelectedCols} /> : null
                             }
