@@ -11,16 +11,14 @@ import {
     EuiTitle,
     EuiSelect,
     EuiSpacer,
-    EuiFieldNumber,
     EuiPageHeader,
     EuiFilePicker,
     EuiRadioGroup,
     EuiText,
 } from '@elastic/eui';
-import { SUPPORTED_ALGOS } from '../../../common/algo'
+import { SUPPORTED_ALGOS, ALGOS } from '../../../common/algo'
 import { APIProvider } from '../../apis/api_provider';
 import { ComponentsCommonProps } from '../app'
-// import { trainSuccessNotification, trainFailNotification } from '../../utils/notification'
 import { parseFile, transToInputData } from '../../../public/utils'
 import { ParsedResult } from '../data/parse_result';
 import { QueryField, type Query } from '../data/query_field';
@@ -28,9 +26,7 @@ import { useIndexPatterns } from '../../hooks'
 import { type DataSource } from '../../apis/train'
 import './index.scss'
 import { TrainResult } from './train_result'
-
-
-import { type ALGOS } from '../../../common/'
+import { TrainForm } from './train_form'
 
 interface Props extends ComponentsCommonProps {
 
@@ -42,9 +38,8 @@ export interface TrainingResult {
     message?: string
 }
 
-export const Train = ({ notifications, data }: Props) => {
+export const Train = ({ data }: Props) => {
     const [selectedAlgo, setSelectedAlgo] = useState<ALGOS>('kmeans')
-    const [params, setParams] = useState({ centroids: 2, iterations: 10, distance_type: 'EUCLIDEAN' });
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCols, setSelectedCols] = useState<number[]>([])
     const [files, setFiles] = useState([{}])
@@ -54,7 +49,16 @@ export const Train = ({ notifications, data }: Props) => {
     const [query, setQuery] = useState<Query>()
     const [trainingResult, setTrainingResult] = useState<TrainingResult>({ status: '' })
 
-
+    const generateDefaultParams = useCallback((algo: string) => {
+        const result: Record<string, string | number> = {}
+        const selectAlgo = SUPPORTED_ALGOS.find(item => item.value === algo)
+        selectAlgo?.parameters?.forEach(item => {
+            result[item.name] = item.default
+        })
+        return result
+    }, [])
+    const defaultParams = generateDefaultParams('kmeans')
+    const [params, setParams] = useState(defaultParams);
 
     const [parsedData, setParsedData] = useState({
         data: []
@@ -71,6 +75,11 @@ export const Train = ({ notifications, data }: Props) => {
             })
         }
 
+    };
+
+    const handleSelectAlgo = (algo: ALGOS) => {
+        setSelectedAlgo(algo);
+        setParams(generateDefaultParams(algo))
     };
 
     const renderFiles = () => {
@@ -93,6 +102,7 @@ export const Train = ({ notifications, data }: Props) => {
 
 
     const handleBuild = useCallback(async (e) => {
+        console.log('params', params)
         setTrainingResult({ status: "", id: '', message: '' })
         setIsLoading(true);
         e.preventDefault();
@@ -104,10 +114,8 @@ export const Train = ({ notifications, data }: Props) => {
             const { status, model_id, message } = result;
             if (status === "COMPLETED") {
                 setTrainingResult({ status: "success", id: model_id })
-                // trainSuccessNotification(notifications, model_id);
             } else if (message) {
                 setTrainingResult({ status: "fail", message })
-                // trainFailNotification(notifications, message)
             }
         } catch (e) {
             console.log('error', e)
@@ -122,58 +130,18 @@ export const Train = ({ notifications, data }: Props) => {
                     <h4>Select a algorithm</h4>
                 </EuiTitle>
                 <EuiSelect
-                    onChange={(e) => setSelectedAlgo(e.target.value)}
+                    onChange={(e) => { handleSelectAlgo(e.target.value as ALGOS) }}
                     value={selectedAlgo}
                     fullWidth
-                    options={[
-                        {
-                            value: 'kmeans',
-                            text: 'K-means'
-                        }, {
-                            value: 'LINEAR_REGRESSION',
-                            text: 'LINEAR_REGRESSION'
-                        }
-                    ]}
+                    options={
+                        SUPPORTED_ALGOS.map(item => ({ value: item.value, text: item.text }))
+                    }
                 />
                 <EuiSpacer />
                 <EuiTitle size="xs">
                     <h4>Parameters</h4>
                 </EuiTitle>
-                <EuiFormRow label="centroids" fullWidth helpText="The number of clusters in which to group the generated data">
-                    <EuiFieldNumber
-                        fullWidth
-                        value={params?.centroids ?? 2}
-                        onChange={(e) => setParams({ ...params, centroids: Number(e.target.value) })}
-                        aria-label="Use aria labels when no actual label is in use"
-                    />
-                </EuiFormRow>
-                <EuiFormRow label="iterations" fullWidth helpText="The number of iterations to perform against the data until a mean generates">
-                    <EuiFieldNumber
-                        fullWidth
-                        value={params?.iterations ?? 10}
-                        onChange={(e) => setParams({ ...params, iterations: Number(e.target.value) })}
-                        aria-label="Use aria labels when no actual label is in use"
-                    />
-                </EuiFormRow>
-                <EuiFormRow label="distance_type" fullWidth helpText="The type of measurement from which to measure the distance between centroids">
-                    <EuiSelect
-                        fullWidth
-                        onChange={(e) => setParams({ ...params, distance_type: e.target.value })}
-                        value={params?.distance_type}
-                        options={[
-                            {
-                                value: 'EUCLIDEAN',
-                                text: 'EUCLIDEAN'
-                            }, {
-                                value: 'COSINE',
-                                text: 'COSINE'
-                            }, {
-                                value: 'L1',
-                                text: 'L1'
-                            }
-                        ]}
-                    />
-                </EuiFormRow>
+                <TrainForm params={params} setParams={setParams} algo={selectedAlgo} />
                 <EuiSpacer />
                 <EuiTitle size="xs">
                     <h4>Training Data</h4>
@@ -190,7 +158,7 @@ export const Train = ({ notifications, data }: Props) => {
                         }
                     ]}
                     idSelected={dataSource}
-                    onChange={(id) => setDataSource(id)}
+                    onChange={(id) => setDataSource(id as DataSource)}
                 />
                 <EuiSpacer />
                 {
