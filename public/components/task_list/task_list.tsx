@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
 
-import { TaskSearchItem } from '../../apis/task';
 import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
-import { TaskTable } from './task_table';
+import { useFetcher } from '../../hooks/use_fetcher';
+import { TaskTable, TaskTableSort } from './task_table';
 import { TaskListFilter, TaskListFilterValue } from './task_list_filter';
 import {
   TaskConfirmDeleteModal,
@@ -13,17 +13,27 @@ import {
 
 export function TaskList({ notifications }: { notifications: CoreStart['notifications'] }) {
   const taskDeleteConfirmModalRef = useRef<TaskConfirmDeleteModalInstance>(null);
-  const [tasks, setTasks] = useState<TaskSearchItem[]>([]);
-  const [totalTaskCounts, setTotalTaskCounts] = useState<number>();
   const [params, setParams] = useState<
     TaskListFilterValue & {
       currentPage: number;
       pageSize: number;
+      sort: TaskTableSort;
     }
   >({
     currentPage: 1,
     pageSize: 15,
+    sort: 'lastUpdateTime-desc',
   });
+
+  const { data, reload } = useFetcher(APIProvider.getAPI('task').search, {
+    ...params,
+    sort: [params.sort],
+    createdStart: params.createdStart?.valueOf(),
+    createdEnd: params.createdEnd?.valueOf(),
+  });
+
+  const tasks = useMemo(() => data?.data || [], [data]);
+  const totalTaskCounts = data?.pagination.totalRecords || 0;
 
   const pagination = useMemo(
     () => ({
@@ -34,40 +44,10 @@ export function TaskList({ notifications }: { notifications: CoreStart['notifica
     [totalTaskCounts, params.currentPage, params.pageSize]
   );
 
-  const loadByParams = useCallback(
-    () =>
-      APIProvider.getAPI('task').search({
-        ...params,
-        createdStart: params.createdStart?.valueOf(),
-        createdEnd: params.createdEnd?.valueOf(),
-      }),
-    [params]
-  );
-
-  const handlePaginationChange = useCallback(
-    (pagination: { currentPage: number; pageSize: number }) => {
-      setParams((previousValue) => {
-        if (
-          previousValue.currentPage === pagination.currentPage &&
-          previousValue.pageSize === pagination.pageSize
-        ) {
-          return previousValue;
-        }
-        return {
-          ...previousValue,
-          ...pagination,
-        };
-      });
-    },
-    []
-  );
-
   const handleTaskDeleted = useCallback(async () => {
-    const payload = await loadByParams();
-    setTasks(payload.data);
-    setTotalTaskCounts(payload.pagination.totalRecords);
+    reload();
     notifications.toasts.addSuccess('Task has been deleted.');
-  }, [loadByParams]);
+  }, [reload]);
 
   const handleFilterChange = useCallback((filter) => {
     setParams((prevParams) => ({ ...prevParams, ...filter }));
@@ -77,12 +57,23 @@ export function TaskList({ notifications }: { notifications: CoreStart['notifica
     taskDeleteConfirmModalRef.current?.show(id);
   }, []);
 
-  useEffect(() => {
-    loadByParams().then((payload) => {
-      setTasks(payload.data);
-      setTotalTaskCounts(payload.pagination.totalRecords);
+  const handleTableChange = useCallback((criteria) => {
+    const { pagination, sort } = criteria;
+    setParams((previousValue) => {
+      if (
+        pagination.currentPage === previousValue.currentPage &&
+        pagination.pageSize === previousValue.pageSize &&
+        (!sort || sort === previousValue.sort)
+      ) {
+        return previousValue;
+      }
+      return {
+        ...previousValue,
+        ...criteria.pagination,
+        ...(criteria.sort ? { sort: criteria.sort } : {}),
+      };
     });
-  }, [loadByParams]);
+  }, []);
 
   return (
     <EuiPanel>
@@ -105,8 +96,9 @@ export function TaskList({ notifications }: { notifications: CoreStart['notifica
       <TaskTable
         tasks={tasks}
         pagination={pagination}
+        sort={params.sort}
         onTaskDelete={handleTaskDelete}
-        onPaginationChange={handlePaginationChange}
+        onChange={handleTableChange}
       />
       <TaskConfirmDeleteModal ref={taskDeleteConfirmModalRef} onDeleted={handleTaskDeleted} />
     </EuiPanel>

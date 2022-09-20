@@ -17,6 +17,8 @@ import { ILegacyClusterClient, ScopeableRequest } from '../../../../src/core/ser
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { convertModelSource, generateModelSearchQuery } from './utils/model';
 
+const modelSortFieldMapping: { [key: string]: string } = { trainTime: 'model_train_time' };
+
 export class ModelNotFound {}
 
 export class ModelService {
@@ -29,6 +31,7 @@ export class ModelService {
   public async search({
     request,
     pagination,
+    sort,
     ...restParams
   }: {
     request: ScopeableRequest;
@@ -38,6 +41,7 @@ export class ModelService {
     context?: Record<string, Array<string | number>>;
     trainedStart?: number;
     trainedEnd?: number;
+    sort?: Array<'trainTime-desc' | 'trainTime-asc'>;
   }) {
     const { hits } = await this.osClient
       .asScoped(request)
@@ -45,6 +49,16 @@ export class ModelService {
         body: {
           query: generateModelSearchQuery(restParams),
           ...getQueryFromSize(pagination),
+          ...(sort
+            ? {
+                sort: sort.map((sorting) => {
+                  const [field, direction] = sorting.split('-');
+                  return {
+                    [modelSortFieldMapping[field] || field]: direction,
+                  };
+                }),
+              }
+            : {}),
         },
       });
     return {

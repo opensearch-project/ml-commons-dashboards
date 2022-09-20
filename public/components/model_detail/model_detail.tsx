@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useRouteMatch, Link, generatePath } from 'react-router-dom';
 import {
   EuiPanel,
@@ -11,12 +11,12 @@ import {
 import moment from 'moment';
 
 import { APIProvider } from '../../apis/api_provider';
-import { ModelDetail as ModelDetailData } from '../../apis/model';
 import { routerPaths } from '../../../common/router_paths';
+import { useFetcher } from '../../hooks/use_fetcher';
 
 export const ModelDetail = (props: any) => {
   const { params } = useRouteMatch<{ id: string }>();
-  const [model, setModel] = useState<ModelDetailData>();
+  const { data: model } = useFetcher(APIProvider.getAPI('model').getOne, params.id);
 
   const modelDescriptionListItems = useMemo(
     () =>
@@ -54,18 +54,6 @@ export const ModelDetail = (props: any) => {
         : [],
     [model]
   );
-
-  useEffect(() => {
-    APIProvider.getAPI('model')
-      .getOne(params.id)
-      .then((payload) => {
-        setModel(payload);
-      });
-  }, [params.id]);
-
-  if (!model) {
-    return null;
-  }
 
   return (
     <EuiPanel>
