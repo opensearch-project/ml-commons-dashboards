@@ -37,7 +37,7 @@ export interface TrainingResult {
 export const Train = ({ data }: Props) => {
     const [selectedAlgo, setSelectedAlgo] = useState<ALGOS>('kmeans')
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedCols, setSelectedCols] = useState<number[]>([])
+    const [selectedCols, setSelectedCols] = useState<number[]>([0, 1])
     const [dataSource, setDataSource] = useState<DataSource>('upload')
     const { indexPatterns } = useIndexPatterns(data);
     const [selectedFields, setSelectedFields] = useState<Record<string, string[]>>({})
@@ -68,7 +68,7 @@ export const Train = ({ data }: Props) => {
         setTrainingResult({ status: "", id: '', message: '' })
         setIsLoading(true);
         e.preventDefault();
-        const input_data = transToInputData(parsedData.data, selectedCols);
+        const input_data = transToInputData(parsedData, selectedCols);
         let result
         try {
             const body = APIProvider.getAPI('train').convertParams(selectedAlgo, dataSource, params, input_data, { fields: selectedFields, query });
@@ -128,7 +128,7 @@ export const Train = ({ data }: Props) => {
                         <>
                             <UploadFile updateParsedData={setParsedData} />
                             {
-                                parsedData?.data?.length > 0 ? <ParsedResult data={parsedData.data} selectedCols={selectedCols} onChangeSelectedCols={setSelectedCols} /> : null
+                                parsedData?.data?.length > 0 ? <ParsedResult parsedData={parsedData} selectedCols={selectedCols} onChangeSelectedCols={setSelectedCols} /> : null
                             }
                         </>
                     ) : <QueryField indexPatterns={indexPatterns} selectedFields={selectedFields} onSelectedFields={setSelectedFields} onUpdateQuerys={setQuery} />

@@ -11,12 +11,13 @@ import {
 } from '@elastic/eui'
 
 type Props = {
-    data: any
+    parsedData: any
     selectedCols: number[],
     onChangeSelectedCols: (val: number[]) => void
 }
 
-export const ParsedResult = ({ data, selectedCols, onChangeSelectedCols }: Props) => {
+export const ParsedResult = ({ parsedData, selectedCols, onChangeSelectedCols }: Props) => {
+    const { data, header } = parsedData
     const sliceLen = data.length >= 7 ? 7 : data.length;
     const slicedData = data.slice(0, sliceLen);
     const keysLen = Object.keys(data[0]).length
@@ -42,7 +43,7 @@ export const ParsedResult = ({ data, selectedCols, onChangeSelectedCols }: Props
                     {loopArr.map((_, index) => (
                         <tr key={index}>
                             <EuiCheckbox id={String(index)} checked={selectedCols.indexOf(index) > -1} onChange={(e) => handleChecked(e.target.checked, index)} />
-                            <td>Col {index + 1} </td>
+                            <td>Col {index + 1} {(header && header[index]) ? ` ${header[index]}` : ''}</td>
                             {slicedData.map((item, i: number) => (
                                 <td key={i}>{item[index]}</td>
                             ))}
