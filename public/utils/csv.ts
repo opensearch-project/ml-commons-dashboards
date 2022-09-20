@@ -8,10 +8,16 @@ import { type Input_data, Rows } from '../types'
 
 const MAX_DISPLAY_COLUMN_LENGTH = 150
 
-export const parseFile = (file: File, callback: (a: ParseResult<unknown>) => void) => {
+export const parseFile = (file: File, ifHeader: boolean, callback: (a: ParseResult<unknown> & { header?: any }) => void) => {
     Papa.parse(file, {
         complete: function (results) {
-            callback(results)
+            if (ifHeader) {
+                const header = results.data.splice(0, 1)
+                callback({
+                    ...results,
+                    header: header ? header[0] : null
+                })
+            } else { callback(results) }
         },
         error: function (err) {
             console.error('err', err)
@@ -20,13 +26,15 @@ export const parseFile = (file: File, callback: (a: ParseResult<unknown>) => voi
 }
 
 
-export const transToInputData = (data: Array<any>, cols: number[]) => {
+export const transToInputData = (parsedData: any, cols: number[]) => {
+    const { data, header } = parsedData
     const columns = cols.sort((a, b) => a - b)
     const input_data: Input_data = { column_metas: [], rows: [] }
-    input_data.column_metas = [{ name: "d0", column_type: "DOUBLE" }, {
-        column_type: "DOUBLE",
-        name: "d1"
-    }]
+    input_data.column_metas = columns.map(item => ({
+        name: (header && header[item]) ? header[item] : `d${item}`,
+        column_type: "DOUBLE"
+    }));
+
     for (const item of data) {
         const res: Rows = { values: [] }
         columns.forEach((i: number) => {

@@ -3,6 +3,7 @@ import {
     EuiFormRow,
     EuiFilePicker,
     EuiText,
+    EuiSwitch
 } from '@elastic/eui';
 
 import { parseFile } from '../../../../public/utils'
@@ -15,7 +16,15 @@ type Props = {
 
 export const UploadFile = ({ updateParsedData }: Props) => {
 
-    const [uploadFiles, setUploadFiles] = useState([{}])
+    const [uploadFiles, setUploadFiles] = useState([])
+    const [ifHeader, setIfHeader] = useState(false)
+    const handleChangeIfHeader = useCallback((checked: boolean) => {
+        setIfHeader(checked)
+        parseFile(uploadFiles[0], checked, (data) => {
+            updateParsedData(data);
+        })
+    }, [uploadFiles])
+
     const renderFiles = useCallback(() => {
         if (uploadFiles.length > 0) {
             return (
@@ -23,6 +32,13 @@ export const UploadFile = ({ updateParsedData }: Props) => {
                     {uploadFiles.map((file, index) => (
                         <li key={index}>
                             <strong>{file.name}</strong> ({file.size} bytes)
+                            <EuiSwitch
+                                label="First row is header"
+                                checked={ifHeader}
+                                style={{ paddingLeft: '16px' }}
+                                compressed
+                                onChange={(e) => handleChangeIfHeader(e.target.checked)}
+                            />
                         </li>
                     ))}
                 </ul>
@@ -32,21 +48,21 @@ export const UploadFile = ({ updateParsedData }: Props) => {
                 <p>Add some files to see a demo of retrieving from the FileList</p>
             );
         }
-    }, [uploadFiles]);
+    }, [uploadFiles, ifHeader]);
 
-    const handleUplpodFile = (files: FileList | null) => {
+    const handleUplpodFile = useCallback((files: FileList | null) => {
         if (!files) return
         setUploadFiles(files.length > 0 ? Array.from(files) : []);
         updateParsedData({
             data: []
         })
         if (files[0]) {
-            parseFile(files[0], (data) => {
+            parseFile(files[0], false, (data) => {
                 updateParsedData(data);
             })
         }
 
-    };
+    }, [ifHeader]);
 
     return (
         <>
