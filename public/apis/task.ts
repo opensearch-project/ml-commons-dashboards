@@ -31,6 +31,7 @@ export class Task {
     modelId?: string;
     createdStart?: number;
     createdEnd?: number;
+    sort?: Array<`${'createTime' | 'lastUpdateTime'}-${'asc' | 'desc'}`>
     currentPage: number;
     pageSize: number;
   }) {

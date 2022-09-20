@@ -1,8 +1,11 @@
 import React, { useMemo, useCallback, useRef } from 'react';
-import { CustomItemAction, EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
+import { CustomItemAction, Direction, EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
 
 import { TaskSearchItem } from '../../apis/task';
 import { renderTime } from '../../utils';
+
+export type TaskTableSort = `${'createTime' | 'lastUpdateTime'}-${'asc' | 'desc'}`
+export type TaskTableCriteria = {pagination: { currentPage: number; pageSize: number }, sort?: TaskTableSort};
 
 export function TaskTable(props: {
   tasks: TaskSearchItem[];
@@ -11,12 +14,13 @@ export function TaskTable(props: {
     pageSize: number;
     totalRecords: number | undefined;
   };
-  onPaginationChange: (pagination: { currentPage: number; pageSize: number }) => void;
+  sort: TaskTableSort;
   onTaskDelete: (id: string) => void;
+  onChange: (criteria: TaskTableCriteria) => void;
 }) {
-  const { tasks, onPaginationChange, onTaskDelete } = props;
-  const onPaginationChangeRef = useRef(onPaginationChange);
-  onPaginationChangeRef.current = onPaginationChange;
+  const { tasks,sort, onTaskDelete, onChange } = props;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   const columns = useMemo(
     () => [
@@ -36,11 +40,13 @@ export function TaskTable(props: {
         field: 'createTime',
         name: 'Create Time',
         render: renderTime,
+        sortable: true,
       },
       {
         field: 'lastUpdateTime',
         name: 'Last Update Time',
         render: renderTime,
+        sortable: true,
       },
       {
         field: 'isAsync',
@@ -82,13 +88,26 @@ export function TaskTable(props: {
     [props.pagination]
   );
 
+  const sorting = useMemo(() => {
+    const [field, direction] = sort.split('-');
+    return {
+      sort: {
+        field: field as keyof TaskSearchItem,
+        direction: direction as Direction,
+      },
+    };
+  }, [sort]);
+
   const handleChange = useCallback(
-    ({ page }) => {
-      if (page) {
-        onPaginationChangeRef.current({ currentPage: page.index + 1, pageSize: page.size });
+    ({ page, sort }) => {
+      const pagination = { currentPage: page.index + 1, pageSize: page.size };
+      if(sort){
+        onChangeRef.current({pagination, sort: `${sort.field}-${sort.direction}` as TaskTableSort});
+        return;
       }
+      onChangeRef.current({pagination});
     },
-    [onPaginationChangeRef.current]
+    []
   );
 
   return (
@@ -97,6 +116,7 @@ export function TaskTable(props: {
       items={tasks}
       pagination={pagination}
       onChange={handleChange}
+      sorting={sorting}
     />
   );
 }

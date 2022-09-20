@@ -26,6 +26,7 @@ export class Model {
     context?: { [key: string]: Array<string | number> };
     trainedStart?: number;
     trainedEnd?: number;
+    sort?: Array<'trainTime-desc' | 'trainTime-asc'>;
     currentPage: number;
     pageSize: number;
   }) {

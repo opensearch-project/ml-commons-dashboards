@@ -22,6 +22,8 @@ import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagi
 import { generateTaskSearchQuery, convertTaskSource } from './utils/task';
 import { TASK_SEARCH_API } from './utils/constants';
 
+const taskSortFieldMapping:{[key: string]: string} = {"createTime":"create_time", "lastUpdateTime":"last_update_time"}
+
 export class TaskNotFound {}
 
 export class TaskService {
@@ -34,6 +36,7 @@ export class TaskService {
   public async search({
     request,
     pagination,
+    sort,
     ...restParams
   }: {
     request: ScopeableRequest;
@@ -42,6 +45,7 @@ export class TaskService {
     functionName?: string;
     createdStart?: number;
     createdEnd?: number;
+    sort?: Array<`${'createTime' | 'lastUpdateTime'}-${'asc' | 'desc'}`>;
     pagination: RequestPagination;
   }) {
     const { hits } = await this.osClient
@@ -50,6 +54,16 @@ export class TaskService {
         body: {
           query: generateTaskSearchQuery(restParams),
           ...getQueryFromSize(pagination),
+          ...(sort
+            ? {
+                sort: sort.map((sorting) => {
+                  const [field, direction] = sorting.split('-');
+                  return {
+                    [taskSortFieldMapping[field] || field]: direction,
+                  };
+                }),
+              }
+            : {}),
         },
       });
     return {
