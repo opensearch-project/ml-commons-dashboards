@@ -9,8 +9,14 @@ const apiInstanceStore: {
   task: Task | undefined;
   train: Train | undefined;
   modelAlgorithm: ModelAlgorithm | undefined;
-  predict: Predict | undefined
-} = { model: undefined, task: undefined, train: undefined, modelAlgorithm: undefined, predict: undefined };
+  predict: Predict | undefined;
+} = {
+  model: undefined,
+  task: undefined,
+  train: undefined,
+  modelAlgorithm: undefined,
+  predict: undefined,
+};
 
 export class APIProvider {
   public static getAPI(type: 'task'): Task;

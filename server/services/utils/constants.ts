@@ -25,7 +25,7 @@ export const CLUSTER = {
   TRAIN: 'opensearch_mlCommonsTrain',
   MODEL: 'opensearch_mlCommonsModel',
   TASK: 'opensearch_mlCommonsTask',
-  PREDICT: 'opensearch_mlCommonsPredict'
+  PREDICT: 'opensearch_mlCommonsPredict',
 };
 
 export const MODEL_INDEX = '.plugins-ml-model';

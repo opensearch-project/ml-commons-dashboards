@@ -79,7 +79,7 @@ export default function (services: { modelService: ModelService }, router: IRout
           ids: typeof ids === 'string' ? [ids] : ids,
           pagination: { currentPage, pageSize },
           context: contextInQuery
-            ? ((JSON.parse(contextInQuery) as unknown) as Record<string, Array<string | number>>)
+            ? (JSON.parse(contextInQuery) as unknown as Record<string, Array<string | number>>)
             : undefined,
           trainedStart,
           trainedEnd,

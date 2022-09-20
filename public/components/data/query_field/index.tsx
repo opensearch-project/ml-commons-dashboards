@@ -115,7 +115,7 @@ export const QueryField = ({
           searchProps={{
             'data-test-subj': 'selectableSearchHere',
           }}
-          options={(fieldsOptions as unknown) as EuiSelectableOption[]}
+          options={fieldsOptions as unknown as EuiSelectableOption[]}
           onChange={handleSelectField}
         >
           {(list, search) => (

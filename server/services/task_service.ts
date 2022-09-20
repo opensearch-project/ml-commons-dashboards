@@ -22,7 +22,10 @@ import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagi
 import { generateTaskSearchQuery, convertTaskSource } from './utils/task';
 import { TASK_SEARCH_API } from './utils/constants';
 
-const taskSortFieldMapping:{[key: string]: string} = {"createTime":"create_time", "lastUpdateTime":"last_update_time"}
+const taskSortFieldMapping: { [key: string]: string } = {
+  createTime: 'create_time',
+  lastUpdateTime: 'last_update_time',
+};
 
 export class TaskNotFound {}
 

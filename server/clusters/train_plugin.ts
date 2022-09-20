@@ -32,7 +32,7 @@ export default function (Client: any, config: any, components: any) {
     method: 'POST',
     needBody: true,
     url: {
-      fmt: '/_plugins/_ml/_train/kmeans'
+      fmt: '/_plugins/_ml/_train/kmeans',
       // fmt: `${TRAIN_BASE_API}/<%=methodName%>?async=<%=async%>`,
       // req: {
       //   methodName: {

@@ -14,7 +14,8 @@ import {
 import { PLUGIN_NAME } from '../common';
 
 export class MlCommonsPluginPlugin
-  implements Plugin<MlCommonsPluginPluginSetup, MlCommonsPluginPluginStart> {
+  implements Plugin<MlCommonsPluginPluginSetup, MlCommonsPluginPluginStart>
+{
   public setup(
     core: CoreSetup<AppPluginStartDependencies, AppPluginStartDependencies>
   ): MlCommonsPluginPluginSetup {
