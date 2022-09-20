@@ -23,6 +23,13 @@ import {
   TASK_STATE_API_ENDPOINT,
 } from './constants';
 
+const taskSortQuerySchema = schema.oneOf([
+  schema.literal('lastUpdateTime-desc'),
+  schema.literal('lastUpdateTime-asc'),
+  schema.literal('createTime-desc'),
+  schema.literal('createTime-asc'),
+]);
+
 export default function (services: { taskService: TaskService }, router: IRouter) {
   const { taskService } = services;
 
@@ -36,17 +43,21 @@ export default function (services: { taskService: TaskService }, router: IRouter
           modelId: schema.maybe(schema.string()),
           createdStart: schema.maybe(schema.number()),
           createdEnd: schema.maybe(schema.number()),
+          sort: schema.maybe(
+            schema.oneOf([taskSortQuerySchema, schema.arrayOf(taskSortQuerySchema)])
+          ),
           currentPage: schema.number(),
           pageSize: schema.number(),
         }),
       },
     },
     async (_context, request) => {
-      const { currentPage, pageSize, ids, ...restQueries } = request.query;
+      const { currentPage, pageSize, ids, sort, ...restQueries } = request.query;
       try {
         const payload = await taskService.search({
           request,
           ids: typeof ids === 'string' ? [ids] : ids,
+          sort: typeof sort === 'string' ? [sort] : sort,
           ...restQueries,
           pagination: { currentPage, pageSize },
         });

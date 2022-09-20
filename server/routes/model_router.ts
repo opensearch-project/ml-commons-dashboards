@@ -19,6 +19,11 @@ import { ModelService } from '../services';
 import { ModelNotFound } from '../services/model_service';
 import { MODEL_API_ENDPOINT } from './constants';
 
+const modelSortQuerySchema = schema.oneOf([
+  schema.literal('trainTime-desc'),
+  schema.literal('trainTime-asc'),
+]);
+
 export default function (services: { modelService: ModelService }, router: IRouter) {
   const { modelService } = services;
 
@@ -50,6 +55,9 @@ export default function (services: { modelService: ModelService }, router: IRout
           pageSize: schema.number(),
           trainedStart: schema.maybe(schema.number()),
           trainedEnd: schema.maybe(schema.number()),
+          sort: schema.maybe(
+            schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
+          ),
         }),
       },
     },
@@ -62,6 +70,7 @@ export default function (services: { modelService: ModelService }, router: IRout
         context: contextInQuery,
         trainedStart,
         trainedEnd,
+        sort,
       } = request.query;
       try {
         const payload = await modelService.search({
@@ -74,6 +83,7 @@ export default function (services: { modelService: ModelService }, router: IRout
             : undefined,
           trainedStart,
           trainedEnd,
+          sort: typeof sort === 'string' ? [sort] : sort,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (err) {

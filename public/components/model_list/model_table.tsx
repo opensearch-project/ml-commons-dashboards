@@ -1,10 +1,22 @@
 import React, { useMemo, useCallback, useRef } from 'react';
 import { generatePath, useHistory } from 'react-router-dom';
-import { CustomItemAction, EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
+import {
+  CriteriaWithPagination,
+  CustomItemAction,
+  Direction,
+  EuiBasicTable,
+  EuiButtonIcon,
+} from '@elastic/eui';
 
 import { ModelSearchItem } from '../../apis/model';
 import { routerPaths } from '../../../common/router_paths';
 import { renderTime } from '../../utils';
+
+export type ModelTableSort = 'trainTime-desc' | 'trainTime-asc';
+export type ModelTableCriteria = {
+  pagination: { currentPage: number; pageSize: number };
+  sort?: ModelTableSort;
+};
 
 export function ModelTable(props: {
   models: ModelSearchItem[];
@@ -13,13 +25,14 @@ export function ModelTable(props: {
     pageSize: number;
     totalRecords: number | undefined;
   };
-  onPaginationChange: (pagination: { currentPage: number; pageSize: number }) => void;
+  sort: ModelTableSort;
   onModelDelete: (id: string) => void;
+  onChange: (criteria: ModelTableCriteria) => void;
 }) {
-  const { models, onPaginationChange, onModelDelete } = props;
+  const { sort, models, onChange, onModelDelete } = props;
   const history = useHistory();
-  const onPaginationChangeRef = useRef(onPaginationChange);
-  onPaginationChangeRef.current = onPaginationChange;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   const columns = useMemo(
     () => [
@@ -44,6 +57,7 @@ export function ModelTable(props: {
         field: 'trainTime',
         name: 'Train Time',
         render: renderTime,
+        sortable: true,
       },
       {
         name: 'Actions',
@@ -77,14 +91,27 @@ export function ModelTable(props: {
     [props.pagination]
   );
 
-  const handleChange = useCallback(
-    ({ page }) => {
-      if (page) {
-        onPaginationChangeRef.current({ currentPage: page.index + 1, pageSize: page.size });
-      }
-    },
-    [onPaginationChangeRef.current]
-  );
+  const sorting = useMemo(() => {
+    const [field, direction] = sort.split('-');
+    return {
+      sort: {
+        field: field as keyof ModelSearchItem,
+        direction: direction as Direction,
+      },
+    };
+  }, [sort]);
+
+  const handleChange = useCallback(({ page, sort }: CriteriaWithPagination<ModelSearchItem>) => {
+    const pagination = { currentPage: page.index + 1, pageSize: page.size };
+    if (sort) {
+      onChangeRef.current({
+        pagination,
+        sort: `${sort.field}-${sort.direction}` as ModelTableSort,
+      });
+      return;
+    }
+    onChangeRef.current({ pagination });
+  }, []);
 
   const rowProps = useCallback(
     ({ id }) => ({
@@ -102,6 +129,7 @@ export function ModelTable(props: {
       pagination={pagination}
       onChange={handleChange}
       rowProps={rowProps}
+      sorting={sorting}
     />
   );
 }

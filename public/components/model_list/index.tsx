@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiButton, EuiSpacer, EuiPanel } from '@elastic/eui';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
 import { CoreStart } from '../../../../../src/core/public';
-import { ModelSearchItem } from '../../apis/model';
 import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
+import { useFetcher } from '../../hooks/use_fetcher';
 
 import { ModelTable } from './model_table';
 import { ModelListFilter } from './model_list_filter';
@@ -17,19 +17,27 @@ import {
 
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
-  const [models, setModels] = useState<ModelSearchItem[]>([]);
-  const [totalModelCounts, setTotalModelCount] = useState(0);
   const [params, setParams] = useState<{
     algorithms?: string[];
     context?: { [key: string]: Array<string | number> };
     trainedStart?: moment.Moment | null;
     trainedEnd?: moment.Moment | null;
+    sort: 'trainTime-desc' | 'trainTime-asc';
     currentPage: number;
     pageSize: number;
   }>({
     currentPage: 1,
     pageSize: 15,
+    sort: 'trainTime-desc',
   });
+  const { data, reload } = useFetcher(APIProvider.getAPI('model').search, {
+    ...params,
+    sort: [params.sort],
+    trainedStart: params.trainedStart?.valueOf(),
+    trainedEnd: params.trainedEnd?.valueOf(),
+  });
+  const models = useMemo(() => data?.data || [], [data]);
+  const totalModelCounts = data?.pagination.totalRecords || 0;
 
   const pagination = useMemo(
     () => ({
@@ -40,34 +48,10 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     [totalModelCounts, params.currentPage, params.pageSize]
   );
 
-  const handlePaginationChange = useCallback(
-    (pagination: { currentPage: number; pageSize: number }) => {
-      setParams((previousValue) => {
-        if (
-          previousValue.currentPage === pagination.currentPage &&
-          previousValue.pageSize === pagination.pageSize
-        ) {
-          return previousValue;
-        }
-        return {
-          ...previousValue,
-          ...pagination,
-        };
-      });
-    },
-    []
-  );
-
   const handleModelDeleted = useCallback(async () => {
-    const payload = await APIProvider.getAPI('model').search({
-      ...params,
-      trainedStart: params.trainedStart?.valueOf(),
-      trainedEnd: params.trainedEnd?.valueOf(),
-    });
-    setModels(payload.data);
-    setTotalModelCount(payload.pagination.totalRecords);
+    reload();
     notifications.toasts.addSuccess('Model has been deleted.');
-  }, [params]);
+  }, [reload]);
 
   const handleAlgorithmsChange = useCallback(
     (algorithms: string | undefined) => {
@@ -96,18 +80,23 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     confirmModelDeleteRef.current?.show(modelId);
   }, []);
 
-  useEffect(() => {
-    APIProvider.getAPI('model')
-      .search({
-        ...params,
-        trainedStart: params.trainedStart?.valueOf(),
-        trainedEnd: params.trainedEnd?.valueOf(),
-      })
-      .then((payload) => {
-        setModels(payload.data);
-        setTotalModelCount(payload.pagination.totalRecords);
-      });
-  }, [params]);
+  const handleTableChange = useCallback((criteria) => {
+    const { pagination, sort } = criteria;
+    setParams((previousValue) => {
+      if (
+        pagination.currentPage === previousValue.currentPage &&
+        pagination.pageSize === previousValue.pageSize &&
+        (!sort || sort === previousValue.sort)
+      ) {
+        return previousValue;
+      }
+      return {
+        ...previousValue,
+        ...criteria.pagination,
+        ...(criteria.sort ? { sort: criteria.sort } : {}),
+      };
+    });
+  }, []);
 
   return (
     <EuiPanel>
@@ -143,9 +132,10 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
       <EuiSpacer />
       <ModelTable
         models={models}
+        sort={params.sort}
         pagination={pagination}
-        onPaginationChange={handlePaginationChange}
         onModelDelete={handleModelDelete}
+        onChange={handleTableChange}
       />
       <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
     </EuiPanel>

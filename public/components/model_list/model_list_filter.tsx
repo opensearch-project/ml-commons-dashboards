@@ -19,8 +19,8 @@ export const ModelListFilter = ({
 }: {
   algorithm: string | undefined;
   context: { [key: string]: Array<string | number> } | undefined;
-  trainedStart: moment.Moment | null;
-  trainedEnd: moment.Moment | null;
+  trainedStart: moment.Moment | null | undefined;
+  trainedEnd: moment.Moment | null | undefined;
   onAlgorithmsChange: (algorithms: string | undefined) => void;
   onContextChange: (context: { [key: string]: Array<string | number> } | undefined) => void;
   onTrainedStartChange: (time: moment.Moment | null) => void;
