@@ -1,8 +1,13 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 export const generateTermQuery = (key: string, value: string | number | Array<string | number>) => {
   if (typeof value === 'string' || typeof value === 'number') {
     return {
       term: {
-        [key]: { value: value },
+        [key]: { value },
       },
     };
   }

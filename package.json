@@ -5,7 +5,8 @@
   "scripts": {
     "build": "yarn plugin-helpers build",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
-    "osd": "node ../../scripts/osd"
+    "osd": "node ../../scripts/osd",
+    "lint:es": "node ../../scripts/eslint"
   },
   "dependencies": {
     "papaparse": "^5.3.2"

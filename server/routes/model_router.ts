@@ -1,22 +1,11 @@
 /*
- *   Copyright OpenSearch Contributors
- *
- *   Licensed under the Apache License, Version 2.0 (the "License").
- *   You may not use this file except in compliance with the License.
- *   A copy of the License is located at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   or in the "license" file accompanying this file. This file is distributed
- *   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- *   express or implied. See the License for the specific language governing
- *   permissions and limitations under the License.
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { schema } from '@osd/config-schema';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
-import { ModelService } from '../services';
-import { ModelNotFound } from '../services/model_service';
+import { ModelService, RecordNotFoundError } from '../services';
 import { MODEL_API_ENDPOINT } from './constants';
 
 const modelSortQuerySchema = schema.oneOf([
@@ -24,7 +13,7 @@ const modelSortQuerySchema = schema.oneOf([
   schema.literal('trainTime-asc'),
 ]);
 
-export default function (services: { modelService: ModelService }, router: IRouter) {
+export const modelRouter = (services: { modelService: ModelService }, router: IRouter) => {
   const { modelService } = services;
 
   router.get(
@@ -79,7 +68,7 @@ export default function (services: { modelService: ModelService }, router: IRout
           ids: typeof ids === 'string' ? [ids] : ids,
           pagination: { currentPage, pageSize },
           context: contextInQuery
-            ? (JSON.parse(contextInQuery) as unknown as Record<string, Array<string | number>>)
+            ? ((JSON.parse(contextInQuery) as unknown) as Record<string, Array<string | number>>)
             : undefined,
           trainedStart,
           trainedEnd,
@@ -131,11 +120,11 @@ export default function (services: { modelService: ModelService }, router: IRout
         });
         return opensearchDashboardsResponseFactory.ok();
       } catch (err) {
-        if (err instanceof ModelNotFound) {
+        if (err instanceof RecordNotFoundError) {
           return opensearchDashboardsResponseFactory.notFound();
         }
         return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
       }
     }
   );
-}
+};

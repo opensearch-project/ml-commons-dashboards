@@ -1,12 +1,17 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useMemo } from 'react';
 import { EuiFormRow, EuiFieldNumber, EuiSelect, EuiFieldText } from '@elastic/eui';
 import { AlgosFormParam, ALGOS_PARAMS, SUPPORTED_ALGOS } from '../../../common/algo';
 
-type Props = {
+interface Props {
   params: Record<string, string | number>;
   setParams: React.Dispatch<React.SetStateAction<Record<string, string | number>>>;
   algo: string;
-};
+}
 
 export const TrainForm = ({ params, setParams, algo }: Props) => {
   const ALGOS_CONFIGS = useMemo(
@@ -29,7 +34,7 @@ export const TrainForm = ({ params, setParams, algo }: Props) => {
             fullWidth
             onChange={(e) => setParams({ ...params, [item.name]: e.target.value })}
             value={params[item.name] ?? item.default}
-            options={item.group.map((item) => ({ value: item, text: item }))}
+            options={item.group.map((groupItem) => ({ value: groupItem, text: groupItem }))}
           />
         );
       case 'string':

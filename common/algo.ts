@@ -98,7 +98,7 @@ export type AlgosFormParam = {
   | {
       type: 'enum';
       default: string;
-      group: Array<string>;
+      group: string[];
     }
 );
-export type AlgosFormParams = Array<AlgosFormParam>;
+export type AlgosFormParams = AlgosFormParam[];

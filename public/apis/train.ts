@@ -1,7 +1,12 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { TRAIN_API_ENDPOINT } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
-import { type ALGOS } from '../../common/';
-import { type Query } from '../../public/components/data/query_field';
+import type { ALGOS } from '../../common/';
+import type { Query } from '../../public/components/data/query_field';
 
 export interface TrainResponse {
   status: string;
@@ -10,12 +15,12 @@ export interface TrainResponse {
 }
 export type DataSource = 'upload' | 'query';
 
-type Body = {
+interface Body {
   parameters: Record<string, string>;
-  input_query?: Record<string, string | number | Array<string> | Query>;
-  input_index?: Array<string>;
+  input_query?: Record<string, string | number | string[] | Query>;
+  input_index?: string[];
   input_data?: Record<string, string>;
-};
+}
 
 export class Train {
   public train(body: Record<string, string[]>) {
@@ -28,13 +33,13 @@ export class Train {
     algo: ALGOS,
     dataSource: DataSource,
     params: any,
-    input_data: any,
+    inputData: any,
     { fields, query }: { fields: Record<string, string[]>; query: Query | undefined }
   ): Record<string, any> {
     if (dataSource === 'query') {
       const index = Object.keys(fields)[0];
       if (!index) return {};
-      let body: Body = {
+      const body: Body = {
         parameters: params,
         input_query: {
           _source: fields[index],
@@ -49,7 +54,7 @@ export class Train {
     } else {
       return {
         parameters: params,
-        input_data,
+        input_data: inputData,
       };
     }
   }

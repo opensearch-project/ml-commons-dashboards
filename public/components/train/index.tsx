@@ -16,14 +16,14 @@ import { SUPPORTED_ALGOS, ALGOS } from '../../../common/algo';
 import { APIProvider } from '../../apis/api_provider';
 import { ComponentsCommonProps } from '../app';
 import { transToInputData } from '../../../public/utils';
-import { ParsedResult, QueryField, type Query, UploadFile } from '../data';
+import { ParsedResult, QueryField, Query, UploadFile } from '../data';
 import { useIndexPatterns } from '../../hooks';
-import { type DataSource } from '../../apis/train';
+import type { DataSource } from '../../apis/train';
 import './index.scss';
 import { TrainResult } from './train_result';
 import { TrainForm } from './train_form';
 
-interface Props extends ComponentsCommonProps {}
+type Props = ComponentsCommonProps;
 
 export interface TrainingResult {
   status: 'success' | 'fail' | '';
@@ -66,25 +66,27 @@ export const Train = ({ data }: Props) => {
       setTrainingResult({ status: '', id: '', message: '' });
       setIsLoading(true);
       e.preventDefault();
-      const input_data = transToInputData(parsedData, selectedCols);
+      const inputData = transToInputData(parsedData, selectedCols);
       let result;
       try {
         const body = APIProvider.getAPI('train').convertParams(
           selectedAlgo,
           dataSource,
           params,
-          input_data,
+          inputData,
           { fields: selectedFields, query }
         );
         result = await APIProvider.getAPI('train').train(body);
-        const { status, model_id, message } = result;
+        const { status, model_id: modelId, message } = result;
         if (status === 'COMPLETED') {
-          setTrainingResult({ status: 'success', id: model_id });
+          setTrainingResult({ status: 'success', id: modelId });
         } else if (message) {
           setTrainingResult({ status: 'fail', message });
         }
-      } catch (e) {
-        console.log('error', e);
+      } catch (error) {
+        // TODO: handle train error here
+        // eslint-disable-next-line no-console
+        console.log('error', error);
       }
       setIsLoading(false);
     },

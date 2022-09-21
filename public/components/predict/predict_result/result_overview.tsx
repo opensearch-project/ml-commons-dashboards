@@ -1,10 +1,15 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import { EuiSpacer, EuiCallOut, EuiBasicTable } from '@elastic/eui';
 
-type Props = {
+interface Props {
   rows: number;
   columns: number;
-};
+}
 export const ResultOverview = ({ rows, columns }: Props) => {
   const columnsOption = [
     {
@@ -19,7 +24,7 @@ export const ResultOverview = ({ rows, columns }: Props) => {
   return (
     <>
       <EuiSpacer />
-      <EuiCallOut title="Prediction Success" iconType="search" size="s"></EuiCallOut>
+      <EuiCallOut title="Prediction Success" iconType="search" size="s" />
       <EuiBasicTable
         tableCaption="Result Overview"
         items={[{ columns, rows }]}

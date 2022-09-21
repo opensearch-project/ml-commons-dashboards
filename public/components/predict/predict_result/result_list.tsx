@@ -1,11 +1,16 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import { EuiAccordion, EuiBasicTable, EuiCallOut } from '@elastic/eui';
 import { convertPredictionToTable } from '../../../utils';
-import { type Input_data } from '../../../types';
+import type { InputData } from '../../../types';
 
-type Props = {
-  data: Input_data;
-};
+interface Props {
+  data: InputData;
+}
 export const ResultList = ({ data }: Props) => {
   const { columns, items } = convertPredictionToTable(data);
   return (

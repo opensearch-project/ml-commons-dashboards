@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Model } from './model';
 import { Task } from './task';
 import { Train } from './train';
@@ -46,7 +51,7 @@ export class APIProvider {
       }
       case 'modelAlgorithm': {
         const newInstance = new ModelAlgorithm();
-        apiInstanceStore['modelAlgorithm'] = newInstance;
+        apiInstanceStore.modelAlgorithm = newInstance;
         return newInstance;
       }
       case 'predict': {

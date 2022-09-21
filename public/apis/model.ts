@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
 import { Pagination } from '../../server/services/utils/pagination';
 import { InnerHttpProvider } from './inner_http_provider';

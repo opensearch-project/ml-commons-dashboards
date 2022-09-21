@@ -1,15 +1,20 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useCallback, useState } from 'react';
 import { EuiFormRow, EuiFilePicker, EuiText, EuiSwitch } from '@elastic/eui';
 
 import { parseFile } from '../../../../public/utils';
 
-type Props = {
+interface Props {
   updateParsedData: React.Dispatch<
     React.SetStateAction<{
       data: never[];
     }>
   >;
-};
+}
 
 export const UploadFile = ({ updateParsedData }: Props) => {
   const [uploadFiles, setUploadFiles] = useState([]);
@@ -21,7 +26,7 @@ export const UploadFile = ({ updateParsedData }: Props) => {
         updateParsedData(data);
       });
     },
-    [uploadFiles]
+    [uploadFiles, updateParsedData]
   );
 
   const renderFiles = useCallback(() => {
@@ -45,7 +50,7 @@ export const UploadFile = ({ updateParsedData }: Props) => {
     } else {
       return <p>Add some files to see a demo of retrieving from the FileList</p>;
     }
-  }, [uploadFiles, ifHeader]);
+  }, [uploadFiles, ifHeader, handleChangeIfHeader]);
 
   const handleUplpodFile = useCallback(
     (files: FileList | null) => {
@@ -60,7 +65,7 @@ export const UploadFile = ({ updateParsedData }: Props) => {
         });
       }
     },
-    [ifHeader]
+    [updateParsedData]
   );
 
   return (

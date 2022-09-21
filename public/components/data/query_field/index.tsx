@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useCallback, useState, useLayoutEffect, useRef } from 'react';
 import {
   EuiSelect,
   EuiSelectable,
@@ -18,11 +18,11 @@ import { MLServices } from '../../../types';
 import { PLUGIN_ID } from '../../../../common';
 import { buildOpenSearchQuery } from '../../../../../../src/plugins/data/common';
 
-export type Query = {
+export interface Query {
   bool?: {
-    [key: string]: Array<any>;
+    [key: string]: any[];
   };
-};
+}
 
 interface Props {
   indexPatterns: IndexPattern[];
@@ -31,7 +31,7 @@ interface Props {
   onUpdateQuerys: React.Dispatch<React.SetStateAction<Query | undefined>>;
 }
 
-type fieldsOption = Partial<IndexPattern & EuiSelectableOption>;
+type FieldsOption = Partial<IndexPattern & EuiSelectableOption>;
 export const QueryField = ({
   indexPatterns,
   selectedFields,
@@ -39,7 +39,13 @@ export const QueryField = ({
   onUpdateQuerys,
 }: Props) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [fieldsOptions, setFieldsOptions] = useState<Array<fieldsOption>>([]);
+  const [fieldsOptions, setFieldsOptions] = useState<FieldsOption[]>([]);
+  const onUpdateQuerysRef = useRef(onUpdateQuerys);
+  onUpdateQuerysRef.current = onUpdateQuerys;
+  const currentSelectedPatternRef = useRef(indexPatterns?.[selectedIndex]);
+  currentSelectedPatternRef.current = indexPatterns?.[selectedIndex];
+  const onSelectedFieldsRef = useRef(onSelectedFields);
+  onSelectedFieldsRef.current = onSelectedFields;
   const { services } = useOpenSearchDashboards<MLServices>();
   const {
     setHeaderActionMenu,
@@ -50,14 +56,14 @@ export const QueryField = ({
   } = services;
 
   const handleSelectField = useCallback(
-    (newOptions: Array<fieldsOption>) => {
+    (newOptions: FieldsOption[]) => {
       setFieldsOptions(newOptions);
       const fields = newOptions.filter((item) => item?.checked === 'on');
       const selectedFieldsLabels = fields.map((i) => i.label);
       const indexTitle = Object.keys(selectedFields)[0];
-      onSelectedFields({ [indexTitle]: selectedFieldsLabels as string[] });
+      onSelectedFieldsRef.current({ [indexTitle]: selectedFieldsLabels as string[] });
     },
-    [selectedFields, onSelectedFields]
+    [selectedFields]
   );
 
   useEffect(() => {
@@ -70,18 +76,18 @@ export const QueryField = ({
       }))
     );
     const indexTitle = indexPatterns[selectedIndex]?.title;
-    onSelectedFields({ [indexTitle]: [] });
+    onSelectedFieldsRef.current({ [indexTitle]: [] });
   }, [selectedIndex, indexPatterns]);
 
   useLayoutEffect(() => {
     const subscription = data.query.state$.subscribe(({ state }) => {
       if (state.filters && state.query) {
         const query = buildOpenSearchQuery(
-          indexPatterns[selectedIndex],
+          currentSelectedPatternRef.current,
           state.query,
           state.filters
         );
-        onUpdateQuerys(query);
+        onUpdateQuerysRef.current(query);
       }
     });
 
@@ -115,7 +121,7 @@ export const QueryField = ({
           searchProps={{
             'data-test-subj': 'selectableSearchHere',
           }}
-          options={fieldsOptions as unknown as EuiSelectableOption[]}
+          options={(fieldsOptions as unknown) as EuiSelectableOption[]}
           onChange={handleSelectField}
         >
           {(list, search) => (

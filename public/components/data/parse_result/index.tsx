@@ -7,11 +7,11 @@ import React, { useCallback } from 'react';
 import './index.scss';
 import { EuiCheckbox, EuiText, EuiSpacer } from '@elastic/eui';
 
-type Props = {
+interface Props {
   parsedData: any;
   selectedCols: number[];
   onChangeSelectedCols: (val: number[]) => void;
-};
+}
 
 export const ParsedResult = ({ parsedData, selectedCols, onChangeSelectedCols }: Props) => {
   const { data, header } = parsedData;
@@ -30,7 +30,7 @@ export const ParsedResult = ({ parsedData, selectedCols, onChangeSelectedCols }:
         onChangeSelectedCols(arr);
       }
     },
-    [selectedCols]
+    [selectedCols, onChangeSelectedCols]
   );
   return (
     <>

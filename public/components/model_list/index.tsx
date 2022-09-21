@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiButton, EuiSpacer, EuiPanel } from '@elastic/eui';
 import { Link } from 'react-router-dom';
@@ -51,7 +56,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   const handleModelDeleted = useCallback(async () => {
     reload();
     notifications.toasts.addSuccess('Model has been deleted.');
-  }, [reload]);
+  }, [reload, notifications.toasts]);
 
   const handleAlgorithmsChange = useCallback(
     (algorithms: string | undefined) => {
@@ -81,19 +86,23 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }, []);
 
   const handleTableChange = useCallback((criteria) => {
-    const { pagination, sort } = criteria;
+    const {
+      pagination: { currentPage, pageSize },
+      sort,
+    } = criteria;
     setParams((previousValue) => {
       if (
-        pagination.currentPage === previousValue.currentPage &&
-        pagination.pageSize === previousValue.pageSize &&
+        currentPage === previousValue.currentPage &&
+        pageSize === previousValue.pageSize &&
         (!sort || sort === previousValue.sort)
       ) {
         return previousValue;
       }
       return {
         ...previousValue,
-        ...criteria.pagination,
-        ...(criteria.sort ? { sort: criteria.sort } : {}),
+        currentPage,
+        pageSize,
+        ...(sort ? { sort } : {}),
       };
     });
   }, []);

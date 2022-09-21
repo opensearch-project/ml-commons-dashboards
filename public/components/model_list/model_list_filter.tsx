@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import moment from 'moment';
 import React from 'react';

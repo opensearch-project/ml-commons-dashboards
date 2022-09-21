@@ -1,4 +1,9 @@
 /*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/*
  *   Copyright OpenSearch Contributors
  *
  *   Licensed under the Apache License, Version 2.0 (the "License").
@@ -21,13 +26,12 @@ import {
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { generateTaskSearchQuery, convertTaskSource } from './utils/task';
 import { TASK_SEARCH_API } from './utils/constants';
+import { RecordNotFoundError } from './errors';
 
 const taskSortFieldMapping: { [key: string]: string } = {
   createTime: 'create_time',
   lastUpdateTime: 'last_update_time',
 };
-
-export class TaskNotFound {}
 
 export class TaskService {
   private osClient: ILegacyClusterClient;
@@ -48,7 +52,9 @@ export class TaskService {
     functionName?: string;
     createdStart?: number;
     createdEnd?: number;
-    sort?: Array<`${'createTime' | 'lastUpdateTime'}-${'asc' | 'desc'}`>;
+    sort?: Array<
+      'createTime-asc' | 'createTime-desc' | 'lastUpdateTime-asc' | 'lastUpdateTime-desc'
+    >;
     pagination: RequestPagination;
   }) {
     const { hits } = await this.osClient
@@ -85,7 +91,7 @@ export class TaskService {
         taskId,
       });
     if (result === 'not_found') {
-      throw new TaskNotFound();
+      throw new RecordNotFoundError();
     }
     return true;
   }

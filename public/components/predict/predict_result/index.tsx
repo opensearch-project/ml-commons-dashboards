@@ -1,8 +1,13 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
+import { EuiCallOut, EuiTextColor } from '@elastic/eui';
 import { ResultOverview } from './result_overview';
 import { ResultList } from './result_list';
 import { IPredictResult } from '../';
-import { EuiCallOut, EuiTextColor } from '@elastic/eui';
 
 type Props = IPredictResult;
 export const PredictResult = (props: Props) => {
