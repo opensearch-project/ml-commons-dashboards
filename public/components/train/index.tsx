@@ -76,7 +76,7 @@ export const Train = ({ data }: Props) => {
           inputData,
           { fields: selectedFields, query }
         );
-        result = await APIProvider.getAPI('train').train(body);
+        result = await APIProvider.getAPI('train').train(body, selectedAlgo, false);
         const { status, model_id: modelId, message } = result;
         if (status === 'COMPLETED') {
           setTrainingResult({ status: 'success', id: modelId });

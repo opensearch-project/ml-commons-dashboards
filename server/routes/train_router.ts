@@ -13,14 +13,19 @@ export const trainRouter = (services: { trainService: TrainService }, router: IR
 
   router.post(
     {
-      path: TRAIN_API_ENDPOINT,
+      path: `${TRAIN_API_ENDPOINT}/{algo}/{async}`,
       validate: {
+        params: schema.object({
+          algo: schema.string(),
+          async: schema.boolean(),
+        }),
         body: schema.any(),
       },
     },
-    async (_context, req) => {
+    async (_context, request) => {
+      const { algo, async = false } = request.params;
       try {
-        const payload = await trainService.trainModel(req);
+        const payload = await trainService.trainModel({ request, algo, async });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (err) {
         // Temporarily set error response ok to pass err detail to web

@@ -80,6 +80,32 @@ export const SUPPORTED_ALGOS = [
       },
     ],
   },
+  {
+    name: 'RCF_SUMMARIZE',
+    value: 'RCF_SUMMARIZE',
+    text: 'RCF_SUMMARIZE',
+    parameters: [
+      {
+        name: 'centroids',
+        type: 'integer',
+        default: 3,
+        description: 'The number of clusters in which to group the generated data',
+      },
+      {
+        name: 'max_k',
+        type: 'integer',
+        default: 2,
+        description: 'The max allowed number of centroids',
+      },
+      {
+        name: 'distance_type',
+        type: 'enum',
+        group: ['EUCLIDEAN', 'LInfinity', 'L1', 'L2'],
+        default: 'L1',
+        description: 'The type of measurement from which to measure the distance between centroids',
+      },
+    ],
+  },
 ] as const;
 export type ALGOS = typeof SUPPORTED_ALGOS[number]['value'];
 export type ALGOS_PARAMS = typeof SUPPORTED_ALGOS[number]['parameters'];
