@@ -1,11 +1,23 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useMemo, useCallback, useRef } from 'react';
 import { CustomItemAction, Direction, EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
 
 import { TaskSearchItem } from '../../apis/task';
 import { renderTime } from '../../utils';
 
-export type TaskTableSort = `${'createTime' | 'lastUpdateTime'}-${'asc' | 'desc'}`
-export type TaskTableCriteria = {pagination: { currentPage: number; pageSize: number }, sort?: TaskTableSort};
+export type TaskTableSort =
+  | 'createTime-asc'
+  | 'createTime-desc'
+  | 'lastUpdateTime-asc'
+  | 'lastUpdateTime-desc';
+export interface TaskTableCriteria {
+  pagination: { currentPage: number; pageSize: number };
+  sort?: TaskTableSort;
+}
 
 export function TaskTable(props: {
   tasks: TaskSearchItem[];
@@ -18,7 +30,7 @@ export function TaskTable(props: {
   onTaskDelete: (id: string) => void;
   onChange: (criteria: TaskTableCriteria) => void;
 }) {
-  const { tasks,sort, onTaskDelete, onChange } = props;
+  const { tasks, sort, onTaskDelete, onChange } = props;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
@@ -98,17 +110,17 @@ export function TaskTable(props: {
     };
   }, [sort]);
 
-  const handleChange = useCallback(
-    ({ page, sort }) => {
-      const pagination = { currentPage: page.index + 1, pageSize: page.size };
-      if(sort){
-        onChangeRef.current({pagination, sort: `${sort.field}-${sort.direction}` as TaskTableSort});
-        return;
-      }
-      onChangeRef.current({pagination});
-    },
-    []
-  );
+  const handleChange = useCallback(({ page, sort: newSort }) => {
+    const newPagination = { currentPage: page.index + 1, pageSize: page.size };
+    if (newSort) {
+      onChangeRef.current({
+        pagination: newPagination,
+        sort: `${newSort.field}-${newSort.direction}` as TaskTableSort,
+      });
+      return;
+    }
+    onChangeRef.current({ pagination: newPagination });
+  }, []);
 
   return (
     <EuiBasicTable<TaskSearchItem>

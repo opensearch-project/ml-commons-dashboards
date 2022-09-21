@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useCallback, useMemo } from 'react';
 import { EuiSideNav } from '@elastic/eui';
 import { generatePath, Link, matchPath, useLocation } from 'react-router-dom';

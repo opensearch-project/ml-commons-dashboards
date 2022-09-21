@@ -1,23 +1,22 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { generateTermQuery, generateMustQueries } from './query';
 
-export const convertModelSource = ({
-  model_content,
-  name,
-  algorithm,
-  model_context,
-  model_train_time,
-}: {
+export const convertModelSource = (source: {
   model_content: string;
   name: string;
   algorithm: string;
   model_context: string;
   model_train_time: number;
 }) => ({
-  content: model_content,
-  name,
-  algorithm,
-  context: model_context,
-  trainTime: model_train_time,
+  content: source.model_content,
+  name: source.name,
+  algorithm: source.algorithm,
+  context: source.model_context,
+  trainTime: source.model_train_time,
 });
 
 const genereateContextQuery = (context: Record<string, Array<string | number>>) => {

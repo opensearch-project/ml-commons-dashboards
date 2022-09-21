@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   TASK_API_ENDPOINT,
   TASK_FUNCTION_API_ENDPOINT,
@@ -31,7 +36,9 @@ export class Task {
     modelId?: string;
     createdStart?: number;
     createdEnd?: number;
-    sort?: Array<`${'createTime' | 'lastUpdateTime'}-${'asc' | 'desc'}`>
+    sort?: Array<
+      'createTime-asc' | 'createTime-desc' | 'lastUpdateTime-asc' | 'lastUpdateTime-desc'
+    >;
     currentPage: number;
     pageSize: number;
   }) {

@@ -7,10 +7,10 @@ import React from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
+import { EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
 import { ROUTES } from '../../common/router';
 
-import { EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
-import store from '../../redux/store';
+import { store } from '../../redux/store';
 
 import { CoreStart, IUiSettingsClient } from '../../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';

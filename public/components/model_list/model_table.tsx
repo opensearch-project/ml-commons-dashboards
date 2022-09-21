@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useMemo, useCallback, useRef } from 'react';
 import { generatePath, useHistory } from 'react-router-dom';
 import {
@@ -13,10 +18,10 @@ import { routerPaths } from '../../../common/router_paths';
 import { renderTime } from '../../utils';
 
 export type ModelTableSort = 'trainTime-desc' | 'trainTime-asc';
-export type ModelTableCriteria = {
+export interface ModelTableCriteria {
   pagination: { currentPage: number; pageSize: number };
   sort?: ModelTableSort;
-};
+}
 
 export function ModelTable(props: {
   models: ModelSearchItem[];
@@ -101,17 +106,20 @@ export function ModelTable(props: {
     };
   }, [sort]);
 
-  const handleChange = useCallback(({ page, sort }: CriteriaWithPagination<ModelSearchItem>) => {
-    const pagination = { currentPage: page.index + 1, pageSize: page.size };
-    if (sort) {
-      onChangeRef.current({
-        pagination,
-        sort: `${sort.field}-${sort.direction}` as ModelTableSort,
-      });
-      return;
-    }
-    onChangeRef.current({ pagination });
-  }, []);
+  const handleChange = useCallback(
+    ({ page, sort: newSort }: CriteriaWithPagination<ModelSearchItem>) => {
+      const newPagination = { currentPage: page.index + 1, pageSize: page.size };
+      if (newSort) {
+        onChangeRef.current({
+          pagination: newPagination,
+          sort: `${newSort.field}-${newSort.direction}` as ModelTableSort,
+        });
+        return;
+      }
+      onChangeRef.current({ pagination: newPagination });
+    },
+    []
+  );
 
   const rowProps = useCallback(
     ({ id }) => ({

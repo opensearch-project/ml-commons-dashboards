@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { EuiDatePicker, EuiDatePickerRange } from '@elastic/eui';
 import moment from 'moment';
 import React, { useCallback, useRef } from 'react';
@@ -42,7 +47,7 @@ export const RangePicker = ({
 
   const handleStartClear = useCallback(() => {
     onStartChange(null);
-  }, []);
+  }, [onStartChange]);
 
   const handleEndClear = useCallback(() => {
     onEndChange(null);

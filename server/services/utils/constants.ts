@@ -1,4 +1,9 @@
 /*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/*
  *   Copyright OpenSearch Contributors
  *
  *   Licensed under the Apache License, Version 2.0 (the "License").
@@ -25,7 +30,7 @@ export const CLUSTER = {
   TRAIN: 'opensearch_mlCommonsTrain',
   MODEL: 'opensearch_mlCommonsModel',
   TASK: 'opensearch_mlCommonsTask',
-  PREDICT: 'opensearch_mlCommonsPredict'
+  PREDICT: 'opensearch_mlCommonsPredict',
 };
 
 export const MODEL_INDEX = '.plugins-ml-model';

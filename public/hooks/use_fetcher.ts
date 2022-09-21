@@ -1,10 +1,15 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export const useFetcher = <TParams extends Array<any>, TResponse>(
+export const useFetcher = <TParams extends any[], TResponse>(
   fetcher: (...params: TParams) => Promise<TResponse>,
   ...params: TParams
 ) => {
-  const [count, setCount] = useState(0);
+  const [, setCount] = useState(0);
   const dataRef = useRef<TResponse | null>(null);
   const loadingRef = useRef(true);
   const errorRef = useRef<unknown | null>(null);
@@ -22,12 +27,14 @@ export const useFetcher = <TParams extends Array<any>, TResponse>(
   }, []);
 
   const loadData = useCallback(
-    async (params: TParams, shouldUpdateResult: () => boolean = () => true) => {
+    async (fetcherParams: TParams, shouldUpdateResult: () => boolean = () => true) => {
       loadingRef.current = true;
-      usedRef.current.loading && forceUpdate();
+      if (usedRef.current.loading) {
+        forceUpdate();
+      }
       let shouldUpdate = false;
       try {
-        const data = await fetcher(...params);
+        const data = await fetcher(...fetcherParams);
         shouldUpdate = shouldUpdateResult();
 
         if (shouldUpdate) {
@@ -49,12 +56,12 @@ export const useFetcher = <TParams extends Array<any>, TResponse>(
         }
       }
     },
-    [forceUpdate]
+    [forceUpdate, fetcher]
   );
 
   const reload = useCallback(() => {
     loadData(paramsRef.current);
-  }, []);
+  }, [loadData]);
 
   useEffect(() => {
     let changed = false;
@@ -62,7 +69,7 @@ export const useFetcher = <TParams extends Array<any>, TResponse>(
     return () => {
       changed = true;
     };
-  }, [stringifyParams]);
+  }, [stringifyParams, loadData]);
 
   return Object.defineProperties(
     {

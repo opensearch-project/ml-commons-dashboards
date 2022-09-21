@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useMemo } from 'react';
 import { useRouteMatch, Link, generatePath } from 'react-router-dom';
 import {

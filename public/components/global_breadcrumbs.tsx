@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect } from 'react';
 import { useLocation, matchPath } from 'react-router-dom';
 
@@ -26,9 +31,10 @@ export const GlobalBreadcrumbs = ({
   basename: string;
 }) => {
   const location = useLocation();
+  const { setBreadcrumbs } = chrome;
 
   useEffect(() => {
-    chrome.setBreadcrumbs(getBreadcrumbs(location.pathname, basename));
-  }, [location.pathname, chrome.setBreadcrumbs, basename]);
+    setBreadcrumbs(getBreadcrumbs(location.pathname, basename));
+  }, [location.pathname, setBreadcrumbs, basename]);
   return null;
 };

@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { EuiConfirmModal } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';

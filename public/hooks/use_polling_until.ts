@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useCallback, useEffect, useRef } from 'react';
 
 export const usePollingUntil = ({
@@ -9,7 +14,7 @@ export const usePollingUntil = ({
 }: {
   pollingGap?: number;
   maxRetries?: number;
-  continueChecker: () => Promise<Boolean>;
+  continueChecker: () => Promise<boolean>;
   onGiveUp: () => void;
   onMaxRetries: () => void;
 }) => {
@@ -40,7 +45,7 @@ export const usePollingUntil = ({
         }
       });
     }, pollingGap);
-  }, [pollingGap, maxRetries, continueChecker]);
+  }, [pollingGap, maxRetries]);
 
   useEffect(() => {
     return () => {

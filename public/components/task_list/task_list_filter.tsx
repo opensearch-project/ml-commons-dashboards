@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 import {
@@ -45,13 +50,19 @@ export const TaskListFilter = ({
     [fireChange]
   );
 
-  const handleFunctionChange = useCallback((functionName) => {
-    fireChange({ functionName });
-  }, []);
+  const handleFunctionChange = useCallback(
+    (functionName) => {
+      fireChange({ functionName });
+    },
+    [fireChange]
+  );
 
-  const handleStateChange = useCallback((state) => {
-    fireChange({ state });
-  }, []);
+  const handleStateChange = useCallback(
+    (state) => {
+      fireChange({ state });
+    },
+    [fireChange]
+  );
 
   const handleCreatedStartChange = useCallback(
     (createdStart) => {
@@ -70,14 +81,14 @@ export const TaskListFilter = ({
   useEffect(() => {
     APIProvider.getAPI('task')
       .getAllFunctions()
-      .then((functions) => {
-        setFunctions(functions);
+      .then((payload) => {
+        setFunctions(payload);
       });
 
     APIProvider.getAPI('task')
       .getAllStates()
-      .then((states) => {
-        setStates(states);
+      .then((payload) => {
+        setStates(payload);
       });
   }, []);
 

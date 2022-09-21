@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiFlexGrid } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
@@ -12,13 +17,13 @@ const ContextSelectorInnter = ({
   onChange,
 }: {
   identity: string;
-  value: Array<FilterOptionValue> | undefined;
-  options: Array<FilterOptionValue>;
-  onChange: (identity: string, value: Array<FilterOptionValue> | undefined) => void;
+  value: FilterOptionValue[] | undefined;
+  options: FilterOptionValue[];
+  onChange: (identity: string, value: FilterOptionValue[] | undefined) => void;
 }) => {
   const handleChange = useCallback(
-    (options) => {
-      onChange(identity, options);
+    (newOptions) => {
+      onChange(identity, newOptions);
     },
     [identity, onChange]
   );
@@ -40,12 +45,12 @@ export const ContextSelector = ({
   onChange,
 }: {
   algorithm: string | undefined;
-  value: { [key: string]: Array<FilterOptionValue> } | undefined;
-  onChange: (value: { [key: string]: Array<FilterOptionValue> } | undefined) => void;
+  value: { [key: string]: FilterOptionValue[] } | undefined;
+  onChange: (value: { [key: string]: FilterOptionValue[] } | undefined) => void;
 }) => {
   const valueRef = useRef(value);
   valueRef.current = value;
-  const [filter, setFilter] = useState<{ [key: string]: Array<FilterOptionValue> }>({});
+  const [filter, setFilter] = useState<{ [key: string]: FilterOptionValue[] }>({});
   const groupedKeys = useMemo(
     () =>
       Object.keys(filter).reduce<string[][]>((pValue, cValue) => {
@@ -60,10 +65,10 @@ export const ContextSelector = ({
   );
 
   const handleChange = useCallback(
-    (identity: string, value: Array<FilterOptionValue> | undefined) => {
+    (identity: string, newOptionsValue: FilterOptionValue[] | undefined) => {
       const newValue = { ...valueRef.current };
-      if (value !== undefined) {
-        newValue[identity] = value;
+      if (newOptionsValue !== undefined) {
+        newValue[identity] = newOptionsValue;
       } else {
         delete newValue[identity];
       }
@@ -83,8 +88,8 @@ export const ContextSelector = ({
     }
     APIProvider.getAPI('modelAlgorithm')
       .getOne(algorithm)
-      .then(({ filter }) => {
-        setFilter(filter);
+      .then((payload) => {
+        setFilter(payload.filter);
       });
   }, [algorithm]);
 

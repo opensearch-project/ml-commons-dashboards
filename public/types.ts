@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { History } from 'history';
 import { DataPublicPluginStart } from '../../../../src/plugins/data/public';
 import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
 import { AppMountParameters, CoreStart } from '../../../src/core/public';
-import { History } from 'history';
 
 export interface MlCommonsPluginPluginSetup {
   getGreeting: () => string;
@@ -26,19 +26,21 @@ export interface MLServices extends CoreStart {
   history: History;
 }
 
-type Column_meta = {
+interface ColumnMeta {
   name: string;
   column_type: string;
-};
+}
 
-export type Row = {
+export interface Row {
   column_type: string;
   value: number | string | boolean;
-};
+}
 
-export type Rows = { values: Array<Row> };
+export interface Rows {
+  values: Row[];
+}
 
-export type Input_data = {
-  column_metas: Array<Column_meta>;
-  rows: Array<Rows>;
-};
+export interface InputData {
+  column_metas: ColumnMeta[];
+  rows: Rows[];
+}

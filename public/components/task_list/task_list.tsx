@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
 
@@ -47,7 +52,7 @@ export function TaskList({ notifications }: { notifications: CoreStart['notifica
   const handleTaskDeleted = useCallback(async () => {
     reload();
     notifications.toasts.addSuccess('Task has been deleted.');
-  }, [reload]);
+  }, [reload, notifications.toasts]);
 
   const handleFilterChange = useCallback((filter) => {
     setParams((prevParams) => ({ ...prevParams, ...filter }));
@@ -58,19 +63,23 @@ export function TaskList({ notifications }: { notifications: CoreStart['notifica
   }, []);
 
   const handleTableChange = useCallback((criteria) => {
-    const { pagination, sort } = criteria;
+    const {
+      pagination: { currentPage, pageSize },
+      sort,
+    } = criteria;
     setParams((previousValue) => {
       if (
-        pagination.currentPage === previousValue.currentPage &&
-        pagination.pageSize === previousValue.pageSize &&
+        currentPage === previousValue.currentPage &&
+        pageSize === previousValue.pageSize &&
         (!sort || sort === previousValue.sort)
       ) {
         return previousValue;
       }
       return {
         ...previousValue,
-        ...criteria.pagination,
-        ...(criteria.sort ? { sort: criteria.sort } : {}),
+        currentPage,
+        pageSize,
+        ...(sort ? { sort } : {}),
       };
     });
   }, []);

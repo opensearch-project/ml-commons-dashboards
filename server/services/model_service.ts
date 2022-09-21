@@ -1,4 +1,9 @@
 /*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/*
  *   Copyright OpenSearch Contributors
  *
  *   Licensed under the Apache License, Version 2.0 (the "License").
@@ -16,10 +21,9 @@
 import { ILegacyClusterClient, ScopeableRequest } from '../../../../src/core/server';
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { convertModelSource, generateModelSearchQuery } from './utils/model';
+import { RecordNotFoundError } from './errors';
 
 const modelSortFieldMapping: { [key: string]: string } = { trainTime: 'model_train_time' };
-
-export class ModelNotFound {}
 
 export class ModelService {
   private osClient: ILegacyClusterClient;
@@ -89,7 +93,7 @@ export class ModelService {
         modelId,
       });
     if (result === 'not_found') {
-      throw new ModelNotFound();
+      throw new RecordNotFoundError();
     }
     return true;
   }
