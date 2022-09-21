@@ -1,16 +1,11 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { generateTermQuery, generateMustQueries } from './query';
 
-export const convertTaskSource = ({
-  last_update_time,
-  create_time,
-  is_async,
-  function_name,
-  input_type,
-  worker_node,
-  state,
-  model_id,
-  task_type,
-}: {
+export const convertTaskSource = (source: {
   last_update_time: number;
   create_time: number;
   is_async: boolean;
@@ -21,15 +16,15 @@ export const convertTaskSource = ({
   model_id: string;
   task_type: string;
 }) => ({
-  lastUpdateTime: last_update_time,
-  createTime: create_time,
-  isAsync: is_async,
-  functionName: function_name,
-  inputType: input_type,
-  workerNode: worker_node,
-  state,
-  modelId: model_id,
-  taskType: task_type,
+  lastUpdateTime: source.last_update_time,
+  createTime: source.create_time,
+  isAsync: source.is_async,
+  functionName: source.function_name,
+  inputType: source.input_type,
+  workerNode: source.worker_node,
+  state: source.state,
+  modelId: source.model_id,
+  taskType: source.task_type,
 });
 
 export const generateTaskSearchQuery = ({

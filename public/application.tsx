@@ -5,9 +5,9 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Router } from 'react-router-dom';
 import { AppMountParameters } from '../../../src/core/public';
 import { MLServices } from './types';
-import { Router } from 'react-router-dom';
 import { MlCommonsPluginApp } from './components/app';
 import { InnerHttpProvider } from './apis/inner_http_provider';
 import { APIProvider } from './apis/api_provider';

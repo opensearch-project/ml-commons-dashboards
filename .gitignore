@@ -9,6 +9,7 @@ build
 .DS_Store
 *.sublime*
 .opensearch-dashboards-plugin-helpers.dev.json
+.eslintcache
 coverage
 yarn-error.log
 target

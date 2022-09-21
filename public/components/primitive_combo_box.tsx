@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useMemo, useCallback } from 'react';
 import { EuiComboBox, EuiComboBoxProps } from '@elastic/eui';
 
@@ -38,9 +43,9 @@ export const PrimitiveComboBox = <T extends string | number>({
   }, [multi, value, options]);
 
   const handleChange = useCallback<Required<EuiComboBoxProps<T>>['onChange']>(
-    (options) => {
+    (newOptions) => {
       const result: T[] = [];
-      options.forEach((item) => {
+      newOptions.forEach((item) => {
         if (item.value !== undefined) {
           result.push(item.value);
         }

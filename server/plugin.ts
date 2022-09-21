@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   PluginInitializerContext,
   CoreSetup,
@@ -6,10 +11,10 @@ import {
   Logger,
 } from '../../../src/core/server';
 
-import createTrainCluster from './clusters/create_train_cluster';
-import createModelCluster from './clusters/create_model_cluster';
-import createTaskCluster from './clusters/create_task_cluster';
-import createPredictCluster from './clusters/create_predict_cluster';
+import { createTrainCluster } from './clusters/create_train_cluster';
+import { createModelCluster } from './clusters/create_model_cluster';
+import { createTaskCluster } from './clusters/create_task_cluster';
+import { createPredictCluster } from './clusters/create_predict_cluster';
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
 import {
   modelRouter,

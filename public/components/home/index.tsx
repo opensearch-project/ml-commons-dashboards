@@ -17,11 +17,11 @@ import {
   EuiKeyPadMenuItem,
 } from '@elastic/eui';
 import { FormattedMessage } from '@osd/i18n/react';
-import { PLUGIN_NAME, PLUGIN_DESC } from '../../../common';
 import { generatePath, Link } from 'react-router-dom';
+import { PLUGIN_NAME, PLUGIN_DESC } from '../../../common';
 import { ROUTES } from '../../../common/router';
 import { ComponentsCommonProps } from '../app';
-interface Props extends ComponentsCommonProps {}
+type Props = ComponentsCommonProps;
 
 export const Home = ({ data }: Props) => {
   return (

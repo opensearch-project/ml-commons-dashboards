@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Model } from './model';
 import { Task } from './task';
 import { Train } from './train';
@@ -9,8 +14,14 @@ const apiInstanceStore: {
   task: Task | undefined;
   train: Train | undefined;
   modelAlgorithm: ModelAlgorithm | undefined;
-  predict: Predict | undefined
-} = { model: undefined, task: undefined, train: undefined, modelAlgorithm: undefined, predict: undefined };
+  predict: Predict | undefined;
+} = {
+  model: undefined,
+  task: undefined,
+  train: undefined,
+  modelAlgorithm: undefined,
+  predict: undefined,
+};
 
 export class APIProvider {
   public static getAPI(type: 'task'): Task;
@@ -40,7 +51,7 @@ export class APIProvider {
       }
       case 'modelAlgorithm': {
         const newInstance = new ModelAlgorithm();
-        apiInstanceStore['modelAlgorithm'] = newInstance;
+        apiInstanceStore.modelAlgorithm = newInstance;
         return newInstance;
       }
       case 'predict': {

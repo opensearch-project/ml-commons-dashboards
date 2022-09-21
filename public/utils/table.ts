@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import moment from 'moment';
 
 export const DEFAULT_EMPTY_DATA = '-';
