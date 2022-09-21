@@ -27,15 +27,22 @@ export class TrainService {
     this.osClient = osClient;
   }
 
-  public async trainModel(request) {
-    const params = {
-      body: {
-        ...request.body,
-      },
-    };
+  public async trainModel({
+    request,
+    algo,
+    async,
+  }: {
+    request: any;
+    algo: string;
+    async: boolean;
+  }) {
     const response = await this.osClient
       .asScoped(request)
-      .callAsCurrentUser('mlCommonsTrain.trainModel', params);
+      .callAsCurrentUser('mlCommonsTrain.trainModel', {
+        body: request.body,
+        algo,
+        async,
+      });
     return response;
   }
 }

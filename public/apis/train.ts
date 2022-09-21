@@ -23,10 +23,13 @@ interface Body {
 }
 
 export class Train {
-  public train(body: Record<string, string[]>) {
-    return InnerHttpProvider.getHttp().post<TrainResponse>(TRAIN_API_ENDPOINT, {
-      body: JSON.stringify(body),
-    });
+  public train(body: Record<string, string[]>, algo: string, async: boolean) {
+    return InnerHttpProvider.getHttp().post<TrainResponse>(
+      `${TRAIN_API_ENDPOINT}/${algo}/${async}`,
+      {
+        body: JSON.stringify(body),
+      }
+    );
   }
 
   public convertParams(

@@ -22,18 +22,17 @@ export default function (Client: any, config: any, components: any) {
     method: 'POST',
     needBody: true,
     url: {
-      fmt: '/_plugins/_ml/_train/kmeans',
-      // fmt: `${TRAIN_BASE_API}/<%=methodName%>?async=<%=async%>`,
-      // req: {
-      //   methodName: {
-      //     type: 'string',
-      //     required: true,
-      //   },
-      //   async: {
-      //     type: 'boolean',
-      //     required: true,
-      //   },
-      // },
+      fmt: `${TRAIN_BASE_API}/<%=algo%>?async=<%=async%>`,
+      req: {
+        algo: {
+          type: 'string',
+          required: true,
+        },
+        async: {
+          type: 'boolean',
+          required: true,
+        },
+      },
     },
   });
 }

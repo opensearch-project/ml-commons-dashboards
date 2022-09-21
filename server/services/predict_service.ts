@@ -27,7 +27,15 @@ export class PredictService {
     this.osClient = osClient;
   }
 
-  public async predict({ request, modelId, algo }) {
+  public async predict({
+    request,
+    modelId,
+    algo,
+  }: {
+    request: any;
+    modelId: string;
+    algo: string;
+  }) {
     const response = await this.osClient
       .asScoped(request)
       .callAsCurrentUser('mlCommonsPredict.predict', {
