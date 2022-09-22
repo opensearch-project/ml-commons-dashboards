@@ -106,6 +106,76 @@ export const SUPPORTED_ALGOS = [
       },
     ],
   },
+  {
+    name: 'LOGISTIC_REGRESSION',
+    value: 'logistic_regression',
+    text: 'LOGISTIC_REGRESSION',
+    parameters: [
+      {
+        name: 'learningRate',
+        type: 'integer',
+        default: 1,
+        description:
+          'The gradient descent step size at each iteration when moving toward a minimum of a loss function or optimal value',
+      },
+      {
+        name: 'momentumFactor',
+        type: 'integer',
+        default: 0,
+        description:
+          'The extra weight factors that accelerate the rate at which the weight is adjusted. This helps move the minimization routine out of local minima.',
+      },
+      {
+        name: 'epsilon',
+        type: 'integer',
+        default: 0.1,
+        description: 'The value for stabilizing gradient inversion',
+      },
+      {
+        name: 'beta1',
+        type: 'integer',
+        default: 0.9,
+        description: 'The exponential decay rates for the moment estimates',
+      },
+      {
+        name: 'beta2',
+        type: 'integer',
+        default: 0.99,
+        description: 'The exponential decay rates for the moment estimates',
+      },
+      {
+        name: 'decayRate',
+        type: 'integer',
+        default: 0.9,
+        description: 'The Root Mean Squared Propagation (RMSProp)',
+      },
+      {
+        name: 'epochs',
+        type: 'integer',
+        default: 5,
+        description: 'The number of iterations',
+      },
+      {
+        name: 'batchSize',
+        type: 'integer',
+        default: 1,
+        description: 'The size of minbatches',
+      },
+      {
+        name: 'loggingInterval',
+        type: 'integer',
+        default: 1000,
+        description:
+          'The interval of logs lost after many iterations. The interval is 1 if the algorithm contains no logs.',
+      },
+      {
+        name: 'target',
+        type: 'string',
+        default: 'class',
+        description: 'The target field',
+      },
+    ],
+  },
 ] as const;
 export type ALGOS = typeof SUPPORTED_ALGOS[number]['value'];
 export type ALGOS_PARAMS = typeof SUPPORTED_ALGOS[number]['parameters'];
