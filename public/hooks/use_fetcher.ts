@@ -42,6 +42,7 @@ export const useFetcher = <TParams extends any[], TResponse>(
           errorRef.current = null;
         }
       } catch (e) {
+        shouldUpdate = shouldUpdateResult();
         if (shouldUpdate) {
           errorRef.current = e;
           dataRef.current = null;
