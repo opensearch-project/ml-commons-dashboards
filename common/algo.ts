@@ -32,6 +32,43 @@ export const SUPPORTED_ALGOS = [
     ],
   },
   {
+    name: 'Batch RCF',
+    value: 'Batch_RCF',
+    text: 'Batch RCF',
+    parameters: [
+      {
+        name: 'number_of_trees',
+        type: 'integer',
+        default: 30,
+        description: 'The number of trees in the forest',
+      },
+      {
+        name: 'sample_size',
+        type: 'integer',
+        default: 256,
+        description: 'The same size used by the stream samplers in the forest',
+      },
+      {
+        name: 'output_after',
+        type: 'integer',
+        default: 32,
+        description: 'The number of points required by stream samplers before results return',
+      },
+      {
+        name: 'training_data_size',
+        type: 'integer',
+        default: 100,
+        description: 'The size of your training data',
+      },
+      {
+        name: 'anomaly_score_threshold',
+        type: 'integer',
+        default: 1.0,
+        description: 'The threshold of the anomaly score',
+      },
+    ],
+  },
+  {
     name: 'Linear regression',
     value: 'LINEAR_REGRESSION',
     text: 'LINEAR_REGRESSION',
