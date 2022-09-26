@@ -25,6 +25,14 @@ export const TrainForm = ({ params, setParams, algo }: Props) => {
           <EuiFieldNumber
             fullWidth
             value={params[item.name] ?? item.default}
+            onChange={(e) => setParams({ ...params, [item.name]: parseInt(e.target.value, 10) })}
+          />
+        );
+      case 'Double':
+        return (
+          <EuiFieldNumber
+            fullWidth
+            value={params[item.name] ?? item.default}
             onChange={(e) => setParams({ ...params, [item.name]: Number(e.target.value) })}
           />
         );

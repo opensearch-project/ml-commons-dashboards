@@ -4,14 +4,7 @@
  */
 
 import React, { useEffect, useCallback, useState, useLayoutEffect, useRef } from 'react';
-import {
-  EuiSelect,
-  EuiSelectable,
-  EuiSelectableOption,
-  EuiBadge,
-  EuiSpacer,
-  EuiFormRow,
-} from '@elastic/eui';
+import { EuiSelect, EuiSelectable, EuiSelectableOption, EuiBadge, EuiFormRow } from '@elastic/eui';
 import { IndexPattern } from '../../../../../../src/plugins/data/public/index';
 import { useOpenSearchDashboards } from '../../../../../../src/plugins/opensearch_dashboards_react/public/index';
 import { MLServices } from '../../../types';
@@ -38,6 +31,7 @@ export const QueryField = ({
   onSelectedFields,
   onUpdateQuerys,
 }: Props) => {
+  console.log('indexPatternsaa', indexPatterns);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [fieldsOptions, setFieldsOptions] = useState<FieldsOption[]>([]);
   const onUpdateQuerysRef = useRef(onUpdateQuerys);
@@ -80,7 +74,7 @@ export const QueryField = ({
   }, [selectedIndex, indexPatterns]);
 
   useLayoutEffect(() => {
-    const subscription = data.query.state$.subscribe(({ state }) => {
+    const subscription = data.query.state$.subscribe(({ state }: { state: any }) => {
       if (state.filters && state.query) {
         const query = buildOpenSearchQuery(
           currentSelectedPatternRef.current,
@@ -98,7 +92,11 @@ export const QueryField = ({
 
   return (
     <>
-      <EuiFormRow label="Select index" fullWidth helpText="select a index which used to query">
+      <EuiFormRow
+        label="Select index pattern"
+        fullWidth
+        helpText="select a index which used to query"
+      >
         <EuiSelect
           options={indexPatterns?.map((i, index) => {
             return { value: index, text: i.title };

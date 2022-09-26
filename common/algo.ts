@@ -62,7 +62,7 @@ export const SUPPORTED_ALGOS = [
       },
       {
         name: 'anomaly_score_threshold',
-        type: 'integer',
+        type: 'Double',
         default: 1.0,
         description: 'The threshold of the anomaly score',
       },
@@ -76,44 +76,67 @@ export const SUPPORTED_ALGOS = [
       {
         name: 'target',
         type: 'string',
-        default: 'price',
-        description: 'The type of measurement from which to measure the distance between centroids',
+        default: '',
+        description: 'The target field',
       },
       {
         name: 'learningRate',
-        type: 'integer',
+        type: 'Double',
         default: 0.01,
         description: 'The rate of speed at which the gradient moves during descent',
       },
       {
         name: 'momentumFactor',
-        type: 'integer',
+        type: 'Double',
         default: 0,
         description: 'The medium-term from which the regressor rises or falls',
       },
       {
         name: 'epsilon',
-        type: 'integer',
+        type: 'Double',
         default: 1.0e-6,
         description: 'The criteria used to identify a linear model',
       },
       {
         name: 'beta1',
-        type: 'integer',
+        type: 'Double',
         default: 0.9,
         description: 'The estimated exponential decay for the moment',
       },
       {
         name: 'beta2',
-        type: 'integer',
+        type: 'Double',
         default: 0.99,
         description: 'The estimated exponential decay for the moment',
       },
       {
         name: 'decayRate',
-        type: 'integer',
+        type: 'Double',
         default: 0.9,
         description: 'The rate at which the model decays exponentially',
+      },
+      {
+        name: 'momentumType',
+        type: 'enum',
+        group: ['STANDARD', 'NESTEROV'],
+        default: 'STANDARD',
+        description:
+          'The defined Stochastic Gradient Descent (SDG) momentum type that helps accelerate gradient vectors in the right directions, leading to a fast convergence',
+      },
+      {
+        name: 'optimizerType',
+        type: 'enum',
+        group: [
+          'SIMPLE_SGD',
+          'LINEAR_DECAY_SGD',
+          'SQRT_DECAY_SGD',
+          'ADA_GRAD',
+          'ADA_DELTA',
+          'ADAM',
+          'RMS_PROP',
+        ],
+        default: 'SIMPLE_SGD',
+        description: 'The optimizer used in the model',
       },
     ],
   },
@@ -150,41 +173,77 @@ export const SUPPORTED_ALGOS = [
     parameters: [
       {
         name: 'learningRate',
-        type: 'integer',
+        type: 'Double',
         default: 1,
         description:
           'The gradient descent step size at each iteration when moving toward a minimum of a loss function or optimal value',
       },
       {
         name: 'momentumFactor',
-        type: 'integer',
+        type: 'Double',
         default: 0,
         description:
           'The extra weight factors that accelerate the rate at which the weight is adjusted. This helps move the minimization routine out of local minima.',
       },
       {
         name: 'epsilon',
-        type: 'integer',
+        type: 'Double',
         default: 0.1,
         description: 'The value for stabilizing gradient inversion',
       },
       {
         name: 'beta1',
-        type: 'integer',
+        type: 'Double',
         default: 0.9,
         description: 'The exponential decay rates for the moment estimates',
       },
       {
         name: 'beta2',
-        type: 'integer',
+        type: 'Double',
         default: 0.99,
         description: 'The exponential decay rates for the moment estimates',
       },
       {
         name: 'decayRate',
-        type: 'integer',
+        type: 'Double',
         default: 0.9,
         description: 'The Root Mean Squared Propagation (RMSProp)',
+      },
+      {
+        name: 'momentumType',
+        type: 'enum',
+        group: ['STANDARD', 'NESTEROV'],
+        default: 'STANDARD',
+        description:
+          'The Stochastic Gradient Descent (SGD) momentum that helps accelerate gradient vectors in the right direction, leading to faster convergence between vectors',
+      },
+      {
+        name: 'optimizerType',
+        type: 'enum',
+        group: [
+          'SIMPLE_SGD',
+          'LINEAR_DECAY_SGD',
+          'SQRT_DECAY_SGD',
+          'ADA_GRAD',
+          'ADA_DELTA',
+          'ADAM',
+          'RMS_PROP',
+        ],
+        default: 'ADA_GRAD',
+        description: 'The optimizer used in the model',
+      },
+      {
+        name: 'target',
+        type: 'string',
+        default: 'class',
+        description: 'The target field',
+      },
+      {
+        name: 'objectiveType',
+        type: 'enum',
+        group: ['HINGE', 'LOGMULTICLASS'],
+        default: 'LOGMULTICLASS',
+        description: 'The objective function type',
       },
       {
         name: 'epochs',
@@ -204,12 +263,6 @@ export const SUPPORTED_ALGOS = [
         default: 1000,
         description:
           'The interval of logs lost after many iterations. The interval is 1 if the algorithm contains no logs.',
-      },
-      {
-        name: 'target',
-        type: 'string',
-        default: 'class',
-        description: 'The target field',
       },
     ],
   },
@@ -232,6 +285,10 @@ export type AlgosFormParam = {
       type: 'enum';
       default: string;
       group: string[];
+    }
+  | {
+      type: 'Double';
+      default: number;
     }
 );
 export type AlgosFormParams = AlgosFormParam[];
