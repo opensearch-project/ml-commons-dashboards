@@ -69,6 +69,67 @@ export const SUPPORTED_ALGOS = [
     ],
   },
   {
+    name: 'FIT RCF',
+    value: 'FIT_RCF',
+    text: 'FIT RCF',
+    parameters: [
+      {
+        name: 'number_of_trees',
+        type: 'integer',
+        default: 30,
+        description: 'The number of trees in the forest',
+      },
+      {
+        name: 'shingle_size',
+        type: 'integer',
+        default: 8,
+        description: 'A shingle, or a consecutive sequence of the most recent records',
+      },
+      {
+        name: 'sample_size',
+        type: 'integer',
+        default: 256,
+        description: 'The same size used by the stream samplers in the forest',
+      },
+      {
+        name: 'output_after',
+        type: 'integer',
+        default: 32,
+        description: 'The number of points required by stream samplers before results return',
+      },
+      {
+        name: 'time_decay',
+        type: 'Double',
+        default: 0.0001,
+        description: 'The decay factor used by stream samplers in the forest',
+      },
+      {
+        name: 'anomaly_rate',
+        type: 'Double',
+        default: 0.005,
+        description: 'The anomaly rate',
+      },
+      {
+        name: 'time_field',
+        type: 'string',
+        default: '',
+        description: '(Required) The time filed for RCF to use as time series data',
+      },
+      {
+        name: 'date_format',
+        type: 'string',
+        default: 'yyyy-MM-ddHH:mm:ss',
+        description: 'The date and time format for the time_field field',
+      },
+      {
+        name: 'time_zone',
+        type: 'string',
+        default: 'UTC',
+        description: 'The time zone for the time_field field',
+      },
+    ],
+  },
+  {
     name: 'Linear regression',
     value: 'LINEAR_REGRESSION',
     text: 'LINEAR_REGRESSION',
