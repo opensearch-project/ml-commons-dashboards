@@ -12,6 +12,11 @@ interface Body {
   input_index?: string[];
 }
 
+interface Payload {
+  query: Query | undefined;
+  fields: Record<string, string[]>;
+}
+
 export interface PredictResponse {
   status: string;
   prediction_result?: {
@@ -30,7 +35,7 @@ export interface PredictResponse {
 }
 
 export class Predict {
-  public predict(payload: any, algo: string, modelId: string) {
+  public predict(payload: Payload, algo: string, modelId: string) {
     const { fields, query } = payload;
     const index = Object.keys(fields)[0];
     if (!index) return {};

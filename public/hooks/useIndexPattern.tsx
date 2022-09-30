@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { useEffect, useState } from 'react';
-import { IndexPattern } from '../../../../../src/plugins/data/public/index';
-import { DataPublicPluginStart } from '../../../../../src/plugins/data/public';
+import { IndexPattern } from '../../../../src/plugins/data/public/index';
+import { DataPublicPluginStart } from '../../../../src/plugins/data/public';
 
 export const useIndexPatterns = (data?: DataPublicPluginStart) => {
   const [indexPatterns, setIndexPatterns] = useState<IndexPattern[]>([]);
