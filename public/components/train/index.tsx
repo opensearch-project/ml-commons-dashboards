@@ -50,7 +50,7 @@ export const Train = ({ data }: Props) => {
     return result;
   }, []);
   const defaultParams = generateDefaultParams('kmeans');
-  const [params, setParams] = useState(defaultParams);
+  const [params, setParams] = useState<Record<string, string | number>>(defaultParams);
 
   const [parsedData, setParsedData] = useState({
     data: [],

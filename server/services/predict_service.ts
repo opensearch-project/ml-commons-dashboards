@@ -18,7 +18,7 @@
  *   permissions and limitations under the License.
  */
 
-import { ILegacyClusterClient } from '../../../../src/core/server';
+import { ILegacyClusterClient, ScopeableRequest } from '../../../../src/core/server';
 
 export class PredictService {
   private osClient: ILegacyClusterClient;
@@ -32,7 +32,7 @@ export class PredictService {
     modelId,
     algo,
   }: {
-    request: any;
+    request: ScopeableRequest & { body: Record<string, string> };
     modelId: string;
     algo: string;
   }) {
