@@ -9,8 +9,8 @@ import { useIndexPatterns } from '../useIndexPattern';
 describe('useIndexPatterns', () => {
   it('should return empty array when no data param', () => {
     const { result } = renderHook(() => useIndexPatterns());
-    expect(result.current.indexPatterns).toBe([]);
-    expect(result.current.error).toBe(undefined);
-    expect(result.current.loading).toBe(true);
+    expect(result.current.indexPatterns).toStrictEqual([]);
+    expect(result.current.error).toStrictEqual(undefined);
+    expect(result.current.loading).toStrictEqual(true);
   });
 });
