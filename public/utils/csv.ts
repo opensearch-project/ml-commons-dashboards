@@ -7,6 +7,7 @@ import Papa from 'papaparse';
 import type { InputData, Rows, ParsedData, ParsedResult } from '../types';
 
 const MAX_DISPLAY_COLUMN_LENGTH = 150;
+const MAX_ROWS_LIMIT = 10000;
 
 export const parseFile = (file: File, ifHeader: boolean, callback: (a: ParsedData) => void) => {
   Papa.parse(file, {
@@ -48,7 +49,7 @@ export const transParsedDataToInputData = (parsedData: ParsedData, cols: number[
       };
       res.values.push(row);
     });
-    if (res.values.length === columns.length) {
+    if (res.values.length === columns.length && inputData.rows.length < MAX_ROWS_LIMIT) {
       inputData.rows.push(res);
     }
   }
