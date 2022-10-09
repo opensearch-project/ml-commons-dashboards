@@ -24,7 +24,7 @@ interface Body {
 }
 
 export class Train {
-  public train(body: Record<string, string[]>, algo: string, async: boolean) {
+  public train(body: Body | {}, algo: string, async: boolean) {
     return InnerHttpProvider.getHttp().post<TrainResponse>(
       `${TRAIN_API_ENDPOINT}/${algo}/${async}`,
       {

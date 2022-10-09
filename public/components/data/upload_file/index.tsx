@@ -7,17 +7,14 @@ import React, { useCallback, useState } from 'react';
 import { EuiFormRow, EuiFilePicker, EuiText, EuiSwitch } from '@elastic/eui';
 
 import { parseFile } from '../../../../public/utils';
+import { ParsedData } from '../../../types';
 
 interface Props {
-  updateParsedData: React.Dispatch<
-    React.SetStateAction<{
-      data: never[];
-    }>
-  >;
+  updateParsedData: React.Dispatch<React.SetStateAction<ParsedData>>;
 }
 
 export const UploadFile = ({ updateParsedData }: Props) => {
-  const [uploadFiles, setUploadFiles] = useState([]);
+  const [uploadFiles, setUploadFiles] = useState<Array<File>>([]);
   const [ifHeader, setIfHeader] = useState(false);
   const handleChangeIfHeader = useCallback(
     (checked: boolean) => {
@@ -58,6 +55,8 @@ export const UploadFile = ({ updateParsedData }: Props) => {
       setUploadFiles(files.length > 0 ? Array.from(files) : []);
       updateParsedData({
         data: [],
+        errors: [],
+        meta: { delimiter: '', linebreak: '', aborted: false, truncated: false, cursor: 0 },
       });
       if (files[0]) {
         parseFile(files[0], false, (data) => {

@@ -5,14 +5,14 @@
 
 import React from 'react';
 import { EuiAccordion, EuiBasicTable, EuiCallOut } from '@elastic/eui';
-import { convertPredictionToTable } from '../../../utils';
+import { convertPredictionResultToTable } from '../../../utils';
 import type { InputData } from '../../../types';
 
 interface Props {
   data: InputData;
 }
 export const ResultList = ({ data }: Props) => {
-  const { columns, items } = convertPredictionToTable(data);
+  const { columns, items } = convertPredictionResultToTable(data);
   return (
     <>
       <EuiAccordion

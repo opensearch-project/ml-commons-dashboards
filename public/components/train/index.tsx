@@ -15,13 +15,14 @@ import {
 import { SUPPORTED_ALGOS, ALGOS } from '../../../common/algo';
 import { APIProvider } from '../../apis/api_provider';
 import { ComponentsCommonProps } from '../app';
-import { transToInputData } from '../../../public/utils';
+import { transParsedDataToInputData } from '../../../public/utils';
 import { ParsedResult, QueryField, Query, UploadFile } from '../data';
 import { useIndexPatterns } from '../../hooks';
 import type { DataSource } from '../../apis/train';
 import './index.scss';
 import { TrainResult } from './train_result';
 import { TrainForm } from './train_form';
+import { ParsedData } from '../../types';
 
 type Props = ComponentsCommonProps;
 
@@ -52,8 +53,10 @@ export const Train = ({ data }: Props) => {
   const defaultParams = generateDefaultParams('kmeans');
   const [params, setParams] = useState<Record<string, string | number>>(defaultParams);
 
-  const [parsedData, setParsedData] = useState({
+  const [parsedData, setParsedData] = useState<ParsedData>({
     data: [],
+    errors: [],
+    meta: { delimiter: '', linebreak: '', aborted: false, truncated: false, cursor: 0 },
   });
 
   const handleSelectAlgo = (algo: ALGOS) => {
@@ -66,7 +69,7 @@ export const Train = ({ data }: Props) => {
       setTrainingResult({ status: '', id: '', message: '' });
       setIsLoading(true);
       e.preventDefault();
-      const inputData = transToInputData(parsedData, selectedCols);
+      const inputData = transParsedDataToInputData(parsedData, selectedCols);
       let result;
       try {
         const body = APIProvider.getAPI('train').convertParams(
