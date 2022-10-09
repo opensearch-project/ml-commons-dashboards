@@ -3,23 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import Papa, { ParseResult } from 'papaparse';
-import type { InputData, Rows } from '../types';
+import Papa from 'papaparse';
+import type { InputData, Rows, ParsedData, ParsedResult } from '../types';
 
 const MAX_DISPLAY_COLUMN_LENGTH = 150;
 
-export const parseFile = (
-  file: File,
-  ifHeader: boolean,
-  callback: (a: ParseResult<unknown> & { header?: any }) => void
-) => {
+export const parseFile = (file: File, ifHeader: boolean, callback: (a: ParsedData) => void) => {
   Papa.parse(file, {
-    complete(results) {
+    complete(results: ParsedResult) {
       if (ifHeader) {
         const header = results.data.splice(0, 1);
         callback({
           ...results,
-          header: header ? header[0] : null,
+          header: header ? header[0] : undefined,
         });
       } else {
         callback(results);
@@ -33,7 +29,7 @@ export const parseFile = (
   });
 };
 
-export const transToInputData = (parsedData: any, cols: number[]) => {
+export const transParsedDataToInputData = (parsedData: ParsedData, cols: number[]) => {
   const { data, header } = parsedData;
   const columns = cols.sort((a, b) => a - b);
   const inputData: InputData = { column_metas: [], rows: [] };
@@ -59,7 +55,7 @@ export const transToInputData = (parsedData: any, cols: number[]) => {
   return inputData;
 };
 
-export const convertPredictionToTable = (data: InputData) => {
+export const convertPredictionResultToTable = (data: InputData) => {
   const { column_metas: columnMetas, rows } = data;
   const rowsLength =
     rows.length > MAX_DISPLAY_COLUMN_LENGTH ? MAX_DISPLAY_COLUMN_LENGTH : rows.length;
