@@ -31,7 +31,6 @@ export const QueryField = ({
   onSelectedFields,
   onUpdateQuerys,
 }: Props) => {
-  console.log('indexPatternsaa', indexPatterns);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [fieldsOptions, setFieldsOptions] = useState<FieldsOption[]>([]);
   const onUpdateQuerysRef = useRef(onUpdateQuerys);
@@ -62,8 +61,12 @@ export const QueryField = ({
 
   useEffect(() => {
     if (!indexPatterns || !indexPatterns[selectedIndex]) return;
+    //filter nested map field
+    const fields = indexPatterns[selectedIndex]?.fields.filter(
+      (item) => item.displayName.indexOf('.') === -1
+    );
     setFieldsOptions(
-      indexPatterns[selectedIndex]?.fields.map((item) => ({
+      fields.map((item) => ({
         ...item,
         label: item.name,
         prepend: <EuiBadge color="hollow">{item?.type}</EuiBadge>,
