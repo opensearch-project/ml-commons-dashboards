@@ -23,10 +23,14 @@ export const RangePicker = ({
   placeholders,
 }: RangePickerProps) => {
   const todayRef = useRef(moment().endOf('day'));
+  const endMinMaxTimeRef = useRef(todayRef.current.clone().add(1, 'd').startOf('d'));
+  const usedEndMinMaxTime = end?.isSame(endMinMaxTimeRef.current, 'day')
+    ? endMinMaxTimeRef.current
+    : undefined;
 
   const startFilterDate = useCallback(
     (date: moment.Moment) => {
-      const usedEnd = end || todayRef.current;
+      const usedEnd = end?.isSameOrBefore(todayRef.current) ? end : todayRef.current;
       return date.isSameOrBefore(usedEnd, 'D');
     },
     [end]
@@ -40,7 +44,7 @@ export const RangePicker = ({
       if (end && date.isSameOrBefore(end, 'D')) {
         return true;
       }
-      return date.isSameOrBefore(todayRef.current, 'D');
+      return date.isSameOrBefore(endMinMaxTimeRef.current, 'D');
     },
     [start, end]
   );
@@ -77,6 +81,8 @@ export const RangePicker = ({
           startDate={start}
           endDate={end}
           filterDate={endFilterDate}
+          maxTime={usedEndMinMaxTime}
+          minTime={usedEndMinMaxTime}
         />
       }
       fullWidth
