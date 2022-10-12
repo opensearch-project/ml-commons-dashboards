@@ -35,6 +35,8 @@ const ContextSelectorInnter = ({
       placeholder={`All ${identity}`}
       onChange={handleChange}
       fullWidth
+      data-test-subj={`${identity}-selector`}
+      attachOptionTestSubj
     />
   );
 };

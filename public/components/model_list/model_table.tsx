@@ -76,6 +76,7 @@ export function ModelTable(props: {
                   e.stopPropagation();
                   onModelDelete(id);
                 }}
+                data-test-subj={`model-delete-button-${id}`}
               />
             ),
           } as CustomItemAction<ModelSearchItem>,

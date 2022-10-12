@@ -80,6 +80,7 @@ export function TaskTable(props: {
                   e.stopPropagation();
                   onTaskDelete(id);
                 }}
+                data-test-subj={`task-delete-button-${id}`}
               />
             ),
           } as CustomItemAction<TaskSearchItem>,

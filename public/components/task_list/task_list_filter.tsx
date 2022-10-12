@@ -97,10 +97,11 @@ export const TaskListFilter = ({
       <EuiFlexGrid columns={3}>
         <EuiFlexItem>
           <EuiFieldSearch
-            placeholder="Search by model id"
+            placeholder="Search by model ID"
             value={value.modelId ?? ''}
             onChange={handleModelIdChange}
             fullWidth
+            data-test-subj="model-id-search"
           />
         </EuiFlexItem>
         <EuiFlexItem>
@@ -110,6 +111,8 @@ export const TaskListFilter = ({
             onChange={handleFunctionChange}
             placeholder="All functions"
             fullWidth
+            data-test-subj="funtion-selector"
+            attachOptionTestSubj
           />
         </EuiFlexItem>
         <EuiFlexItem>
@@ -119,6 +122,8 @@ export const TaskListFilter = ({
             onChange={handleStateChange}
             placeholder="All states"
             fullWidth
+            data-test-subj="state-selector"
+            attachOptionTestSubj
           />
         </EuiFlexItem>
       </EuiFlexGrid>
