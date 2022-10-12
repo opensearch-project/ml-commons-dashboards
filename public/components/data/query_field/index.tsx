@@ -62,8 +62,12 @@ export const QueryField = ({
   useEffect(() => {
     if (!indexPatterns || !indexPatterns[selectedIndex]) return;
     //filter nested map field
-    const fields = indexPatterns[selectedIndex]?.fields.filter(
+    const nonNestedfields = indexPatterns[selectedIndex]?.fields.filter(
       (item) => item.displayName.indexOf('.') === -1
+    );
+    //filter non number boolean map field
+    const fields = nonNestedfields?.filter(
+      (item) => item.type === 'number' || item.type === 'boolean'
     );
     setFieldsOptions(
       fields.map((item) => ({
