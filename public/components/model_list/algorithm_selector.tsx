@@ -8,15 +8,23 @@ import { APIProvider } from '../../apis/api_provider';
 import { PrimitiveComboBox, PrimitiveComboBoxProps } from '../primitive_combo_box';
 
 export const AlgorithmSelector = (props: Omit<PrimitiveComboBoxProps<string>, 'options'>) => {
-  const [algorithms, setAlgorithms] = useState<string[]>([]);
+  const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
     APIProvider.getAPI('modelAlgorithm')
       .getAll()
       .then((payload) => {
-        setAlgorithms(payload);
+        setOptions(payload);
       });
   }, []);
 
-  return <PrimitiveComboBox<string> {...props} options={algorithms} placeholder="All algorithm" />;
+  return (
+    <PrimitiveComboBox<string>
+      {...(props as PrimitiveComboBoxProps<string>)}
+      options={options}
+      placeholder="All algorithm"
+      data-test-subj="algorithm-selector"
+      attachOptionTestSubj
+    />
+  );
 };
