@@ -4,13 +4,16 @@
  */
 
 import React, { useMemo, useCallback } from 'react';
-import { EuiComboBox, EuiComboBoxProps } from '@elastic/eui';
+import { CommonProps, EuiComboBox, EuiComboBoxProps } from '@elastic/eui';
+
+export type OptionWithCommonProps<T> = { value: T } & CommonProps;
 
 export type PrimitiveComboBoxProps<T extends string | number> = Omit<
   EuiComboBoxProps<T>,
   'options' | 'selectedOptions' | 'onChange' | 'singleSelection'
 > & {
-  options: T[];
+  options: Array<T | OptionWithCommonProps<T>>;
+  attachOptionTestSubj?: boolean;
 } & (
     | {
         multi?: false;
@@ -29,11 +32,28 @@ export const PrimitiveComboBox = <T extends string | number>({
   value,
   onChange,
   options: optionsInProps,
+  attachOptionTestSubj,
+  'data-test-subj': parentDataTestSubj,
   ...restProps
 }: PrimitiveComboBoxProps<T>) => {
   const options = useMemo(
-    () => optionsInProps.map((option) => ({ label: option.toString(), value: option })),
-    [optionsInProps]
+    () =>
+      optionsInProps.map((option) =>
+        typeof option === 'object'
+          ? { label: option.value.toString(), ...option }
+          : {
+              label: option.toString(),
+              value: option,
+              ...(attachOptionTestSubj
+                ? {
+                    'data-test-subj': `${
+                      parentDataTestSubj ? `${parentDataTestSubj}-` : ''
+                    }${option.toString()}`,
+                  }
+                : {}),
+            }
+      ),
+    [optionsInProps, attachOptionTestSubj, parentDataTestSubj]
   );
   const selectedOptions = useMemo(() => {
     if (multi) {
@@ -65,6 +85,7 @@ export const PrimitiveComboBox = <T extends string | number>({
       selectedOptions={selectedOptions}
       onChange={handleChange}
       {...(multi ? {} : { singleSelection: true })}
+      data-test-subj={parentDataTestSubj}
       {...restProps}
     />
   );
