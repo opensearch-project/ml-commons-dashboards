@@ -66,4 +66,30 @@ export default function (Client: any, config: any, components: any) {
       needBody: true,
     },
   });
+
+  mlCommonsModel.load = ca({
+    method: 'POST',
+    url: {
+      fmt: `${MODEL_BASE_API}/<%=modelId%>/_load`,
+      req: {
+        modelId: {
+          type: 'string',
+          required: true,
+        },
+      },
+    },
+  });
+
+  mlCommonsModel.unload = ca({
+    method: 'POST',
+    url: {
+      fmt: `${MODEL_BASE_API}/<%=modelId%>/_unload`,
+      req: {
+        modelId: {
+          type: 'string',
+          required: true,
+        },
+      },
+    },
+  });
 }

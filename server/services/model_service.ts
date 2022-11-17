@@ -97,4 +97,20 @@ export class ModelService {
     }
     return true;
   }
+
+  public async load({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
+    const result = await this.osClient.asScoped(request).callAsCurrentUser('mlCommonsModel.load', {
+      modelId,
+    });
+    return result;
+  }
+
+  public async unload({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
+    const result = await this.osClient
+      .asScoped(request)
+      .callAsCurrentUser('mlCommonsModel.unload', {
+        modelId,
+      });
+    return result;
+  }
 }

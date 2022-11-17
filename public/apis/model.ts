@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
+import {
+  MODEL_API_ENDPOINT,
+  MODEL_LOAD_API_ENDPOINT,
+  MODEL_UNLOAD_API_ENDPOINT,
+} from '../../server/routes/constants';
 import { Pagination } from '../../server/services/utils/pagination';
 import { InnerHttpProvider } from './inner_http_provider';
 
@@ -13,6 +17,7 @@ export interface ModelSearchItem {
   algorithm: string;
   context: string;
   trainTime: number;
+  state: string;
 }
 
 export interface ModelDetail extends ModelSearchItem {
@@ -22,6 +27,19 @@ export interface ModelDetail extends ModelSearchItem {
 export interface ModelSarchResponse {
   data: ModelSearchItem[];
   pagination: Pagination;
+}
+
+export interface ModelLoadResponse {
+  task_id: string;
+  status: string;
+}
+
+export interface ModelUnloadResponse {
+  [nodeId: string]: {
+    stats: {
+      [modelId: string]: string;
+    };
+  };
 }
 
 export class Model {
@@ -49,5 +67,17 @@ export class Model {
 
   public getOne(modelId: string) {
     return InnerHttpProvider.getHttp().get<ModelDetail>(`${MODEL_API_ENDPOINT}/${modelId}`);
+  }
+
+  public load(modelId: string) {
+    return InnerHttpProvider.getHttp().post<ModelLoadResponse>(
+      `${MODEL_LOAD_API_ENDPOINT}/${modelId}`
+    );
+  }
+
+  public unload(modelId: string) {
+    return InnerHttpProvider.getHttp().post<ModelUnloadResponse>(
+      `${MODEL_UNLOAD_API_ENDPOINT}/${modelId}`
+    );
   }
 }

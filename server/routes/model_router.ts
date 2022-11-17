@@ -6,7 +6,11 @@
 import { schema } from '@osd/config-schema';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
 import { ModelService, RecordNotFoundError } from '../services';
-import { MODEL_API_ENDPOINT } from './constants';
+import {
+  MODEL_API_ENDPOINT,
+  MODEL_LOAD_API_ENDPOINT,
+  MODEL_UNLOAD_API_ENDPOINT,
+} from './constants';
 
 const modelSortQuerySchema = schema.oneOf([
   schema.literal('trainTime-desc'),
@@ -123,6 +127,50 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
         if (err instanceof RecordNotFoundError) {
           return opensearchDashboardsResponseFactory.notFound();
         }
+        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+      }
+    }
+  );
+
+  router.post(
+    {
+      path: `${MODEL_LOAD_API_ENDPOINT}/{modelId}`,
+      validate: {
+        params: schema.object({
+          modelId: schema.string(),
+        }),
+      },
+    },
+    async (_context, request) => {
+      try {
+        const result = await modelService.load({
+          request,
+          modelId: request.params.modelId,
+        });
+        return opensearchDashboardsResponseFactory.ok({ body: result });
+      } catch (err) {
+        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+      }
+    }
+  );
+
+  router.post(
+    {
+      path: `${MODEL_UNLOAD_API_ENDPOINT}/{modelId}`,
+      validate: {
+        params: schema.object({
+          modelId: schema.string(),
+        }),
+      },
+    },
+    async (_context, request) => {
+      try {
+        const result = await modelService.unload({
+          request,
+          modelId: request.params.modelId,
+        });
+        return opensearchDashboardsResponseFactory.ok({ body: result });
+      } catch (err) {
         return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
       }
     }
