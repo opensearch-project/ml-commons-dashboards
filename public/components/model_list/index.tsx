@@ -37,7 +37,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   });
   const { data, reload } = useFetcher(APIProvider.getAPI('model').search, {
     ...params,
-    sort: [params.sort],
+    sort: undefined,
     trainedStart: params.trainedStart?.valueOf(),
     trainedEnd: params.trainedEnd?.valueOf(),
   });
