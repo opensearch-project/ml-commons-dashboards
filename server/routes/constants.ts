@@ -6,6 +6,8 @@
 export const API_PREFIX = '/api/ml-commons';
 
 export const MODEL_API_ENDPOINT = `${API_PREFIX}/model`;
+export const MODEL_LOAD_API_ENDPOINT = `${API_PREFIX}/model/load`;
+export const MODEL_UNLOAD_API_ENDPOINT = `${API_PREFIX}/model/unload`;
 export const TASK_API_ENDPOINT = `${API_PREFIX}/task`;
 export const TRAIN_API_ENDPOINT = `${API_PREFIX}/train`;
 export const MODEL_ALGORITHM_API_ENDPOINT = `${API_PREFIX}/model-algorithm`;
