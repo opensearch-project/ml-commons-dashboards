@@ -14,6 +14,7 @@ import {
   EuiButton,
 } from '@elastic/eui';
 import moment from 'moment';
+import { NodesModal } from './nodes_modal';
 
 import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
@@ -24,7 +25,13 @@ export const ModelDetail = (props: any) => {
   const [loading, setLoading] = useState(false);
   const { params } = useRouteMatch<{ id: string }>();
   const { data: model } = useFetcher(APIProvider.getAPI('model').getOne, params.id);
-
+  const initialState = useMemo(() => (model?.state ? model.state : ''), [model]);
+  const [changedState, setChangedState] = useState('');
+  const state = useMemo(() => (changedState ? changedState : initialState), [
+    changedState,
+    initialState,
+  ]);
+  const [modalVisible, setModalVisible] = useState(false);
   const modelDescriptionListItems = useMemo(
     () =>
       model
@@ -43,7 +50,7 @@ export const ModelDetail = (props: any) => {
             },
             {
               title: 'State',
-              description: model.state,
+              description: state,
             },
             ...(model.trainTime
               ? [
@@ -63,7 +70,7 @@ export const ModelDetail = (props: any) => {
             },
           ]
         : [],
-    [model]
+    [model, state]
   );
 
   const handleLoad = useCallback(async () => {
@@ -75,6 +82,7 @@ export const ModelDetail = (props: any) => {
       console.log('result', task_id, status);
       if (task_id && status === 'CREATED') {
         setLoading(false);
+        setChangedState(MODEL_STATE.loaded);
       }
     } catch (e) {
       setLoading(false);
@@ -94,26 +102,32 @@ export const ModelDetail = (props: any) => {
           unloaded = false;
         }
       });
-      if (unloaded) setLoading(false);
+      if (unloaded) {
+        setLoading(false);
+        setChangedState(MODEL_STATE.unloaded);
+      }
     } catch (e) {
       setLoading(false);
     }
   }, [model]);
+
+  const handleConfirmNodes = useCallback(() => {
+    setModalVisible(false);
+    if (state === MODEL_STATE.loaded) {
+      handleUnLoad();
+    } else {
+      handleLoad();
+    }
+  }, [state]);
 
   return (
     <EuiPanel>
       <EuiPageHeader
         pageTitle="Model Detail"
         rightSideItems={[
-          model?.state === MODEL_STATE.loaded ? (
-            <EuiButton fill onClick={handleUnLoad} isLoading={loading}>
-              UnLoad
-            </EuiButton>
-          ) : (
-            <EuiButton fill onClick={handleLoad} isLoading={loading}>
-              Load
-            </EuiButton>
-          ),
+          <EuiButton fill onClick={() => setModalVisible(true)} isLoading={loading}>
+            {state === MODEL_STATE.loaded ? 'Unload' : 'Load'}
+          </EuiButton>,
           <Link to={generatePath(routerPaths.predict, { id: params.id })}>
             <EuiButton fill>Predict</EuiButton>
           </Link>,
@@ -129,6 +143,14 @@ export const ModelDetail = (props: any) => {
         <EuiDescriptionList listItems={modelDescriptionListItems} />
       ) : (
         <EuiLoadingSpinner size="xl" />
+      )}
+      {modalVisible && (
+        <NodesModal
+          onClose={() => {
+            setModalVisible(false);
+          }}
+          onConfirm={handleConfirmNodes}
+        />
       )}
     </EuiPanel>
   );
