@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { generateTermQuery, generateMustQueries } from './query';
+import { generateTermQuery } from './query';
 
 export const convertModelSource = (source: {
   model_content: string;
@@ -52,21 +52,30 @@ export const generateModelSearchQuery = ({
   context?: Record<string, Array<string | number>>;
   trainedStart?: number;
   trainedEnd?: number;
-}) =>
-  generateMustQueries([
-    ...(ids ? [{ ids: { values: ids } }] : []),
-    ...(algorithms ? [generateTermQuery('algorithm', algorithms)] : []),
-    ...(context ? genereateContextQuery(context) : []),
-    ...(trainedStart || trainedEnd
-      ? [
-          {
-            range: {
-              model_train_time: {
-                ...(trainedStart ? { gte: trainedStart } : {}),
-                ...(trainedEnd ? { lte: trainedEnd } : {}),
+}) => ({
+  bool: {
+    must: [
+      ...(ids ? [{ ids: { values: ids } }] : []),
+      ...(algorithms ? [generateTermQuery('algorithm', algorithms)] : []),
+      ...(context ? genereateContextQuery(context) : []),
+      ...(trainedStart || trainedEnd
+        ? [
+            {
+              range: {
+                model_train_time: {
+                  ...(trainedStart ? { gte: trainedStart } : {}),
+                  ...(trainedEnd ? { lte: trainedEnd } : {}),
+                },
               },
             },
-          },
-        ]
-      : []),
-  ]);
+          ]
+        : []),
+    ],
+
+    must_not: {
+      exists: {
+        field: 'chunk_number',
+      },
+    },
+  },
+});
