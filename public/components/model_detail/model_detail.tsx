@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import { useRouteMatch, Link, generatePath } from 'react-router-dom';
 import {
   EuiPanel,
@@ -20,6 +20,9 @@ import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { MODEL_STATE } from '../../../common/model';
+import { usePollingUntil } from '../../hooks/use_polling_until';
+
+export class NoIdProvideError {}
 
 export const ModelDetail = (props: any) => {
   const [loading, setLoading] = useState(false);
@@ -27,6 +30,7 @@ export const ModelDetail = (props: any) => {
   const { data: model } = useFetcher(APIProvider.getAPI('model').getOne, params.id);
   const initialState = useMemo(() => (model?.state ? model.state : ''), [model]);
   const [changedState, setChangedState] = useState('');
+  const deleteIdRef = useRef<string>();
   const state = useMemo(() => (changedState ? changedState : initialState), [
     changedState,
     initialState,
@@ -73,16 +77,38 @@ export const ModelDetail = (props: any) => {
     [model, state]
   );
 
+  const { start: startPolling } = usePollingUntil({
+    continueChecker: async () => {
+      if (!deleteIdRef.current) {
+        throw new NoIdProvideError();
+      }
+      const { data } = await APIProvider.getAPI('task').search({
+        ids: [deleteIdRef.current],
+        pageSize: 1,
+        currentPage: 1,
+      });
+      return data[0].state !== 'COMPLETED' && data[0].state !== 'FAILED';
+    },
+    onGiveUp: () => {
+      setLoading(false);
+      setChangedState(MODEL_STATE.loaded);
+    },
+    onMaxRetries: () => {
+      setLoading(false);
+    },
+  });
+
   const handleLoad = useCallback(async () => {
     const modelId = model?.id;
     if (!modelId) return;
     setLoading(true);
     try {
       const { task_id, status } = await APIProvider.getAPI('model').load(modelId);
-      console.log('result', task_id, status);
       if (task_id && status === 'CREATED') {
+        deleteIdRef.current = task_id;
+        startPolling();
+      } else {
         setLoading(false);
-        setChangedState(MODEL_STATE.loaded);
       }
     } catch (e) {
       setLoading(false);
