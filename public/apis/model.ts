@@ -7,6 +7,7 @@ import {
   MODEL_API_ENDPOINT,
   MODEL_LOAD_API_ENDPOINT,
   MODEL_UNLOAD_API_ENDPOINT,
+  MODEL_UPLOAD_API_ENDPOINT,
 } from '../../server/routes/constants';
 import { Pagination } from '../../server/services/utils/pagination';
 import { InnerHttpProvider } from './inner_http_provider';
@@ -40,6 +41,28 @@ export interface ModelUnloadResponse {
       [modelId: string]: string;
     };
   };
+}
+
+interface UploadModelBase {
+  name: string;
+  version: string;
+  description: string;
+  modelFormat: string;
+  modelConfig: {
+    modelType: string;
+    embeddingDimension: number;
+    frameworkType: string;
+  };
+}
+
+export interface UploadModelByURL extends UploadModelBase {
+  url: string;
+}
+
+export interface UploadModelByChunk extends UploadModelBase {
+  modelTaskType: string;
+  modelContentHashValue: string;
+  totalChunks: number;
 }
 
 export class Model {
@@ -79,5 +102,28 @@ export class Model {
     return InnerHttpProvider.getHttp().post<ModelUnloadResponse>(
       `${MODEL_UNLOAD_API_ENDPOINT}/${modelId}`
     );
+  }
+
+  public upload<T extends UploadModelByURL | UploadModelByChunk>(
+    model: T
+  ): Promise<
+    T extends UploadModelByURL
+      ? { taskId: string }
+      : T extends UploadModelByChunk
+      ? { modelId: string }
+      : never
+  > {
+    return InnerHttpProvider.getHttp().post(MODEL_UPLOAD_API_ENDPOINT, {
+      body: JSON.stringify(model),
+    });
+  }
+
+  public uploadChunk(modelId: string, chunkId: string, chunkContent: Blob) {
+    return InnerHttpProvider.getHttp().post(`${MODEL_API_ENDPOINT}/${modelId}/chunk/${chunkId}`, {
+      body: chunkContent,
+      headers: {
+        'Content-Type': 'application/octet-stream',
+      },
+    });
   }
 }

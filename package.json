@@ -15,7 +15,9 @@
     }
   },
   "dependencies": {
-    "papaparse": "^5.3.2"
+    "hash-wasm": "^4.9.0",
+    "papaparse": "^5.3.2",
+    "react-hook-form": "^7.39.4"
   },
   "devDependencies": {
     "@types/papaparse": "^5.3.5",

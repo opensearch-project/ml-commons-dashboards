@@ -25,7 +25,7 @@ import {
 } from '../../../../src/core/server';
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { generateTaskSearchQuery, convertTaskSource } from './utils/task';
-import { TASK_SEARCH_API } from './utils/constants';
+import { TASK_SEARCH_API, TASK_BASE_API } from './utils/constants';
 import { RecordNotFoundError } from './errors';
 
 const taskSortFieldMapping: { [key: string]: string } = {
@@ -144,5 +144,18 @@ export class TaskService {
     });
 
     return buckets.map(({ key }: { key: string }) => key);
+  }
+
+  public async getOne({ client, taskId }: { client: IScopedClusterClient; taskId: string }) {
+    const {
+      body: { error, ...restFields },
+    } = await client.asCurrentUser.transport.request({
+      method: 'GET',
+      path: `${TASK_BASE_API}/${taskId}`,
+    });
+    return {
+      error,
+      ...convertTaskSource(restFields),
+    };
   }
 }
