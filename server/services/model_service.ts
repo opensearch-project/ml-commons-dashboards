@@ -18,12 +18,52 @@
  *   permissions and limitations under the License.
  */
 
-import { ILegacyClusterClient, ScopeableRequest } from '../../../../src/core/server';
+import {
+  ILegacyClusterClient,
+  IScopedClusterClient,
+  ScopeableRequest,
+} from '../../../../src/core/server';
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { convertModelSource, generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
+import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
 
 const modelSortFieldMapping: { [key: string]: string } = { trainTime: 'model_train_time' };
+
+interface UploadModelBase {
+  name: string;
+  version: string;
+  description: string;
+  modelFormat: string;
+  modelConfig: {
+    modelType: string;
+    embeddingDimension: number;
+    frameworkType: string;
+  };
+}
+
+interface UploadModelByURL extends UploadModelBase {
+  url: string;
+}
+
+interface UploadModelByChunk extends UploadModelBase {
+  modelTaskType: string;
+  modelContentHashValue: string;
+  totalChunks: number;
+}
+
+type UploadResultInner<
+  T extends UploadModelByURL | UploadModelByChunk
+> = T extends UploadModelByChunk
+  ? { modelId: string; status: string }
+  : T extends UploadModelByURL
+  ? { taskId: string; status: string }
+  : never;
+
+type UploadResult<T extends UploadModelByURL | UploadModelByChunk> = Promise<UploadResultInner<T>>;
+
+const isUploaModelByURL = (test: UploadModelByURL | UploadModelByChunk): test is UploadModelByURL =>
+  (test as UploadModelByURL).url !== undefined;
 
 export class ModelService {
   private osClient: ILegacyClusterClient;
@@ -112,5 +152,71 @@ export class ModelService {
         modelId,
       });
     return result;
+  }
+
+  public static async upload<T extends UploadModelByChunk | UploadModelByURL>({
+    client,
+    model,
+  }: {
+    client: IScopedClusterClient;
+    model: T;
+  }): UploadResult<T> {
+    const { name, version, description, modelFormat, modelConfig } = model;
+    const uploadModelBase = {
+      name,
+      version,
+      description,
+      model_format: modelFormat,
+      model_config: {
+        model_type: modelConfig.modelType,
+        embedding_dimension: modelConfig.embeddingDimension,
+        framework_type: modelConfig.frameworkType,
+      },
+    };
+    if (isUploaModelByURL(model)) {
+      const { task_id: taskId, status } = (
+        await client.asCurrentUser.transport.request({
+          method: 'POST',
+          path: MODEL_UPLOAD_API,
+          body: {
+            ...uploadModelBase,
+            url: model.url,
+          },
+        })
+      ).body;
+      return { taskId, status } as UploadResultInner<T>;
+    }
+
+    const { model_id: modelId, status } = (
+      await client.asCurrentUser.transport.request({
+        method: 'POST',
+        path: MODEL_META_API,
+        body: {
+          ...uploadModelBase,
+          model_task_type: model.modelTaskType,
+          model_content_hash_value: model.modelContentHashValue,
+          total_chunks: model.totalChunks,
+        },
+      })
+    ).body;
+    return { modelId, status } as UploadResultInner<T>;
+  }
+
+  public static async uploadModelChunk({
+    client,
+    modelId,
+    chunkId,
+    chunk,
+  }: {
+    client: IScopedClusterClient;
+    modelId: string;
+    chunkId: string;
+    chunk: Buffer;
+  }) {
+    return client.asCurrentUser.transport.request({
+      method: 'POST',
+      path: `${MODEL_BASE_API}/${modelId}/chunk/${chunkId}`,
+      body: chunk,
+    });
   }
 }
