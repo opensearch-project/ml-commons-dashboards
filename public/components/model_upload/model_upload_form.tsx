@@ -14,6 +14,7 @@ import {
   EuiRadioGroup,
   EuiFieldNumber,
   EuiFilePicker,
+  EuiSelect,
 } from '@elastic/eui';
 
 enum UploadType {
@@ -30,6 +31,32 @@ const uploadTypeRadios = [
     id: UploadType.FILE,
     label: 'By Select File',
   },
+];
+
+enum ModelFormat {
+  ONNX = 'ONNX',
+  TorchScript = 'TORCH_SCRIPT',
+}
+
+const modelFormatOptions = [
+  { text: 'ONNX', value: ModelFormat.ONNX },
+  {
+    text: 'Torch Script',
+    value: ModelFormat.TorchScript,
+  },
+];
+
+enum ModelFrameworkType {
+  HuggingFaceTransformers = 'HUGGINGFACE_TRANSFORMERS',
+  SentenceTransformers = 'SENTENCE_TRANSFORMERS',
+}
+
+const modelFrameworkTypeOptions = [
+  {
+    text: 'Hugging Face Transformers',
+    value: ModelFrameworkType.HuggingFaceTransformers,
+  },
+  { text: 'Sentence Transformers', value: ModelFrameworkType.SentenceTransformers },
 ];
 
 export interface URLModelUploadFormExtraData {
@@ -75,7 +102,6 @@ export const ModelUploadForm = ({ onSubmit }: ModelUploadFormProps) => {
   const { ref: nameRef, ...nameRegister } = register('name');
   const { ref: versionRef, ...versionRegister } = register('version');
   const { ref: descriptionRef, ...descriptionRegister } = register('description');
-  const { ref: modelFormatRef, ...modelFormatRegister } = register('modelFormat');
   const { ref: modelConfigModelTypeRef, ...modelConfigModelTypeRegister } = register(
     'modelConfig.modelType'
   );
@@ -85,9 +111,6 @@ export const ModelUploadForm = ({ onSubmit }: ModelUploadFormProps) => {
     max,
     ...modelConfigEmbeddingDimensionRegister
   } = register('modelConfig.embeddingDimension');
-  const { ref: modelConfigFrameworkTypeRef, ...modelConfigFrameworkTypeRegister } = register(
-    'modelConfig.frameworkType'
-  );
   const isUploadByURL = watch('uploadType') === UploadType.URL;
 
   return (
@@ -102,7 +125,13 @@ export const ModelUploadForm = ({ onSubmit }: ModelUploadFormProps) => {
         <EuiTextArea inputRef={descriptionRef} {...descriptionRegister} />
       </EuiFormRow>
       <EuiFormRow label="Model Format">
-        <EuiFieldText inputRef={modelFormatRef} {...modelFormatRegister} />
+        <Controller
+          name="modelFormat"
+          control={control}
+          render={({ field }) => (
+            <EuiSelect options={modelFormatOptions} hasNoInitialSelection {...field} />
+          )}
+        />
       </EuiFormRow>
       <EuiFormRow label="Model Config Model Type">
         <EuiFieldText inputRef={modelConfigModelTypeRef} {...modelConfigModelTypeRegister} />
@@ -114,9 +143,12 @@ export const ModelUploadForm = ({ onSubmit }: ModelUploadFormProps) => {
         />
       </EuiFormRow>
       <EuiFormRow label="Model Config Framework Type">
-        <EuiFieldText
-          inputRef={modelConfigFrameworkTypeRef}
-          {...modelConfigFrameworkTypeRegister}
+        <Controller
+          name="modelConfig.frameworkType"
+          control={control}
+          render={({ field }) => (
+            <EuiSelect options={modelFrameworkTypeOptions} hasNoInitialSelection {...field} />
+          )}
         />
       </EuiFormRow>
       <EuiFormRow label="Upload Type">
