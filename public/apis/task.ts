@@ -24,9 +24,24 @@ export interface TaskSearchItem {
   taskType: string;
 }
 
-export interface TaskSarchResponse {
+export interface TaskSearchResponse {
   data: TaskSearchItem[];
   pagination: Pagination;
+}
+
+export interface TaskGetOneResponse
+  extends Pick<
+    TaskSearchItem,
+    | 'modelId'
+    | 'taskType'
+    | 'functionName'
+    | 'state'
+    | 'workerNode'
+    | 'createTime'
+    | 'lastUpdateTime'
+    | 'isAsync'
+  > {
+  error?: string;
 }
 
 export class Task {
@@ -42,7 +57,7 @@ export class Task {
     currentPage: number;
     pageSize: number;
   }) {
-    return InnerHttpProvider.getHttp().get<TaskSarchResponse>(TASK_API_ENDPOINT, {
+    return InnerHttpProvider.getHttp().get<TaskSearchResponse>(TASK_API_ENDPOINT, {
       query,
     });
   }
@@ -57,5 +72,9 @@ export class Task {
 
   public getAllStates() {
     return InnerHttpProvider.getHttp().get<string[]>(TASK_STATE_API_ENDPOINT);
+  }
+
+  public getOne(taskId: string) {
+    return InnerHttpProvider.getHttp().get<TaskGetOneResponse>(`${TASK_API_ENDPOINT}/${taskId}`);
   }
 }

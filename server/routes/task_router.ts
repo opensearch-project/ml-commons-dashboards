@@ -111,4 +111,26 @@ export const taskRouter = (services: { taskService: TaskService }, router: IRout
       }
     }
   );
+
+  router.get(
+    {
+      path: `${TASK_API_ENDPOINT}/{taskId}`,
+      validate: {
+        params: schema.object({
+          taskId: schema.string(),
+        }),
+      },
+    },
+    async (context, request) => {
+      try {
+        const body = await taskService.getOne({
+          client: context.core.opensearch.client,
+          taskId: request.params.taskId,
+        });
+        return opensearchDashboardsResponseFactory.ok({ body });
+      } catch (err) {
+        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+      }
+    }
+  );
 };
