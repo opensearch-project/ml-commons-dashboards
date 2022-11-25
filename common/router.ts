@@ -10,6 +10,7 @@ import { ModelList } from '../public/components/model_list';
 import { TaskList } from '../public/components/task_list';
 import { routerPaths } from './router_paths';
 import { ModelDetail } from '../public/components/model_detail';
+import { ModelUpload } from '../public/components/model_upload';
 
 export const ROUTES = [
   {
@@ -45,5 +46,10 @@ export const ROUTES = [
   {
     path: routerPaths.modelDetail,
     Component: ModelDetail,
+  },
+  {
+    path: routerPaths.modelUpload,
+    label: 'Model Upload',
+    Component: ModelUpload,
   },
 ];

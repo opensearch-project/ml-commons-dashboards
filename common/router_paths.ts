@@ -9,4 +9,5 @@ export const routerPaths = {
   taskList: '/task-list',
   train: '/train',
   modelDetail: '/model/detail/:id',
+  modelUpload: '/model/upload',
 };
