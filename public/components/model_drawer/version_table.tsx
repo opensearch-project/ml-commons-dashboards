@@ -5,13 +5,7 @@
 
 import React, { useMemo, useCallback, useRef } from 'react';
 import { generatePath, useHistory } from 'react-router-dom';
-import {
-  CriteriaWithPagination,
-  CustomItemAction,
-  Direction,
-  EuiBasicTable,
-  EuiButtonIcon,
-} from '@elastic/eui';
+import { CriteriaWithPagination, Direction, EuiBasicTable } from '@elastic/eui';
 
 import { ModelSearchItem } from '../../apis/model';
 import { routerPaths } from '../../../common/router_paths';
@@ -23,7 +17,7 @@ export interface ModelTableCriteria {
   sort?: ModelTableSort;
 }
 
-export function ModelTable(props: {
+export function VersionTable(props: {
   models: ModelSearchItem[];
   pagination: {
     currentPage: number;
@@ -31,11 +25,9 @@ export function ModelTable(props: {
     totalRecords: number | undefined;
   };
   sort: ModelTableSort;
-  onModelDelete: (id: string) => void;
   onChange: (criteria: ModelTableCriteria) => void;
-  onViewModelDrawer: (id: string) => void;
 }) {
-  const { sort, models, onChange, onModelDelete, onViewModelDrawer } = props;
+  const { sort, models, onChange } = props;
   const history = useHistory();
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -65,36 +57,8 @@ export function ModelTable(props: {
         render: renderTime,
         sortable: true,
       },
-      {
-        name: 'Actions',
-        actions: [
-          {
-            render: ({ id }) => (
-              <>
-                <EuiButtonIcon
-                  iconType="lensApp"
-                  onClick={(e: { stopPropagation: () => void }) => {
-                    e.stopPropagation();
-                    onViewModelDrawer(id);
-                  }}
-                  data-test-subj={`model-version-button-${id}`}
-                />
-                <EuiButtonIcon
-                  iconType="trash"
-                  color="danger"
-                  onClick={(e: { stopPropagation: () => void }) => {
-                    e.stopPropagation();
-                    onModelDelete(id);
-                  }}
-                  data-test-subj={`model-delete-button-${id}`}
-                />
-              </>
-            ),
-          } as CustomItemAction<ModelSearchItem>,
-        ],
-      },
     ],
-    [onModelDelete, onViewModelDrawer]
+    []
   );
 
   const pagination = useMemo(
