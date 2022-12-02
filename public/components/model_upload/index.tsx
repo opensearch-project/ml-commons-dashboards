@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   EuiLoadingSpinner,
   EuiModal,
@@ -12,6 +12,7 @@ import {
   EuiModalHeaderTitle,
   EuiPageHeader,
 } from '@elastic/eui';
+import { useLocation } from 'react-router-dom';
 
 import { CoreStart } from 'opensearch-dashboards/public';
 import {
@@ -33,6 +34,9 @@ export function ModelUpload({ notifications }: { notifications: CoreStart['notif
   const [loadingModelState, setLoadingModelState] = useState(LoadingModel.HIDE);
   const [uploadChunkProgress, setUploadChunkProgress] = useState('');
   const uploadTaskIdRef = useRef('');
+  const location = useLocation();
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const prefilledName = searchParams.get('name');
 
   const showModelUploadSuccessToast = useCallback(() => {
     notifications.toasts.addSuccess('Model upload success');
@@ -130,10 +134,15 @@ export function ModelUpload({ notifications }: { notifications: CoreStart['notif
     },
     [showModelUploadSuccessToast, showModelUploadErrorToast, start]
   );
+
   return (
     <>
       <EuiPageHeader pageTitle="Model Upload" />
-      <ModelUploadForm onSubmit={handleSubmit} />
+      <ModelUploadForm
+        disabledFields={prefilledName ? ['name'] : undefined}
+        defaultValues={prefilledName ? { name: prefilledName } : undefined}
+        onSubmit={handleSubmit}
+      />
       {loadingModelState !== LoadingModel.HIDE && (
         <EuiModal onClose={() => {}}>
           <EuiModalHeader>
