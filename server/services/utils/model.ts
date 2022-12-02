@@ -48,12 +48,14 @@ export const generateModelSearchQuery = ({
   context,
   trainedStart,
   trainedEnd,
+  name,
 }: {
   ids?: string[];
   algorithms?: string[];
   context?: Record<string, Array<string | number>>;
   trainedStart?: number;
   trainedEnd?: number;
+  name?: string;
 }) => ({
   bool: {
     must: [
@@ -68,6 +70,15 @@ export const generateModelSearchQuery = ({
                   ...(trainedStart ? { gte: trainedStart } : {}),
                   ...(trainedEnd ? { lte: trainedEnd } : {}),
                 },
+              },
+            },
+          ]
+        : []),
+      ...(name
+        ? [
+            {
+              term: {
+                'name.keyword': name,
               },
             },
           ]
