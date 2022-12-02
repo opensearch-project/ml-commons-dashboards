@@ -91,12 +91,19 @@ export const isFileModelUploadFormData = (
 
 export interface ModelUploadFormProps {
   onSubmit: (data: ModelUploadFormData) => void;
+  defaultValues?: Partial<ModelUploadFormData>;
+  disabledFields?: Array<'name'>;
 }
 
-export const ModelUploadForm = ({ onSubmit }: ModelUploadFormProps) => {
+export const ModelUploadForm = ({
+  onSubmit,
+  defaultValues,
+  disabledFields,
+}: ModelUploadFormProps) => {
   const { register, handleSubmit, watch, control } = useForm<ModelUploadFormData>({
     defaultValues: {
       uploadType: UploadType.FILE,
+      ...defaultValues,
     },
   });
   const { ref: nameRef, ...nameRegister } = register('name');
@@ -116,7 +123,11 @@ export const ModelUploadForm = ({ onSubmit }: ModelUploadFormProps) => {
   return (
     <EuiForm onSubmit={handleSubmit(onSubmit)} component="form">
       <EuiFormRow label="Name">
-        <EuiFieldText inputRef={nameRef} {...nameRegister} />
+        <EuiFieldText
+          disabled={disabledFields?.includes('name')}
+          inputRef={nameRef}
+          {...nameRegister}
+        />
       </EuiFormRow>
       <EuiFormRow label="Version">
         <EuiFieldText inputRef={versionRef} {...versionRegister} />
