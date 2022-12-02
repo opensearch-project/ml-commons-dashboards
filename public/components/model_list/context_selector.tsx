@@ -91,7 +91,7 @@ export const ContextSelector = ({
     APIProvider.getAPI('modelAlgorithm')
       .getOne(algorithm)
       .then((payload) => {
-        setFilter(payload.filter);
+        setFilter(payload.filter || {});
       });
   }, [algorithm]);
 
