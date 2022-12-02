@@ -75,12 +75,7 @@ export const ModelDrawer = ({ onClose, id }: Props) => {
         <EuiTitle size="m">
           <h4>Versions</h4>
         </EuiTitle>
-        {/* <VersionTable
-          models={models}
-          sort={'trainTime-desc'}
-          pagination={pagination}
-          onChange={handleTableChange}
-        /> */}
+        <VersionTable models={[]} />
       </EuiFlyoutBody>
     </EuiFlyout>
   );
