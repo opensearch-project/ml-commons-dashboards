@@ -73,6 +73,7 @@ export class Model {
     trainedStart?: number;
     trainedEnd?: number;
     sort?: Array<'trainTime-desc' | 'trainTime-asc'>;
+    name?: string;
     currentPage: number;
     pageSize: number;
   }) {
