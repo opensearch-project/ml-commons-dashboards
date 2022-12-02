@@ -51,6 +51,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
       path: MODEL_API_ENDPOINT,
       validate: {
         query: schema.object({
+          name: schema.maybe(schema.string()),
           algorithms: schema.maybe(
             schema.oneOf([schema.string(), schema.arrayOf(schema.string())])
           ),
@@ -90,6 +91,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
         trainedStart,
         trainedEnd,
         sort,
+        name,
       } = request.query;
       try {
         const payload = await modelService.search({
@@ -103,6 +105,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           trainedStart,
           trainedEnd,
           sort: typeof sort === 'string' ? [sort] : sort,
+          name,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (err) {

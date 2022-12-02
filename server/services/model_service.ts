@@ -86,6 +86,7 @@ export class ModelService {
     trainedStart?: number;
     trainedEnd?: number;
     sort?: Array<'trainTime-desc' | 'trainTime-asc'>;
+    name?: string;
   }) {
     const { hits } = await this.osClient
       .asScoped(request)
