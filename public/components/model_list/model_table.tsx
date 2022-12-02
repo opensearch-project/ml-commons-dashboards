@@ -33,8 +33,9 @@ export function ModelTable(props: {
   sort: ModelTableSort;
   onModelDelete: (id: string) => void;
   onChange: (criteria: ModelTableCriteria) => void;
+  onViewModelDrawer: (id: string) => void;
 }) {
-  const { sort, models, onChange, onModelDelete } = props;
+  const { sort, models, onChange, onModelDelete, onViewModelDrawer } = props;
   const history = useHistory();
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -69,21 +70,31 @@ export function ModelTable(props: {
         actions: [
           {
             render: ({ id }) => (
-              <EuiButtonIcon
-                iconType="trash"
-                color="danger"
-                onClick={(e: { stopPropagation: () => void }) => {
-                  e.stopPropagation();
-                  onModelDelete(id);
-                }}
-                data-test-subj={`model-delete-button-${id}`}
-              />
+              <>
+                <EuiButtonIcon
+                  iconType="lensApp"
+                  onClick={(e: { stopPropagation: () => void }) => {
+                    e.stopPropagation();
+                    onViewModelDrawer(id);
+                  }}
+                  data-test-subj={`model-version-button-${id}`}
+                />
+                <EuiButtonIcon
+                  iconType="trash"
+                  color="danger"
+                  onClick={(e: { stopPropagation: () => void }) => {
+                    e.stopPropagation();
+                    onModelDelete(id);
+                  }}
+                  data-test-subj={`model-delete-button-${id}`}
+                />
+              </>
             ),
           } as CustomItemAction<ModelSearchItem>,
         ],
       },
     ],
-    [onModelDelete]
+    [onModelDelete, onViewModelDrawer]
   );
 
   const pagination = useMemo(
