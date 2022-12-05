@@ -21,8 +21,8 @@ export function VersionTable(props: { models: ModelSearchItem[] }) {
         name: 'ID',
       },
       {
-        field: 'name',
-        name: 'Name',
+        field: 'version',
+        name: 'Version',
       },
       {
         field: 'algorithm',

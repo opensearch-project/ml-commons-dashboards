@@ -36,7 +36,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     pageSize: 15,
     sort: 'trainTime-desc',
   });
-  const [drawerModelId, setDrawerModelId] = useState('');
+  const [drawerModelName, setDrawerModelName] = useState('');
   const { data, reload } = useFetcher(APIProvider.getAPI('model').search, {
     ...params,
     sort: undefined,
@@ -87,8 +87,8 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     confirmModelDeleteRef.current?.show(modelId);
   }, []);
 
-  const handleViewModelDrawer = useCallback((modelId: string) => {
-    setDrawerModelId(modelId);
+  const handleViewModelDrawer = useCallback((name: string) => {
+    setDrawerModelName(name);
   }, []);
 
   const handleTableChange = useCallback((criteria) => {
@@ -154,7 +154,9 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
         onViewModelDrawer={handleViewModelDrawer}
       />
       <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
-      {drawerModelId && <ModelDrawer onClose={() => setDrawerModelId('')} id={drawerModelId} />}
+      {drawerModelName && (
+        <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
+      )}
     </EuiPanel>
   );
 };
