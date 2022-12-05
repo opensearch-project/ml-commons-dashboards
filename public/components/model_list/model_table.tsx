@@ -33,7 +33,7 @@ export function ModelTable(props: {
   sort: ModelTableSort;
   onModelDelete: (id: string) => void;
   onChange: (criteria: ModelTableCriteria) => void;
-  onViewModelDrawer: (id: string) => void;
+  onViewModelDrawer: (name: string) => void;
 }) {
   const { sort, models, onChange, onModelDelete, onViewModelDrawer } = props;
   const history = useHistory();
@@ -69,15 +69,15 @@ export function ModelTable(props: {
         name: 'Actions',
         actions: [
           {
-            render: ({ id }) => (
+            render: ({ name, id }) => (
               <>
                 <EuiButtonIcon
                   iconType="lensApp"
                   onClick={(e: { stopPropagation: () => void }) => {
                     e.stopPropagation();
-                    onViewModelDrawer(id);
+                    onViewModelDrawer(name);
                   }}
-                  data-test-subj={`model-version-button-${id}`}
+                  data-test-subj={`model-version-button-${name}`}
                 />
                 <EuiButtonIcon
                   iconType="trash"
