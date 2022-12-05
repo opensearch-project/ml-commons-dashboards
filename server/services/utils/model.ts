@@ -12,6 +12,7 @@ export const convertModelSource = (source: {
   model_context: string;
   model_train_time: number;
   model_state: string;
+  model_version: string;
 }) => ({
   content: source.model_content,
   name: source.name,
@@ -19,6 +20,7 @@ export const convertModelSource = (source: {
   context: source.model_context,
   trainTime: source.model_train_time,
   state: source.model_state,
+  version: source.model_version,
 });
 
 const genereateContextQuery = (context: Record<string, Array<string | number>>) => {
