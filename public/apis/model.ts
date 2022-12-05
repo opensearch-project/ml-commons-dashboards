@@ -19,6 +19,7 @@ export interface ModelSearchItem {
   context: string;
   trainTime: number;
   state: string;
+  version: string;
 }
 
 export interface ModelDetail extends ModelSearchItem {

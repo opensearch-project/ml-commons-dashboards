@@ -16,66 +16,53 @@ import {
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import moment from 'moment';
 import { Link, generatePath } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionTable } from './version_table';
 
 interface Props {
   onClose: () => void;
-  id: string;
+  name: string;
 }
 
-export const ModelDrawer = ({ onClose, id }: Props) => {
-  const { data: model } = useFetcher(APIProvider.getAPI('model').getOne, id);
+export const ModelDrawer = ({ onClose, name }: Props) => {
+  const { data: model } = useFetcher(APIProvider.getAPI('model').search, {
+    name,
+    currentPage: 1,
+    pageSize: 50,
+  });
+  const latestVersion = useMemo(() => {
+    //TODO: currently assume that api will return versions in order
+    if (model?.data) {
+      const data = model.data;
+      return data[data.length - 1];
+    }
+    return { id: '' };
+  }, [model]);
 
-  const modelDescriptionListItems = useMemo(
-    () =>
-      model
-        ? [
-            {
-              title: 'ID',
-              description: model.id,
-            },
-            {
-              title: 'Algorithm',
-              description: model.algorithm,
-            },
-            {
-              title: 'State',
-              description: model.state,
-            },
-            ...(model.trainTime
-              ? [
-                  {
-                    title: 'Train time',
-                    description: moment(model.trainTime).format(),
-                  },
-                ]
-              : []),
-          ]
-        : [],
-    [model]
-  );
   return (
     <EuiFlyout onClose={onClose} hideCloseButton={true}>
       <EuiFlyoutHeader>
         <EuiPageHeader
-          pageTitle={model?.name ?? ''}
-          rightSideItems={[
-            <Link to={generatePath(routerPaths.modelDetail, { id })}>
-              <EuiButton>View Details</EuiButton>
-            </Link>,
-          ]}
+          pageTitle={name ?? ''}
+          rightSideItems={
+            latestVersion.id
+              ? [
+                  <Link to={generatePath(routerPaths.modelDetail, { id: latestVersion.id })}>
+                    <EuiButton>View Details</EuiButton>
+                  </Link>,
+                ]
+              : []
+          }
         />
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
-        {model && <EuiDescriptionList type="row" listItems={modelDescriptionListItems} />}
+        {model && <EuiDescriptionList type="row" listItems={[]} />}
         <EuiSpacer size="xl" />
         <EuiTitle size="m">
           <h4>Versions</h4>
         </EuiTitle>
-        <VersionTable models={[]} />
+        <VersionTable models={model?.data ?? []} />
       </EuiFlyoutBody>
     </EuiFlyout>
   );
