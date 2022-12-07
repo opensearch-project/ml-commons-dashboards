@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { useRouteMatch, Link, generatePath, useHistory } from 'react-router-dom';
 import {
   EuiPanel,
@@ -12,6 +12,7 @@ import {
   EuiSpacer,
   EuiLoadingSpinner,
   EuiButton,
+  EuiSelect,
 } from '@elastic/eui';
 import moment from 'moment';
 import { NodesModal } from './nodes_modal';
@@ -27,6 +28,7 @@ import {
   ModelConfirmDeleteModalInstance,
 } from '../model_list/model_confirm_delete_modal';
 import { CoreStart } from '../../../../../src/core/public';
+import { generateVersionList, VersionList } from '../../utils';
 
 export class NoIdProvideError {}
 
@@ -36,6 +38,7 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
   const { params } = useRouteMatch<{ id: string }>();
   const history = useHistory();
   const { data: model } = useFetcher(APIProvider.getAPI('model').getOne, params.id);
+  const [versionList, setVersionList] = useState<VersionList>([]);
   const initialState = useMemo(() => (model?.state ? model.state : ''), [model]);
   const [changedState, setChangedState] = useState('');
   const deleteIdRef = useRef<string>();
@@ -84,6 +87,21 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
         : [],
     [model, state]
   );
+  useEffect(() => {
+    const name = model?.name;
+    if (name) {
+      const fn = async () => {
+        const { data } = await APIProvider.getAPI('model').search({
+          name,
+          currentPage: 1,
+          pageSize: 50,
+        });
+        const versionList = generateVersionList(data);
+        setVersionList(versionList);
+      };
+      fn();
+    }
+  }, [model]);
 
   const { start: startPolling } = usePollingUntil({
     continueChecker: async () => {
@@ -163,23 +181,43 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
     history.replace(routerPaths.modelList);
   }, [notifications.toasts, history]);
 
+  const handleVersionChange = useCallback(
+    (e) => {
+      const newId = e.target.value;
+      history.push(generatePath(routerPaths.modelDetail, { id: newId }));
+    },
+    [history]
+  );
+
   return (
     <EuiPanel>
       <EuiPageHeader
         pageTitle="Model Detail"
         rightSideItems={[
-          <EuiButton fill onClick={handleDelete} isLoading={loading}>
+          <EuiButton onClick={handleDelete} isLoading={loading}>
             Delete
           </EuiButton>,
-          <EuiButton fill onClick={() => setModalVisible(true)} isLoading={loading}>
+          <EuiButton onClick={() => setModalVisible(true)} isLoading={loading}>
             {state === MODEL_STATE.loaded ? 'Unload' : 'Load'}
           </EuiButton>,
-          <Link to={generatePath(routerPaths.predict, { id: params.id })}>
-            <EuiButton fill>Predict</EuiButton>
+          <>
+            {model?.name ? (
+              <Link to={`${routerPaths.modelUpload}?name=${model.name}`}>
+                <EuiButton>Resiter new version</EuiButton>
+              </Link>
+            ) : null}
+          </>,
+          <Link to={''}>
+            <EuiButton>Edit</EuiButton>
           </Link>,
           <Link to={routerPaths.modelList}>
             <EuiButton>Back to list</EuiButton>
           </Link>,
+          <>
+            {versionList ? (
+              <EuiSelect options={versionList} value={params.id} onChange={handleVersionChange} />
+            ) : null}
+          </>,
         ]}
         bottomBorder
       />
