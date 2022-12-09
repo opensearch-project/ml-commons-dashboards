@@ -203,7 +203,7 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
           <>
             {model?.name ? (
               <Link to={`${routerPaths.modelUpload}?name=${model.name}`}>
-                <EuiButton>Resiter new version</EuiButton>
+                <EuiButton>Register new version</EuiButton>
               </Link>
             ) : null}
           </>,
