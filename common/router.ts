@@ -11,6 +11,7 @@ import { TaskList } from '../public/components/task_list';
 import { routerPaths } from './router_paths';
 import { ModelDetail } from '../public/components/model_detail';
 import { ModelUpload } from '../public/components/model_upload';
+import { RegisterModel } from '../public/components/register_model';
 
 export const ROUTES = [
   {
@@ -51,5 +52,10 @@ export const ROUTES = [
     path: routerPaths.modelUpload,
     label: 'Model Upload',
     Component: ModelUpload,
+  },
+  {
+    path: routerPaths.registerModel,
+    label: 'Register Model',
+    Component: RegisterModel,
   },
 ];
