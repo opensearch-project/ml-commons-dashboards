@@ -17,6 +17,8 @@ import {
 const modelSortQuerySchema = schema.oneOf([
   schema.literal('trainTime-desc'),
   schema.literal('trainTime-asc'),
+  schema.literal('version-desc'),
+  schema.literal('version-asc'),
 ]);
 
 const modelUploadBaseSchema = {

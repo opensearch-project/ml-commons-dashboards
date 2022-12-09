@@ -28,7 +28,10 @@ import { convertModelSource, generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
 import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
 
-const modelSortFieldMapping: { [key: string]: string } = { trainTime: 'model_train_time' };
+const modelSortFieldMapping: { [key: string]: string } = {
+  trainTime: 'model_train_time',
+  version: 'model_version',
+};
 
 interface UploadModelBase {
   name: string;
@@ -85,7 +88,7 @@ export class ModelService {
     context?: Record<string, Array<string | number>>;
     trainedStart?: number;
     trainedEnd?: number;
-    sort?: Array<'trainTime-desc' | 'trainTime-asc'>;
+    sort?: Array<'trainTime-desc' | 'trainTime-asc' | 'version-desc' | 'version-asc'>;
     name?: string;
   }) {
     const { hits } = await this.osClient

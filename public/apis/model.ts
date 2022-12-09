@@ -73,7 +73,7 @@ export class Model {
     context?: { [key: string]: Array<string | number> };
     trainedStart?: number;
     trainedEnd?: number;
-    sort?: Array<'trainTime-desc' | 'trainTime-asc'>;
+    sort?: Array<'trainTime-desc' | 'trainTime-asc' | 'version-desc' | 'version-asc'>;
     name?: string;
     currentPage: number;
     pageSize: number;
