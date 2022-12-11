@@ -11,7 +11,7 @@ import { TaskList } from '../public/components/task_list';
 import { routerPaths } from './router_paths';
 import { ModelDetail } from '../public/components/model_detail';
 import { ModelUpload } from '../public/components/model_upload';
-import { RegisterModel } from '../public/components/register_model';
+import { RegisterModelForm } from '../public/components/register_model';
 
 export const ROUTES = [
   {
@@ -56,6 +56,6 @@ export const ROUTES = [
   {
     path: routerPaths.registerModel,
     label: 'Register Model',
-    Component: RegisterModel,
+    Component: RegisterModelForm,
   },
 ];

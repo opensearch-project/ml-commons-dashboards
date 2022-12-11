@@ -1,1 +1,1 @@
-export { RegisterModel } from './register_model';
+export { RegisterModelForm } from './register_model';

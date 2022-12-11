@@ -1,4 +1,4 @@
-export interface RegisterModelForm {
+export interface RegisterModelFormData {
   name: string;
   version: number;
   description: string;
