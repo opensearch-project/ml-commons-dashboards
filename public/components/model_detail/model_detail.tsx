@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
-import { useRouteMatch, Link, generatePath, useHistory } from 'react-router-dom';
+import { useRouteMatch, generatePath, useHistory } from 'react-router-dom';
 import {
   EuiPanel,
   EuiPageHeader,
@@ -22,6 +22,7 @@ import { routerPaths } from '../../../common/router_paths';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { MODEL_STATE } from '../../../common/model';
 import { usePollingUntil } from '../../hooks/use_polling_until';
+import { EuiLinkButton } from '../common';
 
 import {
   ModelConfirmDeleteModal,
@@ -202,17 +203,13 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
           </EuiButton>,
           <>
             {model?.name ? (
-              <Link to={`${routerPaths.modelUpload}?name=${model.name}`}>
-                <EuiButton>Register new version</EuiButton>
-              </Link>
+              <EuiLinkButton to={`${routerPaths.modelUpload}?name=${model.name}`}>
+                Register new version
+              </EuiLinkButton>
             ) : null}
           </>,
-          <Link to={''}>
-            <EuiButton>Edit</EuiButton>
-          </Link>,
-          <Link to={routerPaths.modelList}>
-            <EuiButton>Back to list</EuiButton>
-          </Link>,
+          <EuiButton>Edit</EuiButton>,
+          <EuiLinkButton to={routerPaths.modelList}>Back to list</EuiLinkButton>,
           <>
             {versionList ? (
               <EuiSelect options={versionList} value={params.id} onChange={handleVersionChange} />
