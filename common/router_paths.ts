@@ -10,4 +10,5 @@ export const routerPaths = {
   train: '/train',
   modelDetail: '/model/detail/:id',
   modelUpload: '/model/upload',
+  registerModel: '/model-registry/register-model',
 };

@@ -13,8 +13,8 @@ import { ROUTES } from '../../common/router';
 import { store } from '../../redux/store';
 
 import { CoreStart, IUiSettingsClient } from '../../../../src/core/public';
-import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
-import { DataPublicPluginStart } from '../../../../../src/plugins/data/public';
+import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
+import { DataPublicPluginStart } from '../../../../src/plugins/data/public';
 
 import { NavPanel } from '../components/nav_panel';
 import { GlobalBreadcrumbs } from './global_breadcrumbs';
