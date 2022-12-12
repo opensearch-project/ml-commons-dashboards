@@ -13,14 +13,14 @@ import {
   EuiSpacer,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButton,
   EuiDescriptionList,
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { Link, generatePath, useHistory } from 'react-router-dom';
+import { generatePath, useHistory } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionTable } from './version_table';
+import { EuiLinkButton, EuiCustomLink } from '../common';
 
 export type VersionTableSort = 'version-desc' | 'version-asc';
 
@@ -37,7 +37,6 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
     pageSize: 50,
     sort: [sort],
   });
-  const history = useHistory();
   const latestVersion = useMemo(() => {
     //TODO: currently assume that api will return versions in order
     if (model?.data) {
@@ -58,14 +57,14 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
         <EuiTitle>
           <h2>{name}</h2>
         </EuiTitle>
-        {latestVersion.id
-          ? [
-              <EuiSpacer size="l" />,
-              <Link to={generatePath(routerPaths.modelDetail, { id: latestVersion.id })}>
-                <EuiLink>View Full Details</EuiLink>
-              </Link>,
-            ]
-          : []}
+        {latestVersion.id ? (
+          <>
+            <EuiSpacer size="l" />,
+            <EuiCustomLink to={generatePath(routerPaths.modelDetail, { id: latestVersion.id })}>
+              <EuiLink>View Full Details</EuiLink>
+            </EuiCustomLink>
+          </>
+        ) : null}
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         {model && <EuiDescriptionList type="row" listItems={[]} />}
@@ -76,14 +75,9 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem />
-          <EuiButton
-            fill
-            onClick={() => {
-              history.push(`${routerPaths.modelUpload}?name=${name}`);
-            }}
-          >
+          <EuiLinkButton fill to={`${routerPaths.modelUpload}?name=${name}`}>
             Register new version
-          </EuiButton>
+          </EuiLinkButton>
         </EuiFlexGroup>
         <VersionTable models={model?.data ?? []} sort={sort} onChange={handleTableChange} />
       </EuiFlyoutBody>
