@@ -56,15 +56,31 @@ describe('<RegisterModel />', () => {
     await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
   });
 
-  it('should NOT submit the register model form', async () => {
+  it('should NOT submit the register model form if model name is empty', async () => {
     const result = setup();
     expect(onSubmitMock).not.toHaveBeenCalled();
 
+    // fill model description
+    fireEvent.input(result.descriptionInput, { target: { value: 'test model description' } });
     fireEvent.submit(result.submitButton);
 
     await waitFor(() => {
-      // The name and description are required
+      // The name field is required
       expect(result.nameInput).toBeInvalid();
+    });
+    expect(onSubmitMock).not.toHaveBeenCalled();
+  });
+
+  it('should NOT submit the register model form if model description is empty', async () => {
+    const result = setup();
+    expect(onSubmitMock).not.toHaveBeenCalled();
+
+    // fill model name
+    fireEvent.input(result.nameInput, { target: { value: 'test model name' } });
+    fireEvent.submit(result.submitButton);
+
+    await waitFor(() => {
+      // The description field is required
       expect(result.descriptionInput).toBeInvalid();
     });
     expect(onSubmitMock).not.toHaveBeenCalled();
