@@ -3,22 +3,26 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
-  EuiButton,
   EuiTitle,
-  EuiPageHeader,
+  EuiLink,
   EuiSpacer,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiDescriptionList,
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { Link, generatePath } from 'react-router-dom';
+import { generatePath, useHistory } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionTable } from './version_table';
+import { EuiLinkButton, EuiCustomLink } from '../common';
+
+export type VersionTableSort = 'version-desc' | 'version-asc';
 
 interface Props {
   onClose: () => void;
@@ -26,10 +30,12 @@ interface Props {
 }
 
 export const ModelDrawer = ({ onClose, name }: Props) => {
+  const [sort, setSort] = useState<VersionTableSort>('version-desc');
   const { data: model } = useFetcher(APIProvider.getAPI('model').search, {
     name,
     currentPage: 1,
     pageSize: 50,
+    sort: [sort],
   });
   const latestVersion = useMemo(() => {
     //TODO: currently assume that api will return versions in order
@@ -40,29 +46,40 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
     return { id: '' };
   }, [model]);
 
+  const handleTableChange = useCallback((criteria) => {
+    const { sort } = criteria;
+    setSort(sort);
+  }, []);
+
   return (
-    <EuiFlyout onClose={onClose} hideCloseButton={true}>
-      <EuiFlyoutHeader>
-        <EuiPageHeader
-          pageTitle={name ?? ''}
-          rightSideItems={
-            latestVersion.id
-              ? [
-                  <Link to={generatePath(routerPaths.modelDetail, { id: latestVersion.id })}>
-                    <EuiButton>View Details</EuiButton>
-                  </Link>,
-                ]
-              : []
-          }
-        />
+    <EuiFlyout onClose={onClose}>
+      <EuiFlyoutHeader hasBorder>
+        <EuiTitle>
+          <h2>{name}</h2>
+        </EuiTitle>
+        {latestVersion.id ? (
+          <>
+            <EuiSpacer size="l" />,
+            <EuiCustomLink to={generatePath(routerPaths.modelDetail, { id: latestVersion.id })}>
+              <EuiLink>View Full Details</EuiLink>
+            </EuiCustomLink>
+          </>
+        ) : null}
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         {model && <EuiDescriptionList type="row" listItems={[]} />}
-        <EuiSpacer size="xl" />
-        <EuiTitle size="m">
-          <h4>Versions</h4>
-        </EuiTitle>
-        <VersionTable models={model?.data ?? []} />
+        <EuiFlexGroup alignItems="center">
+          <EuiFlexItem grow={false}>
+            <EuiTitle size="s">
+              <h3>Versions</h3>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem />
+          <EuiLinkButton fill to={`${routerPaths.modelUpload}?name=${name}`}>
+            Register new version
+          </EuiLinkButton>
+        </EuiFlexGroup>
+        <VersionTable models={model?.data ?? []} sort={sort} onChange={handleTableChange} />
       </EuiFlyoutBody>
     </EuiFlyout>
   );
