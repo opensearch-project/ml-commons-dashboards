@@ -3,4 +3,6 @@ export interface RegisterModelFormData {
   version: number;
   description: string;
   annotations: string;
+  modelFile: File;
+  modelURL: string;
 }

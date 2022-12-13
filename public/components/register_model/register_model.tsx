@@ -4,6 +4,7 @@ import { EuiPageHeader, EuiSpacer, EuiForm, EuiButton } from '@elastic/eui';
 
 import { ModelDetailsPanel } from './model_details';
 import type { RegisterModelFormData } from './register_model.types';
+import { ArtifactPanel } from './artifact';
 
 interface RegisterModelFormProps {
   onSubmit?: (data: RegisterModelFormData) => void;
@@ -20,10 +21,12 @@ export const RegisterModelForm: React.FC<RegisterModelFormProps> = (props) => {
     if (props.onSubmit) {
       props.onSubmit(data);
     }
+    // TODO
     console.log(data);
   };
 
   const onError = useCallback((errors: FieldErrors<RegisterModelFormData>) => {
+    // TODO
     console.log(errors);
   }, []);
 
@@ -36,6 +39,8 @@ export const RegisterModelForm: React.FC<RegisterModelFormProps> = (props) => {
       <EuiPageHeader pageTitle="Register Model" />
       <EuiSpacer />
       <ModelDetailsPanel formControl={control} />
+      <EuiSpacer />
+      <ArtifactPanel formControl={control} />
       <EuiSpacer />
       <EuiButton type="submit" fill>
         Register model
