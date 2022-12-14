@@ -13,11 +13,13 @@ import {
 import type { Control } from 'react-hook-form';
 
 import { FORM_ITEM_WIDTH } from './form_constants';
-import { RegisterModelFormData } from './register_model.types';
+import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ModelFileUploader } from './artifact_file';
 import { ArtifactUrl } from './artifact_url';
 
-export const ArtifactPanel = (props: { formControl: Control<RegisterModelFormData> }) => {
+export const ArtifactPanel = (props: {
+  formControl: Control<ModelFileFormData | ModelUrlFormData>;
+}) => {
   const [selectedSource, setSelectedSource] = useState<'source_from_computer' | 'source_from_url'>(
     'source_from_computer'
   );

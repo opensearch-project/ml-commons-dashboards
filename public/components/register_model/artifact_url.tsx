@@ -4,10 +4,12 @@ import { useController } from 'react-hook-form';
 import type { Control } from 'react-hook-form';
 
 import { FORM_ITEM_WIDTH } from './form_constants';
-import { RegisterModelFormData } from './register_model.types';
+import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { URL_REGEX } from '../../utils/regex';
 
-export const ArtifactUrl = (props: { formControl: Control<RegisterModelFormData> }) => {
+export const ArtifactUrl = (props: {
+  formControl: Control<ModelFileFormData | ModelUrlFormData>;
+}) => {
   const modelUrlFieldController = useController({
     name: 'modelURL',
     control: props.formControl,
