@@ -5,6 +5,7 @@ import { EuiPageHeader, EuiSpacer, EuiForm, EuiButton } from '@elastic/eui';
 import { ModelDetailsPanel } from './model_details';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';
+import { ConfigurationPanel } from './model_configuration';
 
 interface RegisterModelFormProps {
   onSubmit?: (data: ModelFileFormData | ModelUrlFormData) => void;
@@ -14,6 +15,7 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
   const { handleSubmit, control } = useForm<ModelFileFormData | ModelUrlFormData>({
     defaultValues: {
       version: 1,
+      configuration: '{}',
     },
   });
 
@@ -41,6 +43,8 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
       <ModelDetailsPanel formControl={control} />
       <EuiSpacer />
       <ArtifactPanel formControl={control} />
+      <EuiSpacer />
+      <ConfigurationPanel formControl={control} />
       <EuiSpacer />
       <EuiButton type="submit" fill>
         Register model
