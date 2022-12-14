@@ -25,42 +25,40 @@ export const ArtifactPanel = (props: {
   );
 
   return (
-    <>
-      <EuiPanel>
-        <EuiTitle size="s">
-          <h3>Artifact</h3>
-        </EuiTitle>
-        <EuiHorizontalRule margin="m" />
-        <EuiFormRow fullWidth style={{ maxWidth: FORM_ITEM_WIDTH * 2 }} label="Model file source">
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiCheckableCard
-                id={htmlIdGenerator()()}
-                name="modelSource"
-                label="From computer"
-                value="source_from_computer"
-                checked={selectedSource === 'source_from_computer'}
-                onChange={() => setSelectedSource('source_from_computer')}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiCheckableCard
-                id={htmlIdGenerator()()}
-                name="modelSource"
-                label="From URL"
-                value="source_from_url"
-                checked={selectedSource === 'source_from_url'}
-                onChange={() => setSelectedSource('source_from_url')}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFormRow>
-        <EuiSpacer size="m" />
-        {selectedSource === 'source_from_computer' && (
-          <ModelFileUploader formControl={props.formControl} />
-        )}
-        {selectedSource === 'source_from_url' && <ArtifactUrl formControl={props.formControl} />}
-      </EuiPanel>
-    </>
+    <EuiPanel>
+      <EuiTitle size="s">
+        <h3>Artifact</h3>
+      </EuiTitle>
+      <EuiHorizontalRule margin="m" />
+      <EuiFormRow fullWidth style={{ maxWidth: FORM_ITEM_WIDTH * 2 }} label="Model file source">
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiCheckableCard
+              id={htmlIdGenerator()()}
+              name="modelSource"
+              label="From computer"
+              value="source_from_computer"
+              checked={selectedSource === 'source_from_computer'}
+              onChange={() => setSelectedSource('source_from_computer')}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiCheckableCard
+              id={htmlIdGenerator()()}
+              name="modelSource"
+              label="From URL"
+              value="source_from_url"
+              checked={selectedSource === 'source_from_url'}
+              onChange={() => setSelectedSource('source_from_url')}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiFormRow>
+      <EuiSpacer size="m" />
+      {selectedSource === 'source_from_computer' && (
+        <ModelFileUploader formControl={props.formControl} />
+      )}
+      {selectedSource === 'source_from_url' && <ArtifactUrl formControl={props.formControl} />}
+    </EuiPanel>
   );
 };
