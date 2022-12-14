@@ -17,7 +17,7 @@ import { RegisterModelFormData } from './register_model.types';
 import { ModelFileUploader } from './artifact_file';
 import { ArtifactUrl } from './artifact_url';
 
-export const ArtifactPanel: React.FC<{ formControl: Control<RegisterModelFormData> }> = (props) => {
+export const ArtifactPanel = (props: { formControl: Control<RegisterModelFormData> }) => {
   const [selectedSource, setSelectedSource] = useState<'source_from_computer' | 'source_from_url'>(
     'source_from_computer'
   );

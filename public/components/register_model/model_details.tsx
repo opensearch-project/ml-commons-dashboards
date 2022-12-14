@@ -16,11 +16,7 @@ import type { Control } from 'react-hook-form';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import { RegisterModelFormData } from './register_model.types';
 
-interface ModelDetailsPanelProps {
-  formControl: Control<RegisterModelFormData>;
-}
-
-export const ModelDetailsPanel: React.FC<ModelDetailsPanelProps> = (props) => {
+export const ModelDetailsPanel = (props: { formControl: Control<RegisterModelFormData> }) => {
   const nameFieldController = useController({
     name: 'name',
     control: props.formControl,

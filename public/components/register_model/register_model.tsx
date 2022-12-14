@@ -10,7 +10,7 @@ interface RegisterModelFormProps {
   onSubmit?: (data: RegisterModelFormData) => void;
 }
 
-export const RegisterModelForm: React.FC<RegisterModelFormProps> = (props) => {
+export const RegisterModelForm = (props: RegisterModelFormProps) => {
   const { handleSubmit, control } = useForm<RegisterModelFormData>({
     defaultValues: {
       version: 1,

@@ -7,7 +7,7 @@ import { FORM_ITEM_WIDTH } from './form_constants';
 import { RegisterModelFormData } from './register_model.types';
 import { URL_REGEX } from '../../utils/regex';
 
-export const ArtifactUrl: React.FC<{ formControl: Control<RegisterModelFormData> }> = (props) => {
+export const ArtifactUrl = (props: { formControl: Control<RegisterModelFormData> }) => {
   const modelUrlFieldController = useController({
     name: 'modelURL',
     control: props.formControl,

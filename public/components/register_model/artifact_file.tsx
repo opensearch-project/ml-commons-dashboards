@@ -6,9 +6,7 @@ import type { Control } from 'react-hook-form';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import { RegisterModelFormData } from './register_model.types';
 
-export const ModelFileUploader: React.FC<{ formControl: Control<RegisterModelFormData> }> = (
-  props
-) => {
+export const ModelFileUploader = (props: { formControl: Control<RegisterModelFormData> }) => {
   const modelFileFieldController = useController({
     name: 'modelFile',
     control: props.formControl,
