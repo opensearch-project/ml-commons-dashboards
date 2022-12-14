@@ -17,6 +17,7 @@ describe('<RegisterModel />', () => {
       name: /register model/i,
     });
     const modelFileInput = screen.getByLabelText<HTMLInputElement>(/model file/i);
+    const configurationInput = screen.getByLabelText(/configuration object/i);
     const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
     const user = userEvent.setup();
 
@@ -35,6 +36,7 @@ describe('<RegisterModel />', () => {
       versionInput,
       descriptionInput,
       annotationsInput,
+      configurationInput,
       submitButton,
       modelFileInput,
       form,
@@ -112,4 +114,7 @@ describe('<RegisterModel />', () => {
     expect(urlInput).toBeInvalid();
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
+
+  // TODO: add tests for Configuration object field.
+  // (Having difficulties to test EuiCodeEditor with testing-library)
 });

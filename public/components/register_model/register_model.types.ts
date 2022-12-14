@@ -3,6 +3,7 @@ interface ModelFormBase {
   version: number;
   description: string;
   annotations: string;
+  configuration: string;
 }
 
 /**
