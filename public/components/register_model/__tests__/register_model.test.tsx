@@ -1,12 +1,13 @@
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 import { RegisterModelForm } from '../register_model';
-import { render, screen, fireEvent, waitFor } from '../../../../test/test_utils';
+import { render, screen } from '../../../../test/test_utils';
 
 describe('<RegisterModel />', () => {
   const onSubmitMock = jest.fn();
 
-  function setup() {
+  async function setup() {
     render(<RegisterModelForm onSubmit={onSubmitMock} />);
     const nameInput = screen.getByLabelText<HTMLInputElement>(/model name/i);
     const versionInput = screen.getByLabelText<HTMLInputElement>(/version/i);
@@ -15,7 +16,19 @@ describe('<RegisterModel />', () => {
     const submitButton = screen.getByRole<HTMLButtonElement>('button', {
       name: /register model/i,
     });
+    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/model file/i);
     const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
+    const user = userEvent.setup();
+
+    // fill model name
+    await user.type(nameInput, 'test model name');
+    // fill model description
+    await user.type(descriptionInput, 'test model description');
+    // fill model file
+    await user.upload(
+      modelFileInput,
+      new File(['test model file'], 'model.zip', { type: 'application/zip' })
+    );
 
     return {
       nameInput,
@@ -23,7 +36,9 @@ describe('<RegisterModel />', () => {
       descriptionInput,
       annotationsInput,
       submitButton,
+      modelFileInput,
       form,
+      user,
     };
   }
 
@@ -31,8 +46,8 @@ describe('<RegisterModel />', () => {
     jest.resetAllMocks();
   });
 
-  it('should render a model details panel', () => {
-    const result = setup();
+  it('should render a model details panel', async () => {
+    const result = await setup();
     expect(result.nameInput).toBeInTheDocument();
     // Model version is not editable
     expect(result.versionInput).toBeDisabled();
@@ -43,46 +58,58 @@ describe('<RegisterModel />', () => {
   });
 
   it('should submit the register model form', async () => {
-    const result = setup();
+    const result = await setup();
     expect(onSubmitMock).not.toHaveBeenCalled();
 
-    // fill model name
-    fireEvent.input(result.nameInput, { target: { value: 'test model name' } });
-    // fill model description
-    fireEvent.input(result.descriptionInput, { target: { value: 'test model description' } });
+    await result.user.click(result.submitButton);
 
-    fireEvent.submit(result.submitButton);
-
-    await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
+    expect(onSubmitMock).toHaveBeenCalled();
   });
 
   it('should NOT submit the register model form if model name is empty', async () => {
-    const result = setup();
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    const result = await setup();
 
-    // fill model description
-    fireEvent.input(result.descriptionInput, { target: { value: 'test model description' } });
-    fireEvent.submit(result.submitButton);
+    await result.user.clear(result.nameInput);
+    await result.user.click(result.submitButton);
 
-    await waitFor(() => {
-      // The name field is required
-      expect(result.nameInput).toBeInvalid();
-    });
+    expect(result.nameInput).toBeInvalid();
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
   it('should NOT submit the register model form if model description is empty', async () => {
-    const result = setup();
+    const result = await setup();
+
+    await result.user.clear(result.descriptionInput);
+    await result.user.click(result.submitButton);
+
+    expect(result.descriptionInput).toBeInvalid();
     expect(onSubmitMock).not.toHaveBeenCalled();
+  });
 
-    // fill model name
-    fireEvent.input(result.nameInput, { target: { value: 'test model name' } });
-    fireEvent.submit(result.submitButton);
+  it('should NOT submit the register model form if model file is empty', async () => {
+    const result = await setup();
 
-    await waitFor(() => {
-      // The description field is required
-      expect(result.descriptionInput).toBeInvalid();
-    });
+    // Empty model file selection by clicking the `Remove` button on EuiFilePicker
+    await result.user.click(screen.getByText(/remove/i));
+    await result.user.click(result.submitButton);
+
+    expect(result.modelFileInput).toBeInvalid();
+    expect(onSubmitMock).not.toHaveBeenCalled();
+  });
+
+  it('should NOT submit the register model form if model url is empty', async () => {
+    const result = await setup();
+
+    // select option: From URL
+    await result.user.click(screen.getByLabelText(/from url/i));
+
+    const urlInput = screen.getByLabelText<HTMLInputElement>(/model url/i);
+
+    // Empty URL input
+    await result.user.clear(urlInput);
+    await result.user.click(result.submitButton);
+
+    expect(urlInput).toBeInvalid();
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 });
