@@ -12,6 +12,7 @@ import {
   MODEL_LOAD_API_ENDPOINT,
   MODEL_UNLOAD_API_ENDPOINT,
   MODEL_UPLOAD_API_ENDPOINT,
+  MODEL_PROFILE_API_ENDPOINT,
 } from './constants';
 
 const modelSortQuerySchema = schema.oneOf([
@@ -197,6 +198,28 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
     async (_context, request) => {
       try {
         const result = await modelService.unload({
+          request,
+          modelId: request.params.modelId,
+        });
+        return opensearchDashboardsResponseFactory.ok({ body: result });
+      } catch (err) {
+        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+      }
+    }
+  );
+
+  router.get(
+    {
+      path: `${MODEL_PROFILE_API_ENDPOINT}/{modelId}`,
+      validate: {
+        params: schema.object({
+          modelId: schema.string(),
+        }),
+      },
+    },
+    async (_context, request) => {
+      try {
+        const result = await modelService.profile({
           request,
           modelId: request.params.modelId,
         });
