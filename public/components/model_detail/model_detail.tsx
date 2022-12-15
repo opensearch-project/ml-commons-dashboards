@@ -23,6 +23,7 @@ import { useFetcher } from '../../hooks/use_fetcher';
 import { MODEL_STATE } from '../../../common/model';
 import { usePollingUntil } from '../../hooks/use_polling_until';
 import { EuiLinkButton } from '../common';
+import { ModelProfile } from './model_profile';
 
 import {
   ModelConfirmDeleteModal,
@@ -218,6 +219,8 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
         ]}
         bottomBorder
       />
+      <ModelProfile id={params.id} />
+
       <EuiSpacer />
       <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
 

@@ -158,6 +158,15 @@ export class ModelService {
     return result;
   }
 
+  public async profile({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
+    const result = await this.osClient
+      .asScoped(request)
+      .callAsCurrentUser('mlCommonsModel.profile', {
+        modelId,
+      });
+    return result;
+  }
+
   public static async upload<T extends UploadModelByChunk | UploadModelByURL>({
     client,
     model,
