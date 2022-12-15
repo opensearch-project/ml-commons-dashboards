@@ -1,7 +1,7 @@
 import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 
-describe('<RegisterModel />', () => {
+describe('<RegisterModel /> Artifact', () => {
   it('should render an artifact panel', async () => {
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
