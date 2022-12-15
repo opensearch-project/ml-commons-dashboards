@@ -102,7 +102,9 @@ export const EvaluationMetricsPanel = (props: {
   return (
     <EuiPanel>
       <EuiTitle size="s">
-        <h3>Evaluation Metrics</h3>
+        <h3>
+          Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
+        </h3>
       </EuiTitle>
       <EuiHorizontalRule margin="m" />
       <EuiFormRow
