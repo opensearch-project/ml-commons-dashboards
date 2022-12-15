@@ -49,23 +49,28 @@ export const MlCommonsPluginApp = ({
   return (
     <ReduxProvider store={store}>
       <I18nProvider>
-        <Switch>
-          <EuiPage>
-            <EuiPageSideBar>
-              <NavPanel />
-            </EuiPageSideBar>
-            <EuiPageBody component="main">
-              {ROUTES.map(({ path, Component, exact }) => (
-                <Route
-                  path={path}
-                  render={() => <Component http={http} notifications={notifications} data={data} />}
-                  exact={exact ?? false}
-                />
-              ))}
-            </EuiPageBody>
-          </EuiPage>
-        </Switch>
-        <GlobalBreadcrumbs chrome={chrome} basename={basename} />
+        <>
+          <Switch>
+            <EuiPage>
+              <EuiPageSideBar>
+                <NavPanel />
+              </EuiPageSideBar>
+              <EuiPageBody component="main">
+                {ROUTES.map(({ path, Component, exact }) => (
+                  <Route
+                    key={path}
+                    path={path}
+                    render={() => (
+                      <Component http={http} notifications={notifications} data={data} />
+                    )}
+                    exact={exact ?? false}
+                  />
+                ))}
+              </EuiPageBody>
+            </EuiPage>
+          </Switch>
+          <GlobalBreadcrumbs chrome={chrome} basename={basename} />
+        </>
       </I18nProvider>
     </ReduxProvider>
   );

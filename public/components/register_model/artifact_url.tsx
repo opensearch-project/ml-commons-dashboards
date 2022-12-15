@@ -28,11 +28,15 @@ export const ArtifactUrl = (props: {
       isInvalid={Boolean(modelUrlFieldController.fieldState.error)}
     >
       <EuiFieldText
+        inputRef={modelUrlFieldController.field.ref}
         id={htmlIdGenerator()()}
         placeholder="Link to the model"
         fullWidth
         isInvalid={Boolean(modelUrlFieldController.fieldState.error)}
-        {...modelUrlFieldController.field}
+        value={modelUrlFieldController.field.value ?? ''}
+        name={modelUrlFieldController.field.name}
+        onChange={modelUrlFieldController.field.onChange}
+        onBlur={modelUrlFieldController.field.onBlur}
       />
     </EuiFormRow>
   );
