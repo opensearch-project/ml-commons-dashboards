@@ -8,6 +8,7 @@ import {
   MODEL_LOAD_API_ENDPOINT,
   MODEL_UNLOAD_API_ENDPOINT,
   MODEL_UPLOAD_API_ENDPOINT,
+  MODEL_PROFILE_API_ENDPOINT,
 } from '../../server/routes/constants';
 import { Pagination } from '../../server/services/utils/pagination';
 import { InnerHttpProvider } from './inner_http_provider';
@@ -40,6 +41,20 @@ export interface ModelUnloadResponse {
   [nodeId: string]: {
     stats: {
       [modelId: string]: string;
+    };
+  };
+}
+
+export interface ModelProfileResponse {
+  nodes: {
+    [nodeId: string]: {
+      models: {
+        [modelId: string]: {
+          model_state: string;
+          predictor: string;
+          worker_nodes: string[];
+        };
+      };
     };
   };
 }
@@ -103,6 +118,12 @@ export class Model {
   public unload(modelId: string) {
     return InnerHttpProvider.getHttp().post<ModelUnloadResponse>(
       `${MODEL_UNLOAD_API_ENDPOINT}/${modelId}`
+    );
+  }
+
+  public profile(modelId: string) {
+    return InnerHttpProvider.getHttp().get<ModelProfileResponse>(
+      `${MODEL_PROFILE_API_ENDPOINT}/${modelId}`
     );
   }
 

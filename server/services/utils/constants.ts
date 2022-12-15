@@ -22,11 +22,12 @@ export const API_ROUTE_PREFIX = '/_plugins/_ml';
 export const TRAIN_BASE_API = `${API_ROUTE_PREFIX}/_train`;
 export const TASK_BASE_API = `${API_ROUTE_PREFIX}/tasks`;
 export const TASK_SEARCH_API = `${TASK_BASE_API}/_search`;
-
+export const PROFILE_BASE_API = `${API_ROUTE_PREFIX}/profile`;
 export const MODEL_BASE_API = `${API_ROUTE_PREFIX}/models`;
 export const MODEL_SEARCH_API = `${MODEL_BASE_API}/_search`;
 export const MODEL_UPLOAD_API = `${MODEL_BASE_API}/_upload`;
 export const MODEL_META_API = `${MODEL_BASE_API}/meta`;
+export const MODEL_PROFILE_API = `${PROFILE_BASE_API}/models`;
 
 export const PREDICT_BASE_API = `${API_ROUTE_PREFIX}/_predict`;
 
