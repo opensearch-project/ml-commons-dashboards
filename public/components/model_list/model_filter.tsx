@@ -8,7 +8,7 @@ import { EuiPopover, EuiPopoverTitle, EuiFieldSearch, EuiFilterButton } from '@e
 import { ModelFilterItem } from './model_filter_item';
 
 export interface ModelFilterProps {
-  displayName: string;
+  name: string;
   searchPlaceholder: string;
   options: Array<string | { name: string; value: string }>;
   value: string[];
@@ -16,9 +16,9 @@ export interface ModelFilterProps {
 }
 
 export const ModelFilter = ({
+  name,
   value,
   options,
-  displayName,
   searchPlaceholder,
   onChange,
 }: ModelFilterProps) => {
@@ -33,7 +33,9 @@ export const ModelFilter = ({
     () =>
       searchText
         ? options.filter((option) =>
-            (typeof option === 'string' ? option : option.name).includes(searchText)
+            (typeof option === 'string' ? option : option.name)
+              .toLowerCase()
+              .includes(searchText.toLowerCase())
           )
         : options,
     [searchText, options]
@@ -67,7 +69,7 @@ export const ModelFilter = ({
           hasActiveFilters={value.length > 0}
           numActiveFilters={value.length}
         >
-          {displayName}
+          {name}
         </EuiFilterButton>
       }
       isOpen={isPopoverOpen}

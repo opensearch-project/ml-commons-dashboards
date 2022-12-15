@@ -12,7 +12,7 @@ export const OwnerFilter = ({ value, onChange }: Pick<ModelFilterProps, 'value' 
       searchPlaceholder="Search"
       options={[]}
       value={value}
-      displayName="Owner"
+      name="Owner"
       onChange={onChange}
     />
   );

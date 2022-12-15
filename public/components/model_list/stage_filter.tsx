@@ -12,7 +12,7 @@ export const StageFilter = ({ value, onChange }: Pick<ModelFilterProps, 'value' 
       searchPlaceholder="Search"
       options={[]}
       value={value}
-      displayName="Stage"
+      name="Stage"
       onChange={onChange}
     />
   );

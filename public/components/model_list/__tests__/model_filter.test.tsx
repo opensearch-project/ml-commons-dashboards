@@ -4,9 +4,10 @@
  */
 
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 import { ModelFilter } from '../model_filter';
-import { render, screen, fireEvent, act } from '../../../../test/test_utils';
+import { render, screen } from '../../../../test/test_utils';
 
 describe('<ModelFilter />', () => {
   afterEach(() => {
@@ -16,7 +17,7 @@ describe('<ModelFilter />', () => {
   it('should render "Tags" with 0 active filter', () => {
     render(
       <ModelFilter
-        displayName="Tags"
+        name="Tags"
         searchPlaceholder="Search Tags"
         options={[]}
         value={[]}
@@ -30,7 +31,7 @@ describe('<ModelFilter />', () => {
   it('should render Tags with 2 active filter', () => {
     render(
       <ModelFilter
-        displayName="Tags"
+        name="Tags"
         searchPlaceholder="Search Tags"
         options={[]}
         value={['foo', 'bar']}
@@ -41,10 +42,10 @@ describe('<ModelFilter />', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
-  it('should render options filter after click tags', () => {
+  it('should render options filter after click tags', async () => {
     render(
       <ModelFilter
-        displayName="Tags"
+        name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
         value={['foo', 'bar']}
@@ -53,44 +54,37 @@ describe('<ModelFilter />', () => {
     );
     expect(screen.queryByText('foo')).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText('Search Tags')).not.toBeInTheDocument();
-    act(() => {
-      screen.getByText('Tags').click();
-    });
+
+    await userEvent.click(screen.getByText('Tags'));
+
     expect(screen.getByText('foo')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Search Tags')).toBeInTheDocument();
   });
 
-  it('should only show bar after search', () => {
+  it('should only show "bar" after search', async () => {
     render(
       <ModelFilter
-        displayName="Tags"
+        name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
         value={['foo', 'bar']}
         onChange={() => {}}
       />
     );
-    act(() => {
-      screen.getByText('Tags').click();
-    });
+
+    await userEvent.click(screen.getByText('Tags'));
     expect(screen.getByText('foo')).toBeInTheDocument();
 
-    act(() => {
-      const serachTagsInput = screen.getByPlaceholderText('Search Tags');
-      fireEvent.input(serachTagsInput, {
-        target: { value: 'bar' },
-      });
-      fireEvent.keyUp(serachTagsInput, { key: 'Enter', code: 'Enter', charCode: 13 });
-    });
+    await userEvent.type(screen.getByPlaceholderText('Search Tags'), 'bAr{enter}');
     expect(screen.queryByText('foo')).not.toBeInTheDocument();
     expect(screen.getByText('bar')).toBeInTheDocument();
   });
 
-  it('should call onChange with consistent value after option click', () => {
+  it('should call onChange with consistent value after option click', async () => {
     const onChangeMock = jest.fn();
     const { rerender } = render(
       <ModelFilter
-        displayName="Tags"
+        name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
         value={[]}
@@ -100,34 +94,28 @@ describe('<ModelFilter />', () => {
 
     expect(onChangeMock).not.toHaveBeenCalled();
 
-    act(() => {
-      screen.getByText('Tags').click();
-    });
-
-    act(() => {
-      screen.getByText('foo').click();
-    });
-
+    await userEvent.click(screen.getByText('Tags'));
+    await userEvent.click(screen.getByText('foo'));
     expect(onChangeMock).toHaveBeenCalledWith(['foo']);
+    onChangeMock.mockClear();
 
     rerender(
       <ModelFilter
-        displayName="Tags"
+        name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
         value={['foo']}
         onChange={onChangeMock}
       />
     );
-    act(() => {
-      screen.getByText('bar').click();
-    });
 
+    await userEvent.click(screen.getByText('bar'));
     expect(onChangeMock).toHaveBeenCalledWith(['foo', 'bar']);
+    onChangeMock.mockClear();
 
     rerender(
       <ModelFilter
-        displayName="Tags"
+        name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
         value={['foo', 'bar']}
@@ -135,10 +123,8 @@ describe('<ModelFilter />', () => {
       />
     );
 
-    act(() => {
-      screen.getByText('bar').click();
-    });
-
+    await userEvent.click(screen.getByText('bar'));
     expect(onChangeMock).toHaveBeenCalledWith(['foo']);
+    onChangeMock.mockClear();
   });
 });

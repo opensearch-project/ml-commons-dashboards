@@ -12,7 +12,7 @@ export const TagFilter = ({ value, onChange }: Pick<ModelFilterProps, 'value' | 
       searchPlaceholder="Search tag"
       options={[]}
       value={value}
-      displayName="Tags"
+      name="Tags"
       onChange={onChange}
     />
   );
