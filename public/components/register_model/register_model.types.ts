@@ -1,9 +1,13 @@
 interface ModelFormBase {
   name: string;
-  version: number;
+  version: string;
   description: string;
   annotations: string;
   configuration: string;
+  metricName?: string;
+  trainingMetricValue?: string;
+  validationMetricValue?: string;
+  testingMetricValue?: string;
 }
 
 /**

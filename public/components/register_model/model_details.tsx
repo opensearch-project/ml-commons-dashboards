@@ -42,6 +42,11 @@ export const ModelDetailsPanel = (props: {
     control: props.formControl,
   });
 
+  const { ref: nameInputRef, ...nameField } = nameFieldController.field;
+  const { ref: versionInputRef, ...versionField } = versionFieldController.field;
+  const { ref: descriptionInputRef, ...descriptionField } = descriptionFieldController.field;
+  const { ref: annotationsInputRef, ...annotationsField } = annotationsFieldController.field;
+
   return (
     <EuiPanel>
       <EuiTitle size="s">
@@ -52,18 +57,20 @@ export const ModelDetailsPanel = (props: {
         <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
           <EuiFormRow label="Model name" isInvalid={Boolean(nameFieldController.fieldState.error)}>
             <EuiFieldText
+              inputRef={nameInputRef}
               placeholder="Enter a name"
               isInvalid={Boolean(nameFieldController.fieldState.error)}
-              {...nameFieldController.field}
+              {...nameField}
             />
           </EuiFormRow>
         </EuiFlexItem>
         <EuiFlexItem grow={false} style={{ width: 220 }}>
           <EuiFormRow label="Version" isInvalid={Boolean(versionFieldController.fieldState.error)}>
             <EuiFieldNumber
+              inputRef={versionInputRef}
               disabled
               isInvalid={Boolean(versionFieldController.fieldState.error)}
-              {...versionFieldController.field}
+              {...versionField}
             />
           </EuiFormRow>
         </EuiFlexItem>
@@ -75,17 +82,19 @@ export const ModelDetailsPanel = (props: {
             isInvalid={Boolean(descriptionFieldController.fieldState.error)}
           >
             <EuiTextArea
+              inputRef={descriptionInputRef}
               placeholder="Enter a description"
               isInvalid={Boolean(descriptionFieldController.fieldState.error)}
-              {...descriptionFieldController.field}
+              {...descriptionField}
             />
           </EuiFormRow>
         </EuiFlexItem>
         <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
           <EuiFormRow label="Annotations(optional)">
             <EuiTextArea
+              inputRef={annotationsInputRef}
               placeholder="Enter annotations or version notes"
-              {...annotationsFieldController.field}
+              {...annotationsField}
             />
           </EuiFormRow>
         </EuiFlexItem>
