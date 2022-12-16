@@ -6,15 +6,18 @@ import { ModelDetailsPanel } from './model_details';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';
 import { ConfigurationPanel } from './model_configuration';
+import { EvaluationMetricsPanel } from './evaluation_metrics';
 
-interface RegisterModelFormProps {
+export interface RegisterModelFormProps {
   onSubmit?: (data: ModelFileFormData | ModelUrlFormData) => void;
 }
 
 export const RegisterModelForm = (props: RegisterModelFormProps) => {
   const { handleSubmit, control } = useForm<ModelFileFormData | ModelUrlFormData>({
     defaultValues: {
-      version: 1,
+      name: '',
+      description: '',
+      version: '1',
       configuration: '{}',
     },
   });
@@ -45,6 +48,8 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
       <ArtifactPanel formControl={control} />
       <EuiSpacer />
       <ConfigurationPanel formControl={control} />
+      <EuiSpacer />
+      <EvaluationMetricsPanel formControl={control} />
       <EuiSpacer />
       <EuiButton type="submit" fill>
         Register model
