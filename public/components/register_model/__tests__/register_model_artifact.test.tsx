@@ -25,7 +25,7 @@ describe('<RegisterModel /> Artifact', () => {
     const result = await setup({ onSubmit: onSubmitMock });
 
     // Empty model file selection by clicking the `Remove` button on EuiFilePicker
-    await result.user.click(screen.getByText(/remove/i));
+    await result.user.click(screen.getByLabelText(/clear selected files/i));
     await result.user.click(result.submitButton);
 
     expect(result.modelFileInput).toBeInvalid();

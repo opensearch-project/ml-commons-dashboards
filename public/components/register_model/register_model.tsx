@@ -7,6 +7,7 @@ import type { ModelFileFormData, ModelUrlFormData } from './register_model.types
 import { ArtifactPanel } from './artifact';
 import { ConfigurationPanel } from './model_configuration';
 import { EvaluationMetricsPanel } from './evaluation_metrics';
+import { ModelTagsPanel } from './model_tags';
 
 export interface RegisterModelFormProps {
   onSubmit?: (data: ModelFileFormData | ModelUrlFormData) => void;
@@ -19,6 +20,7 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
       description: '',
       version: '1',
       configuration: '{}',
+      tags: [{ key: '', value: '' }],
     },
   });
 
@@ -50,6 +52,8 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
       <ConfigurationPanel formControl={control} />
       <EuiSpacer />
       <EvaluationMetricsPanel formControl={control} />
+      <EuiSpacer />
+      <ModelTagsPanel formControl={control} />
       <EuiSpacer />
       <EuiButton type="submit" fill>
         Register model
