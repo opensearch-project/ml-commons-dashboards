@@ -3,11 +3,13 @@ import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
 
 describe('<RegisterModel /> Evaluation Metrics', () => {
-  it('should render a evaluation metrics panel', async () => {
+  beforeEach(() => {
     jest
       .spyOn(formHooks, 'useMetricNames')
       .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
+  });
 
+  it('should render a evaluation metrics panel', async () => {
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
 
@@ -18,10 +20,6 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
   });
 
   it('should render metric value input as disabled by default', async () => {
-    jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
 
@@ -31,10 +29,6 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
   });
 
   it('should render metric value input as enabled after selecting a metric name', async () => {
-    jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
 
@@ -47,10 +41,6 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
   });
 
   it('should submit the form without selecting metric name', async () => {
-    jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
     await result.user.click(result.submitButton);
@@ -58,25 +48,17 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
-  it('should NOT submit the form if metric name is selected but metric value are empty', async () => {
-    jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-
+  it('should submit the form if metric name is selected but metric value are empty', async () => {
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
     await result.user.click(result.metricNameInput);
     await result.user.click(screen.getByText('Metric 1'));
     await result.user.click(result.submitButton);
 
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(onSubmitMock).toHaveBeenCalled();
   });
 
   it('should submit the form if metric name and all metric value are selected', async () => {
-    jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
     await result.user.click(result.metricNameInput);
@@ -91,11 +73,7 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
-  it('should NOT submit the form if metric name is selected but metric value are partially selected', async () => {
-    jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-
+  it('should submit the form if metric name is selected but metric value are partially selected', async () => {
     const onSubmitMock = jest.fn();
     const result = await setup({ onSubmit: onSubmitMock });
     await result.user.click(result.metricNameInput);
@@ -103,6 +81,32 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
 
     // Only input Training metric value
     await result.user.type(result.trainingMetricValueInput, '1');
+    await result.user.click(result.submitButton);
+
+    expect(onSubmitMock).toHaveBeenCalled();
+  });
+
+  it('should NOT submit the form if metric value < 0', async () => {
+    const onSubmitMock = jest.fn();
+    const result = await setup({ onSubmit: onSubmitMock });
+    await result.user.click(result.metricNameInput);
+    await result.user.click(screen.getByText('Metric 1'));
+
+    // Type an invalid value
+    await result.user.type(result.trainingMetricValueInput, '-.1');
+    await result.user.click(result.submitButton);
+
+    expect(onSubmitMock).not.toHaveBeenCalled();
+  });
+
+  it('should NOT submit the form if metric value > 1', async () => {
+    const onSubmitMock = jest.fn();
+    const result = await setup({ onSubmit: onSubmitMock });
+    await result.user.click(result.metricNameInput);
+    await result.user.click(screen.getByText('Metric 1'));
+
+    // Type an invalid value
+    await result.user.type(result.trainingMetricValueInput, '1.1');
     await result.user.click(result.submitButton);
 
     expect(onSubmitMock).not.toHaveBeenCalled();

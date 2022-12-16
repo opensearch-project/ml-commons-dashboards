@@ -18,6 +18,8 @@ import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { useMetricNames } from './register_model.hooks';
 
+const METRIC_VALUE_STEP = 0.01;
+
 export const EvaluationMetricsPanel = (props: {
   formControl: Control<ModelFileFormData | ModelUrlFormData>;
 }) => {
@@ -33,23 +35,12 @@ export const EvaluationMetricsPanel = (props: {
     control: props.formControl,
   });
 
-  // If metric name is selected, then metric values must been set
-  const validateMetricValue = useCallback(
-    (value: string | undefined) => {
-      if (Boolean(metricFieldController.field.value)) {
-        return Boolean(value);
-      }
-    },
-    [metricFieldController.field.value]
-  );
-
   const trainingMetricFieldController = useController({
     name: 'trainingMetricValue',
     control: props.formControl,
     rules: {
       max: 1,
       min: 0,
-      validate: validateMetricValue,
     },
   });
 
@@ -59,7 +50,6 @@ export const EvaluationMetricsPanel = (props: {
     rules: {
       max: 1,
       min: 0,
-      validate: validateMetricValue,
     },
   });
 
@@ -69,7 +59,6 @@ export const EvaluationMetricsPanel = (props: {
     rules: {
       max: 1,
       min: 0,
-      validate: validateMetricValue,
     },
   });
 
@@ -98,6 +87,12 @@ export const EvaluationMetricsPanel = (props: {
     },
     [metricFieldController]
   );
+
+  const metricValueFields = [
+    { label: 'Training metric value', controller: trainingMetricFieldController },
+    { label: 'Validation metric value', controller: validationMetricFieldController },
+    { label: 'Testing metric value', controller: testingMetricFieldController },
+  ];
 
   return (
     <EuiPanel>
@@ -130,63 +125,27 @@ export const EvaluationMetricsPanel = (props: {
       </EuiFormRow>
       <EuiSpacer />
       <EuiFlexGroup style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}>
-        <EuiFlexItem>
-          <EuiFormRow
-            label="Training metric value"
-            helpText="Enter a value between 0 and 1"
-            isInvalid={Boolean(trainingMetricFieldController.fieldState.error)}
-          >
-            <EuiFieldNumber
-              placeholder="Enter a value"
-              isInvalid={Boolean(trainingMetricFieldController.fieldState.error)}
-              disabled={!metricFieldController.field.value}
-              step={0.1}
-              name={trainingMetricFieldController.field.name}
-              value={trainingMetricFieldController.field.value ?? ''}
-              onChange={trainingMetricFieldController.field.onChange}
-              onBlur={trainingMetricFieldController.field.onBlur}
-              inputRef={trainingMetricFieldController.field.ref}
-            />
-          </EuiFormRow>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiFormRow
-            label="Validation metric value"
-            helpText="Enter a value between 0 and 1"
-            isInvalid={Boolean(validationMetricFieldController.fieldState.error)}
-          >
-            <EuiFieldNumber
-              placeholder="Enter a value"
-              isInvalid={Boolean(validationMetricFieldController.fieldState.error)}
-              disabled={!metricFieldController.field.value}
-              step={0.1}
-              name={validationMetricFieldController.field.name}
-              value={validationMetricFieldController.field.value ?? ''}
-              onChange={validationMetricFieldController.field.onChange}
-              onBlur={validationMetricFieldController.field.onBlur}
-              inputRef={validationMetricFieldController.field.ref}
-            />
-          </EuiFormRow>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiFormRow
-            label="Testing metric value"
-            helpText="Enter a value between 0 and 1"
-            isInvalid={Boolean(testingMetricFieldController.fieldState.error)}
-          >
-            <EuiFieldNumber
-              placeholder="Enter a value"
-              isInvalid={Boolean(testingMetricFieldController.fieldState.error)}
-              disabled={!metricFieldController.field.value}
-              step={0.1}
-              name={testingMetricFieldController.field.name}
-              value={testingMetricFieldController.field.value ?? ''}
-              onChange={testingMetricFieldController.field.onChange}
-              onBlur={testingMetricFieldController.field.onBlur}
-              inputRef={testingMetricFieldController.field.ref}
-            />
-          </EuiFormRow>
-        </EuiFlexItem>
+        {metricValueFields.map(({ label, controller }) => (
+          <EuiFlexItem key={controller.field.name}>
+            <EuiFormRow
+              label={label}
+              helpText="Enter a value between 0 and 1"
+              isInvalid={Boolean(controller.fieldState.error)}
+            >
+              <EuiFieldNumber
+                placeholder="Enter a value"
+                isInvalid={Boolean(controller.fieldState.error)}
+                disabled={!metricFieldController.field.value}
+                step={METRIC_VALUE_STEP}
+                name={controller.field.name}
+                value={controller.field.value ?? ''}
+                onChange={controller.field.onChange}
+                onBlur={controller.field.onBlur}
+                inputRef={controller.field.ref}
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+        ))}
       </EuiFlexGroup>
     </EuiPanel>
   );
