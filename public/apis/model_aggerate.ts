@@ -29,6 +29,7 @@ export class ModelAggerate {
     currentPage: number;
     sort: 'created_time';
     order: 'desc' | 'asc';
+    name?: string;
   }) {
     return InnerHttpProvider.getHttp().get<ModelAggerateSearchResponse>(
       MODEL_AGGREGATE_API_ENDPOINT,

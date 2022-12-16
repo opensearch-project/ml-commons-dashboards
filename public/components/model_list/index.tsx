@@ -4,41 +4,43 @@
  */
 
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { EuiPageHeader, EuiButton, EuiSpacer, EuiPanel } from '@elastic/eui';
-import { Link } from 'react-router-dom';
+import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
 
 import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
 import { useFetcher } from '../../hooks/use_fetcher';
+import { ModelDrawer } from '../model_drawer';
+import { EuiLinkButton } from '../common';
 
-import { ModelTable } from './model_table';
+import { ModelTable, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
 import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
-import { ModelDrawer } from '../model_drawer';
 
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
-    sort: 'trainTime-desc' | 'trainTime-asc';
+    sort: ModelTableSort;
     currentPage: number;
     pageSize: number;
     filterValue: ModelListFilterFilterValue;
   }>({
     currentPage: 1,
     pageSize: 15,
-    sort: 'trainTime-desc',
     filterValue: { tag: [], owner: [], stage: [] },
+    sort: { field: 'created_time', direction: 'desc' },
   });
   const [drawerModelName, setDrawerModelName] = useState('');
-  const { data, reload } = useFetcher(APIProvider.getAPI('model').search, {
-    pageSize: params.pageSize,
+
+  const { data, reload } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
     currentPage: params.currentPage,
+    pageSize: params.pageSize,
+    sort: params.sort?.field,
+    order: params.sort?.direction,
     name: params.filterValue.search,
-    sort: undefined,
   });
   const models = useMemo(() => data?.data || [], [data]);
   const totalModelCounts = data?.pagination.totalRecords || 0;
@@ -94,33 +96,22 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   return (
     <EuiPanel>
       <EuiPageHeader
-        pageTitle={
-          <>
-            Models
-            {totalModelCounts !== undefined && (
-              <span style={{ fontSize: '0.6em', verticalAlign: 'middle', paddingLeft: 4 }}>
-                ({totalModelCounts})
-              </span>
-            )}
-          </>
-        }
+        pageTitle={<>Models</>}
         rightSideItems={[
-          <Link to={routerPaths.train}>
-            <EuiButton fill>Train new model</EuiButton>
-          </Link>,
+          <EuiLinkButton to={routerPaths.registerModel} fill iconType="plusInCircle">
+            Register new model
+          </EuiLinkButton>,
         ]}
-        bottomBorder
       />
       <EuiSpacer />
       <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
       <EuiSpacer />
       <ModelTable
-        models={models}
         sort={params.sort}
+        models={models}
         pagination={pagination}
-        onModelDelete={handleModelDelete}
         onChange={handleTableChange}
-        onViewModelDrawer={handleViewModelDrawer}
+        onModelNameClick={handleViewModelDrawer}
       />
       <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
       {drawerModelName && (
