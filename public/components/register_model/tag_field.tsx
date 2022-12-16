@@ -59,20 +59,6 @@ export const ModelTagField = ({
     [tagValueController.field.onChange]
   );
 
-  const onCreateTagKey = useCallback(
-    (value: string) => {
-      tagKeyController.field.onChange(value);
-    },
-    [tagKeyController.field.onChange]
-  );
-
-  const onCreateTagValue = useCallback(
-    (value: string) => {
-      tagValueController.field.onChange(value);
-    },
-    [tagKeyController.field.onChange]
-  );
-
   const keyOptions = useMemo(() => {
     return tagKeys.map((key) => ({ label: key }));
   }, [tagKeys]);
@@ -93,7 +79,7 @@ export const ModelTagField = ({
               tagKeyController.field.value ? [{ label: tagKeyController.field.value }] : []
             }
             onChange={onKeyChange}
-            onCreateOption={onCreateTagKey}
+            onCreateOption={tagKeyController.field.onChange}
             customOptionText="Add {searchValue} as new tag key"
             onBlur={tagKeyController.field.onBlur}
             inputRef={tagKeyController.field.ref}
@@ -110,7 +96,7 @@ export const ModelTagField = ({
               tagValueController.field.value ? [{ label: tagValueController.field.value }] : []
             }
             onChange={onValueChange}
-            onCreateOption={onCreateTagValue}
+            onCreateOption={tagValueController.field.onChange}
             customOptionText="Add {searchValue} as new tag name"
             onBlur={tagValueController.field.onBlur}
             inputRef={tagValueController.field.ref}

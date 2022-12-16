@@ -20,13 +20,6 @@ export const ModelTagsPanel = (props: {
     append({ key: '', value: '' });
   }, []);
 
-  const deleteTag = useCallback(
-    (index: number) => {
-      remove(index);
-    },
-    [remove]
-  );
-
   return (
     <EuiPanel>
       <EuiTitle size="s">
@@ -44,7 +37,7 @@ export const ModelTagsPanel = (props: {
             formControl={props.formControl}
             tagKeys={keys}
             tagValues={values}
-            onDelete={deleteTag}
+            onDelete={remove}
           />
         );
       })}
