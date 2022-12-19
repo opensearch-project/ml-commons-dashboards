@@ -72,7 +72,6 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
   public start(core: CoreStart) {
     this.logger.debug('mlCommons: Started');
 
-    core.opensearch.createClient();
     return {};
   }
 
