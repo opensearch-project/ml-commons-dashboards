@@ -4,97 +4,132 @@
  */
 
 import React, { useMemo, useCallback, useRef } from 'react';
-import { generatePath, useHistory } from 'react-router-dom';
 import {
   CriteriaWithPagination,
-  CustomItemAction,
-  Direction,
   EuiBasicTable,
-  EuiButtonIcon,
+  EuiBasicTableColumn,
+  EuiText,
+  Direction,
 } from '@elastic/eui';
 
-import { ModelSearchItem } from '../../apis/model';
-import { routerPaths } from '../../../common/router_paths';
 import { renderTime } from '../../utils';
+import { ModelOwner } from './model_owner';
+import { ModelDeployedVersions } from './model_deployed_versions';
+import { ModelTableUploadingCell } from './model_table_uploading_cell';
+import { ModelAggerateSearchItem } from '../../apis/model_aggerate';
 
-export type ModelTableSort = 'trainTime-desc' | 'trainTime-asc';
+export interface ModelTableSort {
+  field: 'created_time';
+  direction: Direction;
+}
+
 export interface ModelTableCriteria {
   pagination: { currentPage: number; pageSize: number };
   sort?: ModelTableSort;
 }
 
-export function ModelTable(props: {
-  models: ModelSearchItem[];
+export interface ModelTableProps {
+  models: ModelAggerateSearchItem[];
   pagination: {
     currentPage: number;
     pageSize: number;
     totalRecords: number | undefined;
   };
   sort: ModelTableSort;
-  onModelDelete: (id: string) => void;
   onChange: (criteria: ModelTableCriteria) => void;
-  onViewModelDrawer: (name: string) => void;
-}) {
-  const { sort, models, onChange, onModelDelete, onViewModelDrawer } = props;
-  const history = useHistory();
+  onModelNameClick: (name: string) => void;
+}
+
+export function ModelTable(props: ModelTableProps) {
+  const { models, sort, onChange, onModelNameClick } = props;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const columns = useMemo(
+  const columns = useMemo<Array<EuiBasicTableColumn<ModelAggerateSearchItem>>>(
     () => [
       {
-        field: 'id',
-        name: 'ID',
-      },
-      {
         field: 'name',
-        name: 'Name',
+        name: 'Model Name',
+        width: '266px',
+        render: (name: string, record) => (
+          <ModelTableUploadingCell
+            fallback={
+              <EuiText
+                onClick={() => {
+                  onModelNameClick(name);
+                }}
+                style={{ color: '#006BB4' }}
+              >
+                {name}
+              </EuiText>
+            }
+            latestVersionState={record.latest_version_state}
+            column="name"
+          />
+        ),
       },
       {
-        field: 'algorithm',
-        name: 'Algorithm',
+        field: 'latest_version',
+        name: 'Latest version',
+        width: '98px',
+        align: 'center',
+        render: (latestVersion: string, record) => (
+          <ModelTableUploadingCell
+            fallback={<>{latestVersion}</>}
+            latestVersionState={record.latest_version_state}
+            column="latestVersion"
+          />
+        ),
       },
       {
-        field: 'context',
-        name: 'Context',
-        width: '500px',
+        field: 'description',
+        name: 'Description',
+        render: (description: string, record) => (
+          <ModelTableUploadingCell
+            fallback={<>{description}</>}
+            latestVersionState={record.latest_version_state}
+            column="description"
+          />
+        ),
       },
       {
-        field: 'trainTime',
-        name: 'Train Time',
-        render: renderTime,
+        field: 'owner',
+        name: 'Owner',
+        width: '79px',
+        render: (owner: string, record) => (
+          <ModelTableUploadingCell
+            fallback={<ModelOwner name={owner} />}
+            latestVersionState={record.latest_version_state}
+            column="owner"
+          />
+        ),
+        align: 'center',
+      },
+      {
+        field: 'deployed_versions',
+        name: 'Deployed versions',
+        render: (deployedVersions: string[], record) => (
+          <ModelTableUploadingCell
+            fallback={<ModelDeployedVersions versions={deployedVersions} />}
+            latestVersionState={record.latest_version_state}
+            column="deployedVersions"
+          />
+        ),
+      },
+      {
+        field: 'created_time',
+        name: 'Created at',
+        render: (createdTime: string, record) => (
+          <ModelTableUploadingCell
+            fallback={<>{renderTime(createdTime, 'MMM D, YYYY')}</>}
+            latestVersionState={record.latest_version_state}
+            column="createdAt"
+          />
+        ),
         sortable: true,
       },
-      {
-        name: 'Actions',
-        actions: [
-          {
-            render: ({ name, id }) => (
-              <>
-                <EuiButtonIcon
-                  iconType="lensApp"
-                  onClick={(e: { stopPropagation: () => void }) => {
-                    e.stopPropagation();
-                    onViewModelDrawer(name);
-                  }}
-                  data-test-subj={`model-version-button-${name}`}
-                />
-                <EuiButtonIcon
-                  iconType="trash"
-                  color="danger"
-                  onClick={(e: { stopPropagation: () => void }) => {
-                    e.stopPropagation();
-                    onModelDelete(id);
-                  }}
-                  data-test-subj={`model-delete-button-${id}`}
-                />
-              </>
-            ),
-          } as CustomItemAction<ModelSearchItem>,
-        ],
-      },
     ],
-    [onModelDelete, onViewModelDrawer]
+    [onModelNameClick]
   );
 
   const pagination = useMemo(
@@ -108,48 +143,25 @@ export function ModelTable(props: {
     [props.pagination]
   );
 
-  const sorting = useMemo(() => {
-    const [field, direction] = sort.split('-');
-    return {
-      sort: {
-        field: field as keyof ModelSearchItem,
-        direction: direction as Direction,
-      },
-    };
-  }, [sort]);
+  const sorting = useMemo(() => ({ sort }), [sort]);
 
-  const handleChange = useCallback(
-    ({ page, sort: newSort }: CriteriaWithPagination<ModelSearchItem>) => {
-      const newPagination = { currentPage: page.index + 1, pageSize: page.size };
-      if (newSort) {
-        onChangeRef.current({
-          pagination: newPagination,
-          sort: `${newSort.field}-${newSort.direction}` as ModelTableSort,
-        });
-        return;
-      }
-      onChangeRef.current({ pagination: newPagination });
-    },
-    []
-  );
+  const handleChange = useCallback((criteria: CriteriaWithPagination<ModelAggerateSearchItem>) => {
+    const newPagination = { currentPage: criteria.page.index + 1, pageSize: criteria.page.size };
 
-  const rowProps = useCallback(
-    ({ id }) => ({
-      onClick: () => {
-        history.push(generatePath(routerPaths.modelDetail, { id }));
-      },
-    }),
-    [history]
-  );
+    onChangeRef.current({
+      pagination: newPagination,
+      ...(criteria.sort ? { sort: criteria.sort as ModelTableSort } : {}),
+    });
+  }, []);
 
   return (
-    <EuiBasicTable<ModelSearchItem>
+    <EuiBasicTable<ModelAggerateSearchItem>
       columns={columns}
       items={models}
       pagination={pagination}
       onChange={handleChange}
-      rowProps={rowProps}
       sorting={sorting}
+      hasActions
     />
   );
 }
