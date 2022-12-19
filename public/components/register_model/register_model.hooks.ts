@@ -16,3 +16,21 @@ export const useMetricNames = () => {
 
   return [loading, metricNames] as const;
 };
+
+const keys = ['tag1', 'tag2'];
+const values = ['value1', 'value2'];
+
+/**
+ * TODO: implement this function so that it retrieve tags from BE
+ */
+export const useModelTags = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    window.setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  return [loading, { keys, values }] as const;
+};
