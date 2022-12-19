@@ -22,6 +22,7 @@ import {
   trainRouter,
   modelAlgorithmRouter,
   predictRouter,
+  modelAlgregateRouter,
 } from './routes';
 import { ModelService, TrainService } from './services';
 import { TaskService } from './services/task_service';
@@ -63,12 +64,14 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     trainRouter(services, router);
     modelAlgorithmRouter(services, router);
     predictRouter(services, router);
+    modelAlgregateRouter(router);
 
     return {};
   }
 
   public start(core: CoreStart) {
     this.logger.debug('mlCommons: Started');
+
     return {};
   }
 
