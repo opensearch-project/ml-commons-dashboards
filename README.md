@@ -1,11 +1,15 @@
-## My Project
+[![Test](https://github.com/opensearch-project/ml-commons-dashboards/actions/workflows/unit-tests-workflow.yml/badge.svg?branch=main)](https://github.com/opensearch-project/ml-commons-dashboards/actions/workflows/unit-tests-workflow.yml)
+<br/>
+<img src="https://opensearch.org/assets/brand/SVG/Logo/opensearch_logo_default.svg" height="64px"/>
 
-TODO: Fill this README out!
+## OpenSearch Machine Learning Dashboards
 
-Be sure to:
+Machine Learning Dashboards is an OpenSearch-Dashboards plugin which enables machine learning model builders to seamlessly integrate and manage the trained models on OpenSearch Dashboard.
 
-* Change the title in this README
-* Edit your repository description on GitHub
+## Project Resources
+1. Project Website
+2. [Developer guide](DEVELOPER_GUIDE.md)
+3. [Contributing to this project](CONTRIBUTING.md)
 
 ## Security
 
