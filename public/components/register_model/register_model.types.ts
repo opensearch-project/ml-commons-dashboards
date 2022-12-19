@@ -1,3 +1,8 @@
+export type Tag = {
+  key: string;
+  value: string;
+};
+
 interface ModelFormBase {
   name: string;
   version: string;
@@ -8,6 +13,7 @@ interface ModelFormBase {
   trainingMetricValue?: string;
   validationMetricValue?: string;
   testingMetricValue?: string;
+  tags?: Tag[];
 }
 
 /**
