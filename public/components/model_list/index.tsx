@@ -4,23 +4,26 @@
  */
 
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
+import { EuiPageHeader, EuiSpacer, EuiPanel, EuiButton } from '@elastic/eui';
 
 import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
-import { EuiLinkButton } from '../common';
-
+// import { EuiLinkButton } from '../common';
 import { ModelTable, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
+import { RegisterModelTypeModal } from '../RegisterModelTypeModal';
 import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
 
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const closeModal = () => setIsModalVisible(false);
+  const showModal = () => setIsModalVisible(true);
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
     sort: ModelTableSort;
@@ -92,15 +95,25 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   const handleFilterChange = useCallback((filterValue: ModelListFilterFilterValue) => {
     setParams((prevValue) => ({ ...prevValue, filterValue, currentPage: 1 }));
   }, []);
+  let modal;
+
+  function handle(even: any) {
+    closeModal();
+  }
+  if (isModalVisible) {
+    modal = <RegisterModelTypeModal getMsg={handle} />;
+  }
 
   return (
     <EuiPanel>
       <EuiPageHeader
         pageTitle={<>Models</>}
         rightSideItems={[
-          <EuiLinkButton to={routerPaths.registerModel} fill iconType="plusInCircle">
-            Register new model
-          </EuiLinkButton>,
+          // <EuiLinkButton to={routerPaths.registerModel} fill iconType="plusInCircle">
+          //   Register new model
+          // </EuiLinkButton>,
+          <EuiButton onClick={showModal}>Register new model</EuiButton>,
+          <div>{modal}</div>,
         ]}
       />
       <EuiSpacer />
