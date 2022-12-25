@@ -5,11 +5,8 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-
 import { RegisterModelTypeModal } from '../index';
-
 import { render, screen } from '../../../../test/test_utils';
-
 describe('<RegisterModelTypeModal />', () => {
   it('should render two checkablecard', () => {
     render(<RegisterModelTypeModal />);

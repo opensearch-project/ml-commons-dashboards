@@ -8,13 +8,12 @@ import { EuiPageHeader, EuiSpacer, EuiPanel, EuiButton } from '@elastic/eui';
 
 import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
-import { routerPaths } from '../../../common/router_paths';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
 // import { EuiLinkButton } from '../common';
 import { ModelTable, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
-import { RegisterModelTypeModal } from '../RegisterModelTypeModal';
+import { RegisterModelTypeModal } from '../register_model_type_modal';
 import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
@@ -97,12 +96,12 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }, []);
   let modal;
 
-  function handle(even: any) {
+  function handle() {
     closeModal();
   }
-  if (isModalVisible) {
-    modal = <RegisterModelTypeModal getMsg={handle} />;
-  }
+  // if (isModalVisible) {
+  //   modal = <RegisterModelTypeModal getMsg={handle} />;
+  // }
 
   return (
     <EuiPanel>
@@ -113,7 +112,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
           //   Register new model
           // </EuiLinkButton>,
           <EuiButton onClick={showModal}>Register new model</EuiButton>,
-          <div>{modal}</div>,
+          isModalVisible && <RegisterModelTypeModal getMsg={handle} />,
         ]}
       />
       <EuiSpacer />
