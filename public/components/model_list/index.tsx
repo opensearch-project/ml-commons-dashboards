@@ -10,7 +10,6 @@ import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
-// import { EuiLinkButton } from '../common';
 import { ModelTable, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
 import { RegisterModelTypeModal } from '../register_model_type_modal';
@@ -99,18 +98,11 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   function handle() {
     closeModal();
   }
-  // if (isModalVisible) {
-  //   modal = <RegisterModelTypeModal getMsg={handle} />;
-  // }
-
   return (
     <EuiPanel>
       <EuiPageHeader
         pageTitle={<>Models</>}
         rightSideItems={[
-          // <EuiLinkButton to={routerPaths.registerModel} fill iconType="plusInCircle">
-          //   Register new model
-          // </EuiLinkButton>,
           <EuiButton onClick={showModal}>Register new model</EuiButton>,
           isModalVisible && <RegisterModelTypeModal getMsg={handle} />,
         ]}

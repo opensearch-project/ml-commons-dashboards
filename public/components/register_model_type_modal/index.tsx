@@ -66,7 +66,7 @@ export function RegisterModelTypeModal(props: any) {
   };
   const history = useHistory();
   const [selectedOptions, setSelected] = useState<EuiComboBoxOptionOption[]>([]);
-  const handleContinue = (radioSelected: any) => {
+  const handleContinue = (radioSelected: string) => {
     if (radioSelected === 'fromRepo') {
       history.push(
         `/model-registry/register-model?name=${selectedOptions[0]?.label}&version=${selectedOptions[0]?.label}`
@@ -144,8 +144,7 @@ export function RegisterModelTypeModal(props: any) {
         </EuiModalBody>
         <EuiModalFooter>
           <EuiButton color="primary" iconSide="right" onClick={() => getMsg(msg)}>
-            {/* <EuiButton color="primary" iconSide="right" onClick={() => getMsg(msg)}> */}
-            Cancle
+            Cancel
           </EuiButton>
           <EuiButton
             color="primary"
