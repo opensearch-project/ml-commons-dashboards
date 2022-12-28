@@ -3,17 +3,24 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Train } from '../public/components/train';
-import { Predict } from '../public/components/predict';
-import { Home } from '../public/components/home';
-import { ModelList } from '../public/components/model_list';
-import { TaskList } from '../public/components/task_list';
-import { routerPaths } from './router_paths';
-import { ModelDetail } from '../public/components/model_detail';
-import { ModelUpload } from '../public/components/model_upload';
-import { RegisterModelForm } from '../public/components/register_model';
+import { Monitoring } from '../public/components/monitoring';
 
-export const ROUTES = [
+type RouteConfig = {
+  path: string;
+  Component: React.ComponentType<any>;
+  label: string;
+  exact?: boolean;
+};
+
+export const ROUTES: RouteConfig[] = [
+  {
+    path: '/',
+    Component: Monitoring,
+    label: 'Monitoring',
+  },
+];
+
+/* export const ROUTES1 = [
   {
     path: routerPaths.train,
     Component: Train,
@@ -58,4 +65,4 @@ export const ROUTES = [
     label: 'Register Model',
     Component: RegisterModelForm,
   },
-];
+];*/
