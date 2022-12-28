@@ -27,7 +27,7 @@ describe('<RegisterModelTypeModal />', () => {
   it('should call onClick with null after click "cancel"', async () => {
     const onClickMock = jest.fn();
     render(<RegisterModelTypeModal />);
-    await userEvent.click(screen.getByLabelText('cancel', { selector: 'EuiButton' }));
+    await userEvent.click(screen.getByLabelText('Cancel', { selector: 'EuiButton' }));
     expect(onClickMock).toHaveBeenCalledWith('foo');
   });
 
@@ -37,7 +37,7 @@ describe('<RegisterModelTypeModal />', () => {
     expect(
       screen.getByLabelText('Add your own modal', { selector: 'EuiCheckableCard' })
     ).toBeInTheDocument();
-    await userEvent.click(screen.getByLabelText('continue', { selector: 'EuiButton' }));
+    await userEvent.click(screen.getByLabelText('Continue', { selector: 'EuiButton' }));
     expect(document.URL.includes('/model-registry/register-model')).toEqual(true);
   });
   it('should call onClick with null after click continue', async () => {
@@ -46,7 +46,7 @@ describe('<RegisterModelTypeModal />', () => {
     expect(
       screen.getByLabelText('Add your own modal', { selector: 'EuiCheckableCard' })
     ).toBeInTheDocument();
-    await userEvent.click(screen.getByLabelText('continue', { selector: 'EuiButton' }));
+    await userEvent.click(screen.getByLabelText('Continue', { selector: 'EuiButton' }));
     expect(document.URL.includes('/model-registry/register-model')).toEqual(true);
   });
 });

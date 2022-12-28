@@ -157,7 +157,6 @@ export function RegisterModelTypeModal(props: any) {
             Continue
           </EuiButton>
         </EuiModalFooter>
-        {/* <div>{{selectedOptions}}</div> */}
       </EuiModal>
     </div>
   );
