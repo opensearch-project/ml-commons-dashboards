@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Monitoring } from '../public/components/monitoring';
+import { Monitoring } from '../public/components/model_list';
 
 type RouteConfig = {
   path: string;

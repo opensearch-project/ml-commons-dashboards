@@ -20,7 +20,7 @@ import {
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
 
-export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
+export const Monitoring = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
     sort: ModelTableSort;
@@ -59,10 +59,6 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     notifications.toasts.addSuccess('Model has been deleted.');
   }, [reload, notifications.toasts]);
 
-  const handleModelDelete = useCallback((modelId: string) => {
-    confirmModelDeleteRef.current?.show(modelId);
-  }, []);
-
   const handleViewModelDrawer = useCallback((name: string) => {
     setDrawerModelName(name);
   }, []);
@@ -94,29 +90,32 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }, []);
 
   return (
-    <EuiPanel>
-      <EuiPageHeader
-        pageTitle={<>Models</>}
-        rightSideItems={[
-          <EuiLinkButton to={routerPaths.registerModel} fill iconType="plusInCircle">
-            Register new model
-          </EuiLinkButton>,
-        ]}
-      />
-      <EuiSpacer />
-      <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
-      <EuiSpacer />
-      <ModelTable
-        sort={params.sort}
-        models={models}
-        pagination={pagination}
-        onChange={handleTableChange}
-        onModelNameClick={handleViewModelDrawer}
-      />
-      <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
-      {drawerModelName && (
-        <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
-      )}
-    </EuiPanel>
+    <>
+      <EuiPageHeader pageTitle="Monitoring" />
+      <EuiPanel>
+        <EuiPageHeader
+          pageTitle={<>Models</>}
+          rightSideItems={[
+            <EuiLinkButton to={routerPaths.registerModel} fill iconType="plusInCircle">
+              Register new model
+            </EuiLinkButton>,
+          ]}
+        />
+        <EuiSpacer />
+        <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
+        <EuiSpacer />
+        <ModelTable
+          sort={params.sort}
+          models={models}
+          pagination={pagination}
+          onChange={handleTableChange}
+          onModelNameClick={handleViewModelDrawer}
+        />
+        <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
+        {drawerModelName && (
+          <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
+        )}
+      </EuiPanel>
+    </>
   );
 };
