@@ -11,7 +11,7 @@ import {
   AppPluginStartDependencies,
   MLServices,
 } from './types';
-import { PLUGIN_NAME } from '../common';
+import { PLUGIN_NAME, PLUGIN_ID } from '../common';
 
 export class MlCommonsPluginPlugin
   implements Plugin<MlCommonsPluginPluginSetup, MlCommonsPluginPluginStart> {
@@ -20,7 +20,7 @@ export class MlCommonsPluginPlugin
   ): MlCommonsPluginPluginSetup {
     // Register an application into the side navigation menu
     core.application.register({
-      id: 'mlCommonsPlugin',
+      id: PLUGIN_ID,
       title: PLUGIN_NAME,
       category: {
         id: 'opensearch',
