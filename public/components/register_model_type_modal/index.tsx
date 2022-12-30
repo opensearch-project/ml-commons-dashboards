@@ -20,13 +20,17 @@ import {
   EuiComboBoxOptionOption,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
-import { Link } from 'react-router-dom';
-
-export function RegisterModelTypeModal(props: any) {
-  const { getMsg } = props;
-  const msg: string = 'close';
-  const radioName = htmlIdGenerator()();
-  const [radio, setRadio] = useState('ownModal');
+enum ModelSource {
+  USER_MODEL = 'UserModel',
+  PRE_TRAINED_MODEL = 'PreTrainedModel',
+}
+export interface RegisterModelTypeProp {
+  onCloseModal: () => void;
+}
+export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
+  const { onCloseModal } = props;
+  const history = useHistory();
+  const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
   const options = [
     {
       label: 'Titan',
@@ -60,24 +64,23 @@ export function RegisterModelTypeModal(props: any) {
       label: 'Hyperion',
     },
   ];
-  const onChange = (selectedOptions: EuiComboBoxOptionOption[]) => {
+  const onChange = (modelRepoSelection: EuiComboBoxOptionOption[]) => {
     // We should only get back either 0 or 1 options.
-    setSelected(selectedOptions);
+    setmodelRepoSelection(modelRepoSelection);
   };
-  const history = useHistory();
-  const [selectedOptions, setSelected] = useState<EuiComboBoxOptionOption[]>([]);
+  const [modelRepoSelection, setmodelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
   const handleContinue = (radioSelected: string) => {
-    if (radioSelected === 'fromRepo') {
+    if (radioSelected === 'UserModel' && modelRepoSelection[0]?.label) {
       history.push(
-        `/model-registry/register-model?name=${selectedOptions[0]?.label}&version=${selectedOptions[0]?.label}`
+        `/model-registry/register-model?name=${modelRepoSelection[0]?.label}&version=${modelRepoSelection[0]?.label}`
       );
-    } else {
+    } else if (radioSelected === 'PreTrainedModel') {
       history.push('/model-registry/register-model');
     }
   };
   return (
     <div>
-      <EuiModal onClose={() => getMsg(msg)} maxWidth="1000px">
+      <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
         <EuiModalHeader>
           <EuiModalHeaderTitle>
             <h1>Register new model</h1>
@@ -101,10 +104,8 @@ export function RegisterModelTypeModal(props: any) {
                       </p>
                     </div>
                   }
-                  name={radioName}
-                  value="fromRepo"
-                  checked={radio === 'fromRepo'}
-                  onChange={() => setRadio('fromRepo')}
+                  checked={modelSource === ModelSource.USER_MODEL}
+                  onChange={() => setModelSource(ModelSource.USER_MODEL)}
                 />
               </EuiFlexItem>
               <EuiFlexItem>
@@ -120,10 +121,8 @@ export function RegisterModelTypeModal(props: any) {
                       </p>
                     </div>
                   }
-                  name={radioName}
-                  value="ownModal"
-                  checked={radio === 'ownModal'}
-                  onChange={() => setRadio('ownModal')}
+                  checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
+                  onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -131,27 +130,28 @@ export function RegisterModelTypeModal(props: any) {
         </EuiModalBody>
         <EuiSpacer />
         <EuiSpacer />
-        <EuiModalBody style={{ display: radio === 'fromRepo' ? 'block' : 'none' }}>
+        <EuiModalBody
+          style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}
+        >
           <strong>Select model from repository</strong>
           <EuiSpacer />
           <EuiComboBox
             placeholder="Select modal"
             singleSelection={{ asPlainText: true }}
             options={options}
-            selectedOptions={selectedOptions}
+            selectedOptions={modelRepoSelection}
             onChange={onChange}
           />
         </EuiModalBody>
         <EuiModalFooter>
-          <EuiButton color="primary" iconSide="right" onClick={() => getMsg(msg)}>
+          <EuiButton color="primary" iconSide="right" onClick={() => onCloseModal()}>
             Cancel
           </EuiButton>
           <EuiButton
             color="primary"
             fill
-            iconSide="right"
             onClick={() => {
-              handleContinue(radio);
+              handleContinue(modelSource);
             }}
           >
             Continue

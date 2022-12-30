@@ -2,26 +2,21 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { EuiPageHeader, EuiSpacer, EuiPanel, EuiButton } from '@elastic/eui';
-
+import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
 import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
 import { ModelTable, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
-import { RegisterModelTypeModal } from '../register_model_type_modal';
+import { RegisterNewModelButton } from './regsister_new_model_button';
 import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
 
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const closeModal = () => setIsModalVisible(false);
-  const showModal = () => setIsModalVisible(true);
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
     sort: ModelTableSort;
@@ -93,20 +88,10 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   const handleFilterChange = useCallback((filterValue: ModelListFilterFilterValue) => {
     setParams((prevValue) => ({ ...prevValue, filterValue, currentPage: 1 }));
   }, []);
-  let modal;
-
-  function handle() {
-    closeModal();
-  }
   return (
     <EuiPanel>
-      <EuiPageHeader
-        pageTitle={<>Models</>}
-        rightSideItems={[
-          <EuiButton onClick={showModal}>Register new model</EuiButton>,
-          isModalVisible && <RegisterModelTypeModal getMsg={handle} />,
-        ]}
-      />
+      {/* <RegisterModelTypeModal onCloseModal={handle} /> */}
+      <EuiPageHeader pageTitle={<>Models</>} rightSideItems={[<RegisterNewModelButton />]} />
       <EuiSpacer />
       <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
       <EuiSpacer />
