@@ -9,3 +9,4 @@ export const PLUGIN_DESC = `ML Commons for OpenSearch eases the development of m
 
 export * from './algo';
 export * from './constant';
+export * from './status';
