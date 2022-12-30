@@ -7,30 +7,28 @@ async function setup({ onUpdateFilters = jest.fn() }) {
   const user = userEvent.setup({});
   render(<StatusFilter onUpdateFilters={onUpdateFilters} />);
   // open popover
-  await user.click(screen.getByLabelText('Status'));
+  await user.click(screen.getByText('Status'));
   return { user };
 }
 
 describe('<StatusFilter />', () => {
-  it('should render a dialog with three default items', async () => {
+  it('should render a dialog with selectable list', async () => {
     await setup({});
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Responding')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Partially Responding')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Not Responding')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
   });
 
   it('should render null content when input a invalid text to search', async () => {
     const { user } = await setup({});
     await user.type(screen.getByPlaceholderText('Search'), '1');
-    expect(screen.getByDisplayValue('No filters found')).toBeInTheDocument();
+    expect(screen.getByText('No filters found')).toBeInTheDocument();
   });
 
   it('should call `onUpdateFilters` callback when close popover', async () => {
     const onUpdateFilters = jest.fn();
     const { user } = await setup({ onUpdateFilters });
     expect(onUpdateFilters).not.toHaveBeenCalled();
-    await user.click(screen.getByLabelText('Monitoring'));
+    await user.click(screen.getByText('Status'));
     expect(onUpdateFilters).toHaveBeenCalled();
   });
 });

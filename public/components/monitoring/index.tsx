@@ -10,8 +10,8 @@ export const Monitoring = () => {
       <EuiPanel>
         <EuiTitle size="s">
           <h3>Deployed models</h3>
-          <StatusFilter onUpdateFilters={() => {}} />
         </EuiTitle>
+        <StatusFilter onUpdateFilters={() => {}} />
       </EuiPanel>
     </div>
   );

@@ -21,10 +21,6 @@ interface Props {
 export const StatusFilter = ({ onUpdateFilters }: Props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const onButtonClick = () => {
-    setIsPopoverOpen(!isPopoverOpen);
-  };
-
   const [items, setItems] = useState(
     STATUS_FILTER.map((item) => ({
       label: item.label,
@@ -33,11 +29,23 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
     }))
   );
 
-  const onClosePopover = useCallback(() => {
-    setIsPopoverOpen(false);
+  const handleUpdateFilters = useCallback(() => {
     const selectedItems = items.filter((item) => item.checked === 'on').map((item) => item.label);
     onUpdateFilters(selectedItems);
-  }, [items]);
+  }, [items, onUpdateFilters]);
+
+  const onButtonClick = useCallback(() => {
+    if (isPopoverOpen) {
+      //should close popover and update filters
+      handleUpdateFilters();
+    }
+    setIsPopoverOpen(!isPopoverOpen);
+  }, [isPopoverOpen]);
+
+  const onClosePopover = () => {
+    setIsPopoverOpen(false);
+    handleUpdateFilters();
+  };
 
   const button = (
     <EuiFilterButton
