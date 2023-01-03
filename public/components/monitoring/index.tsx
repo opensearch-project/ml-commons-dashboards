@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
 import React, { useCallback } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';

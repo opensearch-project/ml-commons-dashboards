@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '../../../../test/test_utils';
@@ -65,10 +70,13 @@ describe('<RefreshInterval />', () => {
     await user.click(screen.getByLabelText(/start refresh interval/i));
     expect(screen.getByLabelText(/current interval value/i)).toHaveValue('3 seconds');
 
+    // change interval value to "10"
     await user.clear(screen.getByLabelText(/interval value input/i));
     await user.type(screen.getByLabelText(/interval value input/i), '10');
+    await user.click(screen.getByLabelText(/start refresh interval/i));
     expect(screen.getByLabelText(/current interval value/i)).toHaveValue('10 seconds');
 
+    // change interval unit to "minutes"
     await user.selectOptions(screen.getByLabelText(/interval unit selector/i), 'minutes');
     expect(screen.getByLabelText(/current interval value/i)).toHaveValue('10 minutes');
   });
@@ -119,7 +127,28 @@ describe('<RefreshInterval />', () => {
 
     await user.click(screen.getByLabelText(/stop refresh interval/i));
     jest.advanceTimersByTime(10000);
-    // only called once, it should not be call after `stop refresh interval`
+    // only called once, it should not be called after `stop refresh interval`
     expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('should pause the current interval if user set an invalid interval value', async () => {
+    const onRefresh = jest.fn();
+    const { user } = await setup({ minInterval: 3000, onRefresh });
+    expect(onRefresh).not.toHaveBeenCalled();
+
+    // user start interval
+    await user.click(screen.getByLabelText(/start refresh interval/i));
+    jest.advanceTimersByTime(3000);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+
+    // user set a invalid interval value on the fly
+    await user.clear(screen.getByLabelText(/interval value input/i));
+    await user.type(screen.getByLabelText(/interval value input/i), '1');
+    jest.advanceTimersByTime(3000);
+    // only called once, it should not be called when invalid value is set
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+
+    // The start button is disabled
+    expect(screen.getByLabelText(/start refresh interval/i)).toBeDisabled();
   });
 });

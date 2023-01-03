@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   EuiIcon,
   EuiButtonEmpty,
@@ -76,6 +81,14 @@ export const RefreshInterval = ({
     }
   }, [intervalUnit, intervalValue]);
 
+  const isInvalid = interval === null || interval < minInterval;
+
+  useEffect(() => {
+    if (isInvalid) {
+      setIsPaused(true);
+    }
+  }, [isInvalid]);
+
   useEffect(() => {
     let intervalId: number | null = null;
 
@@ -84,7 +97,7 @@ export const RefreshInterval = ({
         window.clearInterval(intervalId);
       }
     } else {
-      if (interval !== null && intervalValue > 0) {
+      if (interval !== null) {
         intervalId = window.setInterval(() => {
           onRefresh();
         }, interval);
@@ -100,7 +113,7 @@ export const RefreshInterval = ({
         window.clearInterval(intervalId);
       }
     };
-  }, [interval, isPaused]);
+  }, [interval, isPaused, onRefresh, onRefreshChange]);
 
   const intervalButton = (
     <EuiButtonEmpty
@@ -113,7 +126,6 @@ export const RefreshInterval = ({
     </EuiButtonEmpty>
   );
 
-  const isInvalid = interval === null || interval < minInterval;
   let errors: string[] = [];
   if (isInvalid) {
     errors = ['Enter a refresh rate greater than 10 seconds.'];
