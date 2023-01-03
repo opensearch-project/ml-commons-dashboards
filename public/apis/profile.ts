@@ -6,7 +6,7 @@
 import { DEPLOYED_MODEL_PROFILE_API_ENDPOINT } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
 
-export interface ProfileDeployedModel {
+export interface ModelDeployedProfile {
   id: string;
   name: string;
   target_node_ids: string[];
@@ -16,7 +16,7 @@ export interface ProfileDeployedModel {
 
 export class Profile {
   public getAllDeployedModels() {
-    return InnerHttpProvider.getHttp().get<ProfileDeployedModel[]>(
+    return InnerHttpProvider.getHttp().get<ModelDeployedProfile[]>(
       DEPLOYED_MODEL_PROFILE_API_ENDPOINT
     );
   }

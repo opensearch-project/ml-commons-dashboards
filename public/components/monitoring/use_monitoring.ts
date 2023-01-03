@@ -6,7 +6,7 @@
 import { useMemo, useCallback, useState } from 'react';
 
 import { APIProvider } from '../../apis/api_provider';
-import { ProfileDeployedModel } from '../../apis/profile';
+import { ModelDeployedProfile } from '../../apis/profile';
 import { useFetcher } from '../../hooks/use_fetcher';
 
 type ModelDeployState = 'responding' | 'not-responding' | 'partial-responding';
@@ -20,7 +20,7 @@ interface Params {
 }
 
 const convertModelState = (
-  model: Pick<ProfileDeployedModel, 'target_node_ids' | 'deployed_node_ids'>
+  model: Pick<ModelDeployedProfile, 'target_node_ids' | 'deployed_node_ids'>
 ): ModelDeployState => {
   if (model.target_node_ids.length === model.deployed_node_ids.length) {
     return 'responding';
@@ -34,36 +34,33 @@ const convertModelState = (
 const checkFilterExists = (params: Params) =>
   !!params.name || (!!params.state && params.state.length > 0);
 
-const fetchAllDeployedModels = (params: Params) => {
-  return APIProvider.getAPI('profile')
-    .getAllDeployedModels()
-    .then((models) => {
-      const allData = models
-        .map((item) => ({ ...item, state: convertModelState(item) }))
-        .filter((item) => {
-          if (!checkFilterExists(params)) {
-            return true;
-          }
-          if (params.name && !item.name.toLowerCase().includes(params.name.toLowerCase())) {
-            return false;
-          }
-          if (params.state && !params.state.includes(item.state)) {
-            return false;
-          }
-          return true;
-        });
-      const data = allData
-        .sort((a, b) => a.name.localeCompare(b.name) * (params.sort === 'name-asc' ? 1 : -1))
-        .slice((params.currentPage - 1) * params.pageSize, params.currentPage * params.pageSize);
-      return {
-        data,
-        pagination: {
-          currentPage: params.currentPage,
-          pageSize: params.pageSize,
-          totalCounts: allData.length,
-        },
-      };
+const fetchAllDeployedModels = async (params: Params) => {
+  const deployedModels = await APIProvider.getAPI('profile').getAllDeployedModels();
+  const allData = deployedModels
+    .map((item) => ({ ...item, state: convertModelState(item) }))
+    .filter((item) => {
+      if (!checkFilterExists(params)) {
+        return true;
+      }
+      if (params.name && !item.name.toLowerCase().includes(params.name.toLowerCase())) {
+        return false;
+      }
+      if (params.state && !params.state.includes(item.state)) {
+        return false;
+      }
+      return true;
     });
+  const data = allData
+    .sort((a, b) => a.name.localeCompare(b.name) * (params.sort === 'name-asc' ? 1 : -1))
+    .slice((params.currentPage - 1) * params.pageSize, params.currentPage * params.pageSize);
+  return {
+    data,
+    pagination: {
+      currentPage: params.currentPage,
+      pageSize: params.pageSize,
+      totalCounts: allData.length,
+    },
+  };
 };
 
 export const useMonitoring = () => {
@@ -82,14 +79,14 @@ export const useMonitoring = () => {
     if (loading) {
       return 'loading' as const;
     }
-    if (totalCounts === 0 && filterExists) {
+    if (totalCounts === 0) {
       return filterExists ? ('reset-filter' as const) : ('empty' as const);
     }
     return 'normal' as const;
   }, [loading, totalCounts, filterExists]);
 
   const updateDeployedModel = useCallback(
-    (model: ProfileDeployedModel) => {
+    (model: ModelDeployedProfile) => {
       mutate((previousValue) => {
         if (!previousValue) {
           return previousValue;

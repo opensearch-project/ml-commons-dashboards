@@ -5,7 +5,7 @@
 
 import { act, renderHook } from '@testing-library/react-hooks';
 
-import { ProfileDeployedModel } from '../../../apis/profile';
+import { ModelDeployedProfile } from '../../../apis/profile';
 import { APIProvider } from '../../../apis/api_provider';
 import { useMonitoring } from '../use_monitoring';
 
@@ -33,7 +33,7 @@ const mockMultiRecords = () => {
 describe('useMonitoring', () => {
   it('should return "loading" for pageStatus when loading and back to "normal" when loaded', async () => {
     let resolveFn: Function;
-    const promise = new Promise<ProfileDeployedModel[]>((resolve) => {
+    const promise = new Promise<ModelDeployedProfile[]>((resolve) => {
       resolveFn = () => {
         resolve([
           {
@@ -101,6 +101,14 @@ describe('useMonitoring', () => {
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.pageStatus).toBe('normal');
     expect(result.current.deployedModels).toEqual([expect.objectContaining({ id: 'model-1-id' })]);
+
+    jest.spyOn(APIProvider.getAPI('profile'), 'getAllDeployedModels').mockResolvedValueOnce([]);
+
+    act(() => {
+      result.current.reload();
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.pageStatus).toBe('empty');
   });
 
   it('should return consistent data after order change', async () => {
