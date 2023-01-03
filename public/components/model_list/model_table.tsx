@@ -16,7 +16,7 @@ import { renderTime } from '../../utils';
 import { ModelOwner } from './model_owner';
 import { ModelDeployedVersions } from './model_deployed_versions';
 import { ModelTableUploadingCell } from './model_table_uploading_cell';
-import { ModelAggerateSearchItem } from '../../apis/model_aggerate';
+import { ModelAggregateSearchItem } from '../../apis/model_aggregate';
 
 export interface ModelTableSort {
   field: 'created_time';
@@ -29,7 +29,7 @@ export interface ModelTableCriteria {
 }
 
 export interface ModelTableProps {
-  models: ModelAggerateSearchItem[];
+  models: ModelAggregateSearchItem[];
   pagination: {
     currentPage: number;
     pageSize: number;
@@ -45,7 +45,7 @@ export function ModelTable(props: ModelTableProps) {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const columns = useMemo<Array<EuiBasicTableColumn<ModelAggerateSearchItem>>>(
+  const columns = useMemo<Array<EuiBasicTableColumn<ModelAggregateSearchItem>>>(
     () => [
       {
         field: 'name',
@@ -145,7 +145,7 @@ export function ModelTable(props: ModelTableProps) {
 
   const sorting = useMemo(() => ({ sort }), [sort]);
 
-  const handleChange = useCallback((criteria: CriteriaWithPagination<ModelAggerateSearchItem>) => {
+  const handleChange = useCallback((criteria: CriteriaWithPagination<ModelAggregateSearchItem>) => {
     const newPagination = { currentPage: criteria.page.index + 1, pageSize: criteria.page.size };
 
     onChangeRef.current({

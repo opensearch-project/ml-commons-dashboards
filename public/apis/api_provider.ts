@@ -8,7 +8,7 @@ import { Task } from './task';
 import { Train } from './train';
 import { ModelAlgorithm } from './model_algorithm';
 import { Predict } from './predict';
-import { ModelAggerate } from './model_aggerate';
+import { ModelAggregate } from './model_aggregate';
 import { Profile } from './profile';
 
 const apiInstanceStore: {
@@ -17,7 +17,7 @@ const apiInstanceStore: {
   train: Train | undefined;
   modelAlgorithm: ModelAlgorithm | undefined;
   predict: Predict | undefined;
-  modelAggregate: ModelAggerate | undefined;
+  modelAggregate: ModelAggregate | undefined;
   profile: Profile | undefined;
 } = {
   model: undefined,
@@ -35,7 +35,7 @@ export class APIProvider {
   public static getAPI(type: 'train'): Train;
   public static getAPI(type: 'modelAlgorithm'): ModelAlgorithm;
   public static getAPI(type: 'predict'): Predict;
-  public static getAPI(type: 'modelAggregate'): ModelAggerate;
+  public static getAPI(type: 'modelAggregate'): ModelAggregate;
   public static getAPI(type: 'profile'): Profile;
   public static getAPI(type: keyof typeof apiInstanceStore) {
     if (apiInstanceStore[type]) {
@@ -68,7 +68,7 @@ export class APIProvider {
         return newInstance;
       }
       case 'modelAggregate': {
-        const newInstance = new ModelAggerate();
+        const newInstance = new ModelAggregate();
         apiInstanceStore.modelAggregate = newInstance;
         return newInstance;
       }
