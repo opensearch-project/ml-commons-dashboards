@@ -24,11 +24,15 @@ describe('<StatusFilter />', () => {
     expect(screen.getByText('No filters found')).toBeInTheDocument();
   });
 
-  it('should call `onUpdateFilters` callback when close popover', async () => {
+  it('should call `onUpdateFilters` callback with three options selected by default when close popover', async () => {
     const onUpdateFilters = jest.fn();
     const { user } = await setup({ onUpdateFilters });
     expect(onUpdateFilters).not.toHaveBeenCalled();
     await user.click(screen.getByText('Status'));
-    expect(onUpdateFilters).toHaveBeenCalled();
+    expect(onUpdateFilters).toHaveBeenCalledWith([
+      'Responding',
+      'Partially responding',
+      'Not responding',
+    ]);
   });
 });
