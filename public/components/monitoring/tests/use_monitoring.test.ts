@@ -5,7 +5,7 @@
 
 import { act, renderHook } from '@testing-library/react-hooks';
 
-import { ModelDeployedProfile } from '../../../apis/profile';
+import { ModelDeploymentProfile } from '../../../apis/profile';
 import { APIProvider } from '../../../apis/api_provider';
 import { useMonitoring } from '../use_monitoring';
 
@@ -33,7 +33,7 @@ const mockMultiRecords = () => {
 describe('useMonitoring', () => {
   it('should return "loading" for pageStatus when loading and back to "normal" when loaded', async () => {
     let resolveFn: Function;
-    const promise = new Promise<ModelDeployedProfile[]>((resolve) => {
+    const promise = new Promise<ModelDeploymentProfile[]>((resolve) => {
       resolveFn = () => {
         resolve([
           {

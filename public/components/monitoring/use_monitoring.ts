@@ -6,7 +6,7 @@
 import { useMemo, useCallback, useState } from 'react';
 
 import { APIProvider } from '../../apis/api_provider';
-import { ModelDeployedProfile } from '../../apis/profile';
+import { ModelDeploymentProfile } from '../../apis/profile';
 import { useFetcher } from '../../hooks/use_fetcher';
 
 type ModelDeployState = 'responding' | 'not-responding' | 'partial-responding';
@@ -20,7 +20,7 @@ interface Params {
 }
 
 const convertModelState = (
-  model: Pick<ModelDeployedProfile, 'target_node_ids' | 'deployed_node_ids'>
+  model: Pick<ModelDeploymentProfile, 'target_node_ids' | 'deployed_node_ids'>
 ): ModelDeployState => {
   if (model.target_node_ids.length === model.deployed_node_ids.length) {
     return 'responding';
@@ -86,7 +86,7 @@ export const useMonitoring = () => {
   }, [loading, totalCounts, filterExists]);
 
   const updateDeployedModel = useCallback(
-    (model: ModelDeployedProfile) => {
+    (model: ModelDeploymentProfile) => {
       mutate((previousValue) => {
         if (!previousValue) {
           return previousValue;
