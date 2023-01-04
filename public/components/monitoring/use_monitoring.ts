@@ -16,7 +16,7 @@ interface Params {
   state?: ModelDeployState[];
   currentPage: number;
   pageSize: number;
-  sort: 'name-asc' | 'name-desc';
+  sort: { field: 'name'; direction: 'asc' | 'desc' };
 }
 
 const convertModelState = (
@@ -51,14 +51,18 @@ const fetchAllDeployedModels = async (params: Params) => {
       return true;
     });
   const data = allData
-    .sort((a, b) => a.name.localeCompare(b.name) * (params.sort === 'name-asc' ? 1 : -1))
+    .sort(
+      (a, b) =>
+        a[params.sort.field].localeCompare(b[params.sort.field]) *
+        (params.sort.direction === 'asc' ? 1 : -1)
+    )
     .slice((params.currentPage - 1) * params.pageSize, params.currentPage * params.pageSize);
   return {
     data,
     pagination: {
       currentPage: params.currentPage,
       pageSize: params.pageSize,
-      totalCounts: allData.length,
+      totalRecords: allData.length,
     },
   };
 };
@@ -66,12 +70,12 @@ const fetchAllDeployedModels = async (params: Params) => {
 export const useMonitoring = () => {
   const [params, setParams] = useState<Params>({
     currentPage: 1,
-    pageSize: 15,
-    sort: 'name-asc',
+    pageSize: 10,
+    sort: { field: 'name', direction: 'asc' },
   });
   const { data, mutate, loading, reload } = useFetcher(fetchAllDeployedModels, params);
   const filterExists = checkFilterExists(params);
-  const totalCounts = data?.pagination.totalCounts;
+  const totalRecords = data?.pagination.totalRecords;
 
   const deployedModels = useMemo(() => data?.data ?? [], [data]);
 
@@ -79,11 +83,11 @@ export const useMonitoring = () => {
     if (loading) {
       return 'loading' as const;
     }
-    if (totalCounts === 0) {
+    if (totalRecords === 0) {
       return filterExists ? ('reset-filter' as const) : ('empty' as const);
     }
     return 'normal' as const;
-  }, [loading, totalCounts, filterExists]);
+  }, [loading, totalRecords, filterExists]);
 
   const updateDeployedModel = useCallback(
     (model: ModelDeploymentProfile) => {
@@ -127,27 +131,29 @@ export const useMonitoring = () => {
     }));
   }, []);
 
-  const handleTableChange = useCallback((criteria) => {
-    const {
-      pagination: { currentPage, pageSize },
-      sort,
-    } = criteria;
-    setParams((previousValue) => {
-      if (
-        currentPage === previousValue.currentPage &&
-        pageSize === previousValue.pageSize &&
-        (!sort || sort === previousValue.sort)
-      ) {
-        return previousValue;
-      }
-      return {
-        ...previousValue,
-        currentPage,
-        pageSize,
-        ...(sort ? { sort } : {}),
-      };
-    });
-  }, []);
+  const handleTableChange = useCallback(
+    (criteria: {
+      pagination?: { currentPage: number; pageSize: number };
+      sort?: { field: 'name'; direction: 'asc' | 'desc' };
+    }) => {
+      setParams((previousValue) => {
+        if (
+          criteria.pagination?.currentPage === previousValue.currentPage &&
+          criteria.pagination?.pageSize === previousValue.pageSize &&
+          criteria.sort?.field === previousValue.sort.field &&
+          criteria.sort?.direction === previousValue.sort.direction
+        ) {
+          return previousValue;
+        }
+        return {
+          ...previousValue,
+          ...(criteria.pagination ? criteria.pagination : {}),
+          ...(criteria.sort ? { sort: criteria.sort } : {}),
+        };
+      });
+    },
+    []
+  );
 
   return {
     params,
