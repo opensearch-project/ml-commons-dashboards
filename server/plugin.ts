@@ -23,6 +23,7 @@ import {
   modelAlgorithmRouter,
   predictRouter,
   modelAlgregateRouter,
+  profileRouter,
 } from './routes';
 import { ModelService, TrainService } from './services';
 import { TaskService } from './services/task_service';
@@ -65,6 +66,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     modelAlgorithmRouter(services, router);
     predictRouter(services, router);
     modelAlgregateRouter(router);
+    profileRouter(router);
 
     return {};
   }

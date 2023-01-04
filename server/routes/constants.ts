@@ -17,3 +17,5 @@ export const MODEL_ALGORITHM_API_ENDPOINT = `${API_PREFIX}/model-algorithm`;
 export const TASK_FUNCTION_API_ENDPOINT = `${API_PREFIX}/task-function`;
 export const TASK_STATE_API_ENDPOINT = `${API_PREFIX}/task-state`;
 export const PREDICT_API_ENDPOINT = `${API_PREFIX}/predict`;
+export const PROFILE_API_ENDPOINT = `${API_PREFIX}/profile`;
+export const DEPLOYED_MODEL_PROFILE_API_ENDPOINT = `${PROFILE_API_ENDPOINT}/deployed-model`;

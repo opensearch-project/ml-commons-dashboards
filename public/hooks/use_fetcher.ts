@@ -64,6 +64,21 @@ export const useFetcher = <TParams extends any[], TResponse>(
     loadData(paramsRef.current);
   }, [loadData]);
 
+  const update = useCallback(
+    (data: TResponse | null) => {
+      dataRef.current = data;
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
+
+  const mutate = useCallback(
+    async (updateFunction: (prevData: TResponse | null) => TResponse | null) => {
+      update(updateFunction(dataRef.current));
+    },
+    [update]
+  );
+
   useEffect(() => {
     let changed = false;
     loadData(JSON.parse(stringifyParams), () => !changed);
@@ -78,6 +93,8 @@ export const useFetcher = <TParams extends any[], TResponse>(
       loading: loadingRef.current,
       error: errorRef.current,
       reload,
+      update,
+      mutate,
     },
     {
       data: {
