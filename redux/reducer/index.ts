@@ -5,6 +5,6 @@
 
 import { combineReducers } from 'redux';
 
-export const rootReducer = combineReducers({});
+export const rootReducer = combineReducers({ root: () => true });
 
 export type RootState = ReturnType<typeof rootReducer>;
