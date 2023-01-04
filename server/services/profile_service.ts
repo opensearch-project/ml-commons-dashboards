@@ -48,4 +48,27 @@ export class ProfileService {
       };
     });
   }
+
+  public static async getSpecificModel(params: { client: IScopedClusterClient; modelId: string }) {
+    const { client, modelId } = params;
+    const result = (
+      await client.asCurrentUser.transport.request({
+        method: 'GET',
+        path: `${PROFILE_BASE_API}/models/${modelId}?profile_and_deployment=deployment`,
+      })
+    ).body as OpenSearchMLCommonsProfile;
+    if (!result.models) {
+      return {};
+    }
+    const model = result.models[modelId];
+    return {
+      modelId,
+      name: model.model_name,
+      target_node_ids: model.target_node_ids,
+      deployed_node_ids: model.target_node_ids.filter(
+        (nodeId) => !model.not_deployed_node_ids?.includes(nodeId)
+      ),
+      not_deployed_node_ids: model.not_deployed_node_ids ?? [],
+    };
+  }
 }
