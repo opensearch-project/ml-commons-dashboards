@@ -23,7 +23,7 @@ export const Banner = () => {
         <p>
           <span>To leave feedback,</span>
           <span style={{ color: '#006bb4' }}>visit forum.opensearch.org</span>
-          <EuiIcon type="popout" style={{ color: '#006bb4' }} />
+          <EuiIcon type="popout" style={{ color: '#006bb4' }} />.
         </p>
       </EuiCallOut>
     </div>
