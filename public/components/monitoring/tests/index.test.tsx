@@ -51,8 +51,10 @@ const setup = (
     ],
     allStatuses: ['responding'],
     reload: jest.fn(),
-    searchByName: jest.fn(),
+
+    searchByNameOrId: jest.fn(),
     searchByStatus: jest.fn(),
+
     updateDeployedModel: jest.fn(),
     resetSearch: jest.fn(),
     handleTableChange: jest.fn(),

@@ -2,15 +2,16 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer, EuiTextColor } from '@elastic/eui';
+import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer, EuiTextColor, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import React, { useCallback, useState, useMemo } from 'react';
+
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter, IOption } from '../status_filter';
 import { PreviewPanel, PreviewModel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
-
 import { ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
+import { SearchBar } from './search_bar';
 
 const statusFilterOrder = {
   responding: 0,
@@ -27,6 +28,7 @@ export const Monitoring = () => {
     allStatuses,
     handleTableChange,
     resetSearch,
+    searchByNameOrId,
     reload,
     searchByStatus,
   } = useMonitoring();
@@ -84,13 +86,24 @@ export const Monitoring = () => {
             )}
           </h3>
         </EuiTitle>
-        <EuiSpacer size="m" />
-        {pageStatus !== 'empty' && (
-          <>
-            <StatusFilter options={statusFilterOptions} onUpdateFilters={handleFilterUpdate} />
-            <EuiSpacer size="m" />
-          </>
-        )}
+
+
+        <EuiSpacer />
+        <EuiFlexGroup gutterSize="l">
+          <EuiFlexItem>
+            <SearchBar onSearch={searchByNameOrId} value={params.nameOrId ?? ''} />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            {pageStatus !== 'empty' && (
+              <>
+                <StatusFilter options={statusFilterOptions} onUpdateFilters={handleFilterUpdate} />
+                <EuiSpacer size="m" />
+              </>
+            )}
+          </EuiFlexItem>
+        </EuiFlexGroup>
+
+
         <ModelDeploymentTable
           noTable={pageStatus === 'empty'}
           loading={pageStatus === 'loading'}
@@ -114,6 +127,8 @@ export const Monitoring = () => {
             }}
           />
         ) : null}
+
+        <EuiSpacer />
       </EuiPanel>
     </div>
   );
