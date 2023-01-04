@@ -8,7 +8,7 @@ import { InnerHttpProvider } from './inner_http_provider';
 import { Pagination } from '../../server/services/utils/pagination';
 import { MODEL_STATE } from '../../common/model';
 
-export interface ModelAggerateSearchItem {
+export interface ModelAggregateSearchItem {
   name: string;
   description?: string;
   latest_version: string;
@@ -18,12 +18,12 @@ export interface ModelAggerateSearchItem {
   created_time?: number;
 }
 
-export interface ModelAggerateSearchResponse {
-  data: ModelAggerateSearchItem[];
+export interface ModelAggregateSearchResponse {
+  data: ModelAggregateSearchItem[];
   pagination: Pagination;
 }
 
-export class ModelAggerate {
+export class ModelAggregate {
   public search(query: {
     pageSize: number;
     currentPage: number;
@@ -31,7 +31,7 @@ export class ModelAggerate {
     order: 'desc' | 'asc';
     name?: string;
   }) {
-    return InnerHttpProvider.getHttp().get<ModelAggerateSearchResponse>(
+    return InnerHttpProvider.getHttp().get<ModelAggregateSearchResponse>(
       MODEL_AGGREGATE_API_ENDPOINT,
       {
         query,

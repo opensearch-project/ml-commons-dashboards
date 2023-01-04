@@ -9,3 +9,4 @@ export { trainRouter } from './train_router';
 export { modelAlgorithmRouter } from './model_algorithm_router';
 export { predictRouter } from './predict_router';
 export { modelAlgregateRouter } from './model_aggregate_router';
+export { profileRouter } from './profile_router';
