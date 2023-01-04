@@ -9,9 +9,13 @@ export const useMetricNames = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       setLoading(false);
     }, 1000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, []);
 
   return [loading, metricNames] as const;
@@ -27,9 +31,13 @@ export const useModelTags = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       setLoading(false);
     }, 1000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, []);
 
   return [loading, { keys, values }] as const;
