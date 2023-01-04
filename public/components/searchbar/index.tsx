@@ -4,15 +4,12 @@
  */
 import React, { useState } from 'react';
 
-import { EuiFieldSearch, EuiSwitch } from '@elastic/eui';
-// import { FilterButton } from '../filter_button';
-// import './index.css'
+import { EuiFieldSearch } from '@elastic/eui';
 
 export const SearchBar = () => {
-  const [isClearable, setIsClearable] = useState(true);
   const [value, setValue] = useState('');
 
-  const onChange = (e: any) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
@@ -20,11 +17,11 @@ export const SearchBar = () => {
     /* DisplayToggles wrapper for Docs only */
     <div>
       <div>
+        hello
         <EuiFieldSearch
           placeholder="Search by name or ID"
           value={value}
-          onChange={(e) => onChange(e)}
-          isClearable={isClearable}
+          onChange={onChange}
           aria-label="Use aria labels when no actual label is in use"
           fullWidth
         />

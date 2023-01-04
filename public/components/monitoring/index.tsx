@@ -28,9 +28,9 @@ export const Monitoring = () => {
           <EuiFlexItem>
             <SearchBar />
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
+          {/* <EuiFlexItem grow={false}>
             <FilterButton />
-          </EuiFlexItem>
+          </EuiFlexItem> */}
         </EuiFlexGroup>
       </EuiPanel>
     </div>
