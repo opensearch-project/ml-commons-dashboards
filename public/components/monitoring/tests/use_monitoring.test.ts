@@ -59,7 +59,7 @@ describe('useMonitoring', () => {
     expect(result.current.pageStatus).toBe('normal');
   });
 
-  it('should return consistent pageStatus and data after name and state filter applyed', async () => {
+  it('should return consistent pageStatus and data after name and state filter applied', async () => {
     const { result, waitForValueToChange, waitFor } = renderHook(() => useMonitoring());
 
     act(() => {
@@ -120,12 +120,12 @@ describe('useMonitoring', () => {
       expect.objectContaining({ id: 'model-1-id' }),
       expect.objectContaining({ id: 'model-2-id' }),
     ]);
-    expect(result.current.params.sort).toBe('name-asc');
+    expect(result.current.params.sort).toEqual({ field: 'name', direction: 'asc' });
 
     mockMultiRecords();
     act(() => {
       result.current.handleTableChange({
-        sort: 'name-desc',
+        sort: { field: 'name', direction: 'desc' },
         pagination: { currentPage: 1, pageSize: 15 },
       });
     });
@@ -134,7 +134,7 @@ describe('useMonitoring', () => {
       expect.objectContaining({ id: 'model-2-id' }),
       expect.objectContaining({ id: 'model-1-id' }),
     ]);
-    expect(result.current.params.sort).toBe('name-desc');
+    expect(result.current.params.sort).toEqual({ field: 'name', direction: 'desc' });
   });
 
   it('should return consistent data after pagination change', async () => {
@@ -143,7 +143,7 @@ describe('useMonitoring', () => {
     act(() => {
       result.current.handleTableChange({
         pagination: { currentPage: 1, pageSize: 1 },
-        sort: 'name-asc',
+        sort: { field: 'name', direction: 'asc' },
       });
     });
     await waitFor(() => result.current.deployedModels.length === 1);
@@ -153,7 +153,7 @@ describe('useMonitoring', () => {
     act(() => {
       result.current.handleTableChange({
         pagination: { currentPage: 2, pageSize: 1 },
-        sort: 'name-asc',
+        sort: { field: 'name', direction: 'asc' },
       });
     });
     await waitForValueToChange(() => result.current.deployedModels);
