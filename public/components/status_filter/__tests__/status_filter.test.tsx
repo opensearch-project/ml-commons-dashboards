@@ -1,7 +1,3 @@
-/*
- * Copyright OpenSearch Contributors
- * SPDX-License-Identifier: Apache-2.0
- */
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '../../../../test/test_utils';
