@@ -2,7 +2,6 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-/* Vector */
 import React from 'react';
 
 import { EuiCallOut, EuiIcon, EuiLink } from '@elastic/eui';
