@@ -15,19 +15,18 @@ export const ExperimentalWarning = () => {
         </span>
         <span>
           For more information,see{' '}
-          <EuiLink href="#" style={{ color: '#006bb4' }}>
+          <EuiLink href="#" external>
             Machine Learing Monitoring Documentation
           </EuiLink>
-          {/* <span style={{ color: '#006bb4' }}>Machine Learing Monitoring Documentation</span> */}
-          <EuiIcon type="popout" style={{ color: '#006bb4' }} />.
+          .
         </span>
 
         <p>
           <span>To leave feedback,</span>
-          <EuiLink href="#" style={{ color: '#006bb4' }}>
+          <EuiLink href="#" external>
             visit forum.opensearch.org
           </EuiLink>
-          <EuiIcon type="popout" style={{ color: '#006bb4' }} />.
+          .
         </p>
       </EuiCallOut>
     </div>
