@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useCallback } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
 import { EuiPageHeader, EuiSpacer, EuiForm, EuiButton } from '@elastic/eui';

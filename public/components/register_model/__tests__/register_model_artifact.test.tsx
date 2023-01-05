@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 

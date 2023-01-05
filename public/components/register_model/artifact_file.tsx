@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import { EuiFormRow, EuiFilePicker } from '@elastic/eui';
 import { useController } from 'react-hook-form';
