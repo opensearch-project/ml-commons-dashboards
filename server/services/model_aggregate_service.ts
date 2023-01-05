@@ -26,7 +26,7 @@ import { RequestPagination, getQueryFromSize, getPagination } from './utils/pagi
 
 const MAX_MODEL_BUCKET_NUM = 10000;
 
-interface GetAggerateModelsParams {
+interface GetAggregateModelsParams {
   client: IScopedClusterClient;
   pagination: RequestPagination;
   name?: string;
@@ -35,13 +35,13 @@ interface GetAggerateModelsParams {
 }
 
 export class ModelAggregateService {
-  public static async getAggerateModels({
+  public static async getAggregateModels({
     client,
     pagination,
     sort,
     name,
     order,
-  }: GetAggerateModelsParams) {
+  }: GetAggregateModelsParams) {
     const aggregateResult = await client.asCurrentUser.transport.request({
       method: 'GET',
       path: MODEL_SEARCH_API,
@@ -113,9 +113,9 @@ export class ModelAggregateService {
     };
   }
 
-  public static async search(params: GetAggerateModelsParams) {
+  public static async search(params: GetAggregateModelsParams) {
     const { client } = params;
-    const { models, pagination } = await ModelAggregateService.getAggerateModels(params);
+    const { models, pagination } = await ModelAggregateService.getAggregateModels(params);
     const { names, count } = models.reduce<{ names: string[]; count: number }>(
       (previous, { key, doc_count: docCount }: { key: string; doc_count: number }) => ({
         names: previous.names.concat(key),

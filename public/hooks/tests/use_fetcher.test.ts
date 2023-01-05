@@ -103,4 +103,31 @@ describe('useFetcher', () => {
     });
     expect(result.current.data).toBe('bar');
   });
+
+  it('should return consistent updated data', async () => {
+    const fetcher = () => Promise.resolve('foo');
+
+    const { result, waitFor } = renderHook(() => useFetcher(fetcher));
+
+    await waitFor(() => result.current.data === 'foo');
+    await act(async () => {
+      result.current.update('bar');
+    });
+
+    expect(result.current.data).toBe('bar');
+  });
+
+  it('should return consistent mutated data', async () => {
+    const fetcher = () => Promise.resolve('foo');
+
+    const { result, waitFor } = renderHook(() => useFetcher(fetcher));
+
+    await waitFor(() => result.current.data === 'foo');
+
+    await act(async () => {
+      result.current.mutate((prev) => (prev === 'foo' ? 'bar' : prev));
+    });
+
+    expect(result.current.data).toBe('bar');
+  });
 });

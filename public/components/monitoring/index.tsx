@@ -9,28 +9,40 @@ import {
   EuiSpacer,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useCallback } from 'react';
+import { RefreshInterval } from '../common/refresh_interval';
+import { StatusFilter } from '../status_filter';
 import { SearchBar } from '../searchbar';
-import { FilterButton } from '../filter_button';
 export const Monitoring = () => {
+  const onRefresh = useCallback(() => {
+    // TODO call profile API to reload the model list
+  }, []);
+
   return (
     <div>
-      <EuiPageHeader pageTitle="Monitoring" />
+      <EuiPageHeader
+        pageTitle="Monitoring"
+        rightSideItems={[
+          <div style={{ backgroundColor: '#fff' }}>
+            <RefreshInterval onRefresh={onRefresh} />
+          </div>,
+        ]}
+      />
       <EuiSpacer size="m" />
       <EuiPanel>
         <EuiTitle size="s">
           <h3>Deployed models</h3>
         </EuiTitle>
+
         <EuiSpacer />
         <EuiFlexGroup gutterSize="l">
           <EuiFlexItem>
             <SearchBar />
           </EuiFlexItem>
-          {/* <EuiFlexItem grow={false}>
-            <FilterButton />
-          </EuiFlexItem> */}
+          <EuiFlexItem grow={false}>
+            <StatusFilter onUpdateFilters={() => {}} />
+          </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
     </div>
