@@ -1,7 +1,12 @@
-export type Tag = {
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+export interface Tag {
   key: string;
   value: string;
-};
+}
 
 interface ModelFormBase {
   name: string;

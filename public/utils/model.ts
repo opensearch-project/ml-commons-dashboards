@@ -5,14 +5,13 @@
 
 import { ModelSearchItem } from '../apis/model';
 
-export interface VersionList
-  extends Array<{
-    version: string;
-    id: string;
-    //oui select props
-    value: string;
-    text: string;
-  }> {}
+export type VersionList = Array<{
+  version: string;
+  id: string;
+  // oui select props
+  value: string;
+  text: string;
+}>;
 
 export const generateVersionList: (data: ModelSearchItem[]) => VersionList = (data) => {
   return data.map(({ version, id }: ModelSearchItem) => ({
