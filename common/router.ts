@@ -5,12 +5,12 @@
 
 import { Monitoring } from '../public/components/monitoring';
 
-type RouteConfig = {
+interface RouteConfig {
   path: string;
   Component: React.ComponentType<any>;
   label: string;
   exact?: boolean;
-};
+}
 
 export const ROUTES: RouteConfig[] = [
   {

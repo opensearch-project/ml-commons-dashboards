@@ -4,9 +4,9 @@
  */
 
 import React, { useMemo } from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiStat } from '@elastic/eui';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { APIProvider } from '../../apis/api_provider';
-import { EuiFlexGroup, EuiFlexItem, EuiStat } from '@elastic/eui';
 
 interface Props {
   id: string;
@@ -18,7 +18,7 @@ export const ModelProfile = ({ id }: Props) => {
       const { nodes } = data;
       const nodesList = Object.keys(nodes);
       if (nodesList[0]) {
-        //TODO: ensure the api design consistent
+        // TODO: ensure the api design consistent
         const worker_nodes = nodes[nodesList[0]].models?.[id]?.worker_nodes ?? [];
         return worker_nodes;
       }

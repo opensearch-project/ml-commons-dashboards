@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const UploadFile = ({ updateParsedData }: Props) => {
-  const [uploadFiles, setUploadFiles] = useState<Array<File>>([]);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [ifHeader, setIfHeader] = useState(false);
   const handleChangeIfHeader = useCallback(
     (checked: boolean) => {
