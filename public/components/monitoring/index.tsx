@@ -4,15 +4,21 @@
  */
 
 import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter } from '../status_filter';
+import { PreviewPanel, PreviewModel } from '../preview_panel';
 
 export const Monitoring = () => {
   const onRefresh = useCallback(() => {
     // TODO call profile API to reload the model list
   }, []);
 
+  const [previewModel, setPreviewModel] = useState<PreviewModel | null>({
+    //TODO: set preview model to open panel
+    id: 'BbjM0YQBjgpeQ',
+    name: 'test',
+  });
   return (
     <div>
       <EuiPageHeader
@@ -29,6 +35,18 @@ export const Monitoring = () => {
           <h3>Deployed models</h3>
         </EuiTitle>
         <StatusFilter onUpdateFilters={() => {}} />
+        {previewModel ? (
+          <PreviewPanel
+            model={previewModel}
+            onClose={() => {
+              setPreviewModel(null);
+            }}
+            onUpdateData={(data) => {
+              //TODO:update latest data
+              console.log('data');
+            }}
+          />
+        ) : null}
       </EuiPanel>
     </div>
   );
