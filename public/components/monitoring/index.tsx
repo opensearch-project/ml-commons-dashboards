@@ -6,7 +6,7 @@ import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
 import React, { useCallback } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter } from '../status_filter';
-import { ExperimentalWarning } from '../banner';
+import { ExperimentalWarning } from '../experiment_warning';
 
 export const Monitoring = () => {
   const onRefresh = useCallback(() => {
