@@ -23,19 +23,20 @@ export const CopyableText = ({ text, iconLeft }: Props) => {
     setTextCopied(false);
   }, [setTextCopied]);
   return (
-    <>
+    <div data-test-subj="copyable-text-div">
       {iconLeft ? null : text}
       <EuiToolTip content={isTextCopied ? 'ID copied to clipboard' : 'Copy ID'}>
         <EuiButtonIcon
           buttonRef={copyButtonRef}
           aria-label="Copy ID to clipboard"
           color="text"
+          data-test-subj="copy-id-button"
           iconType="copy"
           onClick={onClick}
           onBlur={onBlur}
         />
       </EuiToolTip>
       {iconLeft ? text : null}
-    </>
+    </div>
   );
 };
