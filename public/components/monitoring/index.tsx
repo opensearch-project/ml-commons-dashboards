@@ -16,7 +16,7 @@ export const Monitoring = () => {
 
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>({
     //TODO: set preview model to open panel
-    id: 'BbjM0YQBjgpeQ',
+    id: 'BbjM0YQBjgpeQQ_RYyA2',
     name: 'test',
   });
   return (
