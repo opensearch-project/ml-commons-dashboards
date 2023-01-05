@@ -54,14 +54,14 @@ export const ModelTagField = ({
     (data: EuiComboBoxOptionOption[]) => {
       tagKeyController.field.onChange(getComboBoxValue(data));
     },
-    [tagKeyController.field.onChange]
+    [tagKeyController.field]
   );
 
   const onValueChange = useCallback(
     (data: EuiComboBoxOptionOption[]) => {
       tagValueController.field.onChange(getComboBoxValue(data));
     },
-    [tagValueController.field.onChange]
+    [tagValueController.field]
   );
 
   const keyOptions = useMemo(() => {

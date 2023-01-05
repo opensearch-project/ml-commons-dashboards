@@ -47,8 +47,7 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
   }, [model]);
 
   const handleTableChange = useCallback((criteria) => {
-    const { sort } = criteria;
-    setSort(sort);
+    setSort(criteria.sort);
   }, []);
 
   return (

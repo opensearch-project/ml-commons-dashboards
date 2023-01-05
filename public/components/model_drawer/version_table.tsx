@@ -10,7 +10,7 @@ import { EuiBasicTable, Direction, Criteria } from '@elastic/eui';
 import { ModelSearchItem } from '../../apis/model';
 import { routerPaths } from '../../../common/router_paths';
 import { renderTime } from '../../utils';
-import { type VersionTableSort} from './';
+import type { VersionTableSort } from './';
 
 export interface VersionTableCriteria {
   sort?: VersionTableSort;
