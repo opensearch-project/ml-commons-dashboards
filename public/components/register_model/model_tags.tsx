@@ -23,7 +23,7 @@ export const ModelTagsPanel = (props: {
 
   const addNewTag = useCallback(() => {
     append({ key: '', value: '' });
-  }, []);
+  }, [append]);
 
   return (
     <EuiPanel>

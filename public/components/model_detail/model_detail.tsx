@@ -98,8 +98,7 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
           currentPage: 1,
           pageSize: 50,
         });
-        const versionList = generateVersionList(data);
-        setVersionList(versionList);
+        setVersionList(generateVersionList(data));
       };
       fn();
     }
@@ -131,9 +130,9 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
     if (!modelId) return;
     setLoading(true);
     try {
-      const { task_id, status } = await APIProvider.getAPI('model').load(modelId);
-      if (task_id && status === 'CREATED') {
-        deleteIdRef.current = task_id;
+      const { task_id: taskId, status } = await APIProvider.getAPI('model').load(modelId);
+      if (taskId && status === 'CREATED') {
+        deleteIdRef.current = taskId;
         startPolling();
       } else {
         setLoading(false);
@@ -141,7 +140,7 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
     } catch (e) {
       setLoading(false);
     }
-  }, [model]);
+  }, [startPolling, model]);
 
   const handleUnLoad = useCallback(async () => {
     const modelId = model?.id;
@@ -172,10 +171,12 @@ export const ModelDetail = ({ notifications }: { notifications: CoreStart['notif
     } else {
       handleLoad();
     }
-  }, [state]);
+  }, [state, handleUnLoad, handleLoad]);
 
   const handleDelete = useCallback(() => {
-    model?.id && confirmModelDeleteRef.current?.show(model.id);
+    if (model?.id) {
+      confirmModelDeleteRef.current?.show(model.id);
+    }
   }, [model]);
 
   const handleModelDeleted = useCallback(() => {
