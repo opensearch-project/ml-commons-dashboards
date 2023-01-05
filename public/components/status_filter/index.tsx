@@ -40,7 +40,7 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
       handleUpdateFilters();
     }
     setIsPopoverOpen(!isPopoverOpen);
-  }, [isPopoverOpen]);
+  }, [isPopoverOpen, handleUpdateFilters]);
 
   const onClosePopover = () => {
     setIsPopoverOpen(false);
