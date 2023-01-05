@@ -6,15 +6,16 @@ import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
 import React, { useCallback } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter } from '../status_filter';
-import { Banner } from '../banner';
+import { ExperimentalWarning } from '../banner';
 
 export const Monitoring = () => {
   const onRefresh = useCallback(() => {
     // TODO call profile API to reload the model list
   }, []);
+
   return (
     <div>
-      <Banner />
+      <ExperimentalWarning />
       <EuiPageHeader
         pageTitle="Monitoring"
         rightSideItems={[

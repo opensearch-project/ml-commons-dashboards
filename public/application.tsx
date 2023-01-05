@@ -12,7 +12,6 @@ import { MlCommonsPluginApp } from './components/app';
 import { InnerHttpProvider } from './apis/inner_http_provider';
 import { APIProvider } from './apis/api_provider';
 import { OpenSearchDashboardsContextProvider } from '../../../src/plugins/opensearch_dashboards_react/public';
-// import { OpenSearchDashboardsContextProvider } from '../../../src/plugins/opensearch_dashboards_react/public';
 
 export const renderApp = (
   { element, history, appBasePath }: AppMountParameters,

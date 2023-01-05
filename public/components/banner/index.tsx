@@ -5,9 +5,9 @@
 /* Vector */
 import React from 'react';
 
-import { EuiCallOut, EuiIcon } from '@elastic/eui';
+import { EuiCallOut, EuiIcon, EuiLink } from '@elastic/eui';
 
-export const Banner = () => {
+export const ExperimentalWarning = () => {
   return (
     <div>
       <EuiCallOut title="Experiment Feature" iconType="iInCircle">
@@ -16,13 +16,18 @@ export const Banner = () => {
         </span>
         <span>
           For more information,see{' '}
-          <span style={{ color: '#006bb4' }}>Machine Learing Monitoring Documentation</span>
+          <EuiLink href="#" style={{ color: '#006bb4' }}>
+            Machine Learing Monitoring Documentation
+          </EuiLink>
+          {/* <span style={{ color: '#006bb4' }}>Machine Learing Monitoring Documentation</span> */}
           <EuiIcon type="popout" style={{ color: '#006bb4' }} />.
         </span>
 
         <p>
           <span>To leave feedback,</span>
-          <span style={{ color: '#006bb4' }}>visit forum.opensearch.org</span>
+          <EuiLink href="#" style={{ color: '#006bb4' }}>
+            visit forum.opensearch.org
+          </EuiLink>
           <EuiIcon type="popout" style={{ color: '#006bb4' }} />.
         </p>
       </EuiCallOut>
