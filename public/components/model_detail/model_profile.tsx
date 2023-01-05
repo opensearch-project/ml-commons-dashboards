@@ -19,12 +19,11 @@ export const ModelProfile = ({ id }: Props) => {
       const nodesList = Object.keys(nodes);
       if (nodesList[0]) {
         // TODO: ensure the api design consistent
-        const worker_nodes = nodes[nodesList[0]].models?.[id]?.worker_nodes ?? [];
-        return worker_nodes;
+        return nodes[nodesList[0]].models?.[id]?.worker_nodes ?? [];
       }
     }
     return [];
-  }, [data]);
+  }, [data, id]);
   return (
     <EuiFlexGroup>
       <EuiFlexItem>

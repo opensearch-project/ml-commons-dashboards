@@ -34,11 +34,13 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
       props.onSubmit(data);
     }
     // TODO
+    // eslint-disable-next-line no-console
     console.log(data);
   };
 
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
     // TODO
+    // eslint-disable-next-line no-console
     console.log(errors);
   }, []);
 
