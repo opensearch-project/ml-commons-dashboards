@@ -9,7 +9,18 @@ import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter } from '../status_filter';
 import { PreviewPanel, PreviewModel } from '../preview_panel';
 
+import { ModelDeploymentTable } from './model_deployment_table';
+import { useMonitoring } from './use_monitoring';
+
 export const Monitoring = () => {
+  const {
+    pageStatus,
+    params,
+    pagination,
+    deployedModels,
+    handleTableChange,
+    clearNameStateFilter,
+  } = useMonitoring();
   const onRefresh = useCallback(() => {
     // TODO call profile API to reload the model list
   }, []);
@@ -35,6 +46,15 @@ export const Monitoring = () => {
           <h3>Deployed models</h3>
         </EuiTitle>
         <StatusFilter onUpdateFilters={() => {}} />
+        <ModelDeploymentTable
+          noTable={pageStatus === 'empty'}
+          loading={pageStatus === 'loading'}
+          items={deployedModels}
+          sort={params.sort}
+          pagination={pagination}
+          onChange={handleTableChange}
+          onResetSearchClick={clearNameStateFilter}
+        />
         {previewModel ? (
           <PreviewPanel
             model={previewModel}
