@@ -15,4 +15,14 @@ export class Profile {
       },
     ]);
   }
+
+  public getModel(id: string) {
+    return Promise.resolve({
+      id,
+      name: 'model-1-name',
+      target_node_ids: ['node-1', 'node-2', 'node-3'],
+      deployed_node_ids: ['node-1', 'node-2'],
+      not_deployed_node_ids: ['node-3'],
+    });
+  }
 }
