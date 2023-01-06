@@ -2,11 +2,11 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
 import React, { useCallback } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter } from '../status_filter';
+import { ExperimentalWarning } from '../experiment_warning';
 
 import { ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
@@ -26,6 +26,9 @@ export const Monitoring = () => {
 
   return (
     <div>
+      <ExperimentalWarning />
+      <EuiSpacer size="s" />
+      <EuiSpacer size="xs" />
       <EuiPageHeader
         pageTitle="Monitoring"
         rightSideItems={[
