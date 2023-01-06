@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useCallback } from 'react';
 import {
   EuiFlyout,
   EuiFlyoutBody,
@@ -48,6 +48,18 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
     }));
   }, [data]);
 
+  const defineRespondingStatus = useCallback(() => {
+    const deployedNodesNum = data?.deployed_node_ids?.length ?? 0,
+      targetNodesNum = data?.target_node_ids?.length ?? 0;
+    if (deployedNodesNum < targetNodesNum) {
+      return `Partially responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
+    } else if (deployedNodesNum === 0) {
+      return `Not responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
+    } else {
+      return `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
+    }
+  }, [data]);
+
   useEffect(() => {
     data && onUpdateData(data);
   }, [data]);
@@ -66,11 +78,7 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
             <CopyableText text={id} iconLeft={false} />
           </EuiDescriptionListDescription>
           <EuiDescriptionListTitle>Model status by node</EuiDescriptionListTitle>
-          <EuiDescriptionListDescription>
-            {`Partially responding on ${data?.deployed_node_ids?.length ?? 0} of ${
-              data?.target_node_ids?.length ?? 0
-            } nodes`}
-          </EuiDescriptionListDescription>
+          <EuiDescriptionListDescription>{defineRespondingStatus()}</EuiDescriptionListDescription>
         </EuiDescriptionList>
         <EuiSpacer />
         {nodes.length > 0 ? <NodesTable nodes={nodes} /> : null}
