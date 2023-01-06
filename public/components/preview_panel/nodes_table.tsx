@@ -16,35 +16,33 @@ export interface NodesTableCriteria {
 
 export function NodesTable(props: { nodes: INode[] }) {
   const { nodes } = props;
-  const [sort, setSort] = useState<NodesTableSort>('id-desc');
+  const [sort, setSort] = useState<{ field: keyof INode; direction: Direction }>({
+    field: 'id',
+    direction: 'desc',
+  });
 
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageOptions, setPageOptions] = useState({
+    index: 0,
+    size: 10,
+  });
 
-  const generateItems = useCallback(
-    ({ direction, index, size }) => {
-      const sortedNodes = direction
-        ? nodes.sort((a, b) => {
-            if (a.id < b.id) {
-              return direction === 'asc' ? -1 : 1;
-            }
-            if (a.id > b.id) {
-              return direction === 'asc' ? 1 : -1;
-            }
-            return 0;
-          })
-        : nodes;
-      const startIndex = index * size,
-        endIndex = (index + 1) * size;
-      const result = sortedNodes.slice(startIndex, endIndex);
-      return result;
-    },
-    [nodes]
-  );
-
-  const [items, setItems] = useState(
-    generateItems({ index: pageIndex, size: pageSize, direction: sort.split('-')[1] })
-  );
+  const items = useMemo(() => {
+    const direction = sort.direction;
+    const { index, size } = pageOptions;
+    const sortedNodes = nodes.sort((a, b) => {
+      if (a.id < b.id) {
+        return direction === 'asc' ? -1 : 1;
+      }
+      if (a.id > b.id) {
+        return direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+    const startIndex = index * size,
+      endIndex = (index + 1) * size;
+    const result = sortedNodes.slice(startIndex, endIndex);
+    return result;
+  }, [sort, pageOptions, nodes]);
 
   const columns = useMemo(
     () => [
@@ -72,35 +70,25 @@ export function NodesTable(props: { nodes: INode[] }) {
 
   const pagination = useMemo(
     () => ({
-      pageIndex,
-      pageSize,
+      pageIndex: pageOptions.index,
+      pageSize: pageOptions.size,
       totalItemCount: nodes.length,
       pageSizeOptions: [10, 15, 20, 30, 50],
       showPerPageOptions: true,
     }),
-    [pageIndex, pageSize, nodes]
+    [pageOptions, nodes]
   );
-
-  const sorting = useMemo(() => {
-    const [field, direction] = sort.split('-');
-    return {
-      sort: {
-        field: field as keyof INode,
-        direction: direction as Direction,
-      },
-    };
-  }, [sort]);
 
   const handleTableChange = useCallback(
     ({ sort: newSort, page }: CriteriaWithPagination<INode>) => {
       const { index, size } = page;
-      setPageIndex(index);
-      setPageSize(size);
+      setPageOptions({ index, size });
       if (newSort) {
-        setSort(`${newSort.field}-${newSort.direction}` as NodesTableSort);
+        setSort({
+          field: newSort.field,
+          direction: newSort.direction,
+        });
       }
-      const newItems = generateItems({ direction: newSort?.direction, index, size });
-      setItems(newItems);
     },
     []
   );
@@ -109,7 +97,7 @@ export function NodesTable(props: { nodes: INode[] }) {
     <EuiBasicTable<INode>
       columns={columns}
       items={items}
-      sorting={sorting}
+      sorting={{ sort: sort }}
       pagination={pagination}
       onChange={handleTableChange}
     />
