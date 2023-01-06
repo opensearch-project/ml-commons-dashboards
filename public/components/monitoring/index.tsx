@@ -15,7 +15,7 @@ export const Monitoring = () => {
   }, []);
 
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>({
-    //TODO: set preview model to open panel
+    // TODO: set preview model to open panel
     id: 'BbjM0YQBjgpeQQ_RYyA2',
     name: 'test',
   });
@@ -42,8 +42,7 @@ export const Monitoring = () => {
               setPreviewModel(null);
             }}
             onUpdateData={(data) => {
-              //TODO:update latest data
-              console.log('data');
+              // TODO:update latest data
             }}
           />
         ) : null}

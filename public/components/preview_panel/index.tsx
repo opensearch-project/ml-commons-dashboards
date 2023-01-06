@@ -40,8 +40,8 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
   const { id, name } = model;
   const { data } = useFetcher(APIProvider.getAPI('profile').getSpecificModel, id);
   const nodes = useMemo(() => {
-    const targetNodes = data?.target_node_ids ?? [],
-      deployedNodes = data?.deployed_node_ids ?? [];
+    const targetNodes = data?.target_node_ids ?? [];
+    const deployedNodes = data?.deployed_node_ids ?? [];
     return targetNodes.map((item) => ({
       id: item,
       deployed: deployedNodes.indexOf(item) > -1 ? true : false,
@@ -49,8 +49,8 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
   }, [data]);
 
   const defineRespondingStatus = useCallback(() => {
-    const deployedNodesNum = data?.deployed_node_ids?.length ?? 0,
-      targetNodesNum = data?.target_node_ids?.length ?? 0;
+    const deployedNodesNum = data?.deployed_node_ids?.length ?? 0;
+    const targetNodesNum = data?.target_node_ids?.length ?? 0;
     if (deployedNodesNum < targetNodesNum) {
       return `Partially responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
     } else if (deployedNodesNum === 0) {
@@ -61,8 +61,10 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
   }, [data]);
 
   useEffect(() => {
-    data && onUpdateData(data);
-  }, [data]);
+    if (data) {
+      onUpdateData(data);
+    }
+  }, [data, onUpdateData]);
 
   return (
     <EuiFlyout onClose={onClose}>

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { schema } from '@osd/config-schema';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
 import { ProfileService } from '../services/profile_service';
 import {
   DEPLOYED_MODEL_PROFILE_API_ENDPOINT,
   SPECIFIC_MODEL_PROFILE_API_ENDPOINT,
 } from './constants';
-import { schema } from '@osd/config-schema';
 
 export const profileRouter = (router: IRouter) => {
   router.get(

@@ -38,8 +38,8 @@ export function NodesTable(props: { nodes: INode[] }) {
       }
       return 0;
     });
-    const startIndex = index * size,
-      endIndex = (index + 1) * size;
+    const startIndex = index * size;
+    const endIndex = (index + 1) * size;
     const result = sortedNodes.slice(startIndex, endIndex);
     return result;
   }, [sort, pageOptions, nodes]);
@@ -97,7 +97,7 @@ export function NodesTable(props: { nodes: INode[] }) {
     <EuiBasicTable<INode>
       columns={columns}
       items={items}
-      sorting={{ sort: sort }}
+      sorting={{ sort }}
       pagination={pagination}
       onChange={handleTableChange}
     />
