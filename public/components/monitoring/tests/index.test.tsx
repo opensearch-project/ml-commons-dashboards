@@ -66,15 +66,15 @@ describe('<Monitoring />', () => {
   describe('pageStatus', () => {
     it('should render empty monitoring', () => {
       setup({ pageStatus: 'empty', deployedModels: [] });
-      expect(screen.getByTestId('table-empty-prompt')).toBeInTheDocument();
+      expect(screen.getByLabelText('no deployed models')).toBeInTheDocument();
     });
     it('should render loading monitoring', () => {
       setup({ pageStatus: 'loading', deployedModels: [] });
-      expect(screen.getByTestId('table-loading-prompt')).toBeInTheDocument();
+      expect(screen.getByLabelText('loading models')).toBeInTheDocument();
     });
     it('should render reset filter monitoring', () => {
       setup({ pageStatus: 'reset-filter', deployedModels: [] });
-      expect(screen.getByTestId('table-no-result-prompt')).toBeInTheDocument();
+      expect(screen.getByLabelText('no models results')).toBeInTheDocument();
     });
     it('should render normal monitoring', () => {
       setup();
@@ -108,7 +108,7 @@ describe('<Monitoring />', () => {
     const {
       finalMonitoringReturnValue: { clearNameStateFilter },
     } = setup({ pageStatus: 'reset-filter', deployedModels: [] });
-    expect(screen.getByTestId('table-no-result-prompt')).toBeInTheDocument();
+    expect(screen.getByLabelText('no models results')).toBeInTheDocument();
 
     await userEvent.click(screen.getByText('Reset search'));
     expect(clearNameStateFilter).toHaveBeenCalled();

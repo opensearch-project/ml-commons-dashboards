@@ -47,7 +47,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
 };
 
 describe('<DeployedModelTable />', () => {
-  it('should ONLY render link when noTable equal true, no data and loading equal false', () => {
+  it('should ONLY render an empty screen without the table if loading was completed but no data was loaded', () => {
     setup({
       items: [],
       noTable: true,
@@ -58,7 +58,7 @@ describe('<DeployedModelTable />', () => {
     expect(screen.queryByRole('columnheader')).not.toBeInTheDocument();
   });
 
-  it('should render reset button and table header and call onResetSearchClick when no data and loading equal false', async () => {
+  it('should render no result screen and call onResetSearchClick if loading was completed but no data was loaded', async () => {
     const onResetSearchClickMock = jest.fn();
     setup({
       items: [],
@@ -74,7 +74,7 @@ describe('<DeployedModelTable />', () => {
     expect(onResetSearchClickMock).toHaveBeenCalled();
   });
 
-  it('should render loading with table header when no data and loading equal true', () => {
+  it('should render loading screen if data is loading', () => {
     setup({
       noTable: false,
       loading: true,
