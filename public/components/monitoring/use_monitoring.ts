@@ -79,6 +79,13 @@ export const useMonitoring = () => {
 
   const deployedModels = useMemo(() => data?.data ?? [], [data]);
 
+  /**
+   * The pageStatus represents the different statuses in the monitoring page,
+   * "loading" is for data loading,
+   * "normal" is for data load completed,
+   * "reset-filter" is for no deployed models after filter applied,
+   * "empty" is for no deployed models in current system
+   */
   const pageStatus = useMemo(() => {
     if (loading) {
       return 'loading' as const;

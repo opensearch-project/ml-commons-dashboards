@@ -20,6 +20,26 @@ import {
 
 import { ModelDeploymentProfile } from '../../apis/profile';
 
+/**
+ * We can't use the noItemsMessage to display the empty content, because
+ * there is a bottom line can't remove it. We should display a fake cell content
+ * to remove the bottom line.
+ */
+const emptyOrLoadingTableProps = {
+  items: [
+    {
+      id: '',
+      name: '',
+      deployed_node_ids: [],
+      target_node_ids: [],
+      not_deployed_node_ids: [],
+    },
+  ],
+  cellProps: () => ({
+    style: { display: 'none' },
+  }),
+};
+
 export interface ModelDeploymentTableSort {
   field: 'name';
   direction: Direction;
@@ -140,29 +160,6 @@ export const ModelDeploymentTable = ({
   const sorting = useMemo(() => ({ sort }), [sort]);
   const emptyOrLoading = loading || items.length === 0;
 
-  /**
-   * We can't use the noItemsMessage to display the empty content, because
-   * there is a bottom line can't remove it. We should display a fake cell content
-   * to remove the bottom line.
-   */
-  const emptyOrLoadingTableProps = useMemo(
-    () => ({
-      items: [
-        {
-          id: '',
-          name: '',
-          deployed_node_ids: [],
-          target_node_ids: [],
-          not_deployed_node_ids: [],
-        },
-      ],
-      cellProps: () => ({
-        style: { display: 'none' },
-      }),
-    }),
-    []
-  );
-
   const pagination = useMemo(
     () =>
       paginationInProps
@@ -195,6 +192,7 @@ export const ModelDeploymentTable = ({
         <EuiBasicTable
           columns={columns}
           sorting={sorting}
+          loading={loading}
           onChange={handleChange}
           {...(emptyOrLoading ? emptyOrLoadingTableProps : { items, pagination })}
         />
@@ -210,7 +208,7 @@ export const ModelDeploymentTable = ({
                   <EuiSpacer size="xl" />
                 </>
               }
-              data-test-subj="table-loading-prompt"
+              aria-label="loading models"
             />
           ) : noTable ? (
             <EuiEmptyPrompt
@@ -227,7 +225,7 @@ export const ModelDeploymentTable = ({
                   <EuiSpacer size="xl" />
                 </>
               }
-              data-test-subj="table-empty-prompt"
+              aria-label="no deployed models"
             />
           ) : (
             <EuiEmptyPrompt
@@ -246,7 +244,7 @@ export const ModelDeploymentTable = ({
                   </EuiButton>
                 </>
               }
-              data-test-subj="table-no-result-prompt"
+              aria-label="no models results"
             />
           )}
         </div>
