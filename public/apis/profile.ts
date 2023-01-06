@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  DEPLOYED_MODEL_PROFILE_API_ENDPOINT,
-  SPECIFIC_MODEL_PROFILE_API_ENDPOINT,
-} from '../../server/routes/constants';
+import { DEPLOYED_MODEL_PROFILE_API_ENDPOINT } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
 
 export interface ModelDeploymentProfile {
@@ -26,7 +23,7 @@ export class Profile {
 
   public getModel(modelId: string) {
     return InnerHttpProvider.getHttp().get<ModelDeploymentProfile>(
-      `${SPECIFIC_MODEL_PROFILE_API_ENDPOINT}/${modelId}`
+      `${DEPLOYED_MODEL_PROFILE_API_ENDPOINT}/${modelId}`
     );
   }
 }
