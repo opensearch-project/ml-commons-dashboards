@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo, useEffect, useCallback } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import {
   EuiFlyout,
   EuiFlyoutBody,
@@ -48,7 +48,7 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
     }));
   }, [data]);
 
-  const defineRespondingStatus = useCallback(() => {
+  const respondingStatus = useMemo(() => {
     const deployedNodesNum = data?.deployed_node_ids?.length ?? 0;
     const targetNodesNum = data?.target_node_ids?.length ?? 0;
     if (deployedNodesNum < targetNodesNum) {
@@ -80,7 +80,7 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
             <CopyableText text={id} iconLeft={false} />
           </EuiDescriptionListDescription>
           <EuiDescriptionListTitle>Model status by node</EuiDescriptionListTitle>
-          <EuiDescriptionListDescription>{defineRespondingStatus()}</EuiDescriptionListDescription>
+          <EuiDescriptionListDescription>{respondingStatus}</EuiDescriptionListDescription>
         </EuiDescriptionList>
         <EuiSpacer />
         {nodes.length > 0 ? <NodesTable nodes={nodes} /> : null}
