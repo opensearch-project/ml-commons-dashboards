@@ -16,7 +16,8 @@ export const Monitoring = () => {
   return (
     <div>
       <ExperimentalWarning />
-      <EuiSpacer />
+      <EuiSpacer size="s" />
+      <EuiSpacer size="xs" />
       <EuiPageHeader
         pageTitle="Monitoring"
         rightSideItems={[
