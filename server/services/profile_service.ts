@@ -52,7 +52,7 @@ export class ProfileService {
     });
   }
 
-  public static async getSpecificModel(params: { client: IScopedClusterClient; modelId: string }) {
+  public static async getModel(params: { client: IScopedClusterClient; modelId: string }) {
     const { client, modelId } = params;
     const result = (
       await client.asCurrentUser.transport.request({

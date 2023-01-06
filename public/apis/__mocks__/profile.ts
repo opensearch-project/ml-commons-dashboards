@@ -16,7 +16,7 @@ export class Profile {
     ]);
   }
 
-  public getSpecificModel(id: string) {
+  public getModel(id: string) {
     return Promise.resolve({
       id,
       name: 'model-1-name',

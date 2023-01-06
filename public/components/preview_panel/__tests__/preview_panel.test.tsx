@@ -37,7 +37,7 @@ describe('<PreviewPanel />', () => {
 
   it('should call onUpdate when latest data responds', async () => {
     const onUpdateData = jest.fn();
-    const request = jest.spyOn(APIProvider.getAPI('profile'), 'getSpecificModel');
+    const request = jest.spyOn(APIProvider.getAPI('profile'), 'getModel');
     const mockResult = {
       id: 'model-1-id',
       name: 'model-1-name',

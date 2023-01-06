@@ -8,12 +8,6 @@ import { EuiBasicTable, Direction, CriteriaWithPagination, EuiHealth } from '@el
 import { INode } from './';
 import { CopyableText } from '../common';
 
-type NodesTableSort = 'id-desc' | 'id-asc';
-
-export interface NodesTableCriteria {
-  sort?: NodesTableSort;
-}
-
 export function NodesTable(props: { nodes: INode[] }) {
   const { nodes } = props;
   const [sort, setSort] = useState<{ field: keyof INode; direction: Direction }>({

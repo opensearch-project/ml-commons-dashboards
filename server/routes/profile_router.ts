@@ -40,7 +40,7 @@ export const profileRouter = (router: IRouter) => {
     },
     async (context, request) => {
       try {
-        const payload = await ProfileService.getSpecificModel({
+        const payload = await ProfileService.getModel({
           client: context.core.opensearch.client,
           modelId: request.params.modelId,
         });

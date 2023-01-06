@@ -24,7 +24,7 @@ export class Profile {
     );
   }
 
-  public getSpecificModel(modelId: string) {
+  public getModel(modelId: string) {
     return InnerHttpProvider.getHttp().get<ModelDeploymentProfile>(
       `${SPECIFIC_MODEL_PROFILE_API_ENDPOINT}/${modelId}`
     );

@@ -38,7 +38,7 @@ interface Props {
 
 export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
   const { id, name } = model;
-  const { data } = useFetcher(APIProvider.getAPI('profile').getSpecificModel, id);
+  const { data } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
     const targetNodes = data?.target_node_ids ?? [];
     const deployedNodes = data?.deployed_node_ids ?? [];
