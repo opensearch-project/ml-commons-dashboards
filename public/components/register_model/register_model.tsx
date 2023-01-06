@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useCallback } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
 import { EuiPageHeader, EuiSpacer, EuiForm, EuiButton } from '@elastic/eui';
@@ -29,11 +34,13 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
       props.onSubmit(data);
     }
     // TODO
+    // eslint-disable-next-line no-console
     console.log(data);
   };
 
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
     // TODO
+    // eslint-disable-next-line no-console
     console.log(errors);
   }, []);
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect, useState } from 'react';
 
 const metricNames = ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4'];

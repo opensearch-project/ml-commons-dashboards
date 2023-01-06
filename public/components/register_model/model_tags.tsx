@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useCallback } from 'react';
 import { EuiButton, EuiPanel, EuiTitle, EuiHorizontalRule, EuiSpacer } from '@elastic/eui';
 import { useFieldArray } from 'react-hook-form';
@@ -18,7 +23,7 @@ export const ModelTagsPanel = (props: {
 
   const addNewTag = useCallback(() => {
     append({ key: '', value: '' });
-  }, []);
+  }, [append]);
 
   return (
     <EuiPanel>

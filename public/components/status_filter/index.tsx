@@ -24,7 +24,7 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
   const [items, setItems] = useState(
     STATUS_FILTER.map((item) => ({
       label: item.label,
-      checked: 'on' as 'on' | 'off', //match eui mismatch type
+      checked: 'on' as 'on' | 'off', // match eui mismatch type
       prepend: <EuiIcon type="dot" color={item.color} />,
     }))
   );
@@ -36,11 +36,11 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
 
   const onButtonClick = useCallback(() => {
     if (isPopoverOpen) {
-      //should close popover and update filters
+      // should close popover and update filters
       handleUpdateFilters();
     }
     setIsPopoverOpen(!isPopoverOpen);
-  }, [isPopoverOpen]);
+  }, [isPopoverOpen, handleUpdateFilters]);
 
   const onClosePopover = () => {
     setIsPopoverOpen(false);

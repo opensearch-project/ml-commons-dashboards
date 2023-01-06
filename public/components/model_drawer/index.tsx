@@ -15,9 +15,9 @@ import {
   EuiFlexItem,
   EuiDescriptionList,
 } from '@elastic/eui';
+import { generatePath, useHistory } from 'react-router-dom';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { generatePath, useHistory } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionTable } from './version_table';
 import { EuiLinkButton, EuiCustomLink } from '../common';
@@ -38,7 +38,7 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
     sort: [sort],
   });
   const latestVersion = useMemo(() => {
-    //TODO: currently assume that api will return versions in order
+    // TODO: currently assume that api will return versions in order
     if (model?.data) {
       const data = model.data;
       return data[data.length - 1];
@@ -47,8 +47,7 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
   }, [model]);
 
   const handleTableChange = useCallback((criteria) => {
-    const { sort } = criteria;
-    setSort(sort);
+    setSort(criteria.sort);
   }, []);
 
   return (

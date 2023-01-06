@@ -4,10 +4,10 @@
  */
 
 import { History } from 'history';
+import { ParseResult } from 'papaparse';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppMountParameters, CoreStart } from '../../../src/core/public';
-import { ParseResult } from 'papaparse';
 
 export interface MlCommonsPluginPluginSetup {
   getGreeting: () => string;
@@ -46,8 +46,8 @@ export interface InputData {
   rows: Rows[];
 }
 
-export interface ParsedData extends ParseResult<Array<string>> {
+export interface ParsedData extends ParseResult<string[]> {
   header?: string[];
 }
 
-export interface ParsedResult extends ParseResult<Array<string>> {}
+export type ParsedResult = ParseResult<string[]>;
