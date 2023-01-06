@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter } from '../status_filter';
+import { PreviewPanel, PreviewModel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
 
 import { ModelDeploymentTable } from './model_deployment_table';
@@ -24,6 +25,7 @@ export const Monitoring = () => {
     // TODO call profile API to reload the model list
   }, []);
 
+  const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
   return (
     <div>
       <ExperimentalWarning />
@@ -51,7 +53,21 @@ export const Monitoring = () => {
           pagination={pagination}
           onChange={handleTableChange}
           onResetSearchClick={clearNameStateFilter}
+          onViewDetail={(id, name) => {
+            setPreviewModel({ id, name });
+          }}
         />
+        {previewModel ? (
+          <PreviewPanel
+            model={previewModel}
+            onClose={() => {
+              setPreviewModel(null);
+            }}
+            onUpdateData={(data) => {
+              // TODO:update latest data
+            }}
+          />
+        ) : null}
       </EuiPanel>
     </div>
   );

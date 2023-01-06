@@ -61,7 +61,7 @@ export interface ModelDeploymentTableProps {
   };
   sort: ModelDeploymentTableSort;
   onChange: (criteria: ModelDeploymentTableCriteria) => void;
-  onViewDetail?: (id: string) => void;
+  onViewDetail?: (id: string, name: string) => void;
   onResetSearchClick?: () => void;
 }
 
@@ -141,11 +141,11 @@ export const ModelDeploymentTable = ({
         name: 'Action',
         align: 'right' as const,
         width: '120px',
-        render: (id: string) => {
+        render: (id: string, { name }: ModelDeploymentProfile) => {
           return (
             <EuiButtonIcon
               onClick={() => {
-                onViewDetail?.(id);
+                onViewDetail?.(id, name);
               }}
               role="button"
               aria-label="view detail"
