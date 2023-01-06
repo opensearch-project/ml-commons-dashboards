@@ -4,7 +4,7 @@
  */
 import React from 'react';
 
-import { EuiCallOut, EuiIcon, EuiLink } from '@elastic/eui';
+import { EuiCallOut, EuiLink } from '@elastic/eui';
 
 export const ExperimentalWarning = () => {
   return (
