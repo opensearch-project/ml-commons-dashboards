@@ -25,11 +25,7 @@ export const Monitoring = () => {
     // TODO call profile API to reload the model list
   }, []);
 
-  const [previewModel, setPreviewModel] = useState<PreviewModel | null>({
-    // TODO: set preview model to open panel
-    id: 'BbjM0YQBjgpeQQ_RYyA2',
-    name: 'test',
-  });
+  const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
   return (
     <div>
       <EuiPageHeader
@@ -54,6 +50,9 @@ export const Monitoring = () => {
           pagination={pagination}
           onChange={handleTableChange}
           onResetSearchClick={clearNameStateFilter}
+          onViewDetail={(id, name) => {
+            setPreviewModel({ id, name });
+          }}
         />
         {previewModel ? (
           <PreviewPanel
