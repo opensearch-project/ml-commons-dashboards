@@ -159,13 +159,13 @@ describe('<DeployedModelTable />', () => {
       const cells = columnContent!;
 
       await userEvent.click(within(cells[0] as HTMLElement).getByRole('button'));
-      expect(onViewDetailMock).toHaveBeenCalledWith('model-1-id');
+      expect(onViewDetailMock).toHaveBeenCalledWith('model-1-id', 'model 1 name');
 
       await userEvent.click(within(cells[1] as HTMLElement).getByRole('button'));
-      expect(onViewDetailMock).toHaveBeenCalledWith('model-2-id');
+      expect(onViewDetailMock).toHaveBeenCalledWith('model-2-id', 'model 2 name');
 
       await userEvent.click(within(cells[2] as HTMLElement).getByRole('button'));
-      expect(onViewDetailMock).toHaveBeenCalledWith('model-3-id');
+      expect(onViewDetailMock).toHaveBeenCalledWith('model-3-id', 'model 3 name');
     });
   });
 
