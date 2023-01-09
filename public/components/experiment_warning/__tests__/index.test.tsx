@@ -5,13 +5,17 @@
 import React from 'react';
 import { render, screen } from '../../../../test/test_utils';
 import { ExperimentalWarning } from '..';
-it('should navigete to # when first link is clicked ', () => {
-  render(<ExperimentalWarning />);
-  const link = screen.getByText('Machine Learning Monitoring Documentation');
-  expect(link.getAttribute('href')).toBe('#');
-});
-it('should navigete to # when second link is clicked ', () => {
-  render(<ExperimentalWarning />);
-  const link = screen.getByText('visit forum.opensearch.org');
-  expect(link.getAttribute('href')).toBe('#');
+
+describe('<ExperimentalWarning />', () => {
+  it('should navigate to # when clicking link of `Machine Learning Monitoring Documentation`', () => {
+    render(<ExperimentalWarning />);
+    const link = screen.getByText('Machine Learning Monitoring Documentation');
+    expect(link.getAttribute('href')).toBe('#');
+  });
+
+  it('should navigate to # when clicking forum.opensearch.org', () => {
+    render(<ExperimentalWarning />);
+    const link = screen.getByText('forum.opensearch.org');
+    expect(link.getAttribute('href')).toBe('#');
+  });
 });
