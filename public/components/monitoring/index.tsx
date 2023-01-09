@@ -2,7 +2,7 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
+import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer, EuiTextColor } from '@elastic/eui';
 import React, { useCallback, useState } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter } from '../status_filter';
@@ -20,10 +20,12 @@ export const Monitoring = () => {
     deployedModels,
     handleTableChange,
     clearNameStateFilter,
+    reload,
   } = useMonitoring();
+
   const onRefresh = useCallback(() => {
-    // TODO call profile API to reload the model list
-  }, []);
+    reload();
+  }, [reload]);
 
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
   return (
@@ -42,9 +44,20 @@ export const Monitoring = () => {
       <EuiSpacer size="m" />
       <EuiPanel>
         <EuiTitle size="s">
-          <h3>Deployed models</h3>
+          <h3>
+            Deployed models{' '}
+            <EuiTextColor
+              aria-label="total number of results"
+              style={{ fontWeight: 'normal' }}
+              color="subdued"
+            >
+              ({pagination?.totalRecords ?? 0})
+            </EuiTextColor>
+          </h3>
         </EuiTitle>
+        <EuiSpacer size="m" />
         <StatusFilter onUpdateFilters={() => {}} />
+        <EuiSpacer size="m" />
         <ModelDeploymentTable
           noTable={pageStatus === 'empty'}
           loading={pageStatus === 'loading'}
