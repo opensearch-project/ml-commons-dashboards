@@ -76,6 +76,7 @@ describe('<DeployedModelTable />', () => {
 
   it('should render loading screen if data is loading', () => {
     setup({
+      items: [],
       noTable: false,
       loading: true,
     });
