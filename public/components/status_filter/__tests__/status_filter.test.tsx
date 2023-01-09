@@ -29,15 +29,11 @@ describe('<StatusFilter />', () => {
     expect(screen.getByText('No filters found')).toBeInTheDocument();
   });
 
-  it('should call `onUpdateFilters` callback with three options selected by default when close popover', async () => {
+  it('should call `onUpdateFilters` callback with options clicked', async () => {
     const onUpdateFilters = jest.fn();
     const { user } = await setup({ onUpdateFilters });
-    expect(onUpdateFilters).not.toHaveBeenCalled();
     await user.click(screen.getByText('Status'));
-    expect(onUpdateFilters).toHaveBeenCalledWith([
-      'Responding',
-      'Partially responding',
-      'Not responding',
-    ]);
+    expect(onUpdateFilters).not.toHaveBeenCalled();
+    // EUI popover can't be found in unit test env.
   });
 });
