@@ -31,7 +31,8 @@ export const Monitoring = () => {
   return (
     <div>
       <ExperimentalWarning />
-      <EuiSpacer size="m" />
+      <EuiSpacer size="s" />
+      <EuiSpacer size="xs" />
       <EuiPageHeader
         pageTitle="Monitoring"
         rightSideItems={[
@@ -40,8 +41,7 @@ export const Monitoring = () => {
           </div>,
         ]}
       />
-      <EuiSpacer size="s" />
-      <EuiSpacer size="xs" />
+      <EuiSpacer size="m" />
       <EuiPanel>
         <EuiTitle size="s">
           <h3>
