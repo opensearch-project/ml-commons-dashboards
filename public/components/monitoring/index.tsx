@@ -46,18 +46,24 @@ export const Monitoring = () => {
         <EuiTitle size="s">
           <h3>
             Deployed models{' '}
-            <EuiTextColor
-              aria-label="total number of results"
-              style={{ fontWeight: 'normal' }}
-              color="subdued"
-            >
-              ({pagination?.totalRecords ?? 0})
-            </EuiTextColor>
+            {pageStatus !== 'empty' && (
+              <EuiTextColor
+                aria-label="total number of results"
+                style={{ fontWeight: 'normal' }}
+                color="subdued"
+              >
+                ({pagination?.totalRecords ?? 0})
+              </EuiTextColor>
+            )}
           </h3>
         </EuiTitle>
         <EuiSpacer size="m" />
-        <StatusFilter onUpdateFilters={() => {}} />
-        <EuiSpacer size="m" />
+        {pageStatus !== 'empty' && (
+          <>
+            <StatusFilter onUpdateFilters={() => {}} />
+            <EuiSpacer size="m" />
+          </>
+        )}
         <ModelDeploymentTable
           noTable={pageStatus === 'empty'}
           loading={pageStatus === 'loading'}
