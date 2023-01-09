@@ -139,11 +139,11 @@ describe('<Monitoring />', () => {
     await user.click(screen.getByLabelText(/start refresh interval/i));
     expect(reload).not.toHaveBeenCalled();
 
-    // Called 1st time
+    // Reload at the 1st time
     jest.advanceTimersByTime(10000);
     expect(reload).toHaveBeenCalled();
 
-    // Called 2nd time
+    // Reload at the 2nd time
     jest.advanceTimersByTime(10000);
     expect(reload).toHaveBeenCalledTimes(2);
   });
