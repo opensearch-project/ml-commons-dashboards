@@ -34,6 +34,6 @@ describe('<StatusFilter />', () => {
     const { user } = await setup({ onUpdateFilters });
     await user.click(screen.getByText('Status'));
     expect(onUpdateFilters).not.toHaveBeenCalled();
-    // EUI popover can't be found in unit test env.
+    // euiSelectableList can't be rendered automatically in unit test env.
   });
 });

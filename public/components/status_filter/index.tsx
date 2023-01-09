@@ -37,9 +37,9 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
     }))
   );
 
-  const onButtonClick = useCallback(() => {
-    setIsPopoverOpen(!isPopoverOpen);
-  }, [isPopoverOpen]);
+  const onButtonClick = ()=> {
+    setIsPopoverOpen((previous) => !previous);
+  }
 
   const onClosePopover = () => {
     setIsPopoverOpen(false);
