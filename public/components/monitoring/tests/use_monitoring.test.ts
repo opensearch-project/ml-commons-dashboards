@@ -59,11 +59,11 @@ describe('useMonitoring', () => {
     expect(result.current.pageStatus).toBe('normal');
   });
 
-  it('should return consistent pageStatus and data after name and state filter applied', async () => {
+  it('should return consistent pageStatus and data after nameOrId and state filter applied', async () => {
     const { result, waitForValueToChange, waitFor } = renderHook(() => useMonitoring());
 
     act(() => {
-      result.current.searchByName('foo');
+      result.current.searchByNameOrId('foo');
     });
 
     await waitForValueToChange(() => result.current.pageStatus);
@@ -71,12 +71,21 @@ describe('useMonitoring', () => {
     expect(result.current.deployedModels).toEqual([]);
 
     act(() => {
-      result.current.searchByName('moDel');
+      result.current.searchByNameOrId('moDel');
     });
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.pageStatus).toBe('normal');
     expect(result.current.deployedModels).toEqual([
       expect.objectContaining({ name: expect.stringContaining('model') }),
+    ]);
+
+    act(() => {
+      result.current.searchByNameOrId('1-id');
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.pageStatus).toBe('normal');
+    expect(result.current.deployedModels).toEqual([
+      expect.objectContaining({ id: expect.stringContaining('model-1-id') }),
     ]);
 
     act(() => {
