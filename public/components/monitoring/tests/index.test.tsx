@@ -74,16 +74,44 @@ describe('<Monitoring />', () => {
   });
 
   describe('pageStatus', () => {
-    it('should render empty monitoring', () => {
-      setup({ pageStatus: 'empty', deployedModels: [] });
+    it('should render empty monitoring without filter and total count', () => {
+      setup({
+        pageStatus: 'empty',
+        deployedModels: [],
+        pagination: {
+          currentPage: 1,
+          pageSize: 15,
+          totalRecords: 0,
+        },
+      });
       expect(screen.getByLabelText('no deployed models')).toBeInTheDocument();
+      expect(
+        screen.queryByText('Status', { selector: "[data-text='Status']" })
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('(0)')).not.toBeInTheDocument();
     });
     it('should render loading monitoring', () => {
-      setup({ pageStatus: 'loading', deployedModels: [] });
+      setup({
+        pageStatus: 'loading',
+        deployedModels: [],
+        pagination: {
+          currentPage: 1,
+          pageSize: 15,
+          totalRecords: 0,
+        },
+      });
       expect(screen.getByLabelText('loading models')).toBeInTheDocument();
     });
     it('should render reset filter monitoring', () => {
-      setup({ pageStatus: 'reset-filter', deployedModels: [] });
+      setup({
+        pageStatus: 'reset-filter',
+        deployedModels: [],
+        pagination: {
+          currentPage: 1,
+          pageSize: 15,
+          totalRecords: 0,
+        },
+      });
       expect(screen.getByLabelText('no models results')).toBeInTheDocument();
     });
     it('should render normal monitoring', () => {
