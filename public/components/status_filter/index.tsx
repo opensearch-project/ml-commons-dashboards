@@ -10,6 +10,7 @@ import {
   EuiFilterGroup,
   EuiFilterButton,
   EuiSelectable,
+  EuiSelectableOption,
   EuiIcon,
 } from '@elastic/eui';
 import { STATUS_FILTER } from '../../../common';
@@ -17,35 +18,43 @@ import { STATUS_FILTER } from '../../../common';
 interface Props {
   onUpdateFilters: (filters: string[]) => void;
 }
+interface IItem {
+  label: string;
+  checked: 'on' | 'off';
+  prepend: JSX.Element;
+  value: string;
+}
 
 export const StatusFilter = ({ onUpdateFilters }: Props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const [items, setItems] = useState(
+  const [items, setItems] = useState<IItem[]>(
     STATUS_FILTER.map((item) => ({
       label: item.label,
       checked: 'on' as 'on' | 'off', // match eui mismatch type
       prepend: <EuiIcon type="dot" color={item.color} />,
+      value: item.value,
     }))
   );
 
-  const handleUpdateFilters = useCallback(() => {
-    const selectedItems = items.filter((item) => item.checked === 'on').map((item) => item.label);
-    onUpdateFilters(selectedItems);
-  }, [items, onUpdateFilters]);
-
   const onButtonClick = useCallback(() => {
-    if (isPopoverOpen) {
-      // should close popover and update filters
-      handleUpdateFilters();
-    }
     setIsPopoverOpen(!isPopoverOpen);
-  }, [isPopoverOpen, handleUpdateFilters]);
+  }, [isPopoverOpen]);
 
   const onClosePopover = () => {
     setIsPopoverOpen(false);
-    handleUpdateFilters();
   };
+
+  const handleSelectableChange = useCallback(
+    (newOptions: Array<EuiSelectableOption<IItem>>) => {
+      const selectedItems = newOptions
+        .filter((item) => item.checked === 'on')
+        .map((item) => item.value);
+      onUpdateFilters(selectedItems);
+      setItems(newOptions);
+    },
+    [onUpdateFilters, setItems]
+  );
 
   const button = (
     <EuiFilterButton
@@ -78,7 +87,7 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
             }}
             aria-label="Status"
             options={items}
-            onChange={(newOptions) => setItems(newOptions)}
+            onChange={(newOptions) => handleSelectableChange(newOptions)}
             isLoading={false}
             emptyMessage="No filters available"
             noMatchesMessage="No filters found"
