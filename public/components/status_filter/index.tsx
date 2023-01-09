@@ -37,9 +37,9 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
     }))
   );
 
-  const onButtonClick = ()=> {
+  const onButtonClick = () => {
     setIsPopoverOpen((previous) => !previous);
-  }
+  };
 
   const onClosePopover = () => {
     setIsPopoverOpen(false);
@@ -87,7 +87,7 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
             }}
             aria-label="Status"
             options={items}
-            onChange={(newOptions) => handleSelectableChange(newOptions)}
+            onChange={handleSelectableChange}
             isLoading={false}
             emptyMessage="No filters available"
             noMatchesMessage="No filters found"
