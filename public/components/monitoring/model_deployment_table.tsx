@@ -20,26 +20,6 @@ import {
 
 import { ModelDeploymentProfile } from '../../apis/profile';
 
-/**
- * We can't use the noItemsMessage to display the empty content, because
- * there is a bottom line can't remove it. We should display a fake cell content
- * to remove the bottom line.
- */
-const emptyOrLoadingTableProps = {
-  items: [
-    {
-      id: '',
-      name: '',
-      deployed_node_ids: [],
-      target_node_ids: [],
-      not_deployed_node_ids: [],
-    },
-  ],
-  cellProps: () => ({
-    style: { display: 'none' },
-  }),
-};
-
 export interface ModelDeploymentTableSort {
   field: 'name';
   direction: Direction;
@@ -158,7 +138,6 @@ export const ModelDeploymentTable = ({
     [onViewDetail]
   );
   const sorting = useMemo(() => ({ sort }), [sort]);
-  const emptyOrLoading = loading || items.length === 0;
 
   const pagination = useMemo(
     () =>
@@ -188,66 +167,69 @@ export const ModelDeploymentTable = ({
 
   return (
     <>
-      {!noTable && (
+      {noTable ? (
+        <div style={{ paddingTop: 48, paddingBottom: 32 }}>
+          <EuiEmptyPrompt
+            style={{ maxWidth: 528 }}
+            body={
+              <>
+                <EuiSpacer size="l" />
+                Deployed models will appear here. For more information, see{' '}
+                <EuiLink role="link" href="/todo">
+                  Model Serving Framework Documentation
+                  <EuiIcon type="popout" />
+                </EuiLink>
+                .
+                <EuiSpacer size="xl" />
+              </>
+            }
+            aria-label="no deployed models"
+          />
+        </div>
+      ) : (
         <EuiBasicTable
           columns={columns}
           sorting={sorting}
           loading={loading}
           onChange={handleChange}
-          {...(emptyOrLoading ? emptyOrLoadingTableProps : { items, pagination })}
+          items={items}
+          pagination={items.length > 0 ? pagination : undefined}
+          noItemsMessage={
+            <div style={{ padding: 40 }}>
+              {loading ? (
+                <EuiEmptyPrompt
+                  body={
+                    <>
+                      <EuiSpacer size="l" />
+                      Loading deployed models...
+                      <EuiSpacer size="xl" />
+                    </>
+                  }
+                  aria-label="loading models"
+                />
+              ) : (
+                <EuiEmptyPrompt
+                  title={<EuiSpacer size="s" />}
+                  body={
+                    <>
+                      There are no results to your search. Reset the search criteria to view the
+                      deployed models.
+                    </>
+                  }
+                  actions={
+                    <>
+                      <EuiSpacer size="s" />
+                      <EuiButton role="button" onClick={onResetSearchClick} size="m">
+                        Reset search
+                      </EuiButton>
+                    </>
+                  }
+                  aria-label="no models results"
+                />
+              )}
+            </div>
+          }
         />
-      )}
-      {emptyOrLoading && (
-        <div style={{ paddingTop: 48, paddingBottom: 32 }}>
-          {loading ? (
-            <EuiEmptyPrompt
-              body={
-                <>
-                  <EuiSpacer size="l" />
-                  Loading deployed models...
-                  <EuiSpacer size="xl" />
-                </>
-              }
-              aria-label="loading models"
-            />
-          ) : noTable ? (
-            <EuiEmptyPrompt
-              style={{ maxWidth: 528 }}
-              body={
-                <>
-                  <EuiSpacer size="l" />
-                  Deployed models will appear here. For more information, see{' '}
-                  <EuiLink role="link" href="/todo">
-                    Model Serving Framework Documentation
-                    <EuiIcon type="popout" />
-                  </EuiLink>
-                  .
-                  <EuiSpacer size="xl" />
-                </>
-              }
-              aria-label="no deployed models"
-            />
-          ) : (
-            <EuiEmptyPrompt
-              title={<EuiSpacer size="s" />}
-              body={
-                <>
-                  There are no results to your search. Reset the search criteria to view the
-                  deployed models.
-                </>
-              }
-              actions={
-                <>
-                  <EuiSpacer size="s" />
-                  <EuiButton role="button" onClick={onResetSearchClick} size="m">
-                    Reset search
-                  </EuiButton>
-                </>
-              }
-              aria-label="no models results"
-            />
-          )}
-        </div>
       )}
     </>
   );
