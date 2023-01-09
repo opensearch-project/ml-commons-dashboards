@@ -130,7 +130,7 @@ describe('<Monitoring />', () => {
     const {
       finalMonitoringReturnValue: { reload },
       user,
-    } = setup({ pageStatus: 'normal', deployedModels: [], reload: jest.fn() });
+    } = setup({ reload: jest.fn() });
 
     // Open auto refresh popover
     await user.click(screen.getByLabelText(/set refresh interval/i));
@@ -146,5 +146,15 @@ describe('<Monitoring />', () => {
     // Reload at the 2nd time
     jest.advanceTimersByTime(10000);
     expect(reload).toHaveBeenCalledTimes(2);
+  });
+
+  it('should display total number of results', async () => {
+    const {
+      finalMonitoringReturnValue: { pagination },
+    } = setup({});
+
+    expect(screen.getByLabelText(/total number of results/i).textContent).toBe(
+      `(${pagination?.totalRecords})`
+    );
   });
 });

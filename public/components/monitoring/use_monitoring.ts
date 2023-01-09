@@ -35,8 +35,9 @@ const checkFilterExists = (params: Params) =>
   !!params.name || (!!params.state && params.state.length > 0);
 
 const fetchAllDeployedModels = async (params: Params) => {
-  const deployedModels = await APIProvider.getAPI('profile').getAllDeployedModels();
-  const allData = deployedModels
+  const allData = await APIProvider.getAPI('profile').getAllDeployedModels();
+  // Results after applying filters
+  const filteredData = allData
     .map((item) => ({ ...item, state: convertModelState(item) }))
     .filter((item) => {
       if (!checkFilterExists(params)) {
@@ -50,19 +51,22 @@ const fetchAllDeployedModels = async (params: Params) => {
       }
       return true;
     });
-  const data = allData
+
+  // Results of current page
+  const pageData = filteredData
     .sort(
       (a, b) =>
         a[params.sort.field].localeCompare(b[params.sort.field]) *
         (params.sort.direction === 'asc' ? 1 : -1)
     )
     .slice((params.currentPage - 1) * params.pageSize, params.currentPage * params.pageSize);
+
   return {
-    data,
+    data: pageData,
     pagination: {
       currentPage: params.currentPage,
       pageSize: params.pageSize,
-      totalRecords: allData.length,
+      totalRecords: filteredData.length,
     },
   };
 };
@@ -76,7 +80,6 @@ export const useMonitoring = () => {
   const { data, mutate, loading, reload } = useFetcher(fetchAllDeployedModels, params);
   const filterExists = checkFilterExists(params);
   const totalRecords = data?.pagination.totalRecords;
-
   const deployedModels = useMemo(() => data?.data ?? [], [data]);
 
   /**
@@ -166,6 +169,9 @@ export const useMonitoring = () => {
     params,
     pageStatus,
     pagination: data?.pagination,
+    /**
+     * Data of the current page
+     */
     deployedModels,
     reload,
     searchByName,

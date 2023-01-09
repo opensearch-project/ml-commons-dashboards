@@ -40,13 +40,18 @@ export const Monitoring = () => {
           </div>,
         ]}
       />
-      <EuiSpacer size="m" />
+      <EuiSpacer size="s" />
+      <EuiSpacer size="xs" />
       <EuiPanel>
         <EuiTitle size="s">
           <h3>
             Deployed models{' '}
-            <EuiTextColor style={{ fontWeight: 'normal' }} color="subdued">
-              ({deployedModels.length})
+            <EuiTextColor
+              aria-label="total number of results"
+              style={{ fontWeight: 'normal' }}
+              color="subdued"
+            >
+              ({pagination?.totalRecords ?? 0})
             </EuiTextColor>
           </h3>
         </EuiTitle>
