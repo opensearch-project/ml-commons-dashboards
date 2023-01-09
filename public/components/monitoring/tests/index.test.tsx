@@ -13,6 +13,7 @@ import * as useMonitoringExports from '../use_monitoring';
 const setup = (
   monitoringReturnValue?: Partial<ReturnType<typeof useMonitoringExports.useMonitoring>>
 ) => {
+  const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
   const finalMonitoringReturnValue = {
     params: {
       currentPage: 1,
@@ -59,10 +60,19 @@ const setup = (
   jest.spyOn(useMonitoringExports, 'useMonitoring').mockReturnValueOnce(finalMonitoringReturnValue);
 
   render(<Monitoring />);
-  return { finalMonitoringReturnValue };
+  return { finalMonitoringReturnValue, user };
 };
 
 describe('<Monitoring />', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
   describe('pageStatus', () => {
     it('should render empty monitoring', () => {
       setup({ pageStatus: 'empty', deployedModels: [] });
@@ -87,16 +97,17 @@ describe('<Monitoring />', () => {
   it('should call handleTableChange with consistent params after Name column click or page change', async () => {
     const {
       finalMonitoringReturnValue: { handleTableChange },
+      user,
     } = setup();
-    await userEvent.click(screen.getByTestId('tableHeaderSortButton'));
+    await user.click(screen.getByTestId('tableHeaderSortButton'));
     expect(handleTableChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: { field: 'name', direction: 'desc' },
       })
     );
 
-    await userEvent.click(screen.getByTestId('tablePaginationPopoverButton'));
-    await userEvent.click(screen.getByTestId('tablePagination-50-rows'));
+    await user.click(screen.getByTestId('tablePaginationPopoverButton'));
+    await user.click(screen.getByTestId('tablePagination-50-rows'));
     expect(handleTableChange).toHaveBeenCalledWith(
       expect.objectContaining({
         pagination: { currentPage: 1, pageSize: 50 },
@@ -107,10 +118,33 @@ describe('<Monitoring />', () => {
   it('should call clearNameStateFilter after reset search click', async () => {
     const {
       finalMonitoringReturnValue: { clearNameStateFilter },
+      user,
     } = setup({ pageStatus: 'reset-filter', deployedModels: [] });
     expect(screen.getByLabelText('no models results')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByText('Reset search'));
+    await user.click(screen.getByText('Reset search'));
     expect(clearNameStateFilter).toHaveBeenCalled();
+  });
+
+  it('should reload table data at 10s interval by default when starts auto refresh', async () => {
+    const {
+      finalMonitoringReturnValue: { reload },
+      user,
+    } = setup({ pageStatus: 'normal', deployedModels: [], reload: jest.fn() });
+
+    // Open auto refresh popover
+    await user.click(screen.getByLabelText(/set refresh interval/i));
+
+    // Starts auto refresh with default interval
+    await user.click(screen.getByLabelText(/start refresh interval/i));
+    expect(reload).not.toHaveBeenCalled();
+
+    // Called 1st time
+    jest.advanceTimersByTime(10000);
+    expect(reload).toHaveBeenCalled();
+
+    // Called 2nd time
+    jest.advanceTimersByTime(10000);
+    expect(reload).toHaveBeenCalledTimes(2);
   });
 });
