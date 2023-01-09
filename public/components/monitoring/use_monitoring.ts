@@ -12,7 +12,7 @@ import { useFetcher } from '../../hooks/use_fetcher';
 type ModelDeployState = 'responding' | 'not-responding' | 'partial-responding';
 
 interface Params {
-  name?: string;
+  nameOrId?: string;
   state?: ModelDeployState[];
   currentPage: number;
   pageSize: number;
@@ -32,7 +32,7 @@ const convertModelState = (
 };
 
 const checkFilterExists = (params: Params) =>
-  !!params.name || (!!params.state && params.state.length > 0);
+  !!params.nameOrId || (!!params.state && params.state.length > 0);
 
 const fetchAllDeployedModels = async (params: Params) => {
   const deployedModels = await APIProvider.getAPI('profile').getAllDeployedModels();
@@ -42,7 +42,11 @@ const fetchAllDeployedModels = async (params: Params) => {
       if (!checkFilterExists(params)) {
         return true;
       }
-      if (params.name && !item.name.toLowerCase().includes(params.name.toLowerCase())) {
+      if (
+        params.nameOrId &&
+        !item.name.toLowerCase().includes(params.nameOrId.toLowerCase()) &&
+        !item.id.includes(params.nameOrId)
+      ) {
         return false;
       }
       if (params.state && !params.state.includes(item.state)) {
@@ -124,10 +128,10 @@ export const useMonitoring = () => {
     }));
   }, []);
 
-  const searchByName = useCallback((name: string) => {
+  const searchByNameOrId = useCallback((nameOrId: string) => {
     setParams((previousValue) => ({
       ...previousValue,
-      name,
+      nameOrId,
     }));
   }, []);
 
@@ -168,8 +172,8 @@ export const useMonitoring = () => {
     pagination: data?.pagination,
     deployedModels,
     reload,
-    searchByName,
     searchByState,
+    searchByNameOrId,
     updateDeployedModel,
     clearNameStateFilter,
     handleTableChange,
