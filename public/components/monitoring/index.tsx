@@ -19,7 +19,7 @@ export const Monitoring = () => {
     pagination,
     deployedModels,
     handleTableChange,
-    clearNameStateFilter,
+    clearNameStatusFilter,
     reload,
   } = useMonitoring();
 
@@ -78,7 +78,7 @@ export const Monitoring = () => {
           sort={params.sort}
           pagination={pagination}
           onChange={handleTableChange}
-          onResetSearchClick={clearNameStateFilter}
+          onResetSearchClick={clearNameStatusFilter}
           onViewDetail={(id, name) => {
             setPreviewModel({ id, name });
           }}

@@ -9,19 +9,19 @@ import { APIProvider } from '../../apis/api_provider';
 import { ModelDeploymentProfile } from '../../apis/profile';
 import { useFetcher } from '../../hooks/use_fetcher';
 
-type ModelDeployState = 'responding' | 'not-responding' | 'partial-responding';
+type ModelDeployStatus = 'responding' | 'not-responding' | 'partial-responding';
 
 interface Params {
   nameOrId?: string;
-  state?: ModelDeployState[];
+  status?: ModelDeployStatus[];
   currentPage: number;
   pageSize: number;
   sort: { field: 'name'; direction: 'asc' | 'desc' };
 }
 
-const convertModelState = (
+const convertModelStatus = (
   model: Pick<ModelDeploymentProfile, 'target_node_ids' | 'deployed_node_ids'>
-): ModelDeployState => {
+): ModelDeployStatus => {
   if (model.target_node_ids.length === model.deployed_node_ids.length) {
     return 'responding';
   }
@@ -32,13 +32,13 @@ const convertModelState = (
 };
 
 const checkFilterExists = (params: Params) =>
-  !!params.nameOrId || (!!params.state && params.state.length > 0);
+  !!params.nameOrId || (!!params.status && params.status.length > 0);
 
 const fetchAllDeployedModels = async (params: Params) => {
   const allData = await APIProvider.getAPI('profile').getAllDeployedModels();
   // Results after applying filters
   const filteredData = allData
-    .map((item) => ({ ...item, state: convertModelState(item) }))
+    .map((item) => ({ ...item, status: convertModelStatus(item) }))
     .filter((item) => {
       if (!checkFilterExists(params)) {
         return true;
@@ -50,7 +50,7 @@ const fetchAllDeployedModels = async (params: Params) => {
       ) {
         return false;
       }
-      if (params.state && !params.state.includes(item.state)) {
+      if (params.status && !params.status.includes(item.status)) {
         return false;
       }
       return true;
@@ -113,7 +113,7 @@ export const useMonitoring = () => {
           ...previousValue,
           data: previousValue.data.map((item) => {
             if (item.id === model.id) {
-              return { ...model, state: convertModelState(model) };
+              return { ...model, status: convertModelStatus(model) };
             }
             return item;
           }),
@@ -123,7 +123,7 @@ export const useMonitoring = () => {
     [mutate]
   );
 
-  const clearNameStateFilter = useCallback(() => {
+  const clearNameStatusFilter = useCallback(() => {
     setParams((previousValue) => ({
       currentPage: previousValue.currentPage,
       pageSize: previousValue.pageSize,
@@ -138,10 +138,10 @@ export const useMonitoring = () => {
     }));
   }, []);
 
-  const searchByState = useCallback((state: ModelDeployState[]) => {
+  const searchByStatus = useCallback((status: ModelDeployStatus[]) => {
     setParams((previousValue) => ({
       ...previousValue,
-      state,
+      status,
     }));
   }, []);
 
@@ -178,10 +178,10 @@ export const useMonitoring = () => {
      */
     deployedModels,
     reload,
-    searchByState,
+    searchByStatus,
     searchByNameOrId,
     updateDeployedModel,
-    clearNameStateFilter,
+    clearNameStatusFilter,
     handleTableChange,
   };
 };

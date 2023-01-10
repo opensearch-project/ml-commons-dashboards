@@ -51,9 +51,9 @@ const setup = (
     ],
     reload: jest.fn(),
     searchByName: jest.fn(),
-    searchByState: jest.fn(),
+    searchByStatus: jest.fn(),
     updateDeployedModel: jest.fn(),
-    clearNameStateFilter: jest.fn(),
+    clearNameStatusFilter: jest.fn(),
     handleTableChange: jest.fn(),
     ...monitoringReturnValue,
   } as ReturnType<typeof useMonitoringExports.useMonitoring>;
@@ -143,15 +143,15 @@ describe('<Monitoring />', () => {
     );
   });
 
-  it('should call clearNameStateFilter after reset search click', async () => {
+  it('should call clearNameStatusFilter after reset search click', async () => {
     const {
-      finalMonitoringReturnValue: { clearNameStateFilter },
+      finalMonitoringReturnValue: { clearNameStatusFilter },
       user,
     } = setup({ pageStatus: 'reset-filter', deployedModels: [] });
     expect(screen.getByLabelText('no models results')).toBeInTheDocument();
 
     await user.click(screen.getByText('Reset search'));
-    expect(clearNameStateFilter).toHaveBeenCalled();
+    expect(clearNameStatusFilter).toHaveBeenCalled();
   });
 
   it('should reload table data at 10s interval by default when starts auto refresh', async () => {

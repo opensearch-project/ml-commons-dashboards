@@ -59,7 +59,7 @@ describe('useMonitoring', () => {
     expect(result.current.pageStatus).toBe('normal');
   });
 
-  it('should return consistent pageStatus and data after nameOrId and state filter applied', async () => {
+  it('should return consistent pageStatus and data after nameOrId and status filter applied', async () => {
     const { result, waitForValueToChange, waitFor } = renderHook(() => useMonitoring());
 
     act(() => {
@@ -89,23 +89,23 @@ describe('useMonitoring', () => {
     ]);
 
     act(() => {
-      result.current.searchByState(['partial-responding']);
+      result.current.searchByStatus(['partial-responding']);
     });
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.pageStatus).toBe('normal');
     expect(result.current.deployedModels).toEqual([
-      expect.objectContaining({ state: 'partial-responding' }),
+      expect.objectContaining({ status: 'partial-responding' }),
     ]);
 
     act(() => {
-      result.current.searchByState(['responding']);
+      result.current.searchByStatus(['responding']);
     });
     await waitFor(() => result.current.pageStatus === 'reset-filter');
     expect(result.current.pageStatus).toBe('reset-filter');
     expect(result.current.deployedModels).toEqual([]);
 
     act(() => {
-      result.current.clearNameStateFilter();
+      result.current.clearNameStatusFilter();
     });
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.pageStatus).toBe('normal');
