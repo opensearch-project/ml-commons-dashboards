@@ -9,7 +9,7 @@ import { EuiCallOut, EuiLink } from '@elastic/eui';
 export const ExperimentalWarning = () => {
   return (
     <EuiCallOut title="Experiment Feature" iconType="iInCircle">
-      <span>The feature is experimental and should not be used in a productuion environment.</span>
+      <span>The feature is experimental and should not be used in a production environment.</span>
       <span>
         For more information,see{' '}
         <EuiLink href="#" external>
@@ -19,9 +19,9 @@ export const ExperimentalWarning = () => {
       </span>
 
       <p>
-        <span>To leave feedback,</span>
+        <span>To leave feedback, visit </span>
         <EuiLink href="#" external>
-          visit forum.opensearch.org
+          forum.opensearch.org
         </EuiLink>
         .
       </p>
