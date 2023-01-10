@@ -31,7 +31,7 @@ const mockMultiRecords = () => {
 };
 
 describe('useMonitoring', () => {
-  it('should return "loading" for pageStatus when loading and back to "normal" when loaded', async () => {
+  it('should return "loading" for pageStatus if data loading and will back to "normal" after data loaded', async () => {
     let resolveFn: Function;
     const promise = new Promise<ModelDeploymentProfile[]>((resolve) => {
       resolveFn = () => {
@@ -199,5 +199,52 @@ describe('useMonitoring', () => {
     });
     await waitForValueToChange(() => result.current.deployedModels);
     expect(APIProvider.getAPI('profile').getAllDeployedModels).toHaveBeenCalledTimes(2);
+  });
+
+  it('should return consistent statusFilterOptions', async () => {
+    mockMultiRecords();
+    const { result, waitFor, waitForValueToChange } = renderHook(() => useMonitoring());
+    await waitFor(() => result.current.deployedModels.length > 0);
+
+    expect(result.current.statusFilterOptions).toEqual([
+      { value: 'responding', checked: undefined },
+      { value: 'partial-responding', checked: undefined },
+    ]);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.searchByStatus(['partial-responding']);
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.statusFilterOptions).toEqual([
+      { value: 'responding', checked: undefined },
+      { value: 'partial-responding', checked: 'on' },
+    ]);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.searchByNameOrId('not-exists-model');
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.statusFilterOptions).toEqual([]);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.searchByNameOrId('1-name');
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.statusFilterOptions).toEqual([
+      { value: 'partial-responding', checked: 'on' },
+    ]);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.clearNameStatusFilter();
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.statusFilterOptions).toEqual([
+      { value: 'responding', checked: undefined },
+      { value: 'partial-responding', checked: undefined },
+    ]);
   });
 });
