@@ -17,6 +17,34 @@ async function setup({ onUpdateFilters = jest.fn() }) {
 }
 
 describe('<StatusFilter />', () => {
+  const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+  beforeEach(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 600,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 600,
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight as PropertyDescriptor
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth as PropertyDescriptor
+    );
+  });
   it('should render a dialog with selectable list', async () => {
     await setup({});
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -34,6 +62,7 @@ describe('<StatusFilter />', () => {
     const { user } = await setup({ onUpdateFilters });
     await user.click(screen.getByText('Status'));
     expect(onUpdateFilters).not.toHaveBeenCalled();
-    // euiSelectableList can't be rendered automatically in unit test env.
+    await user.click(screen.getByText('Responding'));
+    expect(onUpdateFilters).toHaveBeenCalledWith(['partial-responding', 'not-responding']);
   });
 });
