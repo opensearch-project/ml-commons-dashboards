@@ -6,11 +6,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '../../../../test/test_utils';
-import { StatusFilter } from '../';
+import { StatusFilter, IOption } from '../';
 
-async function setup({ onUpdateFilters = jest.fn() }) {
+async function setup({
+  onUpdateFilters = jest.fn(),
+  options = [{ value: 'responding', checked: 'on' }] as IOption[],
+}) {
   const user = userEvent.setup({});
-  render(<StatusFilter onUpdateFilters={onUpdateFilters} />);
+  render(<StatusFilter options={options} onUpdateFilters={onUpdateFilters} />);
   // open popover
   await user.click(screen.getByText('Status'));
   return { user };
@@ -57,12 +60,12 @@ describe('<StatusFilter />', () => {
     expect(screen.getByText('No filters found')).toBeInTheDocument();
   });
 
-  it('should call `onUpdateFilters` callback with options clicked', async () => {
+  it('should  call `onUpdateFilters` callback with checked off when clicking options with checked on', async () => {
     const onUpdateFilters = jest.fn();
     const { user } = await setup({ onUpdateFilters });
     await user.click(screen.getByText('Status'));
     expect(onUpdateFilters).not.toHaveBeenCalled();
     await user.click(screen.getByText('Responding'));
-    expect(onUpdateFilters).toHaveBeenCalledWith(['partial-responding', 'not-responding']);
+    expect(onUpdateFilters).toHaveBeenCalledWith([{ value: 'responding', checked: 'off' }]);
   });
 });

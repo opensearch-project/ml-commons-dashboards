@@ -11,4 +11,6 @@ export const STATUS_FILTER = [
   },
   { label: 'Partially responding', color: '#F5A700', value: 'partial-responding' },
   { label: 'Not responding', color: '#343741', value: 'not-responding' },
-];
+] as const;
+
+export type STATUS_VALUE = typeof STATUS_FILTER[number]['value'];

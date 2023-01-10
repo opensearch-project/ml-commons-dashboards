@@ -5,7 +5,7 @@
 import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer } from '@elastic/eui';
 import React, { useCallback, useState } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
-import { StatusFilter } from '../status_filter';
+import { StatusFilter, IOption } from '../status_filter';
 import { PreviewPanel, PreviewModel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
 
@@ -26,6 +26,12 @@ export const Monitoring = () => {
   }, []);
 
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
+  const [filterOptions, setFilterOptions] = useState<IOption[]>([
+    { value: 'responding', checked: 'on' },
+  ]);
+  const handleFilterUpdate = (newOptions: IOption[]) => {
+    setFilterOptions(newOptions);
+  };
   return (
     <div>
       <ExperimentalWarning />
@@ -44,7 +50,7 @@ export const Monitoring = () => {
         <EuiTitle size="s">
           <h3>Deployed models</h3>
         </EuiTitle>
-        <StatusFilter onUpdateFilters={() => {}} />
+        <StatusFilter options={filterOptions} onUpdateFilters={handleFilterUpdate} />
         <ModelDeploymentTable
           noTable={pageStatus === 'empty'}
           loading={pageStatus === 'loading'}
