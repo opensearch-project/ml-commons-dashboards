@@ -13,7 +13,7 @@ import {
   EuiSelectableOption,
   EuiIcon,
 } from '@elastic/eui';
-import { STATUS_FILTER,type STATUS_VALUE } from '../../../common';
+import { STATUS_FILTER, STATUS_VALUE } from '../../../common';
 
 export interface IOption {
   value: STATUS_VALUE;
@@ -34,14 +34,14 @@ export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const items = useMemo<IItem[]>(() => {
-    return options.map(item => {
-      const status = STATUS_FILTER.find(option => (option.value === item.value))
+    return options.map((item) => {
+      const status = STATUS_FILTER.find((option) => option.value === item.value);
       return {
         ...item,
-        label:status!.label,
-        prepend:  <EuiIcon type="dot" color={status!.color}/>
-      }
-    })
+        label: status!.label,
+        prepend: <EuiIcon type="dot" color={status!.color} />,
+      };
+    });
   }, [options]);
 
   const onButtonClick = () => {
@@ -54,11 +54,11 @@ export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
 
   const handleSelectableChange = useCallback(
     (newOptions: Array<EuiSelectableOption<IItem>>) => {
-      const filters = newOptions.map(({value,checked})=>({
+      const filters = newOptions.map(({ value, checked }) => ({
         value,
-        //when checked is off, checked of callback EuiSelectable item will be undefined
-        checked: checked??'off'
-      }))
+        // when checked is off, checked of callback EuiSelectable item will be undefined
+        checked: checked ?? 'off',
+      }));
       onUpdateFilters(filters);
     },
     [onUpdateFilters]
