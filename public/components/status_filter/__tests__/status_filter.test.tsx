@@ -6,17 +6,48 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '../../../../test/test_utils';
-import { StatusFilter } from '../';
+import { StatusFilter, IOption } from '../';
 
-async function setup({ onUpdateFilters = jest.fn() }) {
+async function setup({
+  onUpdateFilters = jest.fn(),
+  options = [{ value: 'responding', checked: 'on' }] as IOption[],
+}) {
   const user = userEvent.setup({});
-  render(<StatusFilter onUpdateFilters={onUpdateFilters} />);
+  render(<StatusFilter options={options} onUpdateFilters={onUpdateFilters} />);
   // open popover
   await user.click(screen.getByText('Status'));
   return { user };
 }
 
 describe('<StatusFilter />', () => {
+  const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+  beforeEach(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 600,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 600,
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight as PropertyDescriptor
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth as PropertyDescriptor
+    );
+  });
   it('should render a dialog with selectable list', async () => {
     await setup({});
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -29,15 +60,12 @@ describe('<StatusFilter />', () => {
     expect(screen.getByText('No filters found')).toBeInTheDocument();
   });
 
-  it('should call `onUpdateFilters` callback with three options selected by default when close popover', async () => {
+  it('should  call `onUpdateFilters` callback with checked off when clicking options with checked on', async () => {
     const onUpdateFilters = jest.fn();
     const { user } = await setup({ onUpdateFilters });
-    expect(onUpdateFilters).not.toHaveBeenCalled();
     await user.click(screen.getByText('Status'));
-    expect(onUpdateFilters).toHaveBeenCalledWith([
-      'Responding',
-      'Partially responding',
-      'Not responding',
-    ]);
+    expect(onUpdateFilters).not.toHaveBeenCalled();
+    await user.click(screen.getByText('Responding'));
+    expect(onUpdateFilters).toHaveBeenCalledWith([{ value: 'responding', checked: 'off' }]);
   });
 });
