@@ -3,49 +3,66 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   EuiPopover,
   EuiPopoverTitle,
   EuiFilterGroup,
   EuiFilterButton,
   EuiSelectable,
+  EuiSelectableOption,
   EuiIcon,
 } from '@elastic/eui';
-import { STATUS_FILTER } from '../../../common';
+import { STATUS_FILTER, STATUS_VALUE } from '../../../common';
 
+export interface IOption {
+  value: STATUS_VALUE;
+  checked: 'on' | 'off';
+}
 interface Props {
-  onUpdateFilters: (filters: string[]) => void;
+  options: IOption[];
+  onUpdateFilters: (filters: IOption[]) => void;
+}
+interface IItem {
+  label: string;
+  checked: 'on' | 'off' | undefined;
+  prepend: JSX.Element;
+  value: STATUS_VALUE;
 }
 
-export const StatusFilter = ({ onUpdateFilters }: Props) => {
+export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const [items, setItems] = useState(
-    STATUS_FILTER.map((item) => ({
-      label: item.label,
-      checked: 'on' as 'on' | 'off', // match eui mismatch type
-      prepend: <EuiIcon type="dot" color={item.color} />,
-    }))
-  );
+  const items = useMemo<IItem[]>(() => {
+    return options.map((item) => {
+      const status = STATUS_FILTER.find((option) => option.value === item.value);
+      return {
+        ...item,
+        label: status!.label,
+        prepend: <EuiIcon type="dot" color={status!.color} />,
+      };
+    });
+  }, [options]);
 
-  const handleUpdateFilters = useCallback(() => {
-    const selectedItems = items.filter((item) => item.checked === 'on').map((item) => item.label);
-    onUpdateFilters(selectedItems);
-  }, [items, onUpdateFilters]);
-
-  const onButtonClick = useCallback(() => {
-    if (isPopoverOpen) {
-      // should close popover and update filters
-      handleUpdateFilters();
-    }
-    setIsPopoverOpen(!isPopoverOpen);
-  }, [isPopoverOpen, handleUpdateFilters]);
+  const onButtonClick = () => {
+    setIsPopoverOpen((previous) => !previous);
+  };
 
   const onClosePopover = () => {
     setIsPopoverOpen(false);
-    handleUpdateFilters();
   };
+
+  const handleSelectableChange = useCallback(
+    (newOptions: Array<EuiSelectableOption<IItem>>) => {
+      const filters = newOptions.map(({ value, checked }) => ({
+        value,
+        // when checked is off, checked of callback EuiSelectable item will be undefined
+        checked: checked ?? 'off',
+      }));
+      onUpdateFilters(filters);
+    },
+    [onUpdateFilters]
+  );
 
   const button = (
     <EuiFilterButton
@@ -78,7 +95,7 @@ export const StatusFilter = ({ onUpdateFilters }: Props) => {
             }}
             aria-label="Status"
             options={items}
-            onChange={(newOptions) => setItems(newOptions)}
+            onChange={handleSelectableChange}
             isLoading={false}
             emptyMessage="No filters available"
             noMatchesMessage="No filters found"
