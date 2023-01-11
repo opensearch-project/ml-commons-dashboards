@@ -16,8 +16,9 @@ import {
   EuiFormRow,
 } from '@elastic/eui';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { Storage } from '../../../../../src/plugins/opensearch_dashboards_utils/public/';
 
-interface RefreshIntervalProps {
+export interface RefreshIntervalProps {
   /**
    * When refresh value/unit/isPaused changed
    */
@@ -30,6 +31,10 @@ interface RefreshIntervalProps {
    * The minimum allowed interval value(in milliseconds)
    */
   minInterval?: number;
+  /**
+   * If set, interval settings are persisted to local storage with the provided string
+   */
+  persistence?: string;
 }
 
 const intervalUnitOptions = [
@@ -38,14 +43,24 @@ const intervalUnitOptions = [
   { text: 'hours', value: 'h' },
 ];
 
+const storage = new Storage(localStorage);
+
 export const RefreshInterval = ({
   onRefresh,
   onRefreshChange,
+  persistence,
+  // default interval 10s
   minInterval = 10 * 1000,
 }: RefreshIntervalProps) => {
-  // default interval 10s
-  const [intervalValue, setIntervalValue] = useState(minInterval / 1000);
-  const [intervalUnit, setIntervalUnit] = useState('s');
+  let defaultInterval = minInterval / 1000;
+  let defaultUnit = 's';
+  if (persistence) {
+    defaultInterval = storage.get(persistence)?.intervalValue ?? defaultInterval;
+    defaultUnit = storage.get(persistence)?.intervalUnit ?? defaultUnit;
+  }
+
+  const [intervalValue, setIntervalValue] = useState(defaultInterval);
+  const [intervalUnit, setIntervalUnit] = useState(defaultUnit);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
 
@@ -67,6 +82,13 @@ export const RefreshInterval = ({
       return `${intervalValue} ${unit.text}`;
     }
   }, [isPaused, intervalUnit, intervalValue]);
+
+  // Persist interval value and unit
+  useEffect(() => {
+    if (persistence) {
+      storage.set(persistence, { intervalValue, intervalUnit });
+    }
+  }, [intervalValue, intervalUnit, persistence]);
 
   const interval = useMemo(() => {
     switch (intervalUnit) {

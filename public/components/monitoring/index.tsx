@@ -43,7 +43,10 @@ export const Monitoring = () => {
         pageTitle="Monitoring"
         rightSideItems={[
           <div style={{ backgroundColor: '#fff' }}>
-            <RefreshInterval onRefresh={onRefresh} />
+            <RefreshInterval
+              onRefresh={onRefresh}
+              persistence="ml_commons:admin_ui_model_list_auto_refresh_setting"
+            />
           </div>,
         ]}
       />

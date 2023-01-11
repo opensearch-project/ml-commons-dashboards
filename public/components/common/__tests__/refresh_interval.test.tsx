@@ -6,18 +6,27 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '../../../../test/test_utils';
-import { RefreshInterval } from '../refresh_interval';
+import { RefreshInterval, RefreshIntervalProps } from '../refresh_interval';
+import { Storage } from '../../../../../../src/plugins/opensearch_dashboards_utils/public';
 
-async function setup({ minInterval = 3000, onRefresh = jest.fn() }) {
+async function setup({
+  minInterval = 3000,
+  onRefresh = jest.fn(),
+  persistence,
+}: Partial<RefreshIntervalProps>) {
   const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
   // Set minimum interval 3000ms(3s)
-  render(<RefreshInterval onRefresh={onRefresh} minInterval={minInterval} />);
+  render(
+    <RefreshInterval onRefresh={onRefresh} minInterval={minInterval} persistence={persistence} />
+  );
   // open popover
   await user.click(screen.getByLabelText(/set refresh interval/i));
   return { user };
 }
 
 describe('<RefreshInterval />', () => {
+  const storage = new Storage(localStorage);
+
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -25,12 +34,15 @@ describe('<RefreshInterval />', () => {
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
+    storage.clear();
   });
 
   it('should render a paused RefreshInterval by default', async () => {
     await setup({ minInterval: 3000 });
     const currentIntervalInput = screen.getByLabelText(/current interval value/i);
     expect(currentIntervalInput).toHaveValue('Off');
+    expect(screen.getByLabelText(/interval value input/)).toHaveValue(3);
+    expect(screen.getByLabelText(/interval unit selector/)).toHaveValue('s');
   });
 
   it('should display a default interval setting popover', async () => {
@@ -150,5 +162,30 @@ describe('<RefreshInterval />', () => {
 
     // The start button is disabled
     expect(screen.getByLabelText(/start refresh interval/i)).toBeDisabled();
+  });
+
+  it('should read interval settings from localStorage if it was set', async () => {
+    const KEY = 'local_storage_test_key';
+    // Set value to local storage
+    storage.set(KEY, { intervalValue: 10, intervalUnit: 'm' });
+    await setup({ minInterval: 3000, persistence: KEY });
+
+    expect(screen.getByLabelText(/interval value input/)).toHaveValue(10);
+    expect(screen.getByLabelText(/interval unit selector/)).toHaveValue('m');
+  });
+
+  it('should persist interval settings to localStorage', async () => {
+    const KEY = 'local_storage_test_key';
+    const { user } = await setup({ minInterval: 3000, persistence: KEY });
+
+    // The initial interval should be the minInterval passed by props
+    // The initial interval unit should be seconds: `s`
+    expect(storage.get(KEY)).toEqual({ intervalValue: 3, intervalUnit: 's' });
+
+    // user set interval to 10 minutes
+    await user.clear(screen.getByLabelText(/interval value input/i));
+    await user.type(screen.getByLabelText(/interval value input/i), '10');
+    await user.selectOptions(screen.getByLabelText(/interval unit selector/i), 'minutes');
+    expect(storage.get(KEY)).toEqual({ intervalValue: 10, intervalUnit: 'm' });
   });
 });
