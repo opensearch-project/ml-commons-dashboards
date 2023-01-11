@@ -6,7 +6,7 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import { render, screen } from '../../../../test/test_utils';
+import { render, screen, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
 
@@ -49,6 +49,7 @@ const setup = (
         deployed_node_ids: [],
       },
     ],
+    statusFilterOptions: [{ value: 'responding', checked: undefined }],
     reload: jest.fn(),
     searchByName: jest.fn(),
     searchByStatus: jest.fn(),
@@ -183,6 +184,53 @@ describe('<Monitoring />', () => {
 
     expect(screen.getByLabelText(/total number of results/i).textContent).toBe(
       `(${pagination?.totalRecords})`
+    );
+  });
+
+  it('should display consistent status filter options and call searchByStatus after filter option clicked', async () => {
+    jest.useRealTimers();
+    const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'offsetHeight'
+    );
+    const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'offsetWidth'
+    );
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 600,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 600,
+    });
+
+    const {
+      finalMonitoringReturnValue: { searchByStatus },
+    } = setup();
+
+    await userEvent.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
+    const allStatusFilterOptions = within(
+      screen.getByRole('listbox', { name: 'Status' })
+    ).getAllByRole('option');
+    expect(allStatusFilterOptions.length).toBe(1);
+    expect(within(allStatusFilterOptions[0]).getByText('Responding')).toBeInTheDocument();
+
+    expect(searchByStatus).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('option', { name: 'Responding' }));
+    expect(searchByStatus).not.toHaveBeenCalledWith([{ value: 'responding', checked: 'on' }]);
+
+    jest.useFakeTimers();
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight as PropertyDescriptor
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth as PropertyDescriptor
     );
   });
 });

@@ -18,23 +18,27 @@ export const Monitoring = () => {
     params,
     pagination,
     deployedModels,
+    statusFilterOptions,
     handleTableChange,
     clearNameStatusFilter,
     reload,
+    searchByStatus,
   } = useMonitoring();
+  const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
 
   const onRefresh = useCallback(() => {
     reload();
   }, [reload]);
 
-  const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
-  const [filterOptions, setFilterOptions] = useState<IOption[]>([
-    { value: 'responding', checked: undefined },
-    { value: 'not-responding', checked: 'on' },
-  ]);
-  const handleFilterUpdate = (newOptions: IOption[]) => {
-    setFilterOptions(newOptions);
-  };
+  const handleFilterUpdate = useCallback(
+    (newOptions: IOption[]) => {
+      searchByStatus(
+        newOptions.filter(({ checked }) => checked === 'on').map(({ value }) => value)
+      );
+    },
+    [searchByStatus]
+  );
+
   return (
     <div>
       <ExperimentalWarning />
@@ -67,7 +71,7 @@ export const Monitoring = () => {
         <EuiSpacer size="m" />
         {pageStatus !== 'empty' && (
           <>
-            <StatusFilter options={filterOptions} onUpdateFilters={handleFilterUpdate} />
+            <StatusFilter options={statusFilterOptions} onUpdateFilters={handleFilterUpdate} />
             <EuiSpacer size="m" />
           </>
         )}
