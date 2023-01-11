@@ -29,7 +29,8 @@ export const Monitoring = () => {
 
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
   const [filterOptions, setFilterOptions] = useState<IOption[]>([
-    { value: 'responding', checked: 'on' },
+    { value: 'responding', checked: undefined },
+    { value: 'not-responding', checked: 'on' },
   ]);
   const handleFilterUpdate = (newOptions: IOption[]) => {
     setFilterOptions(newOptions);
