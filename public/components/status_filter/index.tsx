@@ -17,7 +17,7 @@ import { STATUS_FILTER, STATUS_VALUE } from '../../../common';
 
 export interface IOption {
   value: STATUS_VALUE;
-  checked: 'on' | 'off';
+  checked: 'on' | undefined;
 }
 interface Props {
   options: IOption[];
@@ -25,7 +25,8 @@ interface Props {
 }
 interface IItem {
   label: string;
-  checked: 'on' | 'off' | undefined;
+  // undefined represents unselected in EUI
+  checked: 'on' | undefined;
   prepend: JSX.Element;
   value: STATUS_VALUE;
 }
@@ -56,8 +57,7 @@ export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
     (newOptions: Array<EuiSelectableOption<IItem>>) => {
       const filters = newOptions.map(({ value, checked }) => ({
         value,
-        // when checked is off, checked of callback EuiSelectable item will be undefined
-        checked: checked ?? 'off',
+        checked,
       }));
       onUpdateFilters(filters);
     },
@@ -69,7 +69,7 @@ export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
       iconType="arrowDown"
       onClick={onButtonClick}
       isSelected={isPopoverOpen}
-      numFilters={items.filter((item) => item.checked !== 'off').length}
+      numFilters={items.length}
       hasActiveFilters={!!items.find((item) => item.checked === 'on')}
       numActiveFilters={items.filter((item) => item.checked === 'on').length}
     >
@@ -100,6 +100,7 @@ export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
             emptyMessage="No filters available"
             noMatchesMessage="No filters found"
             listProps={{ onFocusBadge: false }}
+            allowExclusions={false}
           >
             {(list, search) => {
               return (
