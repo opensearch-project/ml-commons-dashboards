@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer, EuiTextColor } from '@elastic/eui';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { RefreshInterval } from '../common/refresh_interval';
 import { StatusFilter, IOption } from '../status_filter';
 import { PreviewPanel, PreviewModel } from '../preview_panel';
@@ -23,10 +23,6 @@ export const Monitoring = () => {
     reload,
   } = useMonitoring();
 
-  const onRefresh = useCallback(() => {
-    reload();
-  }, [reload]);
-
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
   const [filterOptions, setFilterOptions] = useState<IOption[]>([
     { value: 'responding', checked: 'on' },
@@ -44,7 +40,7 @@ export const Monitoring = () => {
         rightSideItems={[
           <div style={{ backgroundColor: '#fff' }}>
             <RefreshInterval
-              onRefresh={onRefresh}
+              onRefresh={reload}
               persistence="ml_commons:admin_ui_model_list_auto_refresh_setting"
             />
           </div>,
