@@ -65,7 +65,6 @@ const setup = (
 };
 
 const mockOffsetMethods = () => {
-  jest.useRealTimers();
   const originalOffsetHeight = Object.getOwnPropertyDescriptor(
     HTMLElement.prototype,
     'offsetHeight'
@@ -220,14 +219,14 @@ describe('<Monitoring />', () => {
   });
 
   it('should display consistent status filter options and call searchByStatus after filter option clicked', async () => {
-    jest.useRealTimers();
     const clearOffsetMethodsMock = mockOffsetMethods();
 
     const {
       finalMonitoringReturnValue: { searchByStatus },
+      user,
     } = setup({});
 
-    await userEvent.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
+    await user.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
     const allStatusFilterOptions = within(
       screen.getByRole('listbox', { name: 'Status' })
     ).getAllByRole('option');
@@ -239,10 +238,9 @@ describe('<Monitoring />', () => {
     expect(within(allStatusFilterOptions[2]).getByText('Not responding')).toBeInTheDocument();
 
     expect(searchByStatus).not.toHaveBeenCalled();
-    await userEvent.click(screen.getByRole('option', { name: 'Responding' }));
+    await user.click(screen.getByRole('option', { name: 'Responding' }));
     expect(searchByStatus).not.toHaveBeenCalledWith([{ value: 'responding', checked: 'on' }]);
 
-    jest.useFakeTimers();
     clearOffsetMethodsMock();
   });
 
