@@ -11,7 +11,7 @@ export interface SearchBarProps {
   value: string;
 }
 export const SearchBar = ({ onSearch, value: valueInProps }: SearchBarProps) => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(valueInProps);
   const onSearchDebounce = useMemo(() => debounce(onSearch, 200), [onSearch]);
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -26,7 +26,7 @@ export const SearchBar = ({ onSearch, value: valueInProps }: SearchBarProps) => 
       incremental={true}
       onSearch={onSearchDebounce}
       onChange={onChange}
-      aria-label="Use aria labels when no actual label is in use"
+      aria-label="Search by name or ID"
       fullWidth
     />
   );
