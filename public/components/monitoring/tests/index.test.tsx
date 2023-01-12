@@ -49,7 +49,7 @@ const setup = (
         deployed_node_ids: [],
       },
     ],
-    statusFilterOptions: [{ value: 'responding', checked: undefined }],
+    allStatuses: ['responding'],
     reload: jest.fn(),
     searchByName: jest.fn(),
     searchByStatus: jest.fn(),
@@ -62,6 +62,35 @@ const setup = (
 
   render(<Monitoring />);
   return { finalMonitoringReturnValue, user };
+};
+
+const mockOffsetMethods = () => {
+  jest.useRealTimers();
+  const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: 600,
+  });
+  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+    configurable: true,
+    value: 600,
+  });
+  return () => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight as PropertyDescriptor
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth as PropertyDescriptor
+    );
+  };
 };
 
 describe('<Monitoring />', () => {
@@ -189,48 +218,28 @@ describe('<Monitoring />', () => {
 
   it('should display consistent status filter options and call searchByStatus after filter option clicked', async () => {
     jest.useRealTimers();
-    const originalOffsetHeight = Object.getOwnPropertyDescriptor(
-      HTMLElement.prototype,
-      'offsetHeight'
-    );
-    const originalOffsetWidth = Object.getOwnPropertyDescriptor(
-      HTMLElement.prototype,
-      'offsetWidth'
-    );
-    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-      configurable: true,
-      value: 600,
-    });
-    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-      configurable: true,
-      value: 600,
-    });
+    const clearOffsetMethodsMock = mockOffsetMethods();
 
     const {
       finalMonitoringReturnValue: { searchByStatus },
-    } = setup();
+    } = setup({
+      allStatuses: ['partial-responding', 'responding', 'not-responding'],
+    });
 
     await userEvent.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
     const allStatusFilterOptions = within(
       screen.getByRole('listbox', { name: 'Status' })
     ).getAllByRole('option');
-    expect(allStatusFilterOptions.length).toBe(1);
+    expect(allStatusFilterOptions.length).toBe(3);
     expect(within(allStatusFilterOptions[0]).getByText('Responding')).toBeInTheDocument();
+    expect(within(allStatusFilterOptions[1]).getByText('Partially responding')).toBeInTheDocument();
+    expect(within(allStatusFilterOptions[2]).getByText('Not responding')).toBeInTheDocument();
 
     expect(searchByStatus).not.toHaveBeenCalled();
     await userEvent.click(screen.getByRole('option', { name: 'Responding' }));
     expect(searchByStatus).not.toHaveBeenCalledWith([{ value: 'responding', checked: 'on' }]);
 
     jest.useFakeTimers();
-    Object.defineProperty(
-      HTMLElement.prototype,
-      'offsetHeight',
-      originalOffsetHeight as PropertyDescriptor
-    );
-    Object.defineProperty(
-      HTMLElement.prototype,
-      'offsetWidth',
-      originalOffsetWidth as PropertyDescriptor
-    );
+    clearOffsetMethodsMock();
   });
 });

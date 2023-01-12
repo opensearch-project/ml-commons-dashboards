@@ -31,12 +31,6 @@ const convertModelStatus = (
   return 'partial-responding';
 };
 
-const statusFilterOrder = {
-  responding: 0,
-  'partial-responding': 1,
-  'not-responding': 2,
-} as const;
-
 const isValidNameOrIdFilter = (nameOrId: string | undefined): nameOrId is string => !!nameOrId;
 const isValidStatusFilter = (
   status: ModelDeployStatus[] | undefined
@@ -101,16 +95,7 @@ export const useMonitoring = () => {
   const filterExists = checkFilterExists(params);
   const totalRecords = data?.pagination.totalRecords;
   const deployedModels = useMemo(() => data?.data ?? [], [data]);
-  const statusFilterOptions = useMemo(
-    () =>
-      (data?.allStatuses ?? [])
-        .sort((a, b) => statusFilterOrder[a] - statusFilterOrder[b])
-        .map((status) => ({
-          value: status,
-          checked: params.status?.includes(status) ? ('on' as const) : undefined,
-        })),
-    [data, params.status]
-  );
+  const allStatuses = useMemo(() => data?.allStatuses ?? [], [data]);
 
   /**
    * The pageStatus represents the different statuses in the monitoring page,
@@ -199,7 +184,7 @@ export const useMonitoring = () => {
     params,
     pageStatus,
     pagination: data?.pagination,
-    statusFilterOptions,
+    allStatuses,
     /**
      * Data of the current page
      */

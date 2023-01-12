@@ -201,50 +201,45 @@ describe('useMonitoring', () => {
     expect(APIProvider.getAPI('profile').getAllDeployedModels).toHaveBeenCalledTimes(2);
   });
 
-  it('should return consistent statusFilterOptions', async () => {
+  it('should return consistent allStatuses after data loaded or search by status', async () => {
     mockMultiRecords();
-    const { result, waitFor, waitForValueToChange } = renderHook(() => useMonitoring());
-    await waitFor(() => result.current.deployedModels.length > 0);
+    const { result, waitForValueToChange } = renderHook(() => useMonitoring());
+    await waitForValueToChange(() => result.current.allStatuses);
 
-    expect(result.current.statusFilterOptions).toEqual([
-      { value: 'responding', checked: undefined },
-      { value: 'partial-responding', checked: undefined },
-    ]);
+    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
 
     mockMultiRecords();
     act(() => {
       result.current.searchByStatus(['partial-responding']);
     });
     await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.statusFilterOptions).toEqual([
-      { value: 'responding', checked: undefined },
-      { value: 'partial-responding', checked: 'on' },
-    ]);
+    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
+  });
 
+  it('should return consistent allStatuses after search by name id or reset', async () => {
     mockMultiRecords();
-    act(() => {
-      result.current.searchByNameOrId('not-exists-model');
-    });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.statusFilterOptions).toEqual([]);
+    const { result, waitForValueToChange } = renderHook(() => useMonitoring());
+    await waitForValueToChange(() => result.current.allStatuses);
 
     mockMultiRecords();
     act(() => {
       result.current.searchByNameOrId('1-name');
     });
     await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.statusFilterOptions).toEqual([
-      { value: 'partial-responding', checked: 'on' },
-    ]);
+    expect(result.current.allStatuses).toEqual(['partial-responding']);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.searchByNameOrId('not-exists-model');
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.allStatuses).toEqual([]);
 
     mockMultiRecords();
     act(() => {
       result.current.resetSearch();
     });
     await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.statusFilterOptions).toEqual([
-      { value: 'responding', checked: undefined },
-      { value: 'partial-responding', checked: undefined },
-    ]);
+    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
   });
 });
