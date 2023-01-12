@@ -185,6 +185,7 @@ describe('<RefreshInterval />', () => {
 
     // The initial interval should be the minInterval passed by props
     // The initial interval unit should be seconds: `s`
+    // The interval is paused initially
     expect(storage.get(KEY)).toEqual({ intervalValue: 3, intervalUnit: 's', isPaused: true });
 
     // user set interval to 10 minutes and start interval
@@ -192,6 +193,8 @@ describe('<RefreshInterval />', () => {
     await user.type(screen.getByLabelText(/interval value input/i), '10');
     await user.selectOptions(screen.getByLabelText(/interval unit selector/i), 'minutes');
     await user.click(screen.getByLabelText(/start refresh interval/i));
+
+    // New interval settings are persisted to localStorage
     expect(storage.get(KEY)).toEqual({ intervalValue: 10, intervalUnit: 'm', isPaused: false });
   });
 });
