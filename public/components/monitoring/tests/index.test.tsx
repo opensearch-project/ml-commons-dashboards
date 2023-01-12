@@ -9,6 +9,7 @@ import React from 'react';
 import { render, screen, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
+import { APIProvider } from '../../../apis/api_provider';
 
 const setup = (
   monitoringReturnValue?: Partial<ReturnType<typeof useMonitoringExports.useMonitoring>>
@@ -243,5 +244,24 @@ describe('<Monitoring />', () => {
 
     jest.useFakeTimers();
     clearOffsetMethodsMock();
+  });
+
+  it('should show preview panel after view detail button clicked', async () => {
+    const { user } = setup();
+    await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
+    const previewPanel = screen.getByRole('dialog');
+    expect(previewPanel).toBeInTheDocument();
+    expect(within(previewPanel).getByText('model 1 name')).toBeInTheDocument();
+  });
+
+  it('should call reload after preview panel closed', async () => {
+    const {
+      finalMonitoringReturnValue: { reload },
+      user,
+    } = setup();
+
+    await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
+    await user.click(screen.getByLabelText('Close this dialog'));
+    expect(reload).toHaveBeenCalled();
   });
 });
