@@ -16,6 +16,7 @@ import {
   EuiFormRow,
 } from '@elastic/eui';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { isNil } from 'lodash';
 import { Storage } from '../../../../../src/plugins/opensearch_dashboards_utils/public/';
 
 export interface RefreshIntervalProps {
@@ -52,17 +53,14 @@ export const RefreshInterval = ({
   // default interval 10s
   minInterval = 10 * 1000,
 }: RefreshIntervalProps) => {
-  let defaultInterval = minInterval / 1000;
-  let defaultUnit = 's';
-  if (persistence) {
-    defaultInterval = storage.get(persistence)?.intervalValue ?? defaultInterval;
-    defaultUnit = storage.get(persistence)?.intervalUnit ?? defaultUnit;
-  }
+  const defaultInterval = minInterval / 1000;
+  const defaultUnit = 's';
+  const defaultIsPaused = true;
 
   const [intervalValue, setIntervalValue] = useState(defaultInterval);
   const [intervalUnit, setIntervalUnit] = useState(defaultUnit);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [isPaused, setIsPaused] = useState(true);
+  const [isPaused, setIsPaused] = useState(defaultIsPaused);
 
   const onIntervalValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setIntervalValue(Number(e.target.value));
@@ -83,12 +81,28 @@ export const RefreshInterval = ({
     }
   }, [isPaused, intervalUnit, intervalValue]);
 
-  // Persist interval value and unit
+  // Read interval settings from localStorage if `persistence` is set
   useEffect(() => {
     if (persistence) {
-      storage.set(persistence, { intervalValue, intervalUnit });
+      const persistedSetting = storage.get(persistence);
+      if (!isNil(persistedSetting?.intervalValue)) {
+        setIntervalValue(persistedSetting?.intervalValue);
+      }
+      if (!isNil(persistedSetting?.intervalUnit)) {
+        setIntervalUnit(persistedSetting?.intervalUnit);
+      }
+      if (!isNil(persistedSetting?.isPaused)) {
+        setIsPaused(persistedSetting?.isPaused);
+      }
     }
-  }, [intervalValue, intervalUnit, persistence]);
+  }, [persistence]);
+
+  // Write interval settings to localStorage if `persistence` is set
+  useEffect(() => {
+    if (persistence) {
+      storage.set(persistence, { intervalValue, intervalUnit, isPaused });
+    }
+  }, [intervalValue, intervalUnit, isPaused, persistence]);
 
   const interval = useMemo(() => {
     switch (intervalUnit) {

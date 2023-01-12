@@ -167,11 +167,16 @@ describe('<RefreshInterval />', () => {
   it('should read interval settings from localStorage if it was set', async () => {
     const KEY = 'local_storage_test_key';
     // Set value to local storage
-    storage.set(KEY, { intervalValue: 10, intervalUnit: 'm' });
+    storage.set(KEY, { intervalValue: 10, intervalUnit: 'm', isPaused: false });
     await setup({ minInterval: 3000, persistence: KEY });
 
+    // Interval values are loaded
     expect(screen.getByLabelText(/interval value input/)).toHaveValue(10);
     expect(screen.getByLabelText(/interval unit selector/)).toHaveValue('m');
+
+    // Interval started with the loaded values
+    expect(screen.getByLabelText(/stop refresh interval/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/current interval value/i)).toHaveValue('10 minutes');
   });
 
   it('should persist interval settings to localStorage', async () => {
@@ -180,12 +185,13 @@ describe('<RefreshInterval />', () => {
 
     // The initial interval should be the minInterval passed by props
     // The initial interval unit should be seconds: `s`
-    expect(storage.get(KEY)).toEqual({ intervalValue: 3, intervalUnit: 's' });
+    expect(storage.get(KEY)).toEqual({ intervalValue: 3, intervalUnit: 's', isPaused: true });
 
-    // user set interval to 10 minutes
+    // user set interval to 10 minutes and start interval
     await user.clear(screen.getByLabelText(/interval value input/i));
     await user.type(screen.getByLabelText(/interval value input/i), '10');
     await user.selectOptions(screen.getByLabelText(/interval unit selector/i), 'minutes');
-    expect(storage.get(KEY)).toEqual({ intervalValue: 10, intervalUnit: 'm' });
+    await user.click(screen.getByLabelText(/start refresh interval/i));
+    expect(storage.get(KEY)).toEqual({ intervalValue: 10, intervalUnit: 'm', isPaused: false });
   });
 });
