@@ -9,19 +9,19 @@ import { APIProvider } from '../../apis/api_provider';
 import { ModelDeploymentProfile } from '../../apis/profile';
 import { useFetcher } from '../../hooks/use_fetcher';
 
-type ModelDeployState = 'responding' | 'not-responding' | 'partial-responding';
+type ModelDeployStatus = 'responding' | 'not-responding' | 'partial-responding';
 
 interface Params {
   nameOrId?: string;
-  state?: ModelDeployState[];
+  status?: ModelDeployStatus[];
   currentPage: number;
   pageSize: number;
   sort: { field: 'name'; direction: 'asc' | 'desc' };
 }
 
-const convertModelState = (
+const convertModelStatus = (
   model: Pick<ModelDeploymentProfile, 'target_node_ids' | 'deployed_node_ids'>
-): ModelDeployState => {
+): ModelDeployStatus => {
   if (model.target_node_ids.length === model.deployed_node_ids.length) {
     return 'responding';
   }
@@ -31,30 +31,32 @@ const convertModelState = (
   return 'partial-responding';
 };
 
+const isValidNameOrIdFilter = (nameOrId: string | undefined): nameOrId is string => !!nameOrId;
+const isValidStatusFilter = (
+  status: ModelDeployStatus[] | undefined
+): status is ModelDeployStatus[] => !!status && status.length > 0;
+
 const checkFilterExists = (params: Params) =>
-  !!params.nameOrId || (!!params.state && params.state.length > 0);
+  isValidNameOrIdFilter(params.nameOrId) || isValidStatusFilter(params.status);
 
 const fetchAllDeployedModels = async (params: Params) => {
+  const { status: statusFilter, nameOrId: nameOrIdFilter } = params;
   const allData = await APIProvider.getAPI('profile').getAllDeployedModels();
-  // Results after applying filters
-  const filteredData = allData
-    .map((item) => ({ ...item, state: convertModelState(item) }))
-    .filter((item) => {
-      if (!checkFilterExists(params)) {
-        return true;
-      }
-      if (
-        params.nameOrId &&
-        !item.name.toLowerCase().includes(params.nameOrId.toLowerCase()) &&
-        !item.id.includes(params.nameOrId)
-      ) {
-        return false;
-      }
-      if (params.state && !params.state.includes(item.state)) {
-        return false;
-      }
-      return true;
-    });
+
+  const allConvertedData = allData.map((item) => ({ ...item, status: convertModelStatus(item) }));
+
+  // Results after applying nameOrId filter
+  const dataAfterNameOrIdFilter = isValidNameOrIdFilter(nameOrIdFilter)
+    ? allConvertedData.filter(
+        ({ name, id }) =>
+          name.toLowerCase().includes(nameOrIdFilter.toLowerCase()) || id.includes(nameOrIdFilter)
+      )
+    : allConvertedData;
+
+  // Results after applying all filters
+  const filteredData = isValidStatusFilter(statusFilter)
+    ? dataAfterNameOrIdFilter.filter((item) => statusFilter.includes(item.status))
+    : dataAfterNameOrIdFilter;
 
   // Results of current page
   const pageData = filteredData
@@ -65,7 +67,15 @@ const fetchAllDeployedModels = async (params: Params) => {
     )
     .slice((params.currentPage - 1) * params.pageSize, params.currentPage * params.pageSize);
 
+  const allStatuses = Object.keys(
+    dataAfterNameOrIdFilter.reduce(
+      (previousData, { status }) => ({ ...previousData, [status]: true }),
+      {}
+    )
+  ) as ModelDeployStatus[];
+
   return {
+    allStatuses,
     data: pageData,
     pagination: {
       currentPage: params.currentPage,
@@ -85,6 +95,7 @@ export const useMonitoring = () => {
   const filterExists = checkFilterExists(params);
   const totalRecords = data?.pagination.totalRecords;
   const deployedModels = useMemo(() => data?.data ?? [], [data]);
+  const allStatuses = useMemo(() => data?.allStatuses ?? [], [data]);
 
   /**
    * The pageStatus represents the different statuses in the monitoring page,
@@ -113,7 +124,7 @@ export const useMonitoring = () => {
           ...previousValue,
           data: previousValue.data.map((item) => {
             if (item.id === model.id) {
-              return { ...model, state: convertModelState(model) };
+              return { ...model, status: convertModelStatus(model) };
             }
             return item;
           }),
@@ -123,7 +134,7 @@ export const useMonitoring = () => {
     [mutate]
   );
 
-  const clearNameStateFilter = useCallback(() => {
+  const resetSearch = useCallback(() => {
     setParams((previousValue) => ({
       currentPage: previousValue.currentPage,
       pageSize: previousValue.pageSize,
@@ -138,10 +149,10 @@ export const useMonitoring = () => {
     }));
   }, []);
 
-  const searchByState = useCallback((state: ModelDeployState[]) => {
+  const searchByStatus = useCallback((status: ModelDeployStatus[]) => {
     setParams((previousValue) => ({
       ...previousValue,
-      state,
+      status,
     }));
   }, []);
 
@@ -173,15 +184,16 @@ export const useMonitoring = () => {
     params,
     pageStatus,
     pagination: data?.pagination,
+    allStatuses,
     /**
      * Data of the current page
      */
     deployedModels,
     reload,
-    searchByState,
+    searchByStatus,
     searchByNameOrId,
     updateDeployedModel,
-    clearNameStateFilter,
+    resetSearch,
     handleTableChange,
   };
 };

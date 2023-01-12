@@ -6,7 +6,7 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import { render, screen } from '../../../../test/test_utils';
+import { render, screen, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
 
@@ -49,11 +49,12 @@ const setup = (
         deployed_node_ids: [],
       },
     ],
+    allStatuses: ['responding'],
     reload: jest.fn(),
     searchByName: jest.fn(),
-    searchByState: jest.fn(),
+    searchByStatus: jest.fn(),
     updateDeployedModel: jest.fn(),
-    clearNameStateFilter: jest.fn(),
+    resetSearch: jest.fn(),
     handleTableChange: jest.fn(),
     ...monitoringReturnValue,
   } as ReturnType<typeof useMonitoringExports.useMonitoring>;
@@ -61,6 +62,35 @@ const setup = (
 
   render(<Monitoring />);
   return { finalMonitoringReturnValue, user };
+};
+
+const mockOffsetMethods = () => {
+  jest.useRealTimers();
+  const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: 600,
+  });
+  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+    configurable: true,
+    value: 600,
+  });
+  return () => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight as PropertyDescriptor
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth as PropertyDescriptor
+    );
+  };
 };
 
 describe('<Monitoring />', () => {
@@ -143,15 +173,15 @@ describe('<Monitoring />', () => {
     );
   });
 
-  it('should call clearNameStateFilter after reset search click', async () => {
+  it('should call resetSearch after reset search click', async () => {
     const {
-      finalMonitoringReturnValue: { clearNameStateFilter },
+      finalMonitoringReturnValue: { resetSearch },
       user,
     } = setup({ pageStatus: 'reset-filter', deployedModels: [] });
     expect(screen.getByLabelText('no models results')).toBeInTheDocument();
 
     await user.click(screen.getByText('Reset search'));
-    expect(clearNameStateFilter).toHaveBeenCalled();
+    expect(resetSearch).toHaveBeenCalled();
   });
 
   it('should reload table data at 10s interval by default when starts auto refresh', async () => {
@@ -184,5 +214,32 @@ describe('<Monitoring />', () => {
     expect(screen.getByLabelText(/total number of results/i).textContent).toBe(
       `(${pagination?.totalRecords})`
     );
+  });
+
+  it('should display consistent status filter options and call searchByStatus after filter option clicked', async () => {
+    jest.useRealTimers();
+    const clearOffsetMethodsMock = mockOffsetMethods();
+
+    const {
+      finalMonitoringReturnValue: { searchByStatus },
+    } = setup({
+      allStatuses: ['partial-responding', 'responding', 'not-responding'],
+    });
+
+    await userEvent.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
+    const allStatusFilterOptions = within(
+      screen.getByRole('listbox', { name: 'Status' })
+    ).getAllByRole('option');
+    expect(allStatusFilterOptions.length).toBe(3);
+    expect(within(allStatusFilterOptions[0]).getByText('Responding')).toBeInTheDocument();
+    expect(within(allStatusFilterOptions[1]).getByText('Partially responding')).toBeInTheDocument();
+    expect(within(allStatusFilterOptions[2]).getByText('Not responding')).toBeInTheDocument();
+
+    expect(searchByStatus).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('option', { name: 'Responding' }));
+    expect(searchByStatus).not.toHaveBeenCalledWith([{ value: 'responding', checked: 'on' }]);
+
+    jest.useFakeTimers();
+    clearOffsetMethodsMock();
   });
 });
