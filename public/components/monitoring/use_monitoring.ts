@@ -149,7 +149,7 @@ export const useMonitoring = () => {
     [mutate]
   );
 
-  const clearNameStatusFilter = useCallback(() => {
+  const resetSearch = useCallback(() => {
     setParams((previousValue) => ({
       currentPage: previousValue.currentPage,
       pageSize: previousValue.pageSize,
@@ -208,7 +208,7 @@ export const useMonitoring = () => {
     searchByStatus,
     searchByNameOrId,
     updateDeployedModel,
-    clearNameStatusFilter,
+    resetSearch,
     handleTableChange,
   };
 };

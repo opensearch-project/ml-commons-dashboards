@@ -105,7 +105,7 @@ describe('useMonitoring', () => {
     expect(result.current.deployedModels).toEqual([]);
 
     act(() => {
-      result.current.clearNameStatusFilter();
+      result.current.resetSearch();
     });
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.pageStatus).toBe('normal');
@@ -239,7 +239,7 @@ describe('useMonitoring', () => {
 
     mockMultiRecords();
     act(() => {
-      result.current.clearNameStatusFilter();
+      result.current.resetSearch();
     });
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.statusFilterOptions).toEqual([

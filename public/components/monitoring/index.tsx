@@ -20,7 +20,7 @@ export const Monitoring = () => {
     deployedModels,
     statusFilterOptions,
     handleTableChange,
-    clearNameStatusFilter,
+    resetSearch,
     reload,
     searchByStatus,
   } = useMonitoring();
@@ -82,7 +82,7 @@ export const Monitoring = () => {
           sort={params.sort}
           pagination={pagination}
           onChange={handleTableChange}
-          onResetSearchClick={clearNameStatusFilter}
+          onResetSearchClick={resetSearch}
           onViewDetail={(id, name) => {
             setPreviewModel({ id, name });
           }}
