@@ -17,8 +17,8 @@ describe('<SearchBar />', () => {
     const user = userEvent.setup();
     await user.type(screen.getByLabelText('Search by name or ID'), 'foo');
     expect(screen.getByLabelText('Search by name or ID')).toHaveValue('foo');
-    const value = '';
-    await rerender(<SearchBar onSearch={() => {}} value={value} />);
+
+    await rerender(<SearchBar onSearch={() => {}} value="" />);
     expect(screen.getByLabelText('Search by name or ID')).not.toHaveValue();
   });
   it('should callback onSearch in 200ms when type', async () => {
