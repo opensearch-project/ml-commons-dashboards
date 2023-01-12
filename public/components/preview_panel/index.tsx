@@ -13,6 +13,7 @@ import {
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
   EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { ModelDeploymentProfile } from '../../apis/profile';
@@ -49,6 +50,9 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
   }, [data]);
 
   const respondingStatus = useMemo(() => {
+    if (!data) {
+      return <EuiText style={{ color: '#6A717D' }}>Loading...</EuiText>;
+    }
     const deployedNodesNum = data?.deployed_node_ids?.length ?? 0;
     const targetNodesNum = data?.target_node_ids?.length ?? 0;
     if (deployedNodesNum < targetNodesNum) {
@@ -83,7 +87,7 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
           <EuiDescriptionListDescription>{respondingStatus}</EuiDescriptionListDescription>
         </EuiDescriptionList>
         <EuiSpacer />
-        {nodes.length > 0 ? <NodesTable nodes={nodes} /> : null}
+        <NodesTable loading={!data} nodes={nodes} />
       </EuiFlyoutBody>
     </EuiFlyout>
   );

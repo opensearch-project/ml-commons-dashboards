@@ -4,12 +4,18 @@
  */
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EuiBasicTable, Direction, CriteriaWithPagination, EuiHealth } from '@elastic/eui';
+import {
+  EuiBasicTable,
+  Direction,
+  CriteriaWithPagination,
+  EuiHealth,
+  EuiEmptyPrompt,
+} from '@elastic/eui';
 import { INode } from './';
 import { CopyableText } from '../common';
 
-export function NodesTable(props: { nodes: INode[] }) {
-  const { nodes } = props;
+export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
+  const { nodes, loading } = props;
   const [sort, setSort] = useState<{ field: keyof INode; direction: Direction }>({
     field: 'id',
     direction: 'desc',
@@ -94,6 +100,10 @@ export function NodesTable(props: { nodes: INode[] }) {
       sorting={{ sort }}
       pagination={pagination}
       onChange={handleTableChange}
+      loading={loading}
+      noItemsMessage={
+        loading ? <EuiEmptyPrompt body={<>Loading...</>} aria-label="loading nodes" /> : null
+      }
     />
   );
 }
