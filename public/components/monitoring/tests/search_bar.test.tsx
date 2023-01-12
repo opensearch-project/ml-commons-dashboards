@@ -13,13 +13,16 @@ describe('<SearchBar />', () => {
     expect(screen.getByPlaceholderText('Search by name or ID')).toBeInTheDocument();
   });
   it('should searchbar changed when value changed', async () => {
+    jest.useFakeTimers();
     const { rerender } = render(<SearchBar onSearch={() => {}} value="" />);
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     await user.type(screen.getByLabelText('Search by name or ID'), 'foo');
     expect(screen.getByLabelText('Search by name or ID')).toHaveValue('foo');
-
-    await rerender(<SearchBar onSearch={() => {}} value="" />);
+    jest.advanceTimersByTime(200);
+    rerender(<SearchBar onSearch={() => {}} value="foo" />);
+    rerender(<SearchBar onSearch={() => {}} value="" />);
     expect(screen.getByLabelText('Search by name or ID')).not.toHaveValue();
+    jest.useRealTimers();
   });
   it('should callback onSearch in 200ms when type', async () => {
     jest.useFakeTimers();
