@@ -3,7 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { EuiPanel, EuiPageHeader, EuiTitle, EuiSpacer, EuiTextColor, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
+import {
+  EuiPanel,
+  EuiPageHeader,
+  EuiTitle,
+  EuiSpacer,
+  EuiTextColor,
+  EuiFlexGroup,
+  EuiFlexItem,
+} from '@elastic/eui';
 import React, { useCallback, useState, useMemo } from 'react';
 
 import { RefreshInterval } from '../common/refresh_interval';
@@ -88,7 +96,6 @@ export const Monitoring = () => {
           </h3>
         </EuiTitle>
 
-
         <EuiSpacer />
         <EuiFlexGroup gutterSize="l">
           <EuiFlexItem>
@@ -103,7 +110,6 @@ export const Monitoring = () => {
             )}
           </EuiFlexItem>
         </EuiFlexGroup>
-
 
         <ModelDeploymentTable
           noTable={pageStatus === 'empty'}
