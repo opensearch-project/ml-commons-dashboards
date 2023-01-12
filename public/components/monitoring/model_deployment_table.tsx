@@ -87,20 +87,29 @@ export const ModelDeploymentTable = ({
           if (respondingNodesCount === 0) {
             return (
               <EuiHealth color="danger">
-                Not responding on {planningNodesCount} of {planningNodesCount} nodes
+                <div>
+                  <span style={{ fontWeight: 600 }}>Not responding</span> on {planningNodesCount} of{' '}
+                  {planningNodesCount} nodes
+                </div>
               </EuiHealth>
             );
           }
           if (notRespondingNodesCount === 0) {
             return (
               <EuiHealth color="success">
-                Responding on {planningNodesCount} of {planningNodesCount} nodes
+                <div>
+                  <span style={{ fontWeight: 600 }}>Responding</span> on {planningNodesCount} of{' '}
+                  {planningNodesCount} nodes
+                </div>
               </EuiHealth>
             );
           }
           return (
             <EuiHealth color="warning">
-              Partially responding on {respondingNodesCount} of {planningNodesCount} nodes
+              <div>
+                <span style={{ fontWeight: 600 }}>Partially responding</span> on{' '}
+                {respondingNodesCount} of {planningNodesCount} nodes
+              </div>
             </EuiHealth>
           );
         },
