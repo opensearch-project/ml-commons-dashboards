@@ -102,7 +102,7 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
       onChange={handleTableChange}
       loading={loading}
       noItemsMessage={
-        loading ? <EuiEmptyPrompt body={<>Loading...</>} aria-label="loading nodes" /> : null
+        loading ? <EuiEmptyPrompt body={<>Loading...</>} aria-label="loading nodes" /> : undefined
       }
     />
   );
