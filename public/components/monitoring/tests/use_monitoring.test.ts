@@ -31,7 +31,7 @@ const mockMultiRecords = () => {
 };
 
 describe('useMonitoring', () => {
-  it('should return "loading" for pageStatus when loading and back to "normal" when loaded', async () => {
+  it('should return "loading" for pageStatus if data loading and will back to "normal" after data loaded', async () => {
     let resolveFn: Function;
     const promise = new Promise<ModelDeploymentProfile[]>((resolve) => {
       resolveFn = () => {
@@ -59,7 +59,7 @@ describe('useMonitoring', () => {
     expect(result.current.pageStatus).toBe('normal');
   });
 
-  it('should return consistent pageStatus and data after nameOrId and state filter applied', async () => {
+  it('should return consistent pageStatus and data after nameOrId and status filter applied', async () => {
     const { result, waitForValueToChange, waitFor } = renderHook(() => useMonitoring());
 
     act(() => {
@@ -89,23 +89,23 @@ describe('useMonitoring', () => {
     ]);
 
     act(() => {
-      result.current.searchByState(['partial-responding']);
+      result.current.searchByStatus(['partial-responding']);
     });
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.pageStatus).toBe('normal');
     expect(result.current.deployedModels).toEqual([
-      expect.objectContaining({ state: 'partial-responding' }),
+      expect.objectContaining({ status: 'partial-responding' }),
     ]);
 
     act(() => {
-      result.current.searchByState(['responding']);
+      result.current.searchByStatus(['responding']);
     });
     await waitFor(() => result.current.pageStatus === 'reset-filter');
     expect(result.current.pageStatus).toBe('reset-filter');
     expect(result.current.deployedModels).toEqual([]);
 
     act(() => {
-      result.current.clearNameStateFilter();
+      result.current.resetSearch();
     });
     await waitForValueToChange(() => result.current.pageStatus);
     expect(result.current.pageStatus).toBe('normal');
@@ -199,5 +199,47 @@ describe('useMonitoring', () => {
     });
     await waitForValueToChange(() => result.current.deployedModels);
     expect(APIProvider.getAPI('profile').getAllDeployedModels).toHaveBeenCalledTimes(2);
+  });
+
+  it('should return consistent allStatuses after data loaded or search by status', async () => {
+    mockMultiRecords();
+    const { result, waitForValueToChange } = renderHook(() => useMonitoring());
+    await waitForValueToChange(() => result.current.allStatuses);
+
+    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.searchByStatus(['partial-responding']);
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
+  });
+
+  it('should return consistent allStatuses after search by name id or reset', async () => {
+    mockMultiRecords();
+    const { result, waitForValueToChange } = renderHook(() => useMonitoring());
+    await waitForValueToChange(() => result.current.allStatuses);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.searchByNameOrId('1-name');
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.allStatuses).toEqual(['partial-responding']);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.searchByNameOrId('not-exists-model');
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.allStatuses).toEqual([]);
+
+    mockMultiRecords();
+    act(() => {
+      result.current.resetSearch();
+    });
+    await waitForValueToChange(() => result.current.pageStatus);
+    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
   });
 });
