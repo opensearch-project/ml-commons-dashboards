@@ -12,7 +12,7 @@ describe('<SearchBar />', () => {
     render(<SearchBar onSearch={() => {}} value="foo" />);
     expect(screen.getByPlaceholderText('Search by name or ID')).toBeInTheDocument();
   });
-  it('should searchbar changed when value changed', async () => {
+  it('should change searchbar value after outside value change', async () => {
     jest.useFakeTimers();
     const { rerender } = render(<SearchBar onSearch={() => {}} value="" />);
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
@@ -26,13 +26,13 @@ describe('<SearchBar />', () => {
   });
   it('should callback onSearch in 200ms when type', async () => {
     jest.useFakeTimers();
-    const searchByNameOrId = jest.fn();
+    const onSearch = jest.fn();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    render(<SearchBar onSearch={searchByNameOrId} value="foo" />);
+    render(<SearchBar onSearch={onSearch} value="foo" />);
     await user.type(screen.getByPlaceholderText('Search by name or ID'), 'foo');
-    expect(searchByNameOrId).not.toHaveBeenCalled();
+    expect(onSearch).not.toHaveBeenCalled();
     jest.advanceTimersByTime(200);
-    expect(searchByNameOrId).toHaveBeenCalled();
+    expect(onSearch).toHaveBeenCalled();
     jest.useRealTimers();
   });
 });

@@ -51,17 +51,14 @@ const setup = (
     ],
     allStatuses: ['responding'],
     reload: jest.fn(),
-
     searchByNameOrId: jest.fn(),
     searchByStatus: jest.fn(),
-
     updateDeployedModel: jest.fn(),
     resetSearch: jest.fn(),
     handleTableChange: jest.fn(),
     ...monitoringReturnValue,
   } as ReturnType<typeof useMonitoringExports.useMonitoring>;
   jest.spyOn(useMonitoringExports, 'useMonitoring').mockReturnValueOnce(finalMonitoringReturnValue);
-
   render(<Monitoring />);
   return { finalMonitoringReturnValue, user };
 };

@@ -6,7 +6,7 @@ import React, { useState, useMemo } from 'react';
 import { useEffect } from 'react';
 import { EuiFieldSearch } from '@elastic/eui';
 import { debounce } from 'lodash';
-export interface SearchBarProps {
+interface SearchBarProps {
   onSearch: (value: string) => void;
   value: string;
 }

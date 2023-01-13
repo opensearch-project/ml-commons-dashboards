@@ -96,20 +96,20 @@ export const Monitoring = () => {
           </h3>
         </EuiTitle>
 
-        <EuiSpacer />
-        <EuiFlexGroup gutterSize="l">
-          <EuiFlexItem>
-            <SearchBar onSearch={searchByNameOrId} value={params.nameOrId ?? ''} />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            {pageStatus !== 'empty' && (
-              <>
+        <EuiSpacer size="m" />
+        {pageStatus !== 'empty' && (
+          <>
+            <EuiFlexGroup gutterSize="l">
+              <EuiFlexItem>
+                <SearchBar onSearch={searchByNameOrId} value={params.nameOrId ?? ''} />
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
                 <StatusFilter options={statusFilterOptions} onUpdateFilters={handleFilterUpdate} />
-                <EuiSpacer size="m" />
-              </>
-            )}
-          </EuiFlexItem>
-        </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size="m" />
+          </>
+        )}
 
         <ModelDeploymentTable
           noTable={pageStatus === 'empty'}
@@ -134,8 +134,6 @@ export const Monitoring = () => {
             }}
           />
         ) : null}
-
-        <EuiSpacer />
       </EuiPanel>
     </div>
   );
