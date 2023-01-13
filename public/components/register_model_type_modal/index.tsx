@@ -104,6 +104,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
                       </p>
                     </div>
                   }
+                  aria-label="Opensearch model repository"
                   checked={modelSource === ModelSource.USER_MODEL}
                   onChange={() => setModelSource(ModelSource.USER_MODEL)}
                 />
@@ -121,6 +122,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
                       </p>
                     </div>
                   }
+                  aria-label="Add your own model"
                   checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
                   onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
                 />
