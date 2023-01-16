@@ -12,21 +12,15 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useState } from 'react';
 
 import { RefreshInterval } from '../common/refresh_interval';
-import { StatusFilter, IOption } from '../status_filter';
 import { PreviewPanel, PreviewModel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
 import { ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
 import { SearchBar } from './search_bar';
-
-const statusFilterOrder = {
-  responding: 0,
-  'partial-responding': 1,
-  'not-responding': 2,
-} as const;
+import { ModelStatusFilter } from './model_status_filter';
 
 export const Monitoring = () => {
   const {
@@ -34,7 +28,6 @@ export const Monitoring = () => {
     params,
     pagination,
     deployedModels,
-    allStatuses,
     handleTableChange,
     resetSearch,
     searchByNameOrId,
@@ -42,29 +35,6 @@ export const Monitoring = () => {
     searchByStatus,
   } = useMonitoring();
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
-  const statusFilterOptions = useMemo(
-    () =>
-      allStatuses
-        .sort((a, b) => statusFilterOrder[a] - statusFilterOrder[b])
-        .map((status) => ({
-          value: status,
-          checked: params.status?.includes(status) ? ('on' as const) : undefined,
-        })),
-    [allStatuses, params.status]
-  );
-
-  const onRefresh = useCallback(() => {
-    reload();
-  }, [reload]);
-
-  const handleFilterUpdate = useCallback(
-    (newOptions: IOption[]) => {
-      searchByStatus(
-        newOptions.filter(({ checked }) => checked === 'on').map(({ value }) => value)
-      );
-    },
-    [searchByStatus]
-  );
 
   return (
     <div>
@@ -75,7 +45,7 @@ export const Monitoring = () => {
         pageTitle="Overview"
         rightSideItems={[
           <div style={{ backgroundColor: '#fff' }}>
-            <RefreshInterval onRefresh={onRefresh} />
+            <RefreshInterval onRefresh={reload} />
           </div>,
         ]}
       />
@@ -104,7 +74,7 @@ export const Monitoring = () => {
                 <SearchBar onSearch={searchByNameOrId} value={params.nameOrId ?? ''} />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <StatusFilter options={statusFilterOptions} onUpdateFilters={handleFilterUpdate} />
+                <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size="m" />

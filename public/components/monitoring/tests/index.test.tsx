@@ -9,6 +9,7 @@ import React from 'react';
 import { render, screen, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
+import { ModelAggregate } from '../../../apis/model_aggregate';
 
 const setup = (
   monitoringReturnValue?: Partial<ReturnType<typeof useMonitoringExports.useMonitoring>>
@@ -58,7 +59,7 @@ const setup = (
     handleTableChange: jest.fn(),
     ...monitoringReturnValue,
   } as ReturnType<typeof useMonitoringExports.useMonitoring>;
-  jest.spyOn(useMonitoringExports, 'useMonitoring').mockReturnValueOnce(finalMonitoringReturnValue);
+  jest.spyOn(useMonitoringExports, 'useMonitoring').mockReturnValue(finalMonitoringReturnValue);
   render(<Monitoring />);
   return { finalMonitoringReturnValue, user };
 };
@@ -221,14 +222,14 @@ describe('<Monitoring />', () => {
 
     const {
       finalMonitoringReturnValue: { searchByStatus },
-    } = setup({
-      allStatuses: ['partial-responding', 'responding', 'not-responding'],
-    });
+    } = setup({});
 
     await userEvent.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
     const allStatusFilterOptions = within(
       screen.getByRole('listbox', { name: 'Status' })
     ).getAllByRole('option');
+
+    // Model status filter only shows 3 selected status for filtering
     expect(allStatusFilterOptions.length).toBe(3);
     expect(within(allStatusFilterOptions[0]).getByText('Responding')).toBeInTheDocument();
     expect(within(allStatusFilterOptions[1]).getByText('Partially responding')).toBeInTheDocument();

@@ -22,6 +22,7 @@ export interface IOption {
 interface Props {
   options: IOption[];
   onUpdateFilters: (filters: IOption[]) => void;
+  loading?: boolean;
 }
 interface IItem {
   label: string;
@@ -31,7 +32,7 @@ interface IItem {
   value: STATUS_VALUE;
 }
 
-export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
+export const StatusFilter = ({ onUpdateFilters, options, loading }: Props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const items = useMemo<IItem[]>(() => {
@@ -72,6 +73,7 @@ export const StatusFilter = ({ onUpdateFilters, options }: Props) => {
       numFilters={items.length}
       hasActiveFilters={!!items.find((item) => item.checked === 'on')}
       numActiveFilters={items.filter((item) => item.checked === 'on').length}
+      isLoading={loading}
     >
       Status
     </EuiFilterButton>

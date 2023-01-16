@@ -18,7 +18,7 @@ export interface ModelAggregateSearchItem {
   created_time?: number;
 }
 
-export interface ModelAggregateSearchResponse {
+interface ModelAggregateSearchResponse {
   data: ModelAggregateSearchItem[];
   pagination: Pagination;
 }
