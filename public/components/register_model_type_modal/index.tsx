@@ -143,10 +143,16 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
             options={options}
             selectedOptions={modelRepoSelection}
             onChange={onChange}
+            aria-label="Select modal"
           />
         </EuiModalBody>
         <EuiModalFooter>
-          <EuiButton color="primary" iconSide="right" onClick={() => onCloseModal()}>
+          <EuiButton
+            color="primary"
+            iconSide="right"
+            onClick={() => onCloseModal()}
+            data-test-subj="cancel button"
+          >
             Cancel
           </EuiButton>
           <EuiButton
@@ -155,6 +161,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
             onClick={() => {
               handleContinue(modelSource);
             }}
+            data-test-subj="continue button"
           >
             Continue
           </EuiButton>
