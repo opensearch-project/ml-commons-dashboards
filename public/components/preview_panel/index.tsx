@@ -13,7 +13,7 @@ import {
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
   EuiSpacer,
-  EuiText,
+  EuiTextColor,
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { ModelDeploymentProfile } from '../../apis/profile';
@@ -39,7 +39,7 @@ interface Props {
 
 export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
   const { id, name } = model;
-  const { data } = useFetcher(APIProvider.getAPI('profile').getModel, id);
+  const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
     const targetNodes = data?.target_node_ids ?? [];
     const deployedNodes = data?.deployed_node_ids ?? [];
@@ -50,8 +50,12 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
   }, [data]);
 
   const respondingStatus = useMemo(() => {
-    if (!data) {
-      return <EuiText style={{ color: '#6A717D' }}>Loading...</EuiText>;
+    if (loading) {
+      return (
+        <EuiTextColor color="subdued" data-test-subj="preview-panel-color-loading-text">
+          Loading...
+        </EuiTextColor>
+      );
     }
     const deployedNodesNum = data?.deployed_node_ids?.length ?? 0;
     const targetNodesNum = data?.target_node_ids?.length ?? 0;
@@ -62,7 +66,7 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
     } else {
       return `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
     }
-  }, [data]);
+  }, [data, loading]);
 
   useEffect(() => {
     if (data) {
@@ -87,7 +91,7 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
           <EuiDescriptionListDescription>{respondingStatus}</EuiDescriptionListDescription>
         </EuiDescriptionList>
         <EuiSpacer />
-        <NodesTable loading={!data} nodes={nodes} />
+        <NodesTable loading={loading} nodes={nodes} />
       </EuiFlyoutBody>
     </EuiFlyout>
   );
