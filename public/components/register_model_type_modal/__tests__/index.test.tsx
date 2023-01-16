@@ -24,32 +24,19 @@ describe('<RegisterModelTypeModal />', () => {
     await userEvent.click(screen.getByTestId('cancel button'));
     expect(onClickMock).toHaveBeenCalled();
   });
-  it('should call drop-down list after click "Select modal"', async () => {
+  it('should call drop-down list and link to url with selected option after click "Select modal" and continue', async () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} />);
+    await userEvent.click(screen.getByLabelText('Opensearch model repository'));
     await userEvent.click(screen.getByLabelText('Open list of options'));
     expect(screen.getByTestId('titanOption')).toBeInTheDocument();
     await userEvent.click(screen.getByTestId('titanOption'));
     expect(screen.getByTestId('comboBoxInput')).toHaveTextContent('Titan');
     await userEvent.click(screen.getByTestId('continue button'));
-    expect(
-      document.URL.includes('/model-registry/register-model?name=Titan&version=Titan')
-    ).toEqual(true);
+    expect(document.URL).toContain('model-registry/register-model?name=Titan&version=Titan');
   });
-  // it('should link href after click "continue"', async () => {
-  //   render(<RegisterModelTypeModal onCloseModal={() => {}} />);
-  //   expect(
-  //     screen.getByLabelText('Add your own model')
-  //   ).toBeInTheDocument();
-  //   await userEvent.click(screen.getByTestId('continue button'));
-  //   expect(document.URL.includes('/model-registry/register-model')).toEqual(true);
-  // });
-  // it('should call onClick with null after click continue', async () => {
-  //   const onClickMock = jest.fn();
-  //   render(<RegisterModelTypeModal onCloseModal={() => {}} />);
-  //   expect(
-  //     screen.getByText('Add your own modal', { selector: 'EuiCheckableCard' })
-  //   ).toBeInTheDocument();
-  //   await userEvent.click(screen.getByText('Continue', { selector: 'EuiButton' }));
-  //   expect(document.URL.includes('/model-registry/register-model')).toEqual(true);
-  // });
+  it('should link href after selecting "add your own model" and continue ', async () => {
+    render(<RegisterModelTypeModal onCloseModal={() => {}} />);
+    await userEvent.click(screen.getByTestId('continue button'));
+    expect(document.URL).toEqual('http://localhost/model-registry/register-model');
+  });
 });
