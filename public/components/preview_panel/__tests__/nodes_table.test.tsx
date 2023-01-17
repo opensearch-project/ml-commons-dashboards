@@ -19,9 +19,9 @@ const NODES = [
   },
 ];
 
-function setup({ nodes = NODES }) {
+function setup({ nodes = NODES, loading = false }) {
   const user = userEvent.setup({});
-  render(<NodesTable nodes={nodes} />);
+  render(<NodesTable nodes={nodes} loading={loading} />);
   return { user };
 }
 
@@ -59,5 +59,10 @@ describe('<NodesTable />', () => {
     const cells = columnContent!;
     expect(within(cells[0] as HTMLElement).getByText('id2')).toBeInTheDocument();
     expect(within(cells[1] as HTMLElement).getByText('id1')).toBeInTheDocument();
+  });
+
+  it('should render loading state when loading is true', () => {
+    setup({ nodes: [], loading: true });
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 });
