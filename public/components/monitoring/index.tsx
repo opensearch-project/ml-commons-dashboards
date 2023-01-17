@@ -72,7 +72,7 @@ export const Monitoring = () => {
       <EuiSpacer size="s" />
       <EuiSpacer size="xs" />
       <EuiPageHeader
-        pageTitle="Monitoring"
+        pageTitle="Overview"
         rightSideItems={[
           <div style={{ backgroundColor: '#fff' }}>
             <RefreshInterval onRefresh={onRefresh} />
