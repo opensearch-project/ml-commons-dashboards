@@ -29,7 +29,6 @@ import { RecordNotFoundError } from './errors';
 import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
 
 const modelSortFieldMapping: { [key: string]: string } = {
-  trainTime: 'model_train_time',
   version: 'model_version',
 };
 
@@ -85,10 +84,7 @@ export class ModelService {
     algorithms?: string[];
     ids?: string[];
     pagination: RequestPagination;
-    context?: Record<string, Array<string | number>>;
-    trainedStart?: number;
-    trainedEnd?: number;
-    sort?: Array<'trainTime-desc' | 'trainTime-asc' | 'version-desc' | 'version-asc'>;
+    sort?: Array<'version-desc' | 'version-asc'>;
     name?: string;
   }) {
     const { hits } = await this.osClient

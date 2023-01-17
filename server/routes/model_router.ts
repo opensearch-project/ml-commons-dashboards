@@ -16,8 +16,6 @@ import {
 } from './constants';
 
 const modelSortQuerySchema = schema.oneOf([
-  schema.literal('trainTime-desc'),
-  schema.literal('trainTime-asc'),
   schema.literal('version-desc'),
   schema.literal('version-asc'),
 ]);
@@ -59,25 +57,8 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
             schema.oneOf([schema.string(), schema.arrayOf(schema.string())])
           ),
           ids: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
-          context: schema.maybe(
-            schema.string({
-              validate: (value) => {
-                const errorMessage = 'must be a object stringify json';
-                try {
-                  const context = JSON.parse(value);
-                  if (typeof context !== 'object') {
-                    return errorMessage;
-                  }
-                } catch (err) {
-                  return errorMessage;
-                }
-              },
-            })
-          ),
           currentPage: schema.number(),
           pageSize: schema.number(),
-          trainedStart: schema.maybe(schema.number()),
-          trainedEnd: schema.maybe(schema.number()),
           sort: schema.maybe(
             schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
           ),
@@ -85,28 +66,13 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
       },
     },
     async (_context, request) => {
-      const {
-        algorithms,
-        ids,
-        currentPage,
-        pageSize,
-        context: contextInQuery,
-        trainedStart,
-        trainedEnd,
-        sort,
-        name,
-      } = request.query;
+      const { algorithms, ids, currentPage, pageSize, sort, name } = request.query;
       try {
         const payload = await modelService.search({
           request,
           algorithms: typeof algorithms === 'string' ? [algorithms] : algorithms,
           ids: typeof ids === 'string' ? [ids] : ids,
           pagination: { currentPage, pageSize },
-          context: contextInQuery
-            ? ((JSON.parse(contextInQuery) as unknown) as Record<string, Array<string | number>>)
-            : undefined,
-          trainedStart,
-          trainedEnd,
           sort: typeof sort === 'string' ? [sort] : sort,
           name,
         });
