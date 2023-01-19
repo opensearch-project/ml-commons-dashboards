@@ -9,6 +9,9 @@ export enum MODEL_STATE {
   unloaded = 'UNLOADED',
   uploaded = 'UPLOADED',
   uploading = 'UPLOADING',
+  loading = 'LOADING',
+  partialLoaded = 'PARTIAL_LOADED',
+  loadFailed = 'LOAD_FAILED',
 }
 
 export interface OpenSearchModelBase {
@@ -42,3 +45,5 @@ export interface OpenSearchCustomerModel extends OpenSearchModelBase {
   total_chunks: number;
   version: number;
 }
+
+export type ModelSearchSort = 'version-desc' | 'version-asc' | 'name-asc' | 'name-desc';

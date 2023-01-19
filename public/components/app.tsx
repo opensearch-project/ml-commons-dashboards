@@ -17,7 +17,6 @@ import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/
 import { DataPublicPluginStart } from '../../../../src/plugins/data/public';
 
 import { GlobalBreadcrumbs } from './global_breadcrumbs';
-import { useIndexPatterns } from '../hooks';
 
 interface MlCommonsPluginAppDeps {
   basename: string;
@@ -42,7 +41,6 @@ export const MlCommonsPluginApp = ({
   chrome,
   data,
 }: MlCommonsPluginAppDeps) => {
-  useIndexPatterns(data);
   // Render the application DOM.
   // Note that `navigation.ui.TopNavMenu` is a stateful component exported on the `navigation` plugin's start contract.
   return (

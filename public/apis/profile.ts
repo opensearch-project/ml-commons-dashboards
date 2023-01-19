@@ -16,12 +16,6 @@ export interface ModelDeploymentProfile {
 }
 
 export class Profile {
-  public getAllDeployedModels() {
-    return InnerHttpProvider.getHttp().get<ModelDeploymentProfile[]>(
-      DEPLOYED_MODEL_PROFILE_API_ENDPOINT
-    );
-  }
-
   public getModel(modelId: string) {
     return InnerHttpProvider.getHttp().get<ModelDeploymentProfile>(
       `${DEPLOYED_MODEL_PROFILE_API_ENDPOINT}/${modelId}`

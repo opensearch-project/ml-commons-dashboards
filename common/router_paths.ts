@@ -4,11 +4,6 @@
  */
 
 export const routerPaths = {
-  predict: '/predict/:id?',
   modelList: '/model-list',
-  taskList: '/task-list',
-  train: '/train',
-  modelDetail: '/model/detail/:id',
-  modelUpload: '/model/upload',
   registerModel: '/model-registry/register-model',
 };
