@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import {
   EuiFlyout,
   EuiFlyoutBody,
@@ -16,7 +16,6 @@ import {
   EuiTextColor,
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
-import { ModelDeploymentProfile } from '../../apis/profile';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { NodesTable } from './nodes_table';
 import { CopyableText } from '../common';
@@ -34,10 +33,9 @@ export interface PreviewModel {
 interface Props {
   onClose: () => void;
   model: PreviewModel;
-  onUpdateData: (data: ModelDeploymentProfile) => void;
 }
 
-export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
+export const PreviewPanel = ({ onClose, model }: Props) => {
   const { id, name } = model;
   const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
@@ -67,12 +65,6 @@ export const PreviewPanel = ({ onClose, model, onUpdateData }: Props) => {
       return `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
     }
   }, [data, loading]);
-
-  useEffect(() => {
-    if (data) {
-      onUpdateData(data);
-    }
-  }, [data, onUpdateData]);
 
   return (
     <EuiFlyout onClose={onClose}>
