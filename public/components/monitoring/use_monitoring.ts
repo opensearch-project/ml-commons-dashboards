@@ -8,8 +8,7 @@ import { useMemo, useCallback, useState } from 'react';
 import { APIProvider } from '../../apis/api_provider';
 import { ModelDeploymentProfile } from '../../apis/profile';
 import { useFetcher } from '../../hooks/use_fetcher';
-
-type ModelDeployStatus = 'responding' | 'not-responding' | 'partial-responding';
+import { ModelDeployStatus } from './types';
 
 interface Params {
   nameOrId?: string;
