@@ -9,7 +9,6 @@ import React from 'react';
 import { render, screen, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
-import { ModelAggregate } from '../../../apis/model_aggregate';
 
 const setup = (
   monitoringReturnValue?: Partial<ReturnType<typeof useMonitoringExports.useMonitoring>>
