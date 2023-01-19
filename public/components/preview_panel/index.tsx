@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   EuiFlyout,
   EuiFlyoutBody,
@@ -19,6 +19,7 @@ import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { NodesTable } from './nodes_table';
 import { CopyableText } from '../common';
+import { ModelDeploymentProfile } from '../../apis/profile';
 
 export interface INode {
   id: string;
@@ -31,7 +32,7 @@ export interface PreviewModel {
 }
 
 interface Props {
-  onClose: () => void;
+  onClose: (data: ModelDeploymentProfile | null) => void;
   model: PreviewModel;
 }
 
@@ -66,8 +67,12 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
     }
   }, [data, loading]);
 
+  const onCloseFlyout = useCallback(() => {
+    onClose(data);
+  }, [onClose, data]);
+
   return (
-    <EuiFlyout onClose={onClose}>
+    <EuiFlyout onClose={onCloseFlyout}>
       <EuiFlyoutHeader>
         <EuiTitle size="s">
           <h3>{name}</h3>
