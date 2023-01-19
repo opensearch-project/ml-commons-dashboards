@@ -27,29 +27,13 @@ export class ProfileService {
   static convertModel(model: OpenSearchMLCommonsProfile['models']['key'], id: string) {
     return {
       id,
-      name: model.model_name,
-      target_node_ids: model.target_node_ids,
-      deployed_node_ids: model.target_node_ids.filter(
-        (nodeId) => !model.not_deployed_node_ids?.includes(nodeId)
-      ),
-      not_deployed_node_ids: model.not_deployed_node_ids ?? [],
+      // TODO:remove mock name for model list after model list api update
+      name: 'mock-value',
+      target_node_ids: model.target_worker_nodes,
+      deployed_node_ids: model.worker_nodes,
+      not_deployed_node_ids:
+        model.target_worker_nodes.filter((nodeId) => !model.worker_nodes?.includes(nodeId)) ?? [],
     };
-  }
-  public static async getAllDeployedModels(params: { client: IScopedClusterClient }) {
-    const { client } = params;
-    const result = (
-      await client.asCurrentUser.transport.request({
-        method: 'GET',
-        path: `${PROFILE_BASE_API}?profile_and_deployment=deployment`,
-      })
-    ).body as OpenSearchMLCommonsProfile;
-    if (!result.models) {
-      return [];
-    }
-    return Object.keys(result.models).map((id) => {
-      const model = result.models[id];
-      return this.convertModel(model, id);
-    });
   }
 
   public static async getModel(params: { client: IScopedClusterClient; modelId: string }) {
@@ -57,7 +41,7 @@ export class ProfileService {
     const result = (
       await client.asCurrentUser.transport.request({
         method: 'GET',
-        path: `${PROFILE_BASE_API}/models/${modelId}?profile_and_deployment=deployment`,
+        path: `${PROFILE_BASE_API}/models/${modelId}?view=model`,
       })
     ).body as OpenSearchMLCommonsProfile;
     if (!result.models) {
