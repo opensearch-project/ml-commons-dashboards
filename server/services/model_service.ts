@@ -23,7 +23,7 @@ import {
   IScopedClusterClient,
   ScopeableRequest,
 } from '../../../../src/core/server';
-import { MODEL_STATE } from '../../common';
+import { MODEL_STATE, ModelSearchSort } from '../../common';
 
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { convertModelSource, generateModelSearchQuery } from './utils/model';
@@ -87,7 +87,7 @@ export class ModelService {
     algorithms?: string[];
     ids?: string[];
     pagination: RequestPagination;
-    sort?: Array<'version-desc' | 'version-asc' | 'name-asc' | 'name-desc'>;
+    sort?: ModelSearchSort[];
     name?: string;
     states?: MODEL_STATE[];
     nameOrId?: string;

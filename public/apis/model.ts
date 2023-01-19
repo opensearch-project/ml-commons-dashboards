@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE } from '../../common';
+import { MODEL_STATE, ModelSearchSort } from '../../common';
 import {
   MODEL_API_ENDPOINT,
   MODEL_LOAD_API_ENDPOINT,
@@ -86,7 +86,7 @@ export class Model {
   public search(query: {
     algorithms?: string[];
     ids?: string[];
-    sort?: Array<'version-desc' | 'version-asc' | 'name-asc' | 'name-desc'>;
+    sort?: ModelSearchSort[];
     name?: string;
     currentPage: number;
     pageSize: number;
