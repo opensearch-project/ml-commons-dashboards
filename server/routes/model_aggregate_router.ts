@@ -8,7 +8,7 @@ import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/co
 import { ModelAggregateService } from '../services/model_aggregate_service';
 import { MODEL_AGGREGATE_API_ENDPOINT } from './constants';
 
-export const modelAlgregateRouter = (router: IRouter) => {
+export const modelAggregateRouter = (router: IRouter) => {
   router.get(
     {
       path: MODEL_AGGREGATE_API_ENDPOINT,
