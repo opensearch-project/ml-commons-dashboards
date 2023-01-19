@@ -5,241 +5,178 @@
 
 import { act, renderHook } from '@testing-library/react-hooks';
 
-import { ModelDeploymentProfile } from '../../../apis/profile';
-import { APIProvider } from '../../../apis/api_provider';
+import { ModelSearchItem, Model, ModelSearchResponse } from '../../../apis/model';
 import { useMonitoring } from '../use_monitoring';
 
-jest.mock('../../../apis/profile');
+jest.mock('../../../apis/model');
 
-const mockMultiRecords = () => {
-  jest.spyOn(APIProvider.getAPI('profile'), 'getAllDeployedModels').mockResolvedValueOnce([
-    {
-      id: 'model-1-id',
-      name: 'model-1-name',
-      target_node_ids: ['node-1', 'node-2', 'node-3'],
-      deployed_node_ids: ['node-1', 'node-2'],
-      not_deployed_node_ids: ['node-3'],
+const mockEmptyRecords = () =>
+  jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
+    data: [],
+    pagination: {
+      currentPage: 0,
+      pageSize: 15,
+      totalRecords: 0,
+      totalPages: 0,
     },
-    {
-      id: 'model-2-id',
-      name: 'model-2-name',
-      target_node_ids: ['node-1', 'node-2', 'node-3'],
-      deployed_node_ids: ['node-1', 'node-2', 'node-3'],
-      not_deployed_node_ids: [],
-    },
-  ]);
-};
-
-describe('useMonitoring', () => {
-  it('should return "loading" for pageStatus if data loading and will back to "normal" after data loaded', async () => {
-    let resolveFn: Function;
-    const promise = new Promise<ModelDeploymentProfile[]>((resolve) => {
-      resolveFn = () => {
-        resolve([
-          {
-            id: 'model-1-id',
-            name: 'model-1-name',
-            target_node_ids: ['node-1', 'node-2', 'node-3'],
-            deployed_node_ids: ['node-1', 'node-2'],
-            not_deployed_node_ids: ['node-3'],
-          },
-        ]);
-      };
-    });
-    jest.spyOn(APIProvider.getAPI('profile'), 'getAllDeployedModels').mockReturnValueOnce(promise);
-    const { result } = renderHook(() => useMonitoring());
-
-    expect(result.current.pageStatus).toBe('loading');
-
-    await act(async () => {
-      resolveFn!();
-      await promise;
-    });
-
-    expect(result.current.pageStatus).toBe('normal');
   });
 
-  it('should return consistent pageStatus and data after nameOrId and status filter applied', async () => {
-    const { result, waitForValueToChange, waitFor } = renderHook(() => useMonitoring());
+describe('useMonitoring', () => {
+  afterEach(() => {
+    jest.spyOn(Model.prototype, 'search').mockClear();
+  });
+  describe('pageStatus', () => {
+    it("should return 'loading' if data loading and will back to 'normal' after data loaded", async () => {
+      let resolveFn: Function;
+      const promise = new Promise<ModelSearchResponse>((resolve) => {
+        resolveFn = () => {
+          resolve({
+            data: [
+              {
+                id: 'model-1-id',
+                name: 'model-1-name',
+                current_worker_node_count: 1,
+                planning_worker_node_count: 3,
+              } as ModelSearchItem,
+            ],
+            pagination: {
+              currentPage: 1,
+              pageSize: 15,
+              totalRecords: 1,
+              totalPages: 1,
+            },
+          });
+        };
+      });
+      jest.spyOn(Model.prototype, 'search').mockReturnValueOnce(promise);
+      const { result } = renderHook(() => useMonitoring());
+
+      expect(result.current.pageStatus).toBe('loading');
+
+      await act(async () => {
+        resolveFn!();
+        await promise;
+      });
+
+      expect(result.current.pageStatus).toBe('normal');
+    });
+
+    it("should return 'reset-filter' and empty data after filter applied", async () => {
+      const { result, waitForValueToChange, waitFor } = renderHook(() => useMonitoring());
+
+      await waitFor(() => result.current.pageStatus === 'normal');
+
+      mockEmptyRecords();
+      act(() => {
+        result.current.searchByNameOrId('foo');
+      });
+
+      await waitForValueToChange(() => result.current.pageStatus);
+      expect(result.current.pageStatus).toBe('reset-filter');
+      expect(result.current.deployedModels).toEqual([]);
+
+      act(() => {
+        result.current.resetSearch();
+      });
+      await waitFor(() => result.current.pageStatus === 'normal');
+
+      mockEmptyRecords();
+      act(() => {
+        result.current.searchByStatus(['responding']);
+      });
+      await waitForValueToChange(() => result.current.pageStatus);
+      expect(result.current.pageStatus).toBe('reset-filter');
+      expect(result.current.deployedModels).toEqual([]);
+    });
+
+    it("should return 'empty' if empty data return", async () => {
+      mockEmptyRecords();
+      const { result, waitFor } = renderHook(() => useMonitoring());
+
+      await waitFor(() => result.current.pageStatus === 'empty');
+      expect(result.current.pageStatus).toBe('empty');
+    });
+  });
+
+  it('should call search API with consistent nameOrId and states after filter applied', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => result.current.pageStatus === 'normal');
 
     act(() => {
       result.current.searchByNameOrId('foo');
     });
-
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.pageStatus).toBe('reset-filter');
-    expect(result.current.deployedModels).toEqual([]);
-
-    act(() => {
-      result.current.searchByNameOrId('moDel');
-    });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.pageStatus).toBe('normal');
-    expect(result.current.deployedModels).toEqual([
-      expect.objectContaining({ name: expect.stringContaining('model') }),
-    ]);
-
-    act(() => {
-      result.current.searchByNameOrId('1-id');
-    });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.pageStatus).toBe('normal');
-    expect(result.current.deployedModels).toEqual([
-      expect.objectContaining({ id: expect.stringContaining('model-1-id') }),
-    ]);
-
-    act(() => {
-      result.current.searchByStatus(['partial-responding']);
-    });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.pageStatus).toBe('normal');
-    expect(result.current.deployedModels).toEqual([
-      expect.objectContaining({ status: 'partial-responding' }),
-    ]);
+    await waitFor(() => result.current.pageStatus === 'normal');
+    expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        nameOrId: 'foo',
+        states: ['LOAD_FAILED', 'LOADED', 'PARTIAL_LOADED'],
+      })
+    );
 
     act(() => {
       result.current.searchByStatus(['responding']);
     });
-    await waitFor(() => result.current.pageStatus === 'reset-filter');
-    expect(result.current.pageStatus).toBe('reset-filter');
-    expect(result.current.deployedModels).toEqual([]);
+    await waitFor(() => result.current.pageStatus === 'normal');
+    expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        nameOrId: 'foo',
+        states: ['LOADED'],
+      })
+    );
 
     act(() => {
       result.current.resetSearch();
     });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.pageStatus).toBe('normal');
-    expect(result.current.deployedModels).toEqual([expect.objectContaining({ id: 'model-1-id' })]);
-
-    jest.spyOn(APIProvider.getAPI('profile'), 'getAllDeployedModels').mockResolvedValueOnce([]);
-
-    act(() => {
-      result.current.reload();
-    });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.pageStatus).toBe('empty');
-  });
-
-  it('should return consistent data after order change', async () => {
-    mockMultiRecords();
-    const { result, waitFor, waitForValueToChange } = renderHook(() => useMonitoring());
-
-    await waitFor(() => result.current.deployedModels.length > 0);
-    expect(result.current.deployedModels).toEqual([
-      expect.objectContaining({ id: 'model-1-id' }),
-      expect.objectContaining({ id: 'model-2-id' }),
-    ]);
-    expect(result.current.params.sort).toEqual({ field: 'name', direction: 'asc' });
-
-    mockMultiRecords();
-    act(() => {
-      result.current.handleTableChange({
-        sort: { field: 'name', direction: 'desc' },
-        pagination: { currentPage: 1, pageSize: 15 },
-      });
-    });
-    await waitForValueToChange(() => result.current.deployedModels);
-    expect(result.current.deployedModels).toEqual([
-      expect.objectContaining({ id: 'model-2-id' }),
-      expect.objectContaining({ id: 'model-1-id' }),
-    ]);
-    expect(result.current.params.sort).toEqual({ field: 'name', direction: 'desc' });
-  });
-
-  it('should return consistent data after pagination change', async () => {
-    mockMultiRecords();
-    const { result, waitFor, waitForValueToChange } = renderHook(() => useMonitoring());
-    act(() => {
-      result.current.handleTableChange({
-        pagination: { currentPage: 1, pageSize: 1 },
-        sort: { field: 'name', direction: 'asc' },
-      });
-    });
-    await waitFor(() => result.current.deployedModels.length === 1);
-    expect(result.current.deployedModels).toEqual([expect.objectContaining({ id: 'model-1-id' })]);
-
-    mockMultiRecords();
-    act(() => {
-      result.current.handleTableChange({
-        pagination: { currentPage: 2, pageSize: 1 },
-        sort: { field: 'name', direction: 'asc' },
-      });
-    });
-    await waitForValueToChange(() => result.current.deployedModels);
-    expect(result.current.deployedModels).toEqual([expect.objectContaining({ id: 'model-2-id' })]);
-  });
-
-  it('should return consistent data after model update', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
-    await waitFor(() => result.current.deployedModels.length > 0);
-    act(() => {
-      result.current.updateDeployedModel({
-        id: 'model-1-id',
-        name: 'model-1-name',
-        target_node_ids: ['node-1', 'node-2', 'node-3'],
-        deployed_node_ids: ['node-1', 'node-2', 'node-3'],
-        not_deployed_node_ids: [],
-      });
-    });
-    expect(result.current.deployedModels).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ deployed_node_ids: ['node-1', 'node-2', 'node-3'] }),
-      ])
-    );
-  });
-
-  it('should call getAllDeployedModels twice after reload called', async () => {
-    jest.spyOn(APIProvider.getAPI('profile'), 'getAllDeployedModels').mockClear();
-    const { result, waitFor, waitForValueToChange } = renderHook(() => useMonitoring());
-    await waitFor(() => result.current.deployedModels.length > 0);
-    expect(APIProvider.getAPI('profile').getAllDeployedModels).toHaveBeenCalledTimes(1);
-
-    act(() => {
-      result.current.reload();
-    });
-    await waitForValueToChange(() => result.current.deployedModels);
-    expect(APIProvider.getAPI('profile').getAllDeployedModels).toHaveBeenCalledTimes(2);
-  });
-
-  it('should return consistent allStatuses after data loaded or search by status', async () => {
-    mockMultiRecords();
-    const { result, waitForValueToChange } = renderHook(() => useMonitoring());
-    await waitForValueToChange(() => result.current.allStatuses);
-
-    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
-
-    mockMultiRecords();
+    await waitFor(() => result.current.pageStatus === 'normal');
     act(() => {
       result.current.searchByStatus(['partial-responding']);
     });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
+    await waitFor(() => result.current.pageStatus === 'normal');
+    expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        states: ['PARTIAL_LOADED'],
+      })
+    );
   });
 
-  it('should return consistent allStatuses after search by name id or reset', async () => {
-    mockMultiRecords();
-    const { result, waitForValueToChange } = renderHook(() => useMonitoring());
-    await waitForValueToChange(() => result.current.allStatuses);
+  it('should call search API with consistent sort and pagination after table change', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
 
-    mockMultiRecords();
-    act(() => {
-      result.current.searchByNameOrId('1-name');
-    });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.allStatuses).toEqual(['partial-responding']);
+    await waitFor(() => result.current.pageStatus === 'normal');
+    expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: ['name-asc'],
+        currentPage: 1,
+        pageSize: 10,
+      })
+    );
 
-    mockMultiRecords();
     act(() => {
-      result.current.searchByNameOrId('not-exists-model');
+      result.current.handleTableChange({
+        sort: { field: 'name', direction: 'desc' },
+        pagination: { currentPage: 2, pageSize: 10 },
+      });
     });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.allStatuses).toEqual([]);
+    await waitFor(() => result.current.pageStatus === 'normal');
+    expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: ['name-desc'],
+        currentPage: 2,
+        pageSize: 10,
+      })
+    );
+  });
 
-    mockMultiRecords();
+  it('should call search API twice after reload called', async () => {
+    const { result, waitFor, waitForValueToChange } = renderHook(() => useMonitoring());
+    await waitFor(() => result.current.pageStatus === 'normal');
+    expect(Model.prototype.search).toHaveBeenCalledTimes(1);
+
     act(() => {
-      result.current.resetSearch();
+      result.current.reload();
     });
-    await waitForValueToChange(() => result.current.pageStatus);
-    expect(result.current.allStatuses).toEqual(['partial-responding', 'responding']);
+    await waitForValueToChange(() => result.current.pageStatus === 'normal');
+    expect(Model.prototype.search).toHaveBeenCalledTimes(2);
   });
 });

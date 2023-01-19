@@ -18,8 +18,6 @@ import {
   EuiLink,
 } from '@elastic/eui';
 
-import { ModelDeploymentProfile } from '../../apis/profile';
-
 export interface ModelDeploymentTableSort {
   field: 'name';
   direction: Direction;
@@ -30,8 +28,16 @@ export interface ModelDeploymentTableCriteria {
   sort?: ModelDeploymentTableSort;
 }
 
+interface ModelDeploymentItem {
+  id: string;
+  name: string;
+  respondingNodesCount: number | undefined;
+  planningNodesCount: number | undefined;
+  notRespondingNodesCount: number | undefined;
+}
+
 export interface ModelDeploymentTableProps {
-  items: ModelDeploymentProfile[];
+  items: ModelDeploymentItem[];
   loading?: boolean;
   noTable?: boolean;
   pagination?: {
@@ -69,29 +75,32 @@ export const ModelDeploymentTable = ({
         width: '338px',
         render: (
           _id: string,
-          {
-            deployed_node_ids: deployedIds,
-            not_deployed_node_ids: notDeployedIds,
-          }: ModelDeploymentProfile
+          { planningNodesCount, respondingNodesCount, notRespondingNodesCount }: ModelDeploymentItem
         ) => {
-          if (deployedIds.length === 0) {
+          if (
+            planningNodesCount === undefined ||
+            respondingNodesCount === undefined ||
+            notRespondingNodesCount === undefined
+          ) {
+            return '-';
+          }
+          if (respondingNodesCount === 0) {
             return (
               <EuiHealth color="danger">
-                Not responding on {notDeployedIds.length} of {notDeployedIds.length} nodes
+                Not responding on {planningNodesCount} of {planningNodesCount} nodes
               </EuiHealth>
             );
           }
-          if (notDeployedIds.length === 0) {
+          if (notRespondingNodesCount === 0) {
             return (
               <EuiHealth color="success">
-                Responding on {deployedIds.length} of {deployedIds.length} nodes
+                Responding on {planningNodesCount} of {planningNodesCount} nodes
               </EuiHealth>
             );
           }
           return (
             <EuiHealth color="warning">
-              Partially responding on {deployedIds.length} of{' '}
-              {deployedIds.length + notDeployedIds.length} nodes
+              Partially responding on {respondingNodesCount} of {planningNodesCount} nodes
             </EuiHealth>
           );
         },
@@ -121,7 +130,7 @@ export const ModelDeploymentTable = ({
         name: 'Action',
         align: 'right' as const,
         width: '120px',
-        render: (id: string, { name }: ModelDeploymentProfile) => {
+        render: (id: string, { name }: ModelDeploymentItem) => {
           return (
             <EuiButtonIcon
               onClick={() => {
@@ -154,7 +163,7 @@ export const ModelDeploymentTable = ({
   );
 
   const handleChange = useCallback(
-    (criteria: Criteria<ModelDeploymentProfile>) => {
+    (criteria: Criteria<ModelDeploymentItem>) => {
       onChange({
         ...(criteria.page
           ? { pagination: { currentPage: criteria.page.index + 1, pageSize: criteria.page.size } }

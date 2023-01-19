@@ -35,22 +35,6 @@ export class ProfileService {
       not_deployed_node_ids: model.not_deployed_node_ids ?? [],
     };
   }
-  public static async getAllDeployedModels(params: { client: IScopedClusterClient }) {
-    const { client } = params;
-    const result = (
-      await client.asCurrentUser.transport.request({
-        method: 'GET',
-        path: `${PROFILE_BASE_API}?profile_and_deployment=deployment`,
-      })
-    ).body as OpenSearchMLCommonsProfile;
-    if (!result.models) {
-      return [];
-    }
-    return Object.keys(result.models).map((id) => {
-      const model = result.models[id];
-      return this.convertModel(model, id);
-    });
-  }
 
   public static async getModel(params: { client: IScopedClusterClient; modelId: string }) {
     const { client, modelId } = params;
