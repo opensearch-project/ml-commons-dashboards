@@ -27,7 +27,7 @@ const isValidStatusFilter = (
 const checkFilterExists = (params: Params) =>
   isValidNameOrIdFilter(params.nameOrId) || isValidStatusFilter(params.status);
 
-const fetchAllDeployedModels = async (params: Params) => {
+const fetchDeployedModels = async (params: Params) => {
   const states = params.status?.map((status) => {
     switch (status) {
       case 'not-responding':
@@ -78,7 +78,7 @@ export const useMonitoring = () => {
     pageSize: 10,
     sort: { field: 'name', direction: 'asc' },
   });
-  const { data, loading, reload } = useFetcher(fetchAllDeployedModels, params);
+  const { data, loading, reload } = useFetcher(fetchDeployedModels, params);
   const filterExists = checkFilterExists(params);
   const totalRecords = data?.pagination.totalRecords;
   const deployedModels = useMemo(() => data?.data ?? [], [data]);
