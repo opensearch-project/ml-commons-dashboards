@@ -28,9 +28,8 @@ export interface OpenSearchMLCommonsProfile {
   };
   models: {
     [key: string]: {
-      model_name: string;
-      target_node_ids: string[];
-      not_deployed_node_ids?: string[];
+      target_worker_nodes: string[];
+      worker_nodes: string[];
     };
   };
 }
