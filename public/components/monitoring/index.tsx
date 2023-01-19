@@ -99,9 +99,6 @@ export const Monitoring = () => {
             onClose={() => {
               setPreviewModel(null);
             }}
-            onUpdateData={(data) => {
-              // TODO:update latest data
-            }}
           />
         ) : null}
       </EuiPanel>
