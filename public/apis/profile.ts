@@ -8,7 +8,8 @@ import { InnerHttpProvider } from './inner_http_provider';
 
 export interface ModelDeploymentProfile {
   id: string;
-  name: string;
+  //TODO: remove this property after model list api update
+  name?: string;
   target_node_ids: string[];
   deployed_node_ids: string[];
   not_deployed_node_ids: string[];
