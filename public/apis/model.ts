@@ -17,8 +17,6 @@ export interface ModelSearchItem {
   id: string;
   name: string;
   algorithm: string;
-  context: string;
-  trainTime: number;
   state: string;
   version: string;
 }
@@ -85,19 +83,13 @@ export class Model {
   public search(query: {
     algorithms?: string[];
     ids?: string[];
-    context?: { [key: string]: Array<string | number> };
-    trainedStart?: number;
-    trainedEnd?: number;
-    sort?: Array<'trainTime-desc' | 'trainTime-asc' | 'version-desc' | 'version-asc'>;
+    sort?: Array<'version-desc' | 'version-asc'>;
     name?: string;
     currentPage: number;
     pageSize: number;
   }) {
     return InnerHttpProvider.getHttp().get<ModelSarchResponse>(MODEL_API_ENDPOINT, {
-      query: {
-        ...query,
-        context: JSON.stringify(query.context),
-      },
+      query,
     });
   }
 

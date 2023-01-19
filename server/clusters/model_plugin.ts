@@ -49,24 +49,6 @@ export default function (Client: any, config: any, components: any) {
     },
   });
 
-  mlCommonsModel.predict = ca({
-    method: 'POST',
-    url: {
-      fmt: `${API_ROUTE_PREFIX}/_predict/<%=methodName%>/<%=modelId%>`,
-      req: {
-        methodName: {
-          type: 'string',
-          required: true,
-        },
-        modelId: {
-          type: 'string',
-          required: true,
-        },
-      },
-      needBody: true,
-    },
-  });
-
   mlCommonsModel.load = ca({
     method: 'POST',
     url: {
