@@ -23,6 +23,8 @@ import {
   IScopedClusterClient,
   ScopeableRequest,
 } from '../../../../src/core/server';
+import { MODEL_STATE, ModelSearchSort } from '../../common';
+
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { convertModelSource, generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
@@ -30,6 +32,7 @@ import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/consta
 
 const modelSortFieldMapping: { [key: string]: string } = {
   version: 'model_version',
+  name: 'name.keyword',
 };
 
 interface UploadModelBase {
@@ -74,37 +77,42 @@ export class ModelService {
     this.osClient = osClient;
   }
 
-  public async search({
-    request,
+  public static async search({
     pagination,
     sort,
+    client,
     ...restParams
   }: {
-    request: ScopeableRequest;
+    client: IScopedClusterClient;
     algorithms?: string[];
     ids?: string[];
     pagination: RequestPagination;
-    sort?: Array<'version-desc' | 'version-asc'>;
+    sort?: ModelSearchSort[];
     name?: string;
+    states?: MODEL_STATE[];
+    nameOrId?: string;
   }) {
-    const { hits } = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.search', {
-        body: {
-          query: generateModelSearchQuery(restParams),
-          ...getQueryFromSize(pagination),
-          ...(sort
-            ? {
-                sort: sort.map((sorting) => {
-                  const [field, direction] = sorting.split('-');
-                  return {
-                    [modelSortFieldMapping[field] || field]: direction,
-                  };
-                }),
-              }
-            : {}),
-        },
-      });
+    const {
+      body: { hits },
+    } = await client.asCurrentUser.transport.request({
+      method: 'POST',
+      path: `${MODEL_BASE_API}/_search`,
+      body: {
+        query: generateModelSearchQuery(restParams),
+        ...getQueryFromSize(pagination),
+        ...(sort
+          ? {
+              sort: sort.map((sorting) => {
+                const [field, direction] = sorting.split('-');
+                return {
+                  [modelSortFieldMapping[field] || field]: direction,
+                };
+              }),
+            }
+          : {}),
+      },
+    });
+
     return {
       data: hits.hits.map(({ _id, _source }) => ({
         id: _id,
