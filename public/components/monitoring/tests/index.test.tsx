@@ -25,31 +25,31 @@ const setup = (
       currentPage: 1,
       pageSize: 15,
       totalRecords: 100,
+      totalPages: 7,
     },
     deployedModels: [
       {
         id: 'model-1-id',
         name: 'model 1 name',
-        target_node_ids: ['node1', 'node2', 'node3'],
-        not_deployed_node_ids: ['node1', 'node2'],
-        deployed_node_ids: ['node3'],
+        respondingNodesCount: 1,
+        notRespondingNodesCount: 2,
+        planningNodesCount: 3,
       },
       {
         id: 'model-2-id',
         name: 'model 2 name',
-        target_node_ids: ['node1', 'node2', 'node3'],
-        not_deployed_node_ids: [],
-        deployed_node_ids: ['node1', 'node2', 'node3'],
+        respondingNodesCount: 3,
+        notRespondingNodesCount: 0,
+        planningNodesCount: 3,
       },
       {
         id: 'model-3-id',
         name: 'model 3 name',
-        target_node_ids: ['node1', 'node2', 'node3'],
-        not_deployed_node_ids: ['node1', 'node2', 'node3'],
-        deployed_node_ids: [],
+        respondingNodesCount: 0,
+        notRespondingNodesCount: 3,
+        planningNodesCount: 3,
       },
     ],
-    allStatuses: ['responding'],
     reload: jest.fn(),
     searchByNameOrId: jest.fn(),
     searchByStatus: jest.fn(),
@@ -111,6 +111,7 @@ describe('<Monitoring />', () => {
           currentPage: 1,
           pageSize: 15,
           totalRecords: 0,
+          totalPages: 0,
         },
       });
       expect(screen.getByLabelText('no deployed models')).toBeInTheDocument();
@@ -127,6 +128,7 @@ describe('<Monitoring />', () => {
           currentPage: 1,
           pageSize: 15,
           totalRecords: 0,
+          totalPages: 0,
         },
       });
       expect(screen.getByLabelText('loading models')).toBeInTheDocument();
@@ -139,6 +141,7 @@ describe('<Monitoring />', () => {
           currentPage: 1,
           pageSize: 15,
           totalRecords: 0,
+          totalPages: 0,
         },
       });
       expect(screen.getByLabelText('no models results')).toBeInTheDocument();
