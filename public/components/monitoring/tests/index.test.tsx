@@ -233,12 +233,12 @@ describe('<Monitoring />', () => {
 
     // Model status filter only shows 3 selected status for filtering
     expect(allStatusFilterOptions.length).toBe(3);
-    expect(within(allStatusFilterOptions[0]).getByText('Responding')).toBeInTheDocument();
-    expect(within(allStatusFilterOptions[1]).getByText('Partially responding')).toBeInTheDocument();
-    expect(within(allStatusFilterOptions[2]).getByText('Not responding')).toBeInTheDocument();
+    expect(within(allStatusFilterOptions[0]).getByText('Responsive')).toBeInTheDocument();
+    expect(within(allStatusFilterOptions[1]).getByText('Partially responsive')).toBeInTheDocument();
+    expect(within(allStatusFilterOptions[2]).getByText('Not responsive')).toBeInTheDocument();
 
     expect(searchByStatus).not.toHaveBeenCalled();
-    await userEvent.click(screen.getByRole('option', { name: 'Responding' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Responsive' }));
     expect(searchByStatus).not.toHaveBeenCalledWith([{ value: 'responding', checked: 'on' }]);
 
     jest.useFakeTimers();

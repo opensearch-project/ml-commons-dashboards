@@ -5,12 +5,12 @@
 
 export const STATUS_FILTER = [
   {
-    label: 'Responding',
+    label: 'Responsive',
     color: '#017D73',
     value: 'responding',
   },
-  { label: 'Partially responding', color: '#F5A700', value: 'partial-responding' },
-  { label: 'Not responding', color: '#343741', value: 'not-responding' },
+  { label: 'Partially responsive', color: '#F5A700', value: 'partial-responding' },
+  { label: 'Not responsive', color: '#BD271E', value: 'not-responding' },
 ] as const;
 
 export type STATUS_VALUE = typeof STATUS_FILTER[number]['value'];

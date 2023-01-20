@@ -65,7 +65,7 @@ describe('<StatusFilter />', () => {
     const { user } = await setup({ onUpdateFilters });
     await user.click(screen.getByText('Status'));
     expect(onUpdateFilters).not.toHaveBeenCalled();
-    await user.click(screen.getByText('Responding'));
+    await user.click(screen.getByText('Responsive'));
     expect(onUpdateFilters).toHaveBeenCalledWith([{ value: 'responding', checked: undefined }]);
   });
 });
