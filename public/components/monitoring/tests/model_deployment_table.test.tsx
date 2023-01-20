@@ -109,15 +109,12 @@ describe('<DeployedModelTable />', () => {
       expect(within(header).getByText('Status')).toBeInTheDocument();
       expect(columnContent?.length).toBe(3);
       const cells = columnContent!;
-      expect(
-        within(cells[0] as HTMLElement).getByText('Partially responding on 1 of 3 nodes')
-      ).toBeInTheDocument();
-      expect(
-        within(cells[1] as HTMLElement).getByText('Responding on 3 of 3 nodes')
-      ).toBeInTheDocument();
-      expect(
-        within(cells[2] as HTMLElement).getByText('Not responding on 3 of 3 nodes')
-      ).toBeInTheDocument();
+      expect(within(cells[0] as HTMLElement).getByText('Partially responding')).toBeInTheDocument();
+      expect(within(cells[0] as HTMLElement).getByText('on 1 of 3 nodes')).toBeInTheDocument();
+      expect(within(cells[1] as HTMLElement).getByText('Responding')).toBeInTheDocument();
+      expect(within(cells[1] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
+      expect(within(cells[2] as HTMLElement).getByText('Not responding')).toBeInTheDocument();
+      expect(within(cells[2] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
     });
 
     it('should render ID at third column and copy to clipboard after button clicked', async () => {
