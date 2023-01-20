@@ -9,6 +9,7 @@ import React from 'react';
 import { render, screen, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
+import { APIProvider } from '../../../apis/api_provider';
 
 const setup = (
   monitoringReturnValue?: Partial<ReturnType<typeof useMonitoringExports.useMonitoring>>
@@ -64,7 +65,6 @@ const setup = (
 };
 
 const mockOffsetMethods = () => {
-  jest.useRealTimers();
   const originalOffsetHeight = Object.getOwnPropertyDescriptor(
     HTMLElement.prototype,
     'offsetHeight'
@@ -219,14 +219,14 @@ describe('<Monitoring />', () => {
   });
 
   it('should display consistent status filter options and call searchByStatus after filter option clicked', async () => {
-    jest.useRealTimers();
     const clearOffsetMethodsMock = mockOffsetMethods();
 
     const {
       finalMonitoringReturnValue: { searchByStatus },
+      user,
     } = setup({});
 
-    await userEvent.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
+    await user.click(screen.getByText('Status', { selector: "[data-text='Status']" }));
     const allStatusFilterOptions = within(
       screen.getByRole('listbox', { name: 'Status' })
     ).getAllByRole('option');
@@ -238,10 +238,28 @@ describe('<Monitoring />', () => {
     expect(within(allStatusFilterOptions[2]).getByText('Not responding')).toBeInTheDocument();
 
     expect(searchByStatus).not.toHaveBeenCalled();
-    await userEvent.click(screen.getByRole('option', { name: 'Responding' }));
+    await user.click(screen.getByRole('option', { name: 'Responding' }));
     expect(searchByStatus).not.toHaveBeenCalledWith([{ value: 'responding', checked: 'on' }]);
 
-    jest.useFakeTimers();
     clearOffsetMethodsMock();
+  });
+
+  it('should show preview panel after view detail button clicked', async () => {
+    const { user } = setup();
+    await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
+    const previewPanel = screen.getByRole('dialog');
+    expect(previewPanel).toBeInTheDocument();
+    expect(within(previewPanel).getByText('model 1 name')).toBeInTheDocument();
+  });
+
+  it('should call reload after preview panel closed', async () => {
+    const {
+      finalMonitoringReturnValue: { reload },
+      user,
+    } = setup();
+
+    await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
+    await user.click(screen.getByLabelText('Close this dialog'));
+    expect(reload).toHaveBeenCalled();
   });
 });
