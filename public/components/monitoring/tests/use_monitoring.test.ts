@@ -179,4 +179,20 @@ describe('useMonitoring', () => {
     await waitForValueToChange(() => result.current.pageStatus === 'normal');
     expect(Model.prototype.search).toHaveBeenCalledTimes(2);
   });
+
+  it('should return consistent deployedModels', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() =>
+      expect(result.current.deployedModels).toEqual([
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          respondingNodesCount: 1,
+          notRespondingNodesCount: 2,
+          planningNodesCount: 3,
+        },
+      ])
+    );
+  });
 });

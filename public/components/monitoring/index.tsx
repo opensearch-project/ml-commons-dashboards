@@ -12,7 +12,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { RefreshInterval } from '../common/refresh_interval';
 import { PreviewPanel, PreviewModel } from '../preview_panel';
@@ -35,6 +35,15 @@ export const Monitoring = () => {
     searchByStatus,
   } = useMonitoring();
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
+
+  const handleViewDetail = useCallback((id, name) => {
+    setPreviewModel({ id, name });
+  }, []);
+
+  const handlePreviewPanelClose = useCallback(() => {
+    setPreviewModel(null);
+    reload();
+  }, [reload]);
 
   return (
     <div>
@@ -89,17 +98,10 @@ export const Monitoring = () => {
           pagination={pagination}
           onChange={handleTableChange}
           onResetSearchClick={resetSearch}
-          onViewDetail={(id, name) => {
-            setPreviewModel({ id, name });
-          }}
+          onViewDetail={handleViewDetail}
         />
         {previewModel ? (
-          <PreviewPanel
-            model={previewModel}
-            onClose={() => {
-              setPreviewModel(null);
-            }}
-          />
+          <PreviewPanel model={previewModel} onClose={handlePreviewPanelClose} />
         ) : null}
       </EuiPanel>
     </div>
