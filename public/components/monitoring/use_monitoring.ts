@@ -61,7 +61,7 @@ const fetchDeployedModels = async (params: Params) => {
           id,
           name,
           respondingNodesCount: workerCount,
-          planingNodesCount: planningCount,
+          planningNodesCount: planningCount,
           notRespondingNodesCount:
             workerCount !== undefined && planningCount !== undefined
               ? planningCount - workerCount
