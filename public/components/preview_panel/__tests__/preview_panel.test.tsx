@@ -39,9 +39,9 @@ describe('<PreviewPanel />', () => {
     const request = jest.spyOn(APIProvider.getAPI('profile'), 'getModel');
     const mockResult = {
       id: 'model-1-id',
-      target_node_ids: ['node-1', 'node-2', 'node-3'],
-      deployed_node_ids: ['node-1', 'node-2'],
-      not_deployed_node_ids: ['node-3'],
+      target_worker_nodes: ['node-1', 'node-2', 'node-3'],
+      worker_nodes: ['node-1', 'node-2'],
+      not_worker_nodes: ['node-3'],
     };
     request.mockResolvedValue(mockResult);
     setup({});
