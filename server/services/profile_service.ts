@@ -27,11 +27,9 @@ export class ProfileService {
   static convertModel(model: OpenSearchMLCommonsProfile['models']['key'], id: string) {
     return {
       id,
-      // TODO:remove mock name for model list after model list api update
-      name: 'mock-value',
-      target_node_ids: model.target_worker_nodes,
-      deployed_node_ids: model.worker_nodes,
-      not_deployed_node_ids:
+      target_worker_nodes: model.target_worker_nodes,
+      worker_nodes: model.worker_nodes,
+      not_worker_nodes:
         model.target_worker_nodes.filter((nodeId) => !model.worker_nodes?.includes(nodeId)) ?? [],
     };
   }
