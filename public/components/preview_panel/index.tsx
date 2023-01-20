@@ -39,8 +39,8 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
   const { id, name } = model;
   const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
-    const targetNodes = data?.target_node_ids ?? [];
-    const deployedNodes = data?.deployed_node_ids ?? [];
+    const targetNodes = data?.target_worker_nodes ?? [];
+    const deployedNodes = data?.worker_nodes ?? [];
     return targetNodes.map((item) => ({
       id: item,
       deployed: deployedNodes.indexOf(item) > -1 ? true : false,
@@ -55,8 +55,8 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
         </EuiTextColor>
       );
     }
-    const deployedNodesNum = data?.deployed_node_ids?.length ?? 0;
-    const targetNodesNum = data?.target_node_ids?.length ?? 0;
+    const deployedNodesNum = data?.worker_nodes?.length ?? 0;
+    const targetNodesNum = data?.target_worker_nodes?.length ?? 0;
     if (deployedNodesNum < targetNodesNum) {
       return `Partially responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
     } else if (deployedNodesNum === 0) {
