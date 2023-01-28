@@ -12,15 +12,15 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 
 import { RefreshInterval } from '../common/refresh_interval';
 import { PreviewPanel, PreviewModel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
 import { ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
-import { SearchBar } from './search_bar';
 import { ModelStatusFilter } from './model_status_filter';
+import { SearchBar } from './search_bar';
 
 export const Monitoring = () => {
   const {
@@ -35,6 +35,18 @@ export const Monitoring = () => {
     searchByStatus,
   } = useMonitoring();
   const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>();
+
+  const setInputRef = useCallback((node: HTMLInputElement | null) => {
+    searchInputRef.current = node;
+  }, []);
+
+  const onResetSearch = useCallback(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
+    }
+    resetSearch();
+  }, [resetSearch]);
 
   const handleViewDetail = useCallback((id, name) => {
     setPreviewModel({ id, name });
@@ -80,7 +92,7 @@ export const Monitoring = () => {
           <>
             <EuiFlexGroup gutterSize="l">
               <EuiFlexItem>
-                <SearchBar onSearch={searchByNameOrId} value={params.nameOrId ?? ''} />
+                <SearchBar inputRef={setInputRef} onSearch={searchByNameOrId} />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
@@ -97,8 +109,8 @@ export const Monitoring = () => {
           sort={params.sort}
           pagination={pagination}
           onChange={handleTableChange}
-          onResetSearchClick={resetSearch}
           onViewDetail={handleViewDetail}
+          onResetSearchClick={onResetSearch}
         />
         {previewModel ? (
           <PreviewPanel model={previewModel} onClose={handlePreviewPanelClose} />
