@@ -6,7 +6,7 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import { render, screen, within } from '../../../../test/test_utils';
+import { render, screen, waitFor, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
 import { APIProvider } from '../../../apis/api_provider';
@@ -100,6 +100,7 @@ describe('<Monitoring />', () => {
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
+    jest.clearAllMocks();
   });
 
   describe('pageStatus', () => {
@@ -175,15 +176,37 @@ describe('<Monitoring />', () => {
     );
   });
 
-  it('should call resetSearch after reset search click', async () => {
+  it('should call resetSearch and reset search input after reset search click', async () => {
     const {
       finalMonitoringReturnValue: { resetSearch },
       user,
-    } = setup({ pageStatus: 'reset-filter', deployedModels: [] });
+    } = setup({
+      pageStatus: 'reset-filter',
+      deployedModels: [],
+    });
+    await user.type(screen.getByLabelText(/Search by name or ID/i), 'test model name');
+
     expect(screen.getByLabelText('no models results')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Search by name or ID/i)).toHaveValue('test model name');
 
     await user.click(screen.getByText('Reset search'));
     expect(resetSearch).toHaveBeenCalled();
+    // Search input should get reset
+    expect(screen.getByLabelText(/Search by name or ID/i)).toHaveValue('');
+  });
+
+  it('should search with user input', async () => {
+    const mockSearchByNameOrId = jest.fn();
+    const {
+      finalMonitoringReturnValue: { searchByNameOrId },
+      user,
+    } = setup({
+      pageStatus: 'reset-filter',
+      deployedModels: [],
+      searchByNameOrId: mockSearchByNameOrId,
+    });
+    await user.type(screen.getByLabelText(/Search by name or ID/i), 'test model name');
+    await waitFor(() => expect(searchByNameOrId).toHaveBeenCalledWith('test model name'));
   });
 
   it('should reload table data at 10s interval by default when starts auto refresh', async () => {
