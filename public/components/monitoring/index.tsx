@@ -56,9 +56,9 @@ export const Monitoring = () => {
   const onCloseModelPreview = useCallback(
     (modelProfile: ModelDeploymentProfile | null) => {
       if (
-        modelProfile === null ||
-        previewModel?.planningNodesCount !== modelProfile.target_worker_nodes.length ||
-        previewModel?.respondingNodesCount !== modelProfile.worker_nodes.length
+        modelProfile !== null &&
+        (previewModel?.planningNodesCount !== modelProfile.target_worker_nodes.length ||
+          previewModel?.respondingNodesCount !== modelProfile.worker_nodes.length)
       ) {
         reload();
       }
