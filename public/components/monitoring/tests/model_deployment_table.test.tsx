@@ -142,10 +142,10 @@ describe('<DeployedModelTable />', () => {
       document.execCommand = execCommandOrigin;
     });
 
-    it('should render Action column and call onViewDetail with consistent model id', async () => {
+    it('should render Action column and call onViewDetail with the model item of the current table row', async () => {
       const columnIndex = 3;
       const onViewDetailMock = jest.fn();
-      setup({
+      const { finalProps } = setup({
         onViewDetail: onViewDetailMock,
       });
       const header = screen.getAllByRole('columnheader')[columnIndex];
@@ -157,13 +157,13 @@ describe('<DeployedModelTable />', () => {
       const cells = columnContent!;
 
       await userEvent.click(within(cells[0] as HTMLElement).getByRole('button'));
-      expect(onViewDetailMock).toHaveBeenCalledWith('model-1-id', 'model 1 name');
+      expect(onViewDetailMock).toHaveBeenCalledWith(finalProps.items[0]);
 
       await userEvent.click(within(cells[1] as HTMLElement).getByRole('button'));
-      expect(onViewDetailMock).toHaveBeenCalledWith('model-2-id', 'model 2 name');
+      expect(onViewDetailMock).toHaveBeenCalledWith(finalProps.items[1]);
 
       await userEvent.click(within(cells[2] as HTMLElement).getByRole('button'));
-      expect(onViewDetailMock).toHaveBeenCalledWith('model-3-id', 'model 3 name');
+      expect(onViewDetailMock).toHaveBeenCalledWith(finalProps.items[2]);
     });
   });
 
