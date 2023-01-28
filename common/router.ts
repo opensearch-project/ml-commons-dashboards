@@ -4,6 +4,7 @@
  */
 
 import { Monitoring } from '../public/components/monitoring';
+import { routerPaths } from './router_paths';
 
 interface RouteConfig {
   path: string;
@@ -14,7 +15,7 @@ interface RouteConfig {
 
 export const ROUTES: RouteConfig[] = [
   {
-    path: '/',
+    path: routerPaths.monitoring,
     Component: Monitoring,
     label: 'Monitoring',
   },

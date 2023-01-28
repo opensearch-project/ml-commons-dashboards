@@ -6,9 +6,10 @@
 import React from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { Provider as ReduxProvider } from 'react-redux';
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { EuiPage, EuiPageBody } from '@elastic/eui';
 import { ROUTES } from '../../common/router';
+import { routerPaths } from '../../common/router_paths';
 
 import { store } from '../../redux/store';
 
@@ -58,6 +59,7 @@ export const MlCommonsPluginApp = ({
                     exact={exact ?? false}
                   />
                 ))}
+                <Redirect from={routerPaths.root} to={routerPaths.monitoring} />
               </EuiPageBody>
             </EuiPage>
           </Switch>
