@@ -28,7 +28,7 @@ export interface ModelDeploymentTableCriteria {
   sort?: ModelDeploymentTableSort;
 }
 
-interface ModelDeploymentItem {
+export interface ModelDeploymentItem {
   id: string;
   name: string;
   respondingNodesCount: number | undefined;
@@ -47,7 +47,7 @@ export interface ModelDeploymentTableProps {
   };
   sort: ModelDeploymentTableSort;
   onChange: (criteria: ModelDeploymentTableCriteria) => void;
-  onViewDetail?: (id: string, name: string) => void;
+  onViewDetail?: (modelDeploymentItem: ModelDeploymentItem) => void;
   onResetSearchClick?: () => void;
 }
 
@@ -139,11 +139,11 @@ export const ModelDeploymentTable = ({
         name: 'Action',
         align: 'right' as const,
         width: '120px',
-        render: (id: string, { name }: ModelDeploymentItem) => {
+        render: (id: string, modelDeploymentItem: ModelDeploymentItem) => {
           return (
             <EuiButtonIcon
               onClick={() => {
-                onViewDetail?.(id, name);
+                onViewDetail?.(modelDeploymentItem);
               }}
               role="button"
               aria-label="view detail"

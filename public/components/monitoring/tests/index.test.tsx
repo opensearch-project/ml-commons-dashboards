@@ -275,14 +275,49 @@ describe('<Monitoring />', () => {
     expect(within(previewPanel).getByText('model 1 name')).toBeInTheDocument();
   });
 
-  it('should call reload after preview panel closed', async () => {
+  it('should call reload after preview panel closed if model deployment status changed', async () => {
+    // model deployment status is changed
+    jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockResolvedValue({
+      id: 'model-1-id',
+      // responding: 2
+      worker_nodes: ['node-1', 'node-2'],
+      // not responding: 1
+      not_worker_nodes: ['node-3'],
+      // planning: 3
+      target_worker_nodes: ['node-1', 'node-2', 'node-3'],
+    });
+
     const {
       finalMonitoringReturnValue: { reload },
       user,
     } = setup();
 
+    // click on first item: responding: 1, not responding: 2, planning: 3
     await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
     await user.click(screen.getByLabelText('Close this dialog'));
     expect(reload).toHaveBeenCalled();
+  });
+
+  it('should NOT call reload after preview panel closed if model deployment status NOT changed', async () => {
+    // model deployment status is NOT changed
+    jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockResolvedValue({
+      id: 'model-1-id',
+      // responding: 1
+      worker_nodes: ['node-1'],
+      // not responding: 2
+      not_worker_nodes: ['node-2', 'node-3'],
+      // planning: 3
+      target_worker_nodes: ['node-1', 'node-2', 'node-3'],
+    });
+
+    const {
+      finalMonitoringReturnValue: { reload },
+      user,
+    } = setup();
+
+    // click on first item: responding: 1, not responding: 2, planning: 3
+    await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
+    await user.click(screen.getByLabelText('Close this dialog'));
+    expect(reload).not.toHaveBeenCalled();
   });
 });

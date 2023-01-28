@@ -15,12 +15,13 @@ import {
 import React, { useState, useRef, useCallback } from 'react';
 
 import { RefreshInterval } from '../common/refresh_interval';
-import { PreviewPanel, PreviewModel } from '../preview_panel';
+import { PreviewPanel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
-import { ModelDeploymentTable } from './model_deployment_table';
+import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
 import { ModelStatusFilter } from './model_status_filter';
 import { SearchBar } from './search_bar';
+import { ModelDeploymentProfile } from '../../apis/profile';
 
 export const Monitoring = () => {
   const {
@@ -34,7 +35,7 @@ export const Monitoring = () => {
     reload,
     searchByStatus,
   } = useMonitoring();
-  const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
+  const [previewModel, setPreviewModel] = useState<ModelDeploymentItem | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>();
 
   const setInputRef = useCallback((node: HTMLInputElement | null) => {
@@ -48,14 +49,23 @@ export const Monitoring = () => {
     resetSearch();
   }, [resetSearch]);
 
-  const handleViewDetail = useCallback((id, name) => {
-    setPreviewModel({ id, name });
+  const handleViewDetail = useCallback((modelPreviewItem: ModelDeploymentItem) => {
+    setPreviewModel(modelPreviewItem);
   }, []);
 
-  const handlePreviewPanelClose = useCallback(() => {
-    setPreviewModel(null);
-    reload();
-  }, [reload]);
+  const onCloseModelPreview = useCallback(
+    (modelProfile: ModelDeploymentProfile | null) => {
+      if (
+        modelProfile !== null &&
+        (previewModel?.planningNodesCount !== modelProfile.target_worker_nodes.length ||
+          previewModel?.respondingNodesCount !== modelProfile.worker_nodes.length)
+      ) {
+        reload();
+      }
+      setPreviewModel(null);
+    },
+    [previewModel, reload]
+  );
 
   return (
     <div>
@@ -112,9 +122,7 @@ export const Monitoring = () => {
           onViewDetail={handleViewDetail}
           onResetSearchClick={onResetSearch}
         />
-        {previewModel ? (
-          <PreviewPanel model={previewModel} onClose={handlePreviewPanelClose} />
-        ) : null}
+        {previewModel ? <PreviewPanel model={previewModel} onClose={onCloseModelPreview} /> : null}
       </EuiPanel>
     </div>
   );
