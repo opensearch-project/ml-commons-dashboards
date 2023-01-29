@@ -66,7 +66,7 @@ export class ModelService {
     return {
       data: hits.hits.map(({ _id, _source }) => ({
         id: _id,
-        ...convertModelSource(_source),
+        ..._source,
       })),
       pagination: getPagination(pagination.currentPage, pagination.pageSize, hits.total.value),
     };
