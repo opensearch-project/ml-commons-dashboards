@@ -43,7 +43,7 @@ describe('<OwnerFilter />', () => {
     expect(screen.getByText('admin (Me)')).toBeInTheDocument();
   });
 
-  it('should call onChange with consistent params', async () => {
+  it('should call onChange with user selection', async () => {
     const onChangeMock = jest.fn();
     const { rerender } = render(<OwnerFilter value={[]} onChange={onChangeMock} />);
     await userEvent.click(screen.getByText('Owner'));
@@ -52,14 +52,16 @@ describe('<OwnerFilter />', () => {
     onChangeMock.mockClear();
 
     rerender(<OwnerFilter value={['owner-1']} onChange={onChangeMock} />);
-    await userEvent.click(screen.getByText('owner-2'));
-    expect(onChangeMock).toHaveBeenCalledWith(['owner-1', 'owner-2']);
-    onChangeMock.mockClear();
+    await userEvent.click(screen.getByText('owner-1'));
+    expect(onChangeMock).toHaveBeenCalledWith([]);
+  });
 
-    rerender(<OwnerFilter value={['owner-1', 'owner-2']} onChange={onChangeMock} />);
+  it('should call onChange with current user', async () => {
+    const onChangeMock = jest.fn();
+    render(<OwnerFilter value={['owner-1', 'owner-2']} onChange={onChangeMock} />);
+    await userEvent.click(screen.getByText('Owner'));
     await userEvent.click(screen.getByText('Show Only My Models'));
     expect(onChangeMock).toHaveBeenCalledWith(['admin']);
-    onChangeMock.mockClear();
   });
 
   it('should NOT render "Show Only My Models" button and "(Me)" option after error fetch account', async () => {
