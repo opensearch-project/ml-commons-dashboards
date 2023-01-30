@@ -90,7 +90,6 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }, []);
   return (
     <EuiPanel>
-      {/* <RegisterModelTypeModal onCloseModal={handle} /> */}
       <EuiPageHeader pageTitle={<>Models</>} rightSideItems={[<RegisterNewModelButton />]} />
       <EuiSpacer />
       <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />

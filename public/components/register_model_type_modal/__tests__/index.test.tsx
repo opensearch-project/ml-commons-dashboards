@@ -16,7 +16,7 @@ describe('<RegisterModelTypeModal />', () => {
   it('should render select with Opensearch model repository', () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} />);
     expect(screen.getByLabelText('Opensearch model repository')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select modal')).toBeInTheDocument();
+    expect(screen.getByLabelText('Select model')).toBeInTheDocument();
   });
   it('should call onCloseModal after click "cancel"', async () => {
     const onClickMock = jest.fn();

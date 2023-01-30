@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -36,48 +36,21 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
       label: 'Titan',
       'data-test-subj': 'titanOption',
     },
-    {
-      label: 'Enceladus',
-    },
-    {
-      label: 'Mimas',
-    },
-    {
-      label: 'Dione',
-    },
-    {
-      label: 'Iapetus',
-    },
-    {
-      label: 'Phoebe',
-    },
-    {
-      label: 'Rhea',
-    },
-    {
-      label: "Pandora is one of Saturn's moons, named for a Titaness of Greek mythology",
-    },
-    {
-      label: 'Tethys',
-    },
-    {
-      label: 'Hyperion',
-    },
   ];
   const onChange = (modelRepoSelection: EuiComboBoxOptionOption[]) => {
-    // We should only get back either 0 or 1 options.
     setmodelRepoSelection(modelRepoSelection);
   };
   const [modelRepoSelection, setmodelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
-  const handleContinue = (radioSelected: string) => {
-    if (radioSelected === 'UserModel' && modelRepoSelection[0]?.label) {
+  const handleContinue = useCallback(() => {
+    if (modelSource === ModelSource.USER_MODEL && modelRepoSelection[0]?.label) {
       history.push(
         `/model-registry/register-model?name=${modelRepoSelection[0]?.label}&version=${modelRepoSelection[0]?.label}`
       );
-    } else if (radioSelected === 'PreTrainedModel') {
+    }
+    if (modelSource === ModelSource.PRE_TRAINED_MODEL) {
       history.push('/model-registry/register-model');
     }
-  };
+  }, [history, modelSource, modelRepoSelection]);
   return (
     <div>
       <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
@@ -138,12 +111,12 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
           <strong>Select model from repository</strong>
           <EuiSpacer />
           <EuiComboBox
-            placeholder="Select modal"
+            placeholder="Select model"
             singleSelection={{ asPlainText: true }}
             options={options}
             selectedOptions={modelRepoSelection}
             onChange={onChange}
-            aria-label="Select modal"
+            aria-label="Select model"
           />
         </EuiModalBody>
         <EuiModalFooter>
@@ -159,7 +132,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
             color="primary"
             fill
             onClick={() => {
-              handleContinue(modelSource);
+              handleContinue();
             }}
             data-test-subj="continue button"
           >

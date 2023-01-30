@@ -7,18 +7,21 @@ import { EuiButton, EuiPageHeader } from '@elastic/eui';
 import { RegisterModelTypeModal } from '../register_model_type_modal';
 export function RegisterNewModelButton(props: any) {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const showModal = () => setIsModalVisible(true);
+  const showModal = useCallback(() => {
+    setIsModalVisible(true);
+  }, []);
   const closeModal = useCallback(() => {
     setIsModalVisible(false);
   }, []);
-  let modal;
-  if (isModalVisible) {
-    modal = <RegisterModelTypeModal onCloseModal={closeModal} />;
-  }
+  // let modal;
+  // if (isModalVisible) {
+  //   modal = <RegisterModelTypeModal onCloseModal={closeModal} />;
+  // }
   return (
     <EuiPageHeader>
       <EuiButton onClick={showModal}>Register new model</EuiButton>
-      {modal}
+      {/* {modal} */}
+      {isModalVisible && <RegisterModelTypeModal onCloseModal={closeModal} />}
     </EuiPageHeader>
   );
 }
