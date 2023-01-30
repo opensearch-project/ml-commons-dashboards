@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { API_ROUTE_PREFIX, MODEL_BASE_API, MODEL_PROFILE_API } from '../services/utils/constants';
+import { MODEL_BASE_API, MODEL_PROFILE_API } from '../services/utils/constants';
 
 // eslint-disable-next-line import/no-default-export
 export default function (Client: any, config: any, components: any) {
