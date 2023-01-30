@@ -33,10 +33,6 @@ export class MlCommonsPluginPlugin
         const [coreStart, pluginsStart] = await core.getStartServices();
         const { data, navigation } = pluginsStart;
 
-        data.indexPatterns.clearCache();
-
-        await pluginsStart.data.indexPatterns.ensureDefaultIndexPattern();
-
         const services: MLServices = {
           ...coreStart,
           data,
