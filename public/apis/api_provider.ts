@@ -6,21 +6,25 @@
 import { Model } from './model';
 import { ModelAggregate } from './model_aggregate';
 import { Profile } from './profile';
+import { Security } from './security';
 
 const apiInstanceStore: {
   model: Model | undefined;
   modelAggregate: ModelAggregate | undefined;
   profile: Profile | undefined;
+  security: Security | undefined;
 } = {
   model: undefined,
   modelAggregate: undefined,
   profile: undefined,
+  security: undefined,
 };
 
 export class APIProvider {
   public static getAPI(type: 'model'): Model;
   public static getAPI(type: 'modelAggregate'): ModelAggregate;
   public static getAPI(type: 'profile'): Profile;
+  public static getAPI(type: 'security'): Security;
   public static getAPI(type: keyof typeof apiInstanceStore) {
     if (apiInstanceStore[type]) {
       return apiInstanceStore[type]!;
@@ -39,6 +43,11 @@ export class APIProvider {
       case 'profile': {
         const newInstance = new Profile();
         apiInstanceStore.profile = newInstance;
+        return newInstance;
+      }
+      case 'security': {
+        const newInstance = new Security();
+        apiInstanceStore.security = newInstance;
         return newInstance;
       }
     }
