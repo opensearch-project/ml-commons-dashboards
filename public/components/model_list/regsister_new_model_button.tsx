@@ -13,14 +13,9 @@ export function RegisterNewModelButton(props: any) {
   const closeModal = useCallback(() => {
     setIsModalVisible(false);
   }, []);
-  // let modal;
-  // if (isModalVisible) {
-  //   modal = <RegisterModelTypeModal onCloseModal={closeModal} />;
-  // }
   return (
     <EuiPageHeader>
       <EuiButton onClick={showModal}>Register new model</EuiButton>
-      {/* {modal} */}
       {isModalVisible && <RegisterModelTypeModal onCloseModal={closeModal} />}
     </EuiPageHeader>
   );
