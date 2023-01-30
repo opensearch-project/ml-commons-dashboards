@@ -13,7 +13,7 @@ import {
 
 import { createModelCluster } from './clusters/create_model_cluster';
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
-import { modelRouter, modelAggregateRouter, profileRouter } from './routes';
+import { modelRouter, modelAggregateRouter, profileRouter, securityRouter } from './routes';
 import { ModelService } from './services';
 
 export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPluginStart> {
@@ -38,6 +38,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     modelRouter(services, router);
     modelAggregateRouter(router);
     profileRouter(router);
+    securityRouter(router);
 
     return {};
   }
