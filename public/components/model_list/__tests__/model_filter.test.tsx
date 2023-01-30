@@ -2,6 +2,7 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
+jest.mock('../../../apis/security');
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
@@ -42,7 +43,7 @@ describe('<ModelFilter />', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
-  it('should render options filter after click tags', async () => {
+  it('should render options filter after filter button clicked', async () => {
     render(
       <ModelFilter
         name="Tags"
@@ -59,6 +60,23 @@ describe('<ModelFilter />', () => {
 
     expect(screen.getByText('foo')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Search Tags')).toBeInTheDocument();
+  });
+
+  it('should render passed footer after filter button clicked', async () => {
+    const { getByText, queryByText } = render(
+      <ModelFilter
+        name="Tags"
+        searchPlaceholder="Search Tags"
+        options={['foo', 'bar']}
+        value={['foo', 'bar']}
+        onChange={() => {}}
+        footer="footer"
+      />
+    );
+    expect(queryByText('footer')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByText('Tags'));
+    expect(getByText('footer')).toBeInTheDocument();
   });
 
   it('should only show "bar" after search', async () => {

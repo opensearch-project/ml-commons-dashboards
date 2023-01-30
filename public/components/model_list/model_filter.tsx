@@ -4,7 +4,13 @@
  */
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { EuiPopover, EuiPopoverTitle, EuiFieldSearch, EuiFilterButton } from '@elastic/eui';
+import {
+  EuiPopover,
+  EuiPopoverTitle,
+  EuiFieldSearch,
+  EuiFilterButton,
+  EuiPopoverFooter,
+} from '@elastic/eui';
 import { ModelFilterItem } from './model_filter_item';
 
 export interface ModelFilterProps {
@@ -13,11 +19,13 @@ export interface ModelFilterProps {
   options: Array<string | { name: string; value: string }>;
   value: string[];
   onChange: (value: string[]) => void;
+  footer?: React.ReactNode;
 }
 
 export const ModelFilter = ({
   name,
   value,
+  footer,
   options,
   searchPlaceholder,
   onChange,
@@ -93,6 +101,7 @@ export const ModelFilter = ({
           </ModelFilterItem>
         );
       })}
+      {footer && <EuiPopoverFooter>{footer}</EuiPopoverFooter>}
     </EuiPopover>
   );
 };

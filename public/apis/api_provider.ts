@@ -7,17 +7,20 @@ import { Connector } from './connector';
 import { Model } from './model';
 import { ModelAggregate } from './model_aggregate';
 import { Profile } from './profile';
+import { Security } from './security';
 
 const apiInstanceStore: {
   model: Model | undefined;
   modelAggregate: ModelAggregate | undefined;
   profile: Profile | undefined;
   connector: Connector | undefined;
+  security: Security | undefined;
 } = {
   model: undefined,
   modelAggregate: undefined,
   profile: undefined,
   connector: undefined,
+  security: undefined,
 };
 
 export class APIProvider {
@@ -25,6 +28,7 @@ export class APIProvider {
   public static getAPI(type: 'modelAggregate'): ModelAggregate;
   public static getAPI(type: 'profile'): Profile;
   public static getAPI(type: 'connector'): Connector;
+  public static getAPI(type: 'security'): Security;
   public static getAPI(type: keyof typeof apiInstanceStore) {
     if (apiInstanceStore[type]) {
       return apiInstanceStore[type]!;
@@ -50,11 +54,16 @@ export class APIProvider {
         apiInstanceStore.connector = newInstance;
         return newInstance;
       }
+      case 'security': {
+        const newInstance = new Security();
+        apiInstanceStore.security = newInstance;
+        return newInstance;
+      }
     }
   }
   public static clear() {
-    apiInstanceStore.model = undefined;
-    apiInstanceStore.profile = undefined;
-    apiInstanceStore.connector = undefined;
+    Object.keys(apiInstanceStore).forEach((key) => {
+      apiInstanceStore[key as keyof typeof apiInstanceStore] = undefined;
+    });
   }
 }
