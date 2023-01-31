@@ -18,7 +18,7 @@ const modelStateSchema = schema.oneOf([
   schema.literal(MODEL_STATE.loadFailed),
   schema.literal(MODEL_STATE.loaded),
   schema.literal(MODEL_STATE.loading),
-  schema.literal(MODEL_STATE.partialLoaded),
+  schema.literal(MODEL_STATE.partiallyLoaded),
   schema.literal(MODEL_STATE.trained),
   schema.literal(MODEL_STATE.uploaded),
   schema.literal(MODEL_STATE.unloaded),
