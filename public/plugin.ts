@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
 import {
   MlCommonsPluginPluginSetup,
@@ -33,10 +32,6 @@ export class MlCommonsPluginPlugin
         const [coreStart, pluginsStart] = await core.getStartServices();
         const { data, navigation } = pluginsStart;
 
-        data.indexPatterns.clearCache();
-
-        await pluginsStart.data.indexPatterns.ensureDefaultIndexPattern();
-
         const services: MLServices = {
           ...coreStart,
           data,
@@ -50,16 +45,7 @@ export class MlCommonsPluginPlugin
     });
 
     // Return methods that should be available to other plugins
-    return {
-      getGreeting() {
-        return i18n.translate('mlCommonsPlugin.greetingText', {
-          defaultMessage: 'Hello from {name}!',
-          values: {
-            name: PLUGIN_NAME,
-          },
-        });
-      },
-    };
+    return {};
   }
 
   public start(core: CoreStart): MlCommonsPluginPluginStart {
