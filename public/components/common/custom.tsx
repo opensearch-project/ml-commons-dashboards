@@ -1,6 +1,11 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import { EuiButton, EuiLink } from '@elastic/eui';
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router-dom';
 
 type LinkProps = React.ComponentProps<typeof EuiLink> & {
   to: string;

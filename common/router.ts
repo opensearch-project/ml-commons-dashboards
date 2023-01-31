@@ -3,23 +3,24 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Train } from '../public/components/train';
-import { Predict } from '../public/components/predict';
-import { Home } from '../public/components/home';
-import { ModelList } from '../public/components/model_list';
-import { TaskList } from '../public/components/task_list';
-import { routerPaths } from './router_paths';
-import { ModelDetail } from '../public/components/model_detail';
-import { ModelUpload } from '../public/components/model_upload';
-import { RegisterModelForm } from '../public/components/register_model';
+import { Monitoring } from '../public/components/monitoring';
 
-export const ROUTES = [
+interface RouteConfig {
+  path: string;
+  Component: React.ComponentType<any>;
+  label: string;
+  exact?: boolean;
+}
+
+export const ROUTES: RouteConfig[] = [
   {
-    path: routerPaths.train,
-    Component: Train,
-    label: 'Train Model',
-    icon: 'createSingleMetricJob',
+    path: '/',
+    Component: Monitoring,
+    label: 'Monitoring',
   },
+];
+
+/* export const ROUTES1 = [
   {
     path: routerPaths.modelList,
     Component: ModelList,
@@ -27,35 +28,8 @@ export const ROUTES = [
     icon: 'createSingleMetricJob',
   },
   {
-    path: routerPaths.predict,
-    Component: Predict,
-    label: 'Predict',
-    icon: 'regressionJob',
-  },
-  {
-    path: '/',
-    Component: Home,
-    label: 'Home',
-    exact: true,
-  },
-  {
-    path: routerPaths.taskList,
-    Component: TaskList,
-    label: 'Task List',
-    icon: 'createSingleMetricJob',
-  },
-  {
-    path: routerPaths.modelDetail,
-    Component: ModelDetail,
-  },
-  {
-    path: routerPaths.modelUpload,
-    label: 'Model Upload',
-    Component: ModelUpload,
-  },
-  {
     path: routerPaths.registerModel,
     label: 'Register Model',
     Component: RegisterModelForm,
   },
-];
+];*/

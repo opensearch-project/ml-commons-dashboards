@@ -4,7 +4,7 @@
  */
 
 import { schema } from '@osd/config-schema';
-import { MAX_MODEL_CHUNK_SIZE } from '../../common';
+import { MAX_MODEL_CHUNK_SIZE, MODEL_STATE } from '../../common';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
 import { ModelService, RecordNotFoundError } from '../services';
 import {
@@ -16,10 +16,21 @@ import {
 } from './constants';
 
 const modelSortQuerySchema = schema.oneOf([
-  schema.literal('trainTime-desc'),
-  schema.literal('trainTime-asc'),
   schema.literal('version-desc'),
   schema.literal('version-asc'),
+  schema.literal('name-asc'),
+  schema.literal('name-desc'),
+]);
+
+const modelStateSchema = schema.oneOf([
+  schema.literal(MODEL_STATE.loadFailed),
+  schema.literal(MODEL_STATE.loaded),
+  schema.literal(MODEL_STATE.loading),
+  schema.literal(MODEL_STATE.partialLoaded),
+  schema.literal(MODEL_STATE.trained),
+  schema.literal(MODEL_STATE.uploaded),
+  schema.literal(MODEL_STATE.unloaded),
+  schema.literal(MODEL_STATE.uploading),
 ]);
 
 const modelUploadBaseSchema = {
@@ -59,56 +70,37 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
             schema.oneOf([schema.string(), schema.arrayOf(schema.string())])
           ),
           ids: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
-          context: schema.maybe(
-            schema.string({
-              validate: (value) => {
-                const errorMessage = 'must be a object stringify json';
-                try {
-                  const context = JSON.parse(value);
-                  if (typeof context !== 'object') {
-                    return errorMessage;
-                  }
-                } catch (err) {
-                  return errorMessage;
-                }
-              },
-            })
-          ),
           currentPage: schema.number(),
           pageSize: schema.number(),
-          trainedStart: schema.maybe(schema.number()),
-          trainedEnd: schema.maybe(schema.number()),
           sort: schema.maybe(
             schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
           ),
+          states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
+          nameOrId: schema.maybe(schema.string()),
         }),
       },
     },
-    async (_context, request) => {
+    async (context, request) => {
       const {
         algorithms,
         ids,
         currentPage,
         pageSize,
-        context: contextInQuery,
-        trainedStart,
-        trainedEnd,
         sort,
         name,
+        states,
+        nameOrId,
       } = request.query;
       try {
-        const payload = await modelService.search({
-          request,
+        const payload = await ModelService.search({
+          client: context.core.opensearch.client,
           algorithms: typeof algorithms === 'string' ? [algorithms] : algorithms,
           ids: typeof ids === 'string' ? [ids] : ids,
           pagination: { currentPage, pageSize },
-          context: contextInQuery
-            ? ((JSON.parse(contextInQuery) as unknown) as Record<string, Array<string | number>>)
-            : undefined,
-          trainedStart,
-          trainedEnd,
           sort: typeof sort === 'string' ? [sort] : sort,
           name,
+          states: typeof states === 'string' ? [states] : states,
+          nameOrId,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (err) {

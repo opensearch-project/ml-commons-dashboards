@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { API_ROUTE_PREFIX, MODEL_BASE_API, MODEL_PROFILE_API } from '../services/utils/constants';
+import { MODEL_BASE_API, MODEL_PROFILE_API } from '../services/utils/constants';
 
 // eslint-disable-next-line import/no-default-export
 export default function (Client: any, config: any, components: any) {
@@ -46,24 +46,6 @@ export default function (Client: any, config: any, components: any) {
           required: true,
         },
       },
-    },
-  });
-
-  mlCommonsModel.predict = ca({
-    method: 'POST',
-    url: {
-      fmt: `${API_ROUTE_PREFIX}/_predict/<%=methodName%>/<%=modelId%>`,
-      req: {
-        methodName: {
-          type: 'string',
-          required: true,
-        },
-        modelId: {
-          type: 'string',
-          required: true,
-        },
-      },
-      needBody: true,
     },
   });
 
