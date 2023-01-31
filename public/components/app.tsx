@@ -46,9 +46,9 @@ export const MlCommonsPluginApp = ({
     <ReduxProvider store={store}>
       <I18nProvider>
         <>
-          <Switch>
-            <EuiPage>
-              <EuiPageBody component="main">
+          <EuiPage>
+            <EuiPageBody component="main">
+              <Switch>
                 {ROUTES.map(({ path, Component, exact }) => (
                   <Route
                     key={path}
@@ -60,9 +60,9 @@ export const MlCommonsPluginApp = ({
                   />
                 ))}
                 <Redirect from={routerPaths.root} to={routerPaths.monitoring} />
-              </EuiPageBody>
-            </EuiPage>
-          </Switch>
+              </Switch>
+            </EuiPageBody>
+          </EuiPage>
           <GlobalBreadcrumbs chrome={chrome} basename={basename} />
         </>
       </I18nProvider>
