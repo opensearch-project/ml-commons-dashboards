@@ -21,7 +21,11 @@ export const generateModelSearchQuery = ({
             {
               bool: {
                 should: [
-                  { wildcard: { name: { value: `*${nameOrId}*` } } },
+                  {
+                    wildcard: {
+                      'name.keyword': { value: `*${nameOrId}*`, case_insensitive: true },
+                    },
+                  },
                   generateTermQuery('_id', nameOrId),
                 ],
               },

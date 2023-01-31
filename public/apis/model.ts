@@ -12,7 +12,7 @@ export interface ModelSearchItem {
   id: string;
   name: string;
   algorithm: string;
-  state: string;
+  model_state: string;
   version: string;
   current_worker_node_count: number;
   planning_worker_node_count: number;

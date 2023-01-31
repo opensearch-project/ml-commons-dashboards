@@ -22,7 +22,7 @@ import { IScopedClusterClient } from '../../../../src/core/server';
 import { MODEL_STATE, ModelSearchSort } from '../../common';
 
 import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
-import { convertModelSource, generateModelSearchQuery } from './utils/model';
+import { generateModelSearchQuery } from './utils/model';
 import { MODEL_BASE_API } from './utils/constants';
 
 const modelSortFieldMapping: { [key: string]: string } = {
