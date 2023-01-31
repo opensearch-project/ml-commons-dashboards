@@ -7,4 +7,5 @@ export const routerPaths = {
   root: '/',
   monitoring: '/monitoring',
   registerModel: '/model-registry/register-model',
+  modelList: '/model-registry/model-list',
 };
