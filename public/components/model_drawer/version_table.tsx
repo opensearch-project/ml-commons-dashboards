@@ -23,32 +23,29 @@ export function VersionTable(props: {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const columns = useMemo<Array<EuiBasicTableColumn<ModelSearchItem>>>(
-    () => [
-      {
-        field: 'model_version',
-        name: 'Version',
-        sortable: false,
+  const columns: Array<EuiBasicTableColumn<ModelSearchItem>> = [
+    {
+      field: 'model_version',
+      name: 'Version',
+      sortable: false,
+    },
+    {
+      field: 'model_state',
+      name: 'Stage',
+    },
+    {
+      field: 'algorithm',
+      name: 'Algorithm',
+    },
+    {
+      field: 'created_time',
+      name: 'Time',
+      render: (time: string) => {
+        return renderTime(time);
       },
-      {
-        field: 'model_state',
-        name: 'Stage',
-      },
-      {
-        field: 'algorithm',
-        name: 'Algorithm',
-      },
-      {
-        field: 'created_time',
-        name: 'Time',
-        render: (time: string) => {
-          return renderTime(time);
-        },
-        sortable: false,
-      },
-    ],
-    []
-  );
+      sortable: false,
+    },
+  ];
   const rowProps = useCallback(
     ({ id }) => ({
       onClick: () => {
