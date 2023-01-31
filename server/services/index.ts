@@ -4,3 +4,4 @@
  */
 
 export { ModelService } from './model_service';
+export { RecordNotFoundError } from './errors';

@@ -46,4 +46,4 @@ export interface OpenSearchCustomerModel extends OpenSearchModelBase {
   version: number;
 }
 
-export type ModelSearchSort = 'name-asc' | 'name-desc';
+export type ModelSearchSort = 'version-desc' | 'version-asc' | 'name-asc' | 'name-desc';

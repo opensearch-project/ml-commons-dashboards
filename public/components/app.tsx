@@ -42,12 +42,19 @@ export const MlCommonsPluginApp = ({
   chrome,
   data,
 }: MlCommonsPluginAppDeps) => {
+  // Render the application DOM.
+  // Note that `navigation.ui.TopNavMenu` is a stateful component exported on the `navigation` plugin's start contract.
   return (
     <ReduxProvider store={store}>
       <I18nProvider>
         <>
           <Switch>
             <EuiPage>
+              {/*
+              <EuiPageSideBar>
+                <NavPanel />
+              </EuiPageSideBar>
+              */}
               <EuiPageBody component="main">
                 {ROUTES.map(({ path, Component, exact }) => (
                   <Route
