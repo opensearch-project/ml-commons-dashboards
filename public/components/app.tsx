@@ -7,7 +7,7 @@ import React from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { EuiPage, EuiPageBody } from '@elastic/eui';
+import { EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
 import { ROUTES } from '../../common/router';
 import { routerPaths } from '../../common/router_paths';
 
@@ -18,6 +18,7 @@ import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/
 import { DataPublicPluginStart } from '../../../../src/plugins/data/public';
 
 import { GlobalBreadcrumbs } from './global_breadcrumbs';
+import { NavPanel } from './nav_panel';
 
 interface MlCommonsPluginAppDeps {
   basename: string;
@@ -48,14 +49,12 @@ export const MlCommonsPluginApp = ({
     <ReduxProvider store={store}>
       <I18nProvider>
         <>
-          <Switch>
-            <EuiPage>
-              {/*
-              <EuiPageSideBar>
-                <NavPanel />
-              </EuiPageSideBar>
-              */}
-              <EuiPageBody component="main">
+          <EuiPage>
+            <EuiPageSideBar>
+              <NavPanel />
+            </EuiPageSideBar>
+            <EuiPageBody component="main">
+              <Switch>
                 {ROUTES.map(({ path, Component, exact }) => (
                   <Route
                     key={path}
@@ -67,9 +66,9 @@ export const MlCommonsPluginApp = ({
                   />
                 ))}
                 <Redirect from={routerPaths.root} to={routerPaths.monitoring} />
-              </EuiPageBody>
-            </EuiPage>
-          </Switch>
+              </Switch>
+            </EuiPageBody>
+          </EuiPage>
           <GlobalBreadcrumbs chrome={chrome} basename={basename} />
         </>
       </I18nProvider>
