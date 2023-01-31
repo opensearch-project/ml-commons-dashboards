@@ -32,7 +32,7 @@ describe('useMonitoring', () => {
           planning_worker_node_count: 3,
           algorithm: '',
           model_state: '',
-          version: '',
+          model_version: '',
         },
       ],
       pagination: {
