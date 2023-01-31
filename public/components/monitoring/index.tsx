@@ -57,8 +57,8 @@ export const Monitoring = () => {
     (modelProfile: ModelDeploymentProfile | null) => {
       if (
         modelProfile !== null &&
-        (previewModel?.planningNodesCount !== modelProfile.target_worker_nodes.length ||
-          previewModel?.respondingNodesCount !== modelProfile.worker_nodes.length)
+        (previewModel?.planningNodesCount !== modelProfile.target_worker_nodes?.length ||
+          previewModel?.respondingNodesCount !== modelProfile.worker_nodes?.length)
       ) {
         reload();
       }
@@ -122,7 +122,7 @@ export const Monitoring = () => {
           onViewDetail={handleViewDetail}
           onResetSearchClick={onResetSearch}
         />
-        {previewModel ? <PreviewPanel model={previewModel} onClose={onCloseModelPreview} /> : null}
+        {previewModel && <PreviewPanel model={previewModel} onClose={onCloseModelPreview} />}
       </EuiPanel>
     </div>
   );
