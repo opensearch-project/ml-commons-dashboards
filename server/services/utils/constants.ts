@@ -22,6 +22,16 @@ export const API_ROUTE_PREFIX = '/_plugins/_ml';
 export const PROFILE_BASE_API = `${API_ROUTE_PREFIX}/profile`;
 export const MODEL_BASE_API = `${API_ROUTE_PREFIX}/models`;
 export const MODEL_SEARCH_API = `${MODEL_BASE_API}/_search`;
+export const MODEL_UPLOAD_API = `${MODEL_BASE_API}/_upload`;
+export const MODEL_META_API = `${MODEL_BASE_API}/meta`;
+export const MODEL_PROFILE_API = `${PROFILE_BASE_API}/models`;
+
+export const CLUSTER = {
+  TRAIN: 'opensearch_mlCommonsTrain',
+  MODEL: 'opensearch_mlCommonsModel',
+  TASK: 'opensearch_mlCommonsTask',
+  PREDICT: 'opensearch_mlCommonsPredict',
+};
 
 export const CONNECTOR_BASE_API = `${API_ROUTE_PREFIX}/connectors`;
 export const CONNECTOR_SEARCH_API = `${CONNECTOR_BASE_API}/_search`;

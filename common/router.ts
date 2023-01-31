@@ -20,3 +20,17 @@ export const ROUTES: RouteConfig[] = [
     label: 'Overview',
   },
 ];
+
+/* export const ROUTES1 = [
+  {
+    path: routerPaths.modelList,
+    Component: ModelList,
+    label: 'Model List',
+    icon: 'createSingleMetricJob',
+  },
+  {
+    path: routerPaths.registerModel,
+    label: 'Register Model',
+    Component: RegisterModelForm,
+  },
+];*/
