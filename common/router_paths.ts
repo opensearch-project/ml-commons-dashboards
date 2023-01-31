@@ -8,4 +8,5 @@ export const routerPaths = {
   overview: '/overview',
   monitoring: '/monitoring',
   registerModel: '/model-registry/register-model',
+  modelList: '/model-registry/model-list',
 };
