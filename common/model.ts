@@ -54,4 +54,6 @@ export type ModelSearchSort =
   | 'id-asc'
   | 'model_state-asc'
   | 'model_state-desc'
-  | 'id-desc';
+  | 'id-desc'
+  | 'version-desc'
+  | 'version-asc';

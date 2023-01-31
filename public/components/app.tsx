@@ -6,7 +6,7 @@
 import React from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { EuiPage, EuiPageBody } from '@elastic/eui';
+import { EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
 import { useObservable } from 'react-use';
 import { ROUTES } from '../../common/router';
 import { routerPaths } from '../../common/router_paths';
@@ -25,6 +25,7 @@ import { DataSourceContextProvider } from '../contexts/data_source_context';
 
 import { GlobalBreadcrumbs } from './global_breadcrumbs';
 import { DataSourceTopNavMenu } from './data_source_top_nav_menu';
+import { NavPanel } from './nav_panel';
 
 interface MlCommonsPluginAppDeps {
   basename: string;
@@ -72,6 +73,11 @@ export const MlCommonsPluginApp = ({
       >
         <>
           <EuiPage>
+            {!useNewPageHeader && (
+              <EuiPageSideBar>
+                <NavPanel />
+              </EuiPageSideBar>
+            )}
             <EuiPageBody component="main">
               <Switch>
                 {ROUTES.map(({ path, Component, exact }) => (
