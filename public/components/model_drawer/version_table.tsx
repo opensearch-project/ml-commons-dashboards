@@ -4,11 +4,9 @@
  */
 
 import React, { useMemo, useCallback, useRef } from 'react';
-import { generatePath, useHistory } from 'react-router-dom';
-import { EuiBasicTable, Direction, Criteria } from '@elastic/eui';
+import { EuiBasicTable, Direction, Criteria, EuiBasicTableColumn } from '@elastic/eui';
 
 import { ModelSearchItem } from '../../apis/model';
-import { routerPaths } from '../../../common/router_paths';
 import { renderTime } from '../../utils';
 import type { VersionTableSort } from './';
 
@@ -22,19 +20,18 @@ export function VersionTable(props: {
   onChange: (criteria: VersionTableCriteria) => void;
 }) {
   const { models, sort, onChange } = props;
-  const history = useHistory();
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const columns = useMemo(
+  const columns = useMemo<Array<EuiBasicTableColumn<ModelSearchItem>>>(
     () => [
       {
-        field: 'version',
+        field: 'model_version',
         name: 'Version',
-        sortable: true,
+        sortable: false,
       },
       {
-        field: 'state',
+        field: 'model_state',
         name: 'Stage',
       },
       {
@@ -44,8 +41,10 @@ export function VersionTable(props: {
       {
         field: 'created_time',
         name: 'Time',
-        render: renderTime,
-        sortable: true,
+        render: (time: string) => {
+          return renderTime(time);
+        },
+        sortable: false,
       },
     ],
     []
@@ -53,10 +52,11 @@ export function VersionTable(props: {
   const rowProps = useCallback(
     ({ id }) => ({
       onClick: () => {
-        history.push(generatePath(routerPaths.modelDetail, { id }));
+        // TODO: update after exsiting detail page
+        // history.push(generatePath(routerPaths.modelDetail, { id }));
       },
     }),
-    [history]
+    []
   );
 
   const sorting = useMemo(() => {
@@ -78,7 +78,7 @@ export function VersionTable(props: {
   }, []);
 
   return (
-    <EuiBasicTable
+    <EuiBasicTable<ModelSearchItem>
       columns={columns}
       items={models}
       rowProps={rowProps}
