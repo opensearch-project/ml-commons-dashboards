@@ -10,7 +10,7 @@ export enum MODEL_STATE {
   uploaded = 'UPLOADED',
   uploading = 'UPLOADING',
   loading = 'LOADING',
-  partialLoaded = 'PARTIAL_LOADED',
+  partiallyLoaded = 'PARTIALLY_LOADED',
   loadFailed = 'LOAD_FAILED',
 }
 

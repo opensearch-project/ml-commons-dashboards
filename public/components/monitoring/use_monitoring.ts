@@ -35,7 +35,7 @@ const fetchDeployedModels = async (params: Params) => {
       case 'responding':
         return MODEL_STATE.loaded;
       case 'partial-responding':
-        return MODEL_STATE.partialLoaded;
+        return MODEL_STATE.partiallyLoaded;
     }
   });
   const result = await APIProvider.getAPI('model').search({
@@ -44,7 +44,7 @@ const fetchDeployedModels = async (params: Params) => {
     nameOrId: params.nameOrId,
     states:
       !states || states.length === 0
-        ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partialLoaded]
+        ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partiallyLoaded]
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
   });

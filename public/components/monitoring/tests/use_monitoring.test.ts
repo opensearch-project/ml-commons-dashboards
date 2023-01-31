@@ -60,7 +60,7 @@ describe('useMonitoring', () => {
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
-          states: ['LOAD_FAILED', 'LOADED', 'PARTIAL_LOADED'],
+          states: ['LOAD_FAILED', 'LOADED', 'PARTIALLY_LOADED'],
         })
       )
     );
@@ -87,7 +87,7 @@ describe('useMonitoring', () => {
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
-          states: ['PARTIAL_LOADED'],
+          states: ['PARTIALLY_LOADED'],
         })
       )
     );
