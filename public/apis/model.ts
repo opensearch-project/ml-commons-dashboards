@@ -22,6 +22,12 @@ export interface ModelSearchItem {
   model_version: string;
   current_worker_node_count: number;
   planning_worker_node_count: number;
+  model_config?: {
+    all_config?: string;
+    embedding_dimension: number;
+    framework_type: string;
+    model_type: string;
+  };
 }
 
 export interface ModelDetail extends ModelSearchItem {
