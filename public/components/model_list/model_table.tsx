@@ -128,6 +128,21 @@ export function ModelTable(props: ModelTableProps) {
         ),
         sortable: true,
       },
+      {
+        name: 'Actions',
+        actions: [
+          // TODO: add a new task to update after design completed
+          {
+            name: 'Prevew',
+            description: 'Preview model group',
+            type: 'icon',
+            icon: 'boxesHorizontal',
+            onClick: ({ name }) => {
+              onModelNameClick(name);
+            },
+          },
+        ],
+      },
     ],
     [onModelNameClick]
   );
@@ -155,7 +170,7 @@ export function ModelTable(props: ModelTableProps) {
   }, []);
 
   return (
-    <EuiBasicTable<ModelAggerateSearchItem>
+    <EuiBasicTable<ModelAggregateSearchItem>
       columns={columns}
       items={models}
       pagination={pagination}
