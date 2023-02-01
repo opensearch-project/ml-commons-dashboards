@@ -5,7 +5,7 @@
 import React, { useState, useCallback } from 'react';
 import { EuiButton, EuiPageHeader } from '@elastic/eui';
 import { RegisterModelTypeModal } from '../register_model_type_modal';
-export function RegisterNewModelButton(props: any) {
+export function RegisterNewModelButton() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const showModal = useCallback(() => {
     setIsModalVisible(true);

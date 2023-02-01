@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+
 import { ModelDeployedVersions } from '../model_deployed_versions';
 import { render, screen } from '../../../../test/test_utils';
 

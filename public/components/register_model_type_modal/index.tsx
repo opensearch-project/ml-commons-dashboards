@@ -24,10 +24,10 @@ enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
 }
-export interface RegisterModelTypeProp {
+export interface RegisterModelTypeProps {
   onCloseModal: () => void;
 }
-export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
+export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
   const { onCloseModal } = props;
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
@@ -42,13 +42,17 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
   };
   const [modelRepoSelection, setmodelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
   const handleContinue = useCallback(() => {
-    if (modelSource === ModelSource.USER_MODEL && modelRepoSelection[0]?.label) {
-      history.push(
-        `/model-registry/register-model?name=${modelRepoSelection[0]?.label}&version=${modelRepoSelection[0]?.label}`
-      );
-    }
-    if (modelSource === ModelSource.PRE_TRAINED_MODEL) {
-      history.push('/model-registry/register-model');
+    switch (modelSource) {
+      case ModelSource.USER_MODEL:
+        if (modelRepoSelection[0]?.label) {
+          history.push(
+            `/model-registry/register-model?name=${modelRepoSelection[0]?.label}&version=${modelRepoSelection[0]?.label}`
+          );
+        }
+        break;
+      case ModelSource.PRE_TRAINED_MODEL:
+        history.push('/model-registry/register-model');
+        break;
     }
   }, [history, modelSource, modelRepoSelection]);
   return (
@@ -123,19 +127,12 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProp) {
           <EuiButton
             color="primary"
             iconSide="right"
-            onClick={() => onCloseModal()}
+            onClick={onCloseModal}
             data-test-subj="cancel button"
           >
             Cancel
           </EuiButton>
-          <EuiButton
-            color="primary"
-            fill
-            onClick={() => {
-              handleContinue();
-            }}
-            data-test-subj="continue button"
-          >
+          <EuiButton color="primary" fill onClick={handleContinue} data-test-subj="continue button">
             Continue
           </EuiButton>
         </EuiModalFooter>
