@@ -9,18 +9,16 @@ import {
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
-  EuiLink,
   EuiSpacer,
   EuiFlexGroup,
   EuiFlexItem,
   EuiDescriptionList,
 } from '@elastic/eui';
-import { generatePath, useHistory } from 'react-router-dom';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionTable } from './version_table';
-import { EuiLinkButton, EuiCustomLink } from '../common';
+import { EuiLinkButton } from '../common';
 
 export type VersionTableSort = 'version-desc' | 'version-asc';
 
@@ -58,10 +56,11 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
         </EuiTitle>
         {latestVersion.id ? (
           <>
-            <EuiSpacer size="l" />,
-            <EuiCustomLink to={generatePath(routerPaths.modelDetail, { id: latestVersion.id })}>
+            <EuiSpacer size="l" />
+            {/* TODO: update after exsiting detail page */}
+            {/* <EuiCustomLink to={generatePath(routerPaths.modelDetail, { id: latestVersion.id })}>
               <EuiLink>View Full Details</EuiLink>
-            </EuiCustomLink>
+            </EuiCustomLink> */}
           </>
         ) : null}
       </EuiFlyoutHeader>
@@ -74,7 +73,7 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem />
-          <EuiLinkButton fill to={`${routerPaths.modelUpload}?name=${name}`}>
+          <EuiLinkButton fill to={`${routerPaths.registerModel}?name=${name}`}>
             Register new version
           </EuiLinkButton>
         </EuiFlexGroup>

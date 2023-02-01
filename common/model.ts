@@ -27,6 +27,7 @@ export interface OpenSearchSelfTrainedModel extends OpenSearchModelBase {
 }
 
 export interface OpenSearchCustomerModel extends OpenSearchModelBase {
+  algorithm: string;
   chunk_number: number;
   created_time: number;
   description: string;
