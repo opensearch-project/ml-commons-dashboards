@@ -29,6 +29,7 @@ export interface INode {
 export interface PreviewModel {
   name: string;
   id: string;
+  planningWorkerNodes: string[];
 }
 
 interface Props {
@@ -40,13 +41,13 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
   const { id, name } = model;
   const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
-    const targetNodes = data?.target_worker_nodes ?? [];
+    const targetNodes = data?.target_worker_nodes ?? model.planningWorkerNodes ?? [];
     const deployedNodes = data?.worker_nodes ?? [];
     return targetNodes.map((item) => ({
       id: item,
       deployed: deployedNodes.indexOf(item) > -1 ? true : false,
     }));
-  }, [data]);
+  }, [data, model]);
 
   const respondingStatus = useMemo(() => {
     if (loading) {
@@ -56,16 +57,16 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
         </EuiTextColor>
       );
     }
-    const deployedNodesNum = data?.worker_nodes?.length ?? 0;
-    const targetNodesNum = data?.target_worker_nodes?.length ?? 0;
+    const deployedNodesNum = nodes.filter(({ deployed }) => deployed).length;
+    const targetNodesNum = nodes.length;
+    if (deployedNodesNum === 0) {
+      return `Not responding on ${targetNodesNum} of ${targetNodesNum} nodes`;
+    }
     if (deployedNodesNum < targetNodesNum) {
       return `Partially responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
-    } else if (deployedNodesNum === 0) {
-      return `Not responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
-    } else {
-      return `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
     }
-  }, [data, loading]);
+    return `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
+  }, [nodes, loading]);
 
   const onCloseFlyout = useCallback(() => {
     onClose(data);

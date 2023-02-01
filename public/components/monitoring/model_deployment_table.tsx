@@ -34,6 +34,7 @@ export interface ModelDeploymentItem {
   respondingNodesCount: number | undefined;
   planningNodesCount: number | undefined;
   notRespondingNodesCount: number | undefined;
+  planningWorkerNodes: string[];
 }
 
 export interface ModelDeploymentTableProps {

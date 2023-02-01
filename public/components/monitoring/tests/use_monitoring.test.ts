@@ -5,7 +5,7 @@
 
 import { act, renderHook } from '@testing-library/react-hooks';
 
-import { ModelSearchItem, Model, ModelSearchResponse } from '../../../apis/model';
+import { Model, ModelSearchResponse } from '../../../apis/model';
 import { useMonitoring } from '../use_monitoring';
 
 jest.mock('../../../apis/model');
@@ -33,6 +33,7 @@ describe('useMonitoring', () => {
           algorithm: '',
           model_state: '',
           model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
         },
       ],
       pagination: {
@@ -145,9 +146,13 @@ describe('useMonitoring.pageStatus', () => {
             {
               id: 'model-1-id',
               name: 'model-1-name',
+              algorithm: 'TEXT_EMBEDDING',
+              model_state: 'LOADED',
+              model_version: '1.0.0',
               current_worker_node_count: 1,
               planning_worker_node_count: 3,
-            } as ModelSearchItem,
+              planning_worker_nodes: ['node1', 'node2', 'node3'],
+            },
           ],
           pagination: {
             currentPage: 1,
@@ -217,6 +222,7 @@ describe('useMonitoring.pageStatus', () => {
           respondingNodesCount: 1,
           notRespondingNodesCount: 2,
           planningNodesCount: 3,
+          planningWorkerNodes: ['node1', 'node2', 'node3'],
         },
       ])
     );
