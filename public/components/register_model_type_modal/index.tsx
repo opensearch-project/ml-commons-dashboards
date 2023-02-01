@@ -18,6 +18,7 @@ import {
   EuiText,
   EuiComboBox,
   EuiComboBoxOptionOption,
+  EuiTextColor,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
 enum ModelSource {
@@ -31,6 +32,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
   const { onCloseModal } = props;
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
+
   const options = [
     {
       label: 'Titan',
@@ -38,9 +40,9 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
     },
   ];
   const onChange = (modelRepoSelection: EuiComboBoxOptionOption[]) => {
-    setmodelRepoSelection(modelRepoSelection);
+    setModelRepoSelection(modelRepoSelection);
   };
-  const [modelRepoSelection, setmodelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
+  const [modelRepoSelection, setModelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
   const handleContinue = useCallback(() => {
     switch (modelSource) {
       case ModelSource.USER_MODEL:
@@ -64,56 +66,62 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
           </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
-          <div style={{ overflow: 'hidden' }}>
-            <EuiText>
-              <strong>Select source</strong>
-            </EuiText>
-            <EuiFlexGroup gutterSize="l">
-              <EuiFlexItem>
-                <EuiCheckableCard
-                  id={htmlIdGenerator()()}
-                  label={
-                    <div>
-                      <span style={{ fontWeight: 500 }}>Opensearch model repository</span>
-                      <EuiSpacer />
-                      <p style={{ color: 'gray' }}>
-                        Select from a curated list of relevant pre-trained machine learning models
-                      </p>
-                    </div>
-                  }
-                  aria-label="Opensearch model repository"
-                  checked={modelSource === ModelSource.USER_MODEL}
-                  onChange={() => setModelSource(ModelSource.USER_MODEL)}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiCheckableCard
-                  id={htmlIdGenerator()()}
-                  label={
-                    <div>
-                      <span style={{ fontWeight: 500 }}>Add your own model</span>
-                      <EuiSpacer />
-                      <p style={{ color: 'gray' }}>
+          <EuiText size="s">
+            <strong>Select source</strong>
+          </EuiText>
+          <EuiFlexGroup gutterSize="l">
+            <EuiFlexItem>
+              <EuiCheckableCard
+                id={htmlIdGenerator()()}
+                label={
+                  <div>
+                    <span style={{ fontSize: 20 }}>Opensearch model repository</span>
+                    <EuiSpacer />
+                    <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
+                      <small>
+                        Select from a curated list of relevant pre-trained machine learning models.
+                      </small>
+                    </EuiTextColor>
+                  </div>
+                }
+                aria-label="Opensearch model repository"
+                checked={modelSource === ModelSource.USER_MODEL}
+                onChange={() => setModelSource(ModelSource.USER_MODEL)}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiCheckableCard
+                id={htmlIdGenerator()()}
+                label={
+                  <div>
+                    <span style={{ fontSize: 20 }}>Add your own model</span>
+                    <EuiSpacer />
+                    <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
+                      <small>
                         Import your own model in Torchscript file format.Lorem ipsum dolar sit amet
                         consecuter.
-                      </p>
-                    </div>
-                  }
-                  aria-label="Add your own model"
-                  checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
-                  onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </div>
+                      </small>
+                    </EuiTextColor>
+                  </div>
+                }
+                aria-label="Add your own model"
+                checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
+                onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiModalBody>
         <EuiSpacer />
         <EuiSpacer />
         <EuiModalBody
           style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}
         >
-          <strong>Select model from repository</strong>
+          <small>
+            <strong>Select model from repository</strong>
+          </small>
+          <small>Lorem ipsum dolor sit amet consecetur lorem ipsum dolor.</small>
           <EuiSpacer />
+
           <EuiComboBox
             placeholder="Select model"
             singleSelection={{ asPlainText: true }}
