@@ -35,6 +35,7 @@ const setup = (
         respondingNodesCount: 1,
         notRespondingNodesCount: 2,
         planningNodesCount: 3,
+        planningWorkerNodes: ['node1', 'node2', 'node3'],
       },
       {
         id: 'model-2-id',
@@ -42,6 +43,7 @@ const setup = (
         respondingNodesCount: 3,
         notRespondingNodesCount: 0,
         planningNodesCount: 3,
+        planningWorkerNodes: ['node1', 'node2', 'node3'],
       },
       {
         id: 'model-3-id',
@@ -49,6 +51,7 @@ const setup = (
         respondingNodesCount: 0,
         notRespondingNodesCount: 3,
         planningNodesCount: 3,
+        planningWorkerNodes: ['node1', 'node2', 'node3'],
       },
     ],
     reload: jest.fn(),

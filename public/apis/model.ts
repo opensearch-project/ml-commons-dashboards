@@ -16,10 +16,7 @@ export interface ModelSearchItem {
   model_version: string;
   current_worker_node_count: number;
   planning_worker_node_count: number;
-}
-
-export interface ModelDetail extends ModelSearchItem {
-  content: string;
+  planning_worker_nodes: string[];
 }
 
 export interface ModelSearchResponse {

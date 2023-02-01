@@ -44,6 +44,7 @@ export interface OpenSearchCustomerModel extends OpenSearchModelBase {
   model_format: string;
   total_chunks: number;
   version: number;
+  planning_worker_nodes: string[];
 }
 
 export type ModelSearchSort = 'name-asc' | 'name-desc';

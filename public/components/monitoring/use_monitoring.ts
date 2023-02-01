@@ -56,6 +56,7 @@ const fetchDeployedModels = async (params: Params) => {
         name,
         current_worker_node_count: workerCount,
         planning_worker_node_count: planningCount,
+        planning_worker_nodes: planningWorkerNodes,
       }) => {
         return {
           id,
@@ -66,6 +67,7 @@ const fetchDeployedModels = async (params: Params) => {
             workerCount !== undefined && planningCount !== undefined
               ? planningCount - workerCount
               : undefined,
+          planningWorkerNodes,
         };
       }
     ),
