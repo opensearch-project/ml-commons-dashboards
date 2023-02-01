@@ -31,8 +31,8 @@ describe('useMonitoring', () => {
           current_worker_node_count: 1,
           planning_worker_node_count: 3,
           algorithm: '',
-          state: '',
-          version: '',
+          model_state: '',
+          model_version: '',
         },
       ],
       pagination: {
