@@ -19,6 +19,7 @@ import { useFetcher } from '../../hooks/use_fetcher';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionTable } from './version_table';
 import { EuiLinkButton } from '../common';
+import { generatePath } from 'react-router-dom';
 
 export type VersionTableSort = 'version-desc' | 'version-asc';
 
@@ -39,7 +40,7 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
     // TODO: currently assume that api will return versions in order
     if (model?.data) {
       const data = model.data;
-      return data[data.length - 1];
+      return data[0];
     }
     return { id: '' };
   }, [model]);
@@ -73,9 +74,14 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem />
-          <EuiLinkButton fill to={`${routerPaths.registerModel}?name=${name}`}>
-            Register new version
-          </EuiLinkButton>
+          {latestVersion?.id && (
+            <EuiLinkButton
+              fill
+              to={generatePath(routerPaths.registerModel, { id: latestVersion.id })}
+            >
+              Register new version
+            </EuiLinkButton>
+          )}
         </EuiFlexGroup>
         <VersionTable models={model?.data ?? []} sort={sort} onChange={handleTableChange} />
       </EuiFlyoutBody>
