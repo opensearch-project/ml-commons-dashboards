@@ -27,6 +27,12 @@ export interface ModelSearchItem {
     name: string;
     description?: string;
   };
+  model_config?: {
+    all_config?: string;
+    embedding_dimension: number;
+    framework_type: string;
+    model_type: string;
+  };
 }
 
 export interface ModelDetail extends ModelSearchItem {

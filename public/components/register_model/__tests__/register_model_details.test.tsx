@@ -5,6 +5,13 @@
 
 import { setup } from './setup';
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useParams: () => ({
+    id: '',
+  }),
+}));
+
 describe('<RegisterModel /> Details', () => {
   it('should render a model details panel', async () => {
     const onSubmitMock = jest.fn();
