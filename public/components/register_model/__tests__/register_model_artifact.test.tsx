@@ -6,6 +6,13 @@
 import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useParams: () => ({
+    id: '',
+  }),
+}));
+
 describe('<RegisterModel /> Artifact', () => {
   it('should render an artifact panel', async () => {
     const onSubmitMock = jest.fn();
