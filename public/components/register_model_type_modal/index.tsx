@@ -67,50 +67,53 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
           </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
-          <EuiText size="s">
-            <strong>Select source</strong>
-          </EuiText>
-          <EuiFlexGroup gutterSize="l">
-            <EuiFlexItem>
-              <EuiCheckableCard
-                id={htmlIdGenerator()()}
-                label={
-                  <div>
-                    <span style={{ fontSize: 20 }}>Opensearch model repository</span>
-                    <EuiSpacer />
-                    <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
-                      <small>
-                        Select from a curated list of relevant pre-trained machine learning models.
-                      </small>
-                    </EuiTextColor>
-                  </div>
-                }
-                aria-label="Opensearch model repository"
-                checked={modelSource === ModelSource.USER_MODEL}
-                onChange={() => setModelSource(ModelSource.USER_MODEL)}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiCheckableCard
-                id={htmlIdGenerator()()}
-                label={
-                  <div>
-                    <span style={{ fontSize: 20 }}>Add your own model</span>
-                    <EuiSpacer />
-                    <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
-                      <small>
-                        Import your own model in Torchscript file format.Lorem ipsum dolar sit amet
-                        consecuter.
-                      </small>
-                    </EuiTextColor>
-                  </div>
-                }
-                aria-label="Add your own model"
-                checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
-                onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          <div style={{ overflow: 'hidden' }}>
+            <EuiText size="s">
+              <strong>Select source</strong>
+            </EuiText>
+            <EuiFlexGroup gutterSize="l">
+              <EuiFlexItem>
+                <EuiCheckableCard
+                  id={htmlIdGenerator()()}
+                  label={
+                    <div>
+                      <span style={{ fontSize: 20 }}>Opensearch model repository</span>
+                      <EuiSpacer />
+                      <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
+                        <small>
+                          Select from a curated list of relevant pre-trained machine learning
+                          models.
+                        </small>
+                      </EuiTextColor>
+                    </div>
+                  }
+                  aria-label="Opensearch model repository"
+                  checked={modelSource === ModelSource.USER_MODEL}
+                  onChange={() => setModelSource(ModelSource.USER_MODEL)}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiCheckableCard
+                  id={htmlIdGenerator()()}
+                  label={
+                    <div>
+                      <span style={{ fontSize: 20 }}>Add your own model</span>
+                      <EuiSpacer />
+                      <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
+                        <small>
+                          Import your own model in Torchscript file format.Lorem ipsum dolar sit
+                          amet consecuter.
+                        </small>
+                      </EuiTextColor>
+                    </div>
+                  }
+                  aria-label="Add your own model"
+                  checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
+                  onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </div>
         </EuiModalBody>
         <EuiSpacer />
         <EuiSpacer />
