@@ -43,7 +43,7 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
 
   useEffect(() => {
     if (!latestVersioinId) return;
-    const fn = async () => {
+    const initializeForm = async () => {
       const { data } = await APIProvider.getAPI('model').search({
         ids: [latestVersioinId],
         currentPage: 1,
@@ -58,7 +58,7 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
         setValue('configuration', model_config?.all_config ?? '');
       }
     };
-    fn();
+    initializeForm();
   }, [latestVersioinId]);
 
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
