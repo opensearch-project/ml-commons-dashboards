@@ -114,34 +114,31 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
               </EuiFlexItem>
             </EuiFlexGroup>
           </div>
-        </EuiModalBody>
-        <EuiSpacer />
-        <EuiSpacer />
-        <EuiModalBody
-          style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}
-        >
-          <small>
-            <strong>Select model from repository</strong>
-          </small>
-          <EuiSpacer size="m" />
-          <div>
-            <small>Lorem ipsum dolor sit amet consecetur lorem ipsum dolor.</small>
+          <EuiSpacer />
+          <EuiSpacer />
+          <div style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}>
             <small>
-              <EuiLink href="#" external>
-                Learn more
-              </EuiLink>
+              <strong>Select model from repository</strong>
             </small>
+            <EuiSpacer size="m" />
+            <div>
+              <small>Lorem ipsum dolor sit amet consecetur lorem ipsum dolor.</small>
+              <small>
+                <EuiLink href="#" external>
+                  Learn more
+                </EuiLink>
+              </small>
+            </div>
+            <EuiSpacer size="s" />
+            <EuiComboBox
+              placeholder="Select model"
+              singleSelection={{ asPlainText: true }}
+              options={options}
+              selectedOptions={modelRepoSelection}
+              onChange={onChange}
+              aria-label="Select model"
+            />
           </div>
-          <EuiSpacer size="s" />
-
-          <EuiComboBox
-            placeholder="Select model"
-            singleSelection={{ asPlainText: true }}
-            options={options}
-            selectedOptions={modelRepoSelection}
-            onChange={onChange}
-            aria-label="Select model"
-          />
         </EuiModalBody>
         <EuiModalFooter>
           <EuiButton
