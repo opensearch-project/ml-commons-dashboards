@@ -19,41 +19,42 @@ import {
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiTextColor,
+  EuiLink,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
+import { routerPaths } from '../../../common/router_paths';
 enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
 }
-export interface RegisterModelTypeProps {
+interface RegisterModelTypeProps {
   onCloseModal: () => void;
 }
 export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
   const { onCloseModal } = props;
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
-
+  const [modelRepoSelection, setModelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
   const options = [
     {
       label: 'Titan',
       'data-test-subj': 'titanOption',
     },
   ];
-  const onChange = (modelRepoSelection: EuiComboBoxOptionOption[]) => {
-    setModelRepoSelection(modelRepoSelection);
-  };
-  const [modelRepoSelection, setModelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
+  const onChange = useCallback((modelSelection: EuiComboBoxOptionOption[]) => {
+    setModelRepoSelection(modelSelection);
+  }, []);
   const handleContinue = useCallback(() => {
     switch (modelSource) {
       case ModelSource.USER_MODEL:
         if (modelRepoSelection[0]?.label) {
           history.push(
-            `/model-registry/register-model?name=${modelRepoSelection[0]?.label}&version=${modelRepoSelection[0]?.label}`
+            `${routerPaths.registerModel}?name=${modelRepoSelection[0]?.label}&version=${modelRepoSelection[0]?.label}`
           );
         }
         break;
       case ModelSource.PRE_TRAINED_MODEL:
-        history.push('/model-registry/register-model');
+        history.push(routerPaths.registerModel);
         break;
     }
   }, [history, modelSource, modelRepoSelection]);
@@ -119,8 +120,16 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
           <small>
             <strong>Select model from repository</strong>
           </small>
-          <small>Lorem ipsum dolor sit amet consecetur lorem ipsum dolor.</small>
-          <EuiSpacer />
+          <EuiSpacer size="m" />
+          <div>
+            <small>Lorem ipsum dolor sit amet consecetur lorem ipsum dolor.</small>
+            <small>
+              <EuiLink href="#" external>
+                Learn more
+              </EuiLink>
+            </small>
+          </div>
+          <EuiSpacer size="s" />
 
           <EuiComboBox
             placeholder="Select model"
