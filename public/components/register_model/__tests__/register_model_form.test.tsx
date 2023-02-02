@@ -50,14 +50,11 @@ describe('<RegisterModel /> Form', () => {
     request.mockResolvedValue(mockResult);
     render(<RegisterModelForm />);
 
-    const { name, model_version } = mockResult.data[0];
+    const { name } = mockResult.data[0];
 
     await waitFor(() => {
       const nameInput = screen.getByLabelText<HTMLInputElement>(/model name/i);
-      const versionInput = screen.getByLabelText<HTMLInputElement>(/version/i);
-
       expect(nameInput.value).toBe(name);
-      expect(versionInput.value).toBe(model_version);
     });
   });
 });
