@@ -12,7 +12,7 @@ interface ModelFormBase {
   name: string;
   version: string;
   description: string;
-  annotations: string;
+  annotations?: string;
   configuration: string;
   metricName?: string;
   trainingMetricValue?: string;
