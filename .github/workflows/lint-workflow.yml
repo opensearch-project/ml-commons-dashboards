@@ -2,12 +2,10 @@ name: Lint workflow
 on:
   push:
     branches:
-      - '*'
-      - 'feature/*'
+      - '**'
   pull_request:
     branches:
-      - '*'
-      - 'feature/*'
+      - '**'
 env:
   OPENSEARCH_DASHBOARDS_VERSION: '2.2'
 jobs:
