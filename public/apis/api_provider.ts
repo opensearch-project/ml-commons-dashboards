@@ -7,20 +7,24 @@ import { Model } from './model';
 import { ModelAggregate } from './model_aggregate';
 import { Profile } from './profile';
 import { Security } from './security';
+import { Task } from './task';
 
 const apiInstanceStore: {
   model: Model | undefined;
   modelAggregate: ModelAggregate | undefined;
   profile: Profile | undefined;
   security: Security | undefined;
+  task: Task | undefined;
 } = {
   model: undefined,
   modelAggregate: undefined,
   profile: undefined,
   security: undefined,
+  task: undefined,
 };
 
 export class APIProvider {
+  public static getAPI(type: 'task'): Task;
   public static getAPI(type: 'model'): Model;
   public static getAPI(type: 'modelAggregate'): ModelAggregate;
   public static getAPI(type: 'profile'): Profile;
@@ -48,6 +52,11 @@ export class APIProvider {
       case 'security': {
         const newInstance = new Security();
         apiInstanceStore.security = newInstance;
+        return newInstance;
+      }
+      case 'task': {
+        const newInstance = new Task();
+        apiInstanceStore.task = newInstance;
         return newInstance;
       }
     }
