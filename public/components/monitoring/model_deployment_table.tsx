@@ -19,6 +19,7 @@ import {
   EuiSpacer,
   EuiLink,
   EuiText,
+  EuiToolTip,
 } from '@elastic/eui';
 
 import { MODEL_STATE } from '../../../common';
@@ -131,7 +132,7 @@ export const ModelDeploymentTable = ({
         sortable: true,
         render: (id: string) => (
           <>
-            <EuiCopy textToCopy={id}>
+            <EuiCopy textToCopy={id} beforeMessage="Copy model ID">
               {(copy) => (
                 <EuiButtonIcon
                   aria-label="copy"
@@ -154,14 +155,16 @@ export const ModelDeploymentTable = ({
         width: '10%',
         render: (id: string, modelDeploymentItem: ModelDeploymentItem) => {
           return (
-            <EuiButtonIcon
-              onClick={() => {
-                onViewDetail?.(modelDeploymentItem);
-              }}
-              role="button"
-              aria-label="view detail"
-              iconType="inspect"
-            />
+            <EuiToolTip content="View status details">
+              <EuiButtonIcon
+                onClick={() => {
+                  onViewDetail?.(modelDeploymentItem);
+                }}
+                role="button"
+                aria-label="view detail"
+                iconType="inspect"
+              />
+            </EuiToolTip>
           );
         },
       },
