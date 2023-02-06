@@ -92,7 +92,7 @@ export const ModelDeploymentTable = ({
           }
           if (respondingNodesCount === 0) {
             return (
-              <EuiHealth className="modelStatusCell" color="danger">
+              <EuiHealth className="ml-modelStatusCell" color="danger">
                 <div className="eui-textTruncate">
                   <span style={{ fontWeight: 600 }}>Not responding</span> on {planningNodesCount} of{' '}
                   {planningNodesCount} nodes
@@ -102,7 +102,7 @@ export const ModelDeploymentTable = ({
           }
           if (notRespondingNodesCount === 0) {
             return (
-              <EuiHealth className="modelStatusCell" color="success">
+              <EuiHealth className="ml-modelStatusCell" color="success">
                 <div className="eui-textTruncate">
                   <span style={{ fontWeight: 600 }}>Responding</span> on {planningNodesCount} of{' '}
                   {planningNodesCount} nodes
@@ -111,7 +111,7 @@ export const ModelDeploymentTable = ({
             );
           }
           return (
-            <EuiHealth className="modelStatusCell" color="warning">
+            <EuiHealth className="ml-modelStatusCell" color="warning">
               <div className="eui-textTruncate">
                 <span style={{ fontWeight: 600 }}>Partially responding</span> on{' '}
                 {respondingNodesCount} of {planningNodesCount} nodes
