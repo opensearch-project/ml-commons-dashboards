@@ -126,7 +126,7 @@ export const ModelDeploymentTable = ({
       },
       {
         field: 'id',
-        name: 'ID',
+        name: 'Model ID',
         width: '25%',
         sortable: true,
         render: (id: string) => (

@@ -120,7 +120,7 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
     });
 
-    it('should render ID at third column and copy to clipboard after button clicked', async () => {
+    it('should render Model ID at third column and copy to clipboard after button clicked', async () => {
       const execCommandOrigin = document.execCommand;
       document.execCommand = jest.fn(() => true);
 
@@ -130,7 +130,7 @@ describe('<DeployedModelTable />', () => {
       const columnContent = header
         .closest('table')
         ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
-      expect(within(header).getByText('ID')).toBeInTheDocument();
+      expect(within(header).getByText('Model ID')).toBeInTheDocument();
       expect(columnContent?.length).toBe(3);
       const cells = columnContent!;
       expect(within(cells[0] as HTMLElement).getByText('model-1-id')).toBeInTheDocument();
@@ -247,7 +247,7 @@ describe('<DeployedModelTable />', () => {
     );
   });
 
-  it('should call onChange with consistent id sort parameters', async () => {
+  it('should call onChange with consistent model id sort parameters', async () => {
     const {
       finalProps,
       result: { rerender },
@@ -258,7 +258,7 @@ describe('<DeployedModelTable />', () => {
       },
     });
 
-    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('ID'));
+    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('Model ID'));
     expect(finalProps.onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: {
@@ -277,7 +277,7 @@ describe('<DeployedModelTable />', () => {
         }}
       />
     );
-    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('ID'));
+    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('Model ID'));
     expect(finalProps.onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: {
