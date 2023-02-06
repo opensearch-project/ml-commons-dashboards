@@ -12,6 +12,10 @@ import { MODEL_API_ENDPOINT } from './constants';
 const modelSortQuerySchema = schema.oneOf([
   schema.literal('name-asc'),
   schema.literal('name-desc'),
+  schema.literal('model_state-asc'),
+  schema.literal('model_state-desc'),
+  schema.literal('id-asc'),
+  schema.literal('id-desc'),
 ]);
 
 const modelStateSchema = schema.oneOf([

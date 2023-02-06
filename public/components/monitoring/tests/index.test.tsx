@@ -163,7 +163,7 @@ describe('<Monitoring />', () => {
       finalMonitoringReturnValue: { handleTableChange },
       user,
     } = setup();
-    await user.click(screen.getByTestId('tableHeaderSortButton'));
+    await user.click(screen.getAllByTestId('tableHeaderSortButton')[0]);
     expect(handleTableChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: { field: 'name', direction: 'desc' },

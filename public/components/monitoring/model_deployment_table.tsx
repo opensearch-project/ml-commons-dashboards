@@ -21,8 +21,10 @@ import {
   EuiText,
 } from '@elastic/eui';
 
+import { MODEL_STATE } from '../../../common';
+
 export interface ModelDeploymentTableSort {
-  field: 'name';
+  field: 'name' | 'model_state' | 'id';
   direction: Direction;
 }
 
@@ -34,6 +36,7 @@ export interface ModelDeploymentTableCriteria {
 export interface ModelDeploymentItem {
   id: string;
   name: string;
+  model_state?: MODEL_STATE;
   respondingNodesCount: number | undefined;
   planningNodesCount: number | undefined;
   notRespondingNodesCount: number | undefined;
@@ -75,12 +78,13 @@ export const ModelDeploymentTable = ({
         truncateText: true,
       },
       {
-        field: 'id',
+        field: 'model_state',
         name: 'Status',
         width: '37.5%',
+        sortable: true,
         truncateText: true,
         render: (
-          _id: string,
+          _model_state: string,
           { planningNodesCount, respondingNodesCount, notRespondingNodesCount }: ModelDeploymentItem
         ) => {
           if (
@@ -124,6 +128,7 @@ export const ModelDeploymentTable = ({
         field: 'id',
         name: 'ID',
         width: '25%',
+        sortable: true,
         render: (id: string) => (
           <>
             <EuiCopy textToCopy={id}>

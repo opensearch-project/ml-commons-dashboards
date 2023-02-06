@@ -18,6 +18,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         respondingNodesCount: 1,
         notRespondingNodesCount: 2,
         planningNodesCount: 3,
+        planningWorkerNodes: [],
       },
       {
         id: 'model-2-id',
@@ -25,6 +26,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         respondingNodesCount: 3,
         notRespondingNodesCount: 0,
         planningNodesCount: 3,
+        planningWorkerNodes: [],
       },
       {
         id: 'model-3-id',
@@ -32,6 +34,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         respondingNodesCount: 0,
         notRespondingNodesCount: 3,
         planningNodesCount: 3,
+        planningWorkerNodes: [],
       },
     ],
     pagination: { currentPage: 1, pageSize: 10, totalRecords: 100 },
@@ -167,7 +170,7 @@ describe('<DeployedModelTable />', () => {
     });
   });
 
-  it('should call onChange with consistent sort parameters', async () => {
+  it('should call onChange with consistent name sort parameters', async () => {
     const {
       finalProps,
       result: { rerender },
@@ -197,6 +200,88 @@ describe('<DeployedModelTable />', () => {
       expect.objectContaining({
         sort: {
           field: 'name',
+          direction: 'asc',
+        },
+      })
+    );
+  });
+
+  it('should call onChange with consistent status sort parameters', async () => {
+    const {
+      finalProps,
+      result: { rerender },
+    } = setup({
+      sort: {
+        field: 'model_state',
+        direction: 'asc',
+      },
+    });
+
+    await userEvent.click(within(screen.getAllByRole('columnheader')[1]).getByText('Status'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'model_state',
+          direction: 'desc',
+        },
+      })
+    );
+
+    rerender(
+      <ModelDeploymentTable
+        {...finalProps}
+        sort={{
+          field: 'model_state',
+          direction: 'desc',
+        }}
+      />
+    );
+    await userEvent.click(within(screen.getAllByRole('columnheader')[1]).getByText('Status'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'model_state',
+          direction: 'asc',
+        },
+      })
+    );
+  });
+
+  it('should call onChange with consistent id sort parameters', async () => {
+    const {
+      finalProps,
+      result: { rerender },
+    } = setup({
+      sort: {
+        field: 'id',
+        direction: 'asc',
+      },
+    });
+
+    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('ID'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'id',
+          direction: 'desc',
+        },
+      })
+    );
+
+    rerender(
+      <ModelDeploymentTable
+        {...finalProps}
+        sort={{
+          field: 'id',
+          direction: 'desc',
+        }}
+      />
+    );
+    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('ID'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'id',
           direction: 'asc',
         },
       })

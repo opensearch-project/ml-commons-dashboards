@@ -100,7 +100,7 @@ describe('useMonitoring', () => {
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
-          sort: ['name-asc'],
+          sort: ['model_state-asc'],
           currentPage: 1,
           pageSize: 10,
         })
