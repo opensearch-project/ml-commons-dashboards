@@ -71,7 +71,7 @@ interface UploadModelBase {
   version: string;
   description: string;
   modelFormat: string;
-  modelConfig: string;
+  modelConfig: Record<string, unknown>;
 }
 
 export interface UploadModelByURL extends UploadModelBase {
