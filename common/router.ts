@@ -15,8 +15,8 @@ interface RouteConfig {
 
 export const ROUTES: RouteConfig[] = [
   {
-    path: routerPaths.monitoring,
+    path: routerPaths.overview,
     Component: Monitoring,
-    label: 'Monitoring',
+    label: 'Overview',
   },
 ];

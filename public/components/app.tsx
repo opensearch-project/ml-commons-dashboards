@@ -53,7 +53,7 @@ export const MlCommonsPluginApp = ({
                   exact={exact ?? false}
                 />
               ))}
-              <Redirect from={routerPaths.root} to={routerPaths.monitoring} />
+              <Redirect from={routerPaths.root} to={routerPaths.overview} />
             </Switch>
           </EuiPageBody>
         </EuiPage>

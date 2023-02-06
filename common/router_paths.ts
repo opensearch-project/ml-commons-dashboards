@@ -5,5 +5,5 @@
 
 export const routerPaths = {
   root: '/',
-  monitoring: '/monitoring',
+  overview: '/overview',
 };
