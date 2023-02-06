@@ -33,7 +33,7 @@ describe('<NodesTable />', () => {
     expect(screen.getByText('id2')).toBeInTheDocument();
   });
 
-  it('should render status at first column with desc by default', () => {
+  it('should render status at first column with asc by default', () => {
     const columnIndex = 0;
     setup({});
     const header = screen.getAllByRole('columnheader')[columnIndex];
@@ -54,7 +54,7 @@ describe('<NodesTable />', () => {
     const columnContent = header
       .closest('table')
       ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
-    expect(within(header).getByText('NODE ID')).toBeInTheDocument();
+    expect(within(header).getByText('Node ID')).toBeInTheDocument();
     expect(columnContent?.length).toBe(2);
     const cells = columnContent!;
     expect(within(cells[0] as HTMLElement).getByText('id2')).toBeInTheDocument();

@@ -9,6 +9,7 @@ import {
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
+  EuiHealth,
   EuiDescriptionList,
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
@@ -60,12 +61,24 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
     const deployedNodesNum = nodes.filter(({ deployed }) => deployed).length;
     const targetNodesNum = nodes.length;
     if (deployedNodesNum === 0) {
-      return `Not responding on ${targetNodesNum} of ${targetNodesNum} nodes`;
+      return (
+        <EuiHealth className="ml-modelStatusCell" color="danger">
+          Not responding on {targetNodesNum} of {targetNodesNum} nodes
+        </EuiHealth>
+      );
     }
     if (deployedNodesNum < targetNodesNum) {
-      return `Partially responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
+      return (
+        <EuiHealth className="ml-modelStatusCell" color="warning">
+          Partially responding on {deployedNodesNum} of {targetNodesNum} nodes
+        </EuiHealth>
+      );
     }
-    return `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
+    return (
+      <EuiHealth className="ml-modelStatusCell" color="success">
+        Responding on {deployedNodesNum} of {targetNodesNum} nodes
+      </EuiHealth>
+    );
   }, [nodes, loading]);
 
   const onCloseFlyout = useCallback(() => {
@@ -81,11 +94,13 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         <EuiDescriptionList>
-          <EuiDescriptionListTitle>Model ID</EuiDescriptionListTitle>
+          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>Model ID</EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
-            <CopyableText text={id} iconLeft={false} />
+            <CopyableText text={id} iconLeft={false} tooltipText="Copy model ID" />
           </EuiDescriptionListDescription>
-          <EuiDescriptionListTitle>Model status by node</EuiDescriptionListTitle>
+          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>
+            Model status by node
+          </EuiDescriptionListTitle>
           <EuiDescriptionListDescription>{respondingStatus}</EuiDescriptionListDescription>
         </EuiDescriptionList>
         <EuiSpacer />
