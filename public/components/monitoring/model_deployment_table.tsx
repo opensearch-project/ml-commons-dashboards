@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import './index.scss';
+
 import React, { useCallback, useMemo } from 'react';
 import {
   Criteria,
@@ -16,6 +18,7 @@ import {
   EuiIcon,
   EuiSpacer,
   EuiLink,
+  EuiText,
 } from '@elastic/eui';
 
 export interface ModelDeploymentTableSort {
@@ -67,13 +70,15 @@ export const ModelDeploymentTable = ({
       {
         field: 'name',
         name: 'Name',
-        width: '299px',
+        width: '27.5%',
         sortable: true,
+        truncateText: true,
       },
       {
         field: 'id',
         name: 'Status',
-        width: '338px',
+        width: '37.5%',
+        truncateText: true,
         render: (
           _id: string,
           { planningNodesCount, respondingNodesCount, notRespondingNodesCount }: ModelDeploymentItem
@@ -87,8 +92,8 @@ export const ModelDeploymentTable = ({
           }
           if (respondingNodesCount === 0) {
             return (
-              <EuiHealth color="danger">
-                <div>
+              <EuiHealth className="ml-modelStatusCell" color="danger">
+                <div className="eui-textTruncate">
                   <span style={{ fontWeight: 600 }}>Not responding</span> on {planningNodesCount} of{' '}
                   {planningNodesCount} nodes
                 </div>
@@ -97,8 +102,8 @@ export const ModelDeploymentTable = ({
           }
           if (notRespondingNodesCount === 0) {
             return (
-              <EuiHealth color="success">
-                <div>
+              <EuiHealth className="ml-modelStatusCell" color="success">
+                <div className="eui-textTruncate">
                   <span style={{ fontWeight: 600 }}>Responding</span> on {planningNodesCount} of{' '}
                   {planningNodesCount} nodes
                 </div>
@@ -106,8 +111,8 @@ export const ModelDeploymentTable = ({
             );
           }
           return (
-            <EuiHealth color="warning">
-              <div>
+            <EuiHealth className="ml-modelStatusCell" color="warning">
+              <div className="eui-textTruncate">
                 <span style={{ fontWeight: 600 }}>Partially responding</span> on{' '}
                 {respondingNodesCount} of {planningNodesCount} nodes
               </div>
@@ -118,8 +123,8 @@ export const ModelDeploymentTable = ({
       {
         field: 'id',
         name: 'ID',
-        width: '266px',
-        render: (id) => (
+        width: '25%',
+        render: (id: string) => (
           <>
             <EuiCopy textToCopy={id}>
               {(copy) => (
@@ -131,7 +136,9 @@ export const ModelDeploymentTable = ({
                 />
               )}
             </EuiCopy>
-            {id}
+            <EuiText className="eui-textTruncate" size="s">
+              {id}
+            </EuiText>
           </>
         ),
       },
@@ -139,7 +146,7 @@ export const ModelDeploymentTable = ({
         field: 'id',
         name: 'Action',
         align: 'right' as const,
-        width: '120px',
+        width: '10%',
         render: (id: string, modelDeploymentItem: ModelDeploymentItem) => {
           return (
             <EuiButtonIcon

@@ -1,0 +1,11 @@
+.ml-modelStatusCell {
+  width: 100%;
+
+  .euiFlexGroup {
+    .euiFlexItem {
+      &:nth-child(2) {
+        width: calc(100% - 16px);
+      }
+    }
+  }
+}
