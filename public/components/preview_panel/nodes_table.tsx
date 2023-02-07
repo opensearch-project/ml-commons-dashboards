@@ -31,13 +31,8 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
     const { index, size } = pageOptions;
     const sortedNodes = nodes.sort((a, b) => {
       if (field === 'id') {
-        if (a.id < b.id) {
-          return direction === 'asc' ? -1 : 1;
-        }
-        if (a.id > b.id) {
-          return direction === 'asc' ? 1 : -1;
-        }
-        return 0;
+        const compareResult = a.id.localeCompare(b.id);
+        return direction === 'asc' ? compareResult : -compareResult;
       } else {
         return direction === 'asc'
           ? Number(a.deployed) - Number(b.deployed)
