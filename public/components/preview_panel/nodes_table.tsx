@@ -17,8 +17,8 @@ import { CopyableText } from '../common';
 export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
   const { nodes, loading } = props;
   const [sort, setSort] = useState<{ field: keyof INode; direction: Direction }>({
-    field: 'id',
-    direction: 'desc',
+    field: 'deployed',
+    direction: 'asc',
   });
 
   const [pageOptions, setPageOptions] = useState({
@@ -27,14 +27,17 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
   });
 
   const items = useMemo(() => {
-    const direction = sort.direction;
+    const { field, direction } = sort;
     const { index, size } = pageOptions;
     const sortedNodes = nodes.sort((a, b) => {
-      if (a.id < b.id) {
-        return direction === 'asc' ? -1 : 1;
+      if (field === 'id') {
+        const compareResult = a.id.localeCompare(b.id);
+        return direction === 'asc' ? compareResult : -compareResult;
       }
-      if (a.id > b.id) {
-        return direction === 'asc' ? 1 : -1;
+      if (field === 'deployed') {
+        return direction === 'asc'
+          ? Number(a.deployed) - Number(b.deployed)
+          : Number(b.deployed) - Number(a.deployed);
       }
       return 0;
     });
@@ -49,7 +52,7 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
       {
         field: 'deployed',
         name: 'Status',
-        sortable: false,
+        sortable: true,
         render: (deployed: boolean) => {
           const color = deployed ? 'success' : 'danger';
           const label = deployed ? 'Responding' : 'Not responding';
@@ -58,10 +61,10 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
       },
       {
         field: 'id',
-        name: 'NODE ID',
+        name: 'Node ID',
         sortable: true,
         render: (id: string) => {
-          return <CopyableText text={id} iconLeft={true} />;
+          return <CopyableText text={id} iconLeft={true} tooltipText="Copy node ID" />;
         },
       },
     ],
@@ -73,7 +76,7 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
       pageIndex: pageOptions.index,
       pageSize: pageOptions.size,
       totalItemCount: nodes.length,
-      pageSizeOptions: [10, 15, 20, 30, 50],
+      pageSizeOptions: [10, 20, 50],
       showPerPageOptions: true,
     }),
     [pageOptions, nodes]
