@@ -33,7 +33,8 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
       if (field === 'id') {
         const compareResult = a.id.localeCompare(b.id);
         return direction === 'asc' ? compareResult : -compareResult;
-      } else if (field === 'deployed') {
+      }
+      if (field === 'deployed') {
         return direction === 'asc'
           ? Number(a.deployed) - Number(b.deployed)
           : Number(b.deployed) - Number(a.deployed);
