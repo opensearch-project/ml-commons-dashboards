@@ -47,4 +47,10 @@ export interface OpenSearchCustomerModel extends OpenSearchModelBase {
   planning_worker_nodes: string[];
 }
 
-export type ModelSearchSort = 'name-asc' | 'name-desc';
+export type ModelSearchSort =
+  | 'name-asc'
+  | 'name-desc'
+  | 'id-asc'
+  | 'model_state-asc'
+  | 'model_state-desc'
+  | 'id-desc';

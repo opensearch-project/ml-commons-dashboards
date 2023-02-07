@@ -16,7 +16,7 @@ interface Params {
   status?: ModelDeployStatus[];
   currentPage: number;
   pageSize: number;
-  sort: { field: 'name'; direction: 'asc' | 'desc' };
+  sort: { field: 'name' | 'model_state' | 'id'; direction: 'asc' | 'desc' };
 }
 
 const isValidNameOrIdFilter = (nameOrId: string | undefined): nameOrId is string => !!nameOrId;
@@ -78,7 +78,7 @@ export const useMonitoring = () => {
   const [params, setParams] = useState<Params>({
     currentPage: 1,
     pageSize: 10,
-    sort: { field: 'name', direction: 'asc' },
+    sort: { field: 'model_state', direction: 'asc' },
   });
   const { data, loading, reload } = useFetcher(fetchDeployedModels, params);
   const filterExists = checkFilterExists(params);

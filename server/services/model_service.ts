@@ -27,6 +27,7 @@ import { MODEL_BASE_API } from './utils/constants';
 
 const modelSortFieldMapping: { [key: string]: string } = {
   name: 'name.keyword',
+  id: '_id',
 };
 
 export class ModelService {

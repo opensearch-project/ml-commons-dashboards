@@ -6,11 +6,11 @@
 import {
   EuiPanel,
   EuiPageHeader,
-  EuiTitle,
   EuiSpacer,
   EuiTextColor,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiText,
 } from '@elastic/eui';
 import React, { useState, useRef, useCallback } from 'react';
 
@@ -82,20 +82,16 @@ export const Monitoring = () => {
       />
       <EuiSpacer size="m" />
       <EuiPanel>
-        <EuiTitle size="s">
-          <h3>
+        <EuiText size="s">
+          <h2>
             Deployed models{' '}
             {pageStatus !== 'empty' && (
-              <EuiTextColor
-                aria-label="total number of results"
-                style={{ fontWeight: 'normal' }}
-                color="subdued"
-              >
+              <EuiTextColor aria-label="total number of results" color="subdued">
                 ({pagination?.totalRecords ?? 0})
               </EuiTextColor>
             )}
-          </h3>
-        </EuiTitle>
+          </h2>
+        </EuiText>
 
         <EuiSpacer size="m" />
         {pageStatus !== 'empty' && (

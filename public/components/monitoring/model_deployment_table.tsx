@@ -19,10 +19,13 @@ import {
   EuiSpacer,
   EuiLink,
   EuiText,
+  EuiToolTip,
 } from '@elastic/eui';
 
+import { MODEL_STATE } from '../../../common';
+
 export interface ModelDeploymentTableSort {
-  field: 'name';
+  field: 'name' | 'model_state' | 'id';
   direction: Direction;
 }
 
@@ -34,6 +37,7 @@ export interface ModelDeploymentTableCriteria {
 export interface ModelDeploymentItem {
   id: string;
   name: string;
+  model_state?: MODEL_STATE;
   respondingNodesCount: number | undefined;
   planningNodesCount: number | undefined;
   notRespondingNodesCount: number | undefined;
@@ -75,12 +79,13 @@ export const ModelDeploymentTable = ({
         truncateText: true,
       },
       {
-        field: 'id',
+        field: 'model_state',
         name: 'Status',
         width: '37.5%',
+        sortable: true,
         truncateText: true,
         render: (
-          _id: string,
+          _model_state: string,
           { planningNodesCount, respondingNodesCount, notRespondingNodesCount }: ModelDeploymentItem
         ) => {
           if (
@@ -122,11 +127,12 @@ export const ModelDeploymentTable = ({
       },
       {
         field: 'id',
-        name: 'ID',
+        name: 'Model ID',
         width: '25%',
+        sortable: true,
         render: (id: string) => (
           <>
-            <EuiCopy textToCopy={id}>
+            <EuiCopy textToCopy={id} beforeMessage="Copy model ID">
               {(copy) => (
                 <EuiButtonIcon
                   aria-label="copy"
@@ -149,14 +155,16 @@ export const ModelDeploymentTable = ({
         width: '10%',
         render: (id: string, modelDeploymentItem: ModelDeploymentItem) => {
           return (
-            <EuiButtonIcon
-              onClick={() => {
-                onViewDetail?.(modelDeploymentItem);
-              }}
-              role="button"
-              aria-label="view detail"
-              iconType="inspect"
-            />
+            <EuiToolTip content="View status details">
+              <EuiButtonIcon
+                onClick={() => {
+                  onViewDetail?.(modelDeploymentItem);
+                }}
+                role="button"
+                aria-label="view detail"
+                iconType="inspect"
+              />
+            </EuiToolTip>
           );
         },
       },

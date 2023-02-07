@@ -8,23 +8,17 @@ import { EuiCallOut, EuiLink } from '@elastic/eui';
 
 export const ExperimentalWarning = () => {
   return (
-    <EuiCallOut title="Experiment Feature" iconType="iInCircle">
-      <span>The feature is experimental and should not be used in a production environment.</span>
-      <span>
-        For more information,see{' '}
-        <EuiLink href="#" external>
-          Machine Learning Monitoring Documentation
-        </EuiLink>
-        .
-      </span>
-
-      <p>
-        <span>To leave feedback, visit </span>
-        <EuiLink href="#" external>
-          forum.opensearch.org
-        </EuiLink>
-        .
-      </p>
+    <EuiCallOut title="Experimental Feature" iconType="iInCircle">
+      The feature is experimental and should not be used in a production environment. For more
+      information, see{' '}
+      <EuiLink href="#" external>
+        Machine Learning Documentation
+      </EuiLink>
+      . To leave feedback, visit{' '}
+      <EuiLink href="#" external>
+        forum.opensearch.org
+      </EuiLink>
+      .
     </EuiCallOut>
   );
 };
