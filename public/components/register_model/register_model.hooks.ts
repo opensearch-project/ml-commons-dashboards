@@ -51,9 +51,6 @@ export const useModelTags = () => {
   return [loading, { keys, values }] as const;
 };
 
-const isUploadByURL = (model: { modelURL?: string; modelFile?: File }): model is ModelUrlFormData =>
-  !!model.modelURL;
-
 export const useModelUpload = () => {
   const timeoutIdRef = useRef(-1);
   const mountedRef = useRef(true);
@@ -74,7 +71,7 @@ export const useModelUpload = () => {
       modelFormat: 'TORCH_SCRIPT',
       modelConfig: JSON.parse(model.configuration),
     };
-    if (isUploadByURL(model)) {
+    if ('modelURL' in model) {
       const { task_id: taskId } = await APIProvider.getAPI('model').upload({
         ...modelUploadBase,
         url: model.modelURL,
