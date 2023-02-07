@@ -33,11 +33,12 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
       if (field === 'id') {
         const compareResult = a.id.localeCompare(b.id);
         return direction === 'asc' ? compareResult : -compareResult;
-      } else {
+      } else if (field === 'deployed') {
         return direction === 'asc'
           ? Number(a.deployed) - Number(b.deployed)
           : Number(b.deployed) - Number(a.deployed);
       }
+      return 0;
     });
     const startIndex = index * size;
     const endIndex = (index + 1) * size;
