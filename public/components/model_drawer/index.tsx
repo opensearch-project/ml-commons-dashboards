@@ -18,8 +18,9 @@ import { generatePath } from 'react-router-dom';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { routerPaths } from '../../../common/router_paths';
-import { VersionTable } from './version_table';
 import { EuiLinkButton } from '../common';
+
+import { VersionTable } from './version_table';
 
 export type VersionTableSort = 'version-desc' | 'version-asc';
 

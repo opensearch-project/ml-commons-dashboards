@@ -30,6 +30,8 @@ export const PREDICT_BASE_API = `${ML_COMMONS_API_PREFIX}/_predict`;
 export const SECURITY_API_PREFIX = '/_plugins/_security/api';
 export const SECURITY_ACCOUNT_API = `${SECURITY_API_PREFIX}/account`;
 
+export const TASK_BASE_API = `${ML_COMMONS_API_PREFIX}/tasks`;
+
 export const CLUSTER = {
   TRAIN: 'opensearch_mlCommonsTrain',
   MODEL: 'opensearch_mlCommonsModel',

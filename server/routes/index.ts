@@ -8,3 +8,4 @@ export { modelAggregateRouter } from './model_aggregate_router';
 export { profileRouter } from './profile_router';
 export { connectorRouter } from './connector_router';
 export { securityRouter } from './security_router';
+export { taskRouter } from './task_router';
