@@ -85,7 +85,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
       <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
         <EuiModalHeader>
           <EuiModalHeaderTitle>
-            <h1>Register new model</h1>
+            <h1>Register model</h1>
           </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
@@ -103,8 +103,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
                       <EuiSpacer />
                       <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
                         <small>
-                          Select from a curated list of relevant pre-trained machine learning
-                          models.
+                          Select from a curated list of pre-trained models for search use cases.
                         </small>
                       </EuiTextColor>
                     </div>
@@ -123,8 +122,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
                       <EuiSpacer />
                       <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
                         <small>
-                          Import your own model in Torchscript file format.Lorem ipsum dolar sit
-                          amet consecuter.
+                          Upload your own model in Torchscript format, as a local file via URL.
                         </small>
                       </EuiTextColor>
                     </div>
@@ -144,7 +142,9 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
             </small>
             <EuiSpacer size="m" />
             <div>
-              <small>For more information on each model, see </small>
+              <EuiTextColor color="subdued">
+                <small>For more information on each model, see </small>
+              </EuiTextColor>
               <small>
                 <EuiLink href="#" external>
                   OpenSearch model repository documentation
