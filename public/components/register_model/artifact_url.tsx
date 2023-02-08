@@ -19,24 +19,23 @@ export const ArtifactUrl = (props: {
     name: 'modelURL',
     control: props.formControl,
     rules: {
-      required: true,
-      pattern: URL_REGEX,
+      required: { value: true, message: 'URL is required. Enter a URL.' },
+      pattern: { value: URL_REGEX, message: 'URL is invalid. Enter a valid URL.' },
     },
     shouldUnregister: true,
   });
 
   return (
     <EuiFormRow
-      fullWidth
       style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
-      label="Model URL"
+      label="URL"
       isInvalid={Boolean(modelUrlFieldController.fieldState.error)}
+      error={modelUrlFieldController.fieldState.error?.message}
     >
       <EuiFieldText
         inputRef={modelUrlFieldController.field.ref}
         id={htmlIdGenerator()()}
         placeholder="Link to the model"
-        fullWidth
         isInvalid={Boolean(modelUrlFieldController.fieldState.error)}
         value={modelUrlFieldController.field.value ?? ''}
         name={modelUrlFieldController.field.name}

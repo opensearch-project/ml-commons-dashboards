@@ -5,7 +5,7 @@
 
 import { ModelList } from '../public/components/model_list';
 import { Monitoring } from '../public/components/monitoring';
-import { RegisterModelForm } from '../public/components/register_model';
+import { RegisterModelForm } from '../public/components/register_model/register_model';
 import { routerPaths } from './router_paths';
 
 interface RouteConfig {

@@ -4,16 +4,12 @@
  */
 
 import React from 'react';
+import { Route } from 'react-router-dom';
+
 import { render, screen, waitFor } from '../../../../test/test_utils';
 import { RegisterModelForm } from '../register_model';
 import { APIProvider } from '../../../apis/api_provider';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useParams: () => ({
-    id: 'test_model_id',
-  }),
-}));
+import { routerPaths } from '../../../../common/router_paths';
 
 describe('<RegisterModel /> Form', () => {
   it('should init form when id param in url route', async () => {
@@ -48,12 +44,17 @@ describe('<RegisterModel /> Form', () => {
       pagination: { currentPage: 1, pageSize: 1, totalRecords: 1, totalPages: 1 },
     };
     request.mockResolvedValue(mockResult);
-    render(<RegisterModelForm />);
+    render(
+      <Route path={routerPaths.registerModel}>
+        <RegisterModelForm />
+      </Route>,
+      { route: '/model-registry/register-model/test_model_id' }
+    );
 
     const { name } = mockResult.data[0];
 
     await waitFor(() => {
-      const nameInput = screen.getByLabelText<HTMLInputElement>(/model name/i);
+      const nameInput = screen.getByLabelText<HTMLInputElement>(/^name$/i);
       expect(nameInput.value).toBe(name);
     });
   });

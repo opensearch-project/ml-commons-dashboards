@@ -5,11 +5,8 @@
 
 import React, { useCallback, useEffect } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
-import { EuiPageHeader, EuiSpacer, EuiForm, EuiButton } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
-
-import { APIProvider } from '../../apis/api_provider';
-import { upgradeModelVersion } from '../../utils';
+import { EuiPageHeader, EuiSpacer, EuiForm, EuiButton, EuiPanel, EuiText } from '@elastic/eui';
 
 import { ModelDetailsPanel } from './model_details';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
@@ -18,23 +15,44 @@ import { ConfigurationPanel } from './model_configuration';
 import { EvaluationMetricsPanel } from './evaluation_metrics';
 import { ModelTagsPanel } from './model_tags';
 import { useModelUpload } from './register_model.hooks';
+import { APIProvider } from '../../apis/api_provider';
+import { upgradeModelVersion } from '../../utils';
+import { useSearchParams } from '../../hooks/use_search_params';
+import { isValidModelRegisterFormType } from './utils';
 
 export interface RegisterModelFormProps {
   onSubmit?: (data: ModelFileFormData | ModelUrlFormData) => void;
 }
 
+const DEFAULT_VALUES = {
+  name: '',
+  description: '',
+  version: '1',
+  configuration: '{}',
+  tags: [{ key: '', value: '' }],
+};
+
 export const RegisterModelForm = (props: RegisterModelFormProps) => {
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
+  const typeParams = useSearchParams().get('type');
+
+  const formType = isValidModelRegisterFormType(typeParams) ? typeParams : 'upload';
+  const partials =
+    formType === 'import'
+      ? [ModelDetailsPanel, ModelTagsPanel]
+      : [
+          ModelDetailsPanel,
+          ArtifactPanel,
+          ConfigurationPanel,
+          EvaluationMetricsPanel,
+          ModelTagsPanel,
+        ];
+
   const { handleSubmit, control, setValue, formState } = useForm<
     ModelFileFormData | ModelUrlFormData
   >({
-    defaultValues: {
-      name: '',
-      description: '',
-      version: '1',
-      configuration: '{}',
-      tags: [{ key: '', value: '' }],
-    },
+    mode: 'onChange',
+    defaultValues: DEFAULT_VALUES,
   });
   const submitModel = useModelUpload();
 
@@ -80,26 +98,30 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
       onSubmit={handleSubmit(onSubmit, onError)}
       component="form"
     >
-      <EuiPageHeader pageTitle="Register Model" />
-      <EuiSpacer />
-      <ModelDetailsPanel formControl={control} />
-      <EuiSpacer />
-      <ArtifactPanel formControl={control} />
-      <EuiSpacer />
-      <ConfigurationPanel formControl={control} />
-      <EuiSpacer />
-      <EvaluationMetricsPanel formControl={control} />
-      <EuiSpacer />
-      <ModelTagsPanel formControl={control} />
-      <EuiSpacer />
-      <EuiButton
-        disabled={formState.isSubmitting}
-        isLoading={formState.isSubmitting}
-        type="submit"
-        fill
-      >
-        Register model
-      </EuiButton>
+      <EuiPanel>
+        <EuiPageHeader pageTitle="Register Model" />
+        <EuiText style={{ maxWidth: 420 }}>
+          <small>
+            Register your model to collaboratively manage its life cycle, and facilitate model
+            discovery across your organization.
+          </small>
+        </EuiText>
+        <EuiSpacer />
+        {partials.map((FormPartial, i) => (
+          <React.Fragment key={i}>
+            <FormPartial formControl={control} ordinalNumber={i + 1} />
+            <EuiSpacer size="xl" />
+          </React.Fragment>
+        ))}
+        <EuiButton
+          disabled={formState.isSubmitting}
+          isLoading={formState.isSubmitting}
+          type="submit"
+          fill
+        >
+          Register model
+        </EuiButton>
+      </EuiPanel>
     </EuiForm>
   );
 };
