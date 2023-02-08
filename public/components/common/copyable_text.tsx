@@ -19,7 +19,7 @@ export const CopyableText = ({ text, iconLeft }: Props) => {
     copyToClipboard(text);
     setTextCopied(true);
   }, [text, setTextCopied]);
-  const onBlur = useCallback(() => {
+  const onMouseLeave = useCallback(() => {
     setTextCopied(false);
   }, [setTextCopied]);
   return (
@@ -33,7 +33,7 @@ export const CopyableText = ({ text, iconLeft }: Props) => {
           data-test-subj="copy-id-button"
           iconType="copy"
           onClick={onClick}
-          onBlur={onBlur}
+          onMouseLeave={onMouseLeave}
         />
       </EuiToolTip>
       {iconLeft ? text : null}
