@@ -18,4 +18,14 @@ export class Model {
       total_models: 1,
     });
   }
+
+  public upload({ url }: { url?: string }) {
+    return Promise.resolve(
+      url === undefined ? { model_id: 'model-id-1' } : { task_id: 'task-id-1' }
+    );
+  }
+
+  public uploadChunk() {
+    return Promise.resolve();
+  }
 }

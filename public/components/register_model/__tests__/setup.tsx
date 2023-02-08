@@ -10,6 +10,9 @@ import { RegisterModelForm } from '../register_model';
 import type { RegisterModelFormProps } from '../register_model';
 import { render, screen } from '../../../../test/test_utils';
 
+jest.mock('../../../apis/model');
+jest.mock('../../../apis/task');
+
 export async function setup({ onSubmit }: RegisterModelFormProps) {
   render(<RegisterModelForm onSubmit={onSubmit} />);
   const nameInput = screen.getByLabelText<HTMLInputElement>(/model name/i);

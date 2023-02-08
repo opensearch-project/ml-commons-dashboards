@@ -41,11 +41,7 @@ interface UploadModelBase {
   version: string;
   description: string;
   modelFormat: string;
-  modelConfig: {
-    modelType: string;
-    embeddingDimension: number;
-    frameworkType: string;
-  };
+  modelConfig: Record<string, unknown>;
 }
 
 interface UploadModelByURL extends UploadModelBase {
@@ -53,7 +49,6 @@ interface UploadModelByURL extends UploadModelBase {
 }
 
 interface UploadModelByChunk extends UploadModelBase {
-  modelTaskType: string;
   modelContentHashValue: string;
   totalChunks: number;
 }
@@ -61,15 +56,16 @@ interface UploadModelByChunk extends UploadModelBase {
 type UploadResultInner<
   T extends UploadModelByURL | UploadModelByChunk
 > = T extends UploadModelByChunk
-  ? { modelId: string; status: string }
+  ? { model_id: string; status: string }
   : T extends UploadModelByURL
-  ? { taskId: string; status: string }
+  ? { task_id: string; status: string }
   : never;
 
 type UploadResult<T extends UploadModelByURL | UploadModelByChunk> = Promise<UploadResultInner<T>>;
 
-const isUploaModelByURL = (test: UploadModelByURL | UploadModelByChunk): test is UploadModelByURL =>
-  (test as UploadModelByURL).url !== undefined;
+const isUploadModelByURL = (
+  test: UploadModelByURL | UploadModelByChunk
+): test is UploadModelByURL => (test as UploadModelByURL).url !== undefined;
 
 export class ModelService {
   private osClient: ILegacyClusterClient;
@@ -187,13 +183,9 @@ export class ModelService {
       version,
       description,
       model_format: modelFormat,
-      model_config: {
-        model_type: modelConfig.modelType,
-        embedding_dimension: modelConfig.embeddingDimension,
-        framework_type: modelConfig.frameworkType,
-      },
+      model_config: modelConfig,
     };
-    if (isUploaModelByURL(model)) {
+    if (isUploadModelByURL(model)) {
       const { task_id: taskId, status } = (
         await client.asCurrentUser.transport.request({
           method: 'POST',
@@ -204,7 +196,7 @@ export class ModelService {
           },
         })
       ).body;
-      return { taskId, status } as UploadResultInner<T>;
+      return { task_id: taskId, status } as UploadResultInner<T>;
     }
 
     const { model_id: modelId, status } = (
@@ -213,13 +205,12 @@ export class ModelService {
         path: MODEL_META_API,
         body: {
           ...uploadModelBase,
-          model_task_type: model.modelTaskType,
           model_content_hash_value: model.modelContentHashValue,
           total_chunks: model.totalChunks,
         },
       })
     ).body;
-    return { modelId, status } as UploadResultInner<T>;
+    return { model_id: modelId, status } as UploadResultInner<T>;
   }
 
   public static async uploadModelChunk({

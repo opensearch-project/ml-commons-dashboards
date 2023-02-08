@@ -18,3 +18,5 @@ export const INTERNAL_CONNECTOR_API_ENDPOINT = `${API_PREFIX}/internal-connector
 
 export const SECURITY_API_ENDPOINT = `${API_PREFIX}/security`;
 export const SECURITY_ACCOUNT_API_ENDPOINT = `${SECURITY_API_ENDPOINT}/account`;
+
+export const TASK_API_ENDPOINT = `${API_PREFIX}/task`;
