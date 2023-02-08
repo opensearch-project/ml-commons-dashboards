@@ -71,11 +71,7 @@ interface UploadModelBase {
   version: string;
   description: string;
   modelFormat: string;
-  modelConfig: {
-    modelType: string;
-    embeddingDimension: number;
-    frameworkType: string;
-  };
+  modelConfig: Record<string, unknown>;
 }
 
 export interface UploadModelByURL extends UploadModelBase {
@@ -83,7 +79,6 @@ export interface UploadModelByURL extends UploadModelBase {
 }
 
 export interface UploadModelByChunk extends UploadModelBase {
-  modelTaskType: string;
   modelContentHashValue: string;
   totalChunks: number;
 }
@@ -134,9 +129,9 @@ export class Model {
     model: T
   ): Promise<
     T extends UploadModelByURL
-      ? { taskId: string }
+      ? { task_id: string }
       : T extends UploadModelByChunk
-      ? { modelId: string }
+      ? { model_id: string }
       : never
   > {
     return InnerHttpProvider.getHttp().post(MODEL_UPLOAD_API_ENDPOINT, {

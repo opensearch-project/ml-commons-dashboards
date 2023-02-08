@@ -38,11 +38,7 @@ const modelUploadBaseSchema = {
   version: schema.string(),
   description: schema.string(),
   modelFormat: schema.string(),
-  modelConfig: schema.object({
-    modelType: schema.string(),
-    embeddingDimension: schema.number(),
-    frameworkType: schema.string(),
-  }),
+  modelConfig: schema.object({}, { unknowns: 'allow' }),
 };
 
 const modelUploadByURLSchema = schema.object({
@@ -52,7 +48,6 @@ const modelUploadByURLSchema = schema.object({
 
 const modelUploadByChunkSchema = schema.object({
   ...modelUploadBaseSchema,
-  modelTaskType: schema.string(),
   modelContentHashValue: schema.string(),
   totalChunks: schema.number(),
 });

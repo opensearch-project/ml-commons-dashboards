@@ -57,36 +57,3 @@ export const generateModelSearchQuery = ({
     },
   },
 });
-
-export interface UploadModel {
-  name: string;
-  version: string;
-  description: string;
-  modelFormat: string;
-  modelConfig: {
-    modelType: string;
-    membeddingDimension: number;
-    frameworkType: string;
-  };
-  url?: string;
-}
-
-export const convertUploadModel = ({
-  name,
-  version,
-  description,
-  modelFormat,
-  modelConfig,
-  url,
-}: UploadModel) => ({
-  name,
-  version,
-  description,
-  model_format: modelFormat,
-  model_config: {
-    model_type: modelConfig.modelType,
-    embedding_dimension: modelConfig.membeddingDimension,
-    framework_type: modelConfig.frameworkType,
-  },
-  url,
-});
