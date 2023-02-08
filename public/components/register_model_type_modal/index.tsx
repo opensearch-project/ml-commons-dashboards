@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Fragment } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -16,12 +16,12 @@ import {
   EuiFlexItem,
   EuiCheckableCard,
   EuiText,
-  EuiComboBox,
-  EuiComboBoxOptionOption,
+  EuiSelectable,
   EuiTextColor,
   EuiLink,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { routerPaths } from '../../../common/router_paths';
 enum ModelSource {
   USER_MODEL = 'UserModel',
@@ -30,34 +30,56 @@ enum ModelSource {
 interface RegisterModelTypeProps {
   onCloseModal: () => void;
 }
+interface OptionsType {
+  label: string;
+  'data-test-subj'?: string;
+  checked?: string;
+}
 export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
   const { onCloseModal } = props;
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
-  const [modelRepoSelection, setModelRepoSelection] = useState<EuiComboBoxOptionOption[]>([]);
   const options = [
     {
       label: 'Titan',
       'data-test-subj': 'titanOption',
     },
+    {
+      label: 'WSSS',
+    },
+    {
+      label: 'T33',
+    },
   ];
-  const onChange = useCallback((modelSelection: EuiComboBoxOptionOption[]) => {
+  const [modelRepoSelection, setModelRepoSelection] = useState(options);
+  const onChange = useCallback((modelSelection: OptionsType[]) => {
+    let selectedOption: OptionsType = { label: '' };
     setModelRepoSelection(modelSelection);
+    modelSelection.map((u: OptionsType) => {
+      if (u.checked) {
+        selectedOption = u;
+      }
+    });
+    return selectedOption;
   }, []);
-  const handleContinue = useCallback(() => {
-    switch (modelSource) {
-      case ModelSource.USER_MODEL:
-        if (modelRepoSelection[0]?.label) {
-          history.push(
-            `${routerPaths.registerModel}?name=${modelRepoSelection[0]?.label}&version=${modelRepoSelection[0]?.label}`
-          );
-        }
-        break;
-      case ModelSource.PRE_TRAINED_MODEL:
-        history.push(routerPaths.registerModel);
-        break;
-    }
-  }, [history, modelSource, modelRepoSelection]);
+  const handleContinue = useCallback(
+    (selectedOption) => {
+      selectedOption = onChange(modelRepoSelection);
+      switch (modelSource) {
+        case ModelSource.USER_MODEL:
+          if (selectedOption?.label) {
+            history.push(
+              `${routerPaths.registerModel}?name=${selectedOption?.label}&version=${selectedOption?.label}`
+            );
+          }
+          break;
+        case ModelSource.PRE_TRAINED_MODEL:
+          history.push(routerPaths.registerModel);
+          break;
+      }
+    },
+    [history, modelSource, modelRepoSelection, onChange]
+  );
   return (
     <div>
       <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
@@ -130,14 +152,29 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
               </small>
             </div>
             <EuiSpacer size="s" />
-            <EuiComboBox
-              placeholder="Select model"
-              singleSelection={{ asPlainText: true }}
-              options={options}
-              selectedOptions={modelRepoSelection}
+            <EuiSelectable
+              aria-label="Searchable example"
+              searchable
+              searchProps={{
+                'data-test-subj': 'selectableSearchHere',
+                placeholder: i18n.translate(
+                  'indexPatternManagement.createIndexPattern.stepDataSource.searchPlaceHolder',
+                  {
+                    defaultMessage: 'Filter options',
+                  }
+                ),
+              }}
+              options={modelRepoSelection}
               onChange={onChange}
-              aria-label="Select model"
-            />
+              singleSelection={true}
+            >
+              {(list, search) => (
+                <Fragment>
+                  {search}
+                  {list}
+                </Fragment>
+              )}
+            </EuiSelectable>
           </div>
         </EuiModalBody>
         <EuiModalFooter>
@@ -149,6 +186,9 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
           >
             Cancel
           </EuiButton>
+          {/* <EuiButton color="primary" fill onClick={handleContinue} data-test-subj="continue button">
+            Continue
+          </EuiButton> */}
           <EuiButton color="primary" fill onClick={handleContinue} data-test-subj="continue button">
             Continue
           </EuiButton>
