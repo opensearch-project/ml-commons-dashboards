@@ -6,15 +6,15 @@
 import React, { useState } from 'react';
 import {
   EuiFormRow,
-  EuiPanel,
   EuiTitle,
-  EuiHorizontalRule,
   EuiCodeEditor,
   EuiText,
   EuiButtonEmpty,
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
+  EuiLink,
+  EuiSpacer,
 } from '@elastic/eui';
 import { useController } from 'react-hook-form';
 import type { Control } from 'react-hook-form';
@@ -27,31 +27,42 @@ function validateConfigurationObject(value: string) {
   try {
     JSON.parse(value.trim());
   } catch {
-    return false;
+    return 'JSON is invalid. Enter a valid JSON';
   }
   return true;
 }
 
 export const ConfigurationPanel = (props: {
   formControl: Control<ModelFileFormData | ModelUrlFormData>;
+  ordinalNumber: number;
 }) => {
   const [isHelpVisible, setIsHelpVisible] = useState(false);
   const configurationFieldController = useController({
     name: 'configuration',
     control: props.formControl,
-    rules: { required: true, validate: validateConfigurationObject },
+    rules: {
+      required: { value: true, message: 'Configuration is required.' },
+      validate: validateConfigurationObject,
+    },
   });
 
   return (
-    <EuiPanel>
+    <div>
       <EuiTitle size="s">
-        <h3>Configuration</h3>
+        <h3>{props.ordinalNumber}. Configuration</h3>
       </EuiTitle>
-      <EuiHorizontalRule margin="m" />
+      <EuiText style={{ maxWidth: 450 }}>
+        <small>
+          The model configuration JSON object.{' '}
+          <EuiLink href="http://www.example.com">Help.</EuiLink>
+        </small>
+      </EuiText>
+      <EuiSpacer size="m" />
       <EuiFormRow
         style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
-        label="Configuration object"
+        label="Configuration in JSON"
         isInvalid={Boolean(configurationFieldController.fieldState.error)}
+        error={configurationFieldController.fieldState.error?.message}
         labelAppend={
           <EuiText size="xs">
             <EuiButtonEmpty onClick={() => setIsHelpVisible(true)} size="xs" color="primary">
@@ -90,6 +101,6 @@ export const ConfigurationPanel = (props: {
           </EuiFlyoutBody>
         </EuiFlyout>
       )}
-    </EuiPanel>
+    </div>
   );
 };

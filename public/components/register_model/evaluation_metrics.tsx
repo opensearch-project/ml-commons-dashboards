@@ -6,20 +6,18 @@
 import React, { useCallback, useMemo } from 'react';
 import {
   EuiFormRow,
-  EuiPanel,
   EuiTitle,
-  EuiHorizontalRule,
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiFlexItem,
   EuiFlexGroup,
   EuiFieldNumber,
   EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
 import { useController } from 'react-hook-form';
 import type { Control } from 'react-hook-form';
 
-import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { useMetricNames } from './register_model.hooks';
 
@@ -27,6 +25,7 @@ const METRIC_VALUE_STEP = 0.01;
 
 export const EvaluationMetricsPanel = (props: {
   formControl: Control<ModelFileFormData | ModelUrlFormData>;
+  ordinalNumber: number;
 }) => {
   const [metricNamesLoading, metricNames] = useMetricNames();
 
@@ -94,28 +93,33 @@ export const EvaluationMetricsPanel = (props: {
   );
 
   const metricValueFields = [
-    { label: 'Training metric value', controller: trainingMetricFieldController },
-    { label: 'Validation metric value', controller: validationMetricFieldController },
-    { label: 'Testing metric value', controller: testingMetricFieldController },
+    { label: 'Training value', controller: trainingMetricFieldController },
+    { label: 'Validation value', controller: validationMetricFieldController },
+    { label: 'Testing value', controller: testingMetricFieldController },
   ];
 
   return (
-    <EuiPanel>
+    <div style={{ width: 475 }}>
       <EuiTitle size="s">
         <h3>
-          Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
+          {props.ordinalNumber}. Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
       </EuiTitle>
-      <EuiHorizontalRule margin="m" />
+      <EuiText>
+        <small>
+          Track training, validation, and testing metrics to compare across versions and models.
+        </small>
+      </EuiText>
+      <EuiSpacer size="m" />
       <EuiFormRow
         fullWidth
-        label="Metric name"
-        helpText="Select a metric from the list, or add a custom one."
+        label="Metric"
         isInvalid={Boolean(metricFieldController.fieldState.error)}
       >
         <EuiComboBox
+          fullWidth
           isLoading={metricNamesLoading}
-          placeholder="Select or add a training metric name"
+          placeholder='Select or add a metric, like "Accuracy"'
           singleSelection={{ asPlainText: true }}
           options={options}
           selectedOptions={
@@ -129,12 +133,12 @@ export const EvaluationMetricsPanel = (props: {
         />
       </EuiFormRow>
       <EuiSpacer />
-      <EuiFlexGroup style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}>
+      <EuiFlexGroup>
         {metricValueFields.map(({ label, controller }) => (
           <EuiFlexItem key={controller.field.name}>
             <EuiFormRow
               label={label}
-              helpText="Enter a value between 0 and 1"
+              helpText="Enter a value from 0 to 1"
               isInvalid={Boolean(controller.fieldState.error)}
             >
               <EuiFieldNumber
@@ -152,6 +156,6 @@ export const EvaluationMetricsPanel = (props: {
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
-    </EuiPanel>
+    </div>
   );
 };

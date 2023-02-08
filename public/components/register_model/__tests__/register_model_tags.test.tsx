@@ -7,13 +7,6 @@ import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useParams: () => ({
-    id: '',
-  }),
-}));
-
 describe('<RegisterModel /> Tags', () => {
   beforeEach(() => {
     jest
