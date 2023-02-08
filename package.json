@@ -7,7 +7,7 @@
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "osd": "node ../../scripts/osd",
     "lint:es": "node ../../scripts/eslint",
-    "test:jest": "../../node_modules/.bin/jest --slient --config ./test/jest.config.js"
+    "test:jest": "../../node_modules/.bin/jest --silent --config ./test/jest.config.js"
   },
   "husky": {
     "hooks": {
