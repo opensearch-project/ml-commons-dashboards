@@ -91,7 +91,7 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
         <EuiModalBody>
           <div style={{ overflow: 'hidden' }}>
             <EuiText size="s">
-              <strong>Select source</strong>
+              <strong>Model source</strong>
             </EuiText>
             <EuiFlexGroup gutterSize="l">
               <EuiFlexItem>
@@ -140,14 +140,14 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
           <EuiSpacer />
           <div style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}>
             <small>
-              <strong>Select model from repository</strong>
+              <strong>Model</strong>
             </small>
             <EuiSpacer size="m" />
             <div>
-              <small>Lorem ipsum dolor sit amet consecetur lorem ipsum dolor.</small>
+              <small>For more information on each model, see </small>
               <small>
                 <EuiLink href="#" external>
-                  Learn more
+                  OpenSearch model repository documentation
                 </EuiLink>
               </small>
             </div>
