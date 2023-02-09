@@ -153,14 +153,14 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
             </div>
             <EuiSpacer size="s" />
             <EuiSelectable
-              aria-label="Searchable example"
+              aria-label="Searchable"
               searchable
               searchProps={{
                 'data-test-subj': 'selectableSearchHere',
                 placeholder: i18n.translate(
                   'indexPatternManagement.createIndexPattern.stepDataSource.searchPlaceHolder',
                   {
-                    defaultMessage: 'Filter options',
+                    defaultMessage: 'Find model',
                   }
                 ),
               }}
@@ -186,9 +186,6 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
           >
             Cancel
           </EuiButton>
-          {/* <EuiButton color="primary" fill onClick={handleContinue} data-test-subj="continue button">
-            Continue
-          </EuiButton> */}
           <EuiButton color="primary" fill onClick={handleContinue} data-test-subj="continue button">
             Continue
           </EuiButton>
