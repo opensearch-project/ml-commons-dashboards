@@ -45,4 +45,4 @@ jobs:
       - name: Run tests
         run: |
           cd OpenSearch-Dashboards/plugins/ml-commons-dashboards
-          yarn run test:jest
+          yarn run test:jest --silent
