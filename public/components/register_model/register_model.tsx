@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback, useEffect } from 'react';
-import { FieldErrors, useForm } from 'react-hook-form';
+import { FieldErrors, useForm, FormProvider } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { EuiPageHeader, EuiSpacer, EuiForm, EuiButton, EuiPanel, EuiText } from '@elastic/eui';
 
@@ -48,9 +48,7 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
           ModelTagsPanel,
         ];
 
-  const { handleSubmit, control, setValue, formState } = useForm<
-    ModelFileFormData | ModelUrlFormData
-  >({
+  const form = useForm<ModelFileFormData | ModelUrlFormData>({
     mode: 'onChange',
     defaultValues: DEFAULT_VALUES,
   });
@@ -78,13 +76,13 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
         // TODO:  clarify which fields to pre-populate
         const { model_version: modelVersion, name, model_config: modelConfig } = data?.[0];
         const newVersion = upgradeModelVersion(modelVersion);
-        setValue('name', name);
-        setValue('version', newVersion);
-        setValue('configuration', modelConfig?.all_config ?? '');
+        form.setValue('name', name);
+        form.setValue('version', newVersion);
+        form.setValue('configuration', modelConfig?.all_config ?? '');
       }
     };
     initializeForm();
-  }, [latestVersionId, setValue]);
+  }, [latestVersionId, form]);
 
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
     // TODO
@@ -93,35 +91,37 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
   }, []);
 
   return (
-    <EuiForm
-      data-test-subj="mlCommonsPlugin-registerModelForm"
-      onSubmit={handleSubmit(onSubmit, onError)}
-      component="form"
-    >
-      <EuiPanel>
-        <EuiPageHeader pageTitle="Register Model" />
-        <EuiText style={{ maxWidth: 420 }}>
-          <small>
-            Register your model to collaboratively manage its life cycle, and facilitate model
-            discovery across your organization.
-          </small>
-        </EuiText>
-        <EuiSpacer />
-        {partials.map((FormPartial, i) => (
-          <React.Fragment key={i}>
-            <FormPartial formControl={control} ordinalNumber={i + 1} />
-            <EuiSpacer size="xl" />
-          </React.Fragment>
-        ))}
-        <EuiButton
-          disabled={formState.isSubmitting}
-          isLoading={formState.isSubmitting}
-          type="submit"
-          fill
-        >
-          Register model
-        </EuiButton>
-      </EuiPanel>
-    </EuiForm>
+    <FormProvider {...form}>
+      <EuiForm
+        data-test-subj="mlCommonsPlugin-registerModelForm"
+        onSubmit={form.handleSubmit(onSubmit, onError)}
+        component="form"
+      >
+        <EuiPanel>
+          <EuiPageHeader pageTitle="Register Model" />
+          <EuiText style={{ maxWidth: 420 }}>
+            <small>
+              Register your model to collaboratively manage its life cycle, and facilitate model
+              discovery across your organization.
+            </small>
+          </EuiText>
+          <EuiSpacer />
+          {partials.map((FormPartial, i) => (
+            <React.Fragment key={i}>
+              <FormPartial formControl={form.control} ordinalNumber={i + 1} />
+              <EuiSpacer size="xl" />
+            </React.Fragment>
+          ))}
+          <EuiButton
+            disabled={form.formState.isSubmitting}
+            isLoading={form.formState.isSubmitting}
+            type="submit"
+            fill
+          >
+            Register model
+          </EuiButton>
+        </EuiPanel>
+      </EuiForm>
+    </FormProvider>
   );
 };
