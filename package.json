@@ -1,7 +1,10 @@
 {
-  "name": "mlCommonsPlugin",
-  "version": "0.0.0",
-  "private": true,
+  "name": "ml-commons-dashboards",
+  "license": "Apache-2.0",
+  "config": {
+    "id": "mlCommonsDashboards"
+  },
+  "version": "2.6.0.0",
   "scripts": {
     "build": "yarn plugin-helpers build",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
