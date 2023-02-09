@@ -10,10 +10,6 @@ import {
   EuiCodeEditor,
   EuiText,
   EuiButtonEmpty,
-  EuiFlyout,
-  EuiFlyoutHeader,
-  EuiFlyoutBody,
-  EuiLink,
   EuiSpacer,
 } from '@elastic/eui';
 import { useController } from 'react-hook-form';
@@ -22,6 +18,7 @@ import type { Control } from 'react-hook-form';
 import '../../ace-themes/sql_console.js';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { HelpFlyout } from './help_flyout';
 
 function validateConfigurationObject(value: string) {
   try {
@@ -54,7 +51,14 @@ export const ConfigurationPanel = (props: {
       <EuiText style={{ maxWidth: 450 }}>
         <small>
           The model configuration JSON object.{' '}
-          <EuiLink href="http://www.example.com">Help.</EuiLink>
+          <EuiButtonEmpty
+            onClick={() => setIsHelpVisible(true)}
+            size="xs"
+            color="primary"
+            data-test-subj="model-configuration-help-button"
+          >
+            Help.
+          </EuiButtonEmpty>
         </small>
       </EuiText>
       <EuiSpacer size="m" />
@@ -63,13 +67,6 @@ export const ConfigurationPanel = (props: {
         label="Configuration in JSON"
         isInvalid={Boolean(configurationFieldController.fieldState.error)}
         error={configurationFieldController.fieldState.error?.message}
-        labelAppend={
-          <EuiText size="xs">
-            <EuiButtonEmpty onClick={() => setIsHelpVisible(true)} size="xs" color="primary">
-              Help
-            </EuiButtonEmpty>
-          </EuiText>
-        }
       >
         <EuiCodeEditor
           tabSize={2}
@@ -87,20 +84,7 @@ export const ConfigurationPanel = (props: {
           }}
         />
       </EuiFormRow>
-      {isHelpVisible && (
-        <EuiFlyout ownFocus onClose={() => setIsHelpVisible(false)}>
-          <EuiFlyoutHeader hasBorder>
-            <EuiTitle size="m">
-              <h2 id="flyoutTitle">Help</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiText>
-              <p>TODO</p>
-            </EuiText>
-          </EuiFlyoutBody>
-        </EuiFlyout>
-      )}
+      {isHelpVisible && <HelpFlyout onClose={() => setIsHelpVisible(false)} />}
     </div>
   );
 };
