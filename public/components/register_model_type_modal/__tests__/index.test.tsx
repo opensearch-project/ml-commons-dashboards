@@ -16,7 +16,7 @@ describe('<RegisterModelTypeModal />', () => {
   it('should render select with Opensearch model repository', () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} />);
     expect(screen.getByLabelText('Opensearch model repository')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select model')).toBeInTheDocument();
+    expect(screen.getByLabelText('Searchable')).toBeInTheDocument();
   });
   it('should call onCloseModal after click "cancel"', async () => {
     const onClickMock = jest.fn();
@@ -24,13 +24,12 @@ describe('<RegisterModelTypeModal />', () => {
     await userEvent.click(screen.getByTestId('cancel button'));
     expect(onClickMock).toHaveBeenCalled();
   });
-  it('should call drop-down list and link to url with selected option after click "Select modal" and continue', async () => {
+  it('should call drop-down list and link to url with selected option after click "Find model" and continue', async () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} />);
     await userEvent.click(screen.getByLabelText('Opensearch model repository'));
-    await userEvent.click(screen.getByLabelText('Open list of options'));
-    expect(screen.getByTestId('titanOption')).toBeInTheDocument();
+    await userEvent.click(screen.getByLabelText('Searchable'));
+    expect(screen.getByTestId('selectableSearchHere')).toBeInTheDocument();
     await userEvent.click(screen.getByTestId('titanOption'));
-    expect(screen.getByTestId('comboBoxInput')).toHaveTextContent('Titan');
     await userEvent.click(screen.getByTestId('continue button'));
     expect(document.URL).toContain('model-registry/register-model?name=Titan&version=Titan');
   });
