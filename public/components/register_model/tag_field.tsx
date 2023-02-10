@@ -49,7 +49,7 @@ export const ModelTagField = ({
   });
 
   const tagKeyController = useController({
-    name: `tags.${index}.key` as 'tags.0.key',
+    name: `tags.${index}.key` as const,
     control: formControl,
     rules: {
       validate: (tagKey) => {
@@ -75,7 +75,7 @@ export const ModelTagField = ({
   });
 
   const tagValueController = useController({
-    name: `tags.${index}.value` as 'tags.0.value',
+    name: `tags.${index}.value` as const,
     control: formControl,
     rules: {
       validate: (tagValue) => {
