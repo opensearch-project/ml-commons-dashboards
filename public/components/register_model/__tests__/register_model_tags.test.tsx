@@ -172,7 +172,7 @@ describe('<RegisterModel /> Tags', () => {
       // 25 tags are displayed
       waitFor(() => expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(25));
       // add new tag button should not be displayed
-      waitFor(() => expect(screen.getByText(/add new tag/i)).toBeDisabled());
+      waitFor(() => expect(screen.getByRole('button', { name: /add new tag/i })).toBeDisabled());
     },
     // The test will fail due to timeout as we interact with the page a lot(24 button click to add new tags)
     // So we try to increase test running timeout to 60000ms to mitigate the timeout issue

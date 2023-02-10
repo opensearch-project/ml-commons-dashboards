@@ -152,9 +152,9 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
         return;
       }
       // Validate the form only when the current tag row blurred
-      trigger(`tags.${index}` as 'tags.0');
+      trigger('tags');
     },
-    [trigger, index]
+    [trigger]
   );
 
   return (
