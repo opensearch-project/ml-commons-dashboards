@@ -8,15 +8,24 @@ import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
 
 describe('<RegisterModel /> Tags', () => {
+  const onSubmitMock = jest.fn();
+
   beforeEach(() => {
+    jest
+      .spyOn(formHooks, 'useMetricNames')
+      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
     jest
       .spyOn(formHooks, 'useModelTags')
       .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
+    jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should render a tags panel', async () => {
-    const onSubmitMock = jest.fn();
-    await setup({ onSubmit: onSubmitMock });
+    await setup();
 
     const keyContainer = screen.queryByTestId('ml-tagKey1');
     const valueContainer = screen.queryByTestId('ml-tagValue1');
@@ -26,16 +35,14 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should submit the form without selecting tags', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
     await result.user.click(result.submitButton);
 
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
   it('should submit the form with selected tags', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     const keyContainer = screen.getByTestId('ml-tagKey1');
     const keyInput = within(keyContainer).getByRole('textbox');
@@ -54,8 +61,7 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should allow to add multiple tags', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     // Add two tags
     await result.user.click(screen.getByText(/add new tag/i));
@@ -79,8 +85,7 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should NOT allow to submit tag which does NOT have value', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     const keyContainer = screen.getByTestId('ml-tagKey1');
     const keyInput = within(keyContainer).getByRole('textbox');
@@ -98,8 +103,7 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should NOT allow to submit tag which does NOT have key', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     const valueContainer = screen.getByTestId('ml-tagValue1');
     const valueInput = within(valueContainer).getByRole('textbox');
@@ -117,8 +121,7 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should NOT allow to submit if it has duplicate tags', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     // input tag key: 'Key 1'
     const keyContainer1 = screen.getByTestId('ml-tagKey1');
@@ -155,8 +158,7 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should only allow to add maximum 25 tags', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
     const MAX_TAG_NUM = 25;
 
     // It has one tag by default, we can add 24 more tags
@@ -171,8 +173,7 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should allow to remove multiple tags', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     // Add two tags
     await result.user.click(screen.getByText(/add new tag/i));

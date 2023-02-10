@@ -20,10 +20,6 @@ import { upgradeModelVersion } from '../../utils';
 import { useSearchParams } from '../../hooks/use_search_params';
 import { isValidModelRegisterFormType } from './utils';
 
-export interface RegisterModelFormProps {
-  onSubmit?: (data: ModelFileFormData | ModelUrlFormData) => void;
-}
-
 const DEFAULT_VALUES = {
   name: '',
   description: '',
@@ -32,7 +28,7 @@ const DEFAULT_VALUES = {
   tags: [{ key: '', value: '' }],
 };
 
-export const RegisterModelForm = (props: RegisterModelFormProps) => {
+export const RegisterModelForm = () => {
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const typeParams = useSearchParams().get('type');
 
@@ -55,13 +51,7 @@ export const RegisterModelForm = (props: RegisterModelFormProps) => {
   const submitModel = useModelUpload();
 
   const onSubmit = async (data: ModelFileFormData | ModelUrlFormData) => {
-    if (props.onSubmit) {
-      props.onSubmit(data);
-    }
     await submitModel(data);
-    // TODO
-    // eslint-disable-next-line no-console
-    console.log(data);
   };
 
   useEffect(() => {
