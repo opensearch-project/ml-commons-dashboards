@@ -103,15 +103,53 @@ describe('<RegisterModel /> Tags', () => {
 
     const valueContainer = screen.getByTestId('ml-tagValue1');
     const valueInput = within(valueContainer).getByRole('textbox');
-    // only input key, but NOT value
+    // only input value, but NOT key
     await result.user.type(valueInput, 'Value 1');
     await result.user.click(result.submitButton);
 
-    // tag value input should be invalid
+    // tag key input should be invalid
     const keyContainer = screen.getByTestId('ml-tagKey1');
     const keyInput = within(keyContainer).queryByText('A key is required. Enter a key.');
     expect(keyInput).toBeInTheDocument();
 
+    // it should not submit the form
+    expect(onSubmitMock).not.toHaveBeenCalled();
+  });
+
+  it('should NOT allow to submit if it has duplicate tags', async () => {
+    const onSubmitMock = jest.fn();
+    const result = await setup({ onSubmit: onSubmitMock });
+
+    // input tag key: 'Key 1'
+    const keyContainer1 = screen.getByTestId('ml-tagKey1');
+    const keyInput1 = within(keyContainer1).getByRole('textbox');
+    await result.user.type(keyInput1, 'Key 1');
+
+    // input tag key: 'Value 1'
+    const valueContainer1 = screen.getByTestId('ml-tagValue1');
+    const valueInput1 = within(valueContainer1).getByRole('textbox');
+    await result.user.type(valueInput1, 'Value 1');
+
+    // Add a new tag, and input the same tag key and value
+    await result.user.click(screen.getByText(/add new tag/i));
+    // input tag key: 'Key 1'
+    const keyContainer2 = screen.getByTestId('ml-tagKey2');
+    const keyInput2 = within(keyContainer2).getByRole('textbox');
+    await result.user.type(keyInput2, 'Key 1');
+
+    // input tag key: 'Value 1'
+    const valueContainer2 = screen.getByTestId('ml-tagValue2');
+    const valueInput2 = within(valueContainer2).getByRole('textbox');
+    await result.user.type(valueInput2, 'Value 1');
+
+    await result.user.click(result.submitButton);
+
+    // Display error message
+    expect(
+      within(keyContainer2).queryByText(
+        'This tag has already been added. Remove the duplicate tag.'
+      )
+    ).toBeInTheDocument();
     // it should not submit the form
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
