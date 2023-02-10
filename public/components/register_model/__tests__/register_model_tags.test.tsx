@@ -10,17 +10,6 @@ import * as formHooks from '../register_model.hooks';
 describe('<RegisterModel /> Tags', () => {
   const onSubmitMock = jest.fn();
 
-  beforeAll(() => {
-    // One test will fail due to timeout as we interact with the page a lot(24 button click to add new tags)
-    // So we try to increase test running timeout to 60000ms to mitigate the timeout issue
-    jest.setTimeout(60 * 1000);
-  });
-
-  afterAll(() => {
-    // Reset timeout to default
-    jest.setTimeout(5 * 1000);
-  });
-
   beforeEach(() => {
     jest
       .spyOn(formHooks, 'useMetricNames')
@@ -168,21 +157,27 @@ describe('<RegisterModel /> Tags', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should only allow to add maximum 25 tags', async () => {
-    const result = await setup();
-    const MAX_TAG_NUM = 25;
+  it(
+    'should only allow to add maximum 25 tags',
+    async () => {
+      const result = await setup();
+      const MAX_TAG_NUM = 25;
 
-    // It has one tag by default, we can add 24 more tags
-    const addNewTagButton = screen.getByText(/add new tag/i);
-    for (let i = 1; i < MAX_TAG_NUM; i++) {
-      await result.user.click(addNewTagButton);
-    }
+      // It has one tag by default, we can add 24 more tags
+      const addNewTagButton = screen.getByText(/add new tag/i);
+      for (let i = 1; i < MAX_TAG_NUM; i++) {
+        await result.user.click(addNewTagButton);
+      }
 
-    // 25 tags are displayed
-    expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(25);
-    // add new tag button should not be displayed
-    expect(screen.queryByText(/add new tag/i)).not.toBeInTheDocument();
-  });
+      // 25 tags are displayed
+      expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(25);
+      // add new tag button should not be displayed
+      expect(screen.queryByText(/add new tag/i)).not.toBeInTheDocument();
+    },
+    // The test will fail due to timeout as we interact with the page a lot(24 button click to add new tags)
+    // So we try to increase test running timeout to 60000ms to mitigate the timeout issue
+    60 * 1000
+  );
 
   it('should allow to remove multiple tags', async () => {
     const result = await setup();
