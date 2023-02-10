@@ -158,6 +158,10 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should only allow to add maximum 25 tags', async () => {
+    // The test will failed due to timeout as we interact with the page a lot(24 button click to add new tags)
+    // So we try to increase test running timeout to 60000ms to mitigate the timeout issue
+    jest.setTimeout(60000);
+
     const result = await setup();
     const MAX_TAG_NUM = 25;
 
