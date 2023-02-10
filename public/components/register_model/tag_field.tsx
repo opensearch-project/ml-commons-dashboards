@@ -46,18 +46,24 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
     control,
     rules: {
       validate: (tagKey) => {
-        const tag = tags?.[index];
-        if (!tagKey && tag?.value) {
-          return 'A key is required. Enter a key.';
-        }
-        if (tags && tag && tag.key && tag.value) {
-          for (let i = 0; i < tags.length; i++) {
-            // Display error on duplicate tag if the first matching tag is not the current one
-            if (tags[i].key === tag.key && tags[i].value === tag.value) {
-              if (index !== i) {
-                return 'This tag has already been added. Remove the duplicate tag.';
-              } else {
-                break;
+        if (tags) {
+          const tag = tags[index];
+          // If it has value, key cannot be empty
+          if (!tagKey && tag.value) {
+            return 'A key is required. Enter a key.';
+          }
+          // If a tag has both key and value, validate if the same tag was added before
+          if (tagKey && tag.value) {
+            for (let i = 0; i < tags.length; i++) {
+              // Found the same tag
+              if (tags[i].key === tagKey && tags[i].value === tag.value) {
+                // The same tag appears before the current tag
+                // Display error message on the current tag
+                if (index > i) {
+                  return 'This tag has already been added. Remove the duplicate tag.';
+                } else {
+                  break;
+                }
               }
             }
           }
@@ -72,19 +78,25 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
     control,
     rules: {
       validate: (tagValue) => {
-        const tag = tags?.[index];
-        if (!tagValue && tag?.key) {
-          return 'A value is required. Enter a value.';
-        }
-        if (tags && tag && tag.key && tag.value) {
-          for (let i = 0; i < tags.length; i++) {
-            // Display error on duplicate tag if the first matching tag is not the current one
-            if (tags[i].key === tag.key && tags[i].value === tag.value) {
-              if (index !== i) {
-                // return `false` because we only show error message on tag `key` field
-                return false;
-              } else {
-                break;
+        if (tags) {
+          const tag = tags[index];
+          // If it has key, value cannot be empty
+          if (!tagValue && tag.key) {
+            return 'A value is required. Enter a value.';
+          }
+          // If a tag has both key and value, validate if the same tag was added before
+          if (tag.key && tagValue) {
+            for (let i = 0; i < tags.length; i++) {
+              // Found the same tag
+              if (tags[i].key === tag.key && tags[i].value === tagValue) {
+                // The same tag appears before the current tag
+                // Display error message on the current tag
+                if (index > i) {
+                  // return `false` instead of error message because we don't show error message on value field
+                  return false;
+                } else {
+                  break;
+                }
               }
             }
           }
