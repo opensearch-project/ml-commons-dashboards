@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { screen, within } from '../../../../test/test_utils';
+import { screen, waitFor, within } from '../../../../test/test_utils';
 import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
 
@@ -162,8 +162,9 @@ describe('<RegisterModel /> Tags', () => {
     const MAX_TAG_NUM = 25;
 
     // It has one tag by default, we can add 24 more tags
+    const addNewTagButton = screen.getByText(/add new tag/i);
     for (let i = 1; i < MAX_TAG_NUM; i++) {
-      await result.user.click(screen.getByText(/add new tag/i));
+      await result.user.click(addNewTagButton);
     }
 
     // 25 tags are displayed
@@ -186,6 +187,9 @@ describe('<RegisterModel /> Tags', () => {
     // Remove 2n tag, and 1st tag
     await result.user.click(screen.getByLabelText(/remove tag at row 2/i));
     await result.user.click(screen.getByLabelText(/remove tag at row 1/i));
+
+    // should have only one tag left
+    await waitFor(() => expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(1));
 
     await result.user.click(result.submitButton);
 
