@@ -169,7 +169,7 @@ export const ModelTagField = ({
       <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
         <EuiFormRow
           label={index === 0 ? 'Key' : ''}
-          aria-label={`Tag key ${index + 1}`}
+          data-test-subj={`ml-tagKey${index + 1}`}
           isInvalid={Boolean(tagKeyController.fieldState.error)}
           error={tagKeyController.fieldState.error?.message}
         >
@@ -192,7 +192,7 @@ export const ModelTagField = ({
       <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
         <EuiFormRow
           label={index === 0 ? 'Value' : ''}
-          aria-label={`Tag value ${index + 1}`}
+          data-test-subj={`ml-tagValue${index + 1}`}
           isInvalid={Boolean(tagValueController.fieldState.error)}
           error={tagValueController.fieldState.error?.message}
         >

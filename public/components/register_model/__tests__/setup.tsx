@@ -22,8 +22,6 @@ export async function setup({ onSubmit }: RegisterModelFormProps, options?: Rend
     name: /register model/i,
   });
   const modelFileInput = screen.queryByLabelText<HTMLInputElement>(/file/i);
-  const tagKeyInput = screen.getByLabelText(/^key$/i);
-  const tagValueInput = screen.getByLabelText(/^value$/i);
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
 
@@ -44,8 +42,6 @@ export async function setup({ onSubmit }: RegisterModelFormProps, options?: Rend
     descriptionInput,
     annotationsInput,
     submitButton,
-    tagKeyInput,
-    tagValueInput,
     form,
     user,
   };
