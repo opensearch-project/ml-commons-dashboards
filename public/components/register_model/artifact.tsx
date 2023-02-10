@@ -4,30 +4,12 @@
  */
 
 import React, { useState } from 'react';
-import {
-  EuiFormRow,
-  EuiTitle,
-  EuiHorizontalRule,
-  htmlIdGenerator,
-  EuiSpacer,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiCheckableCard,
-  EuiText,
-  EuiRadio,
-  EuiLink,
-} from '@elastic/eui';
-import type { Control } from 'react-hook-form';
+import { EuiTitle, htmlIdGenerator, EuiSpacer, EuiText, EuiRadio, EuiLink } from '@elastic/eui';
 
-import { FORM_ITEM_WIDTH } from './form_constants';
-import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ModelFileUploader } from './artifact_file';
 import { ArtifactUrl } from './artifact_url';
 
-export const ArtifactPanel = (props: {
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
-  ordinalNumber: number;
-}) => {
+export const ArtifactPanel = (props: { ordinalNumber: number }) => {
   const [selectedSource, setSelectedSource] = useState<'source_from_computer' | 'source_from_url'>(
     'source_from_computer'
   );
@@ -64,10 +46,8 @@ export const ArtifactPanel = (props: {
         onChange={() => setSelectedSource('source_from_url')}
       />
       <EuiSpacer size="m" />
-      {selectedSource === 'source_from_computer' && (
-        <ModelFileUploader formControl={props.formControl} />
-      )}
-      {selectedSource === 'source_from_url' && <ArtifactUrl formControl={props.formControl} />}
+      {selectedSource === 'source_from_computer' && <ModelFileUploader />}
+      {selectedSource === 'source_from_url' && <ArtifactUrl />}
     </div>
   );
 };

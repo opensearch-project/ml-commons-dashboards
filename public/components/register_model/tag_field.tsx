@@ -12,19 +12,18 @@ import {
   EuiFormRow,
 } from '@elastic/eui';
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Control, useController, useWatch, useFormContext } from 'react-hook-form';
+import { useController, useWatch, useFormContext } from 'react-hook-form';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
 interface ModelTagFieldProps {
   index: number;
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
   onDelete: (index: number) => void;
   tagKeys: string[];
   tagValues: string[];
 }
 
-const MAX_TAG_SIZE = 80;
+const MAX_TAG_LENGTH = 80;
 
 function getComboBoxValue(data: EuiComboBoxOptionOption[]) {
   if (data.length === 0) {
@@ -34,23 +33,17 @@ function getComboBoxValue(data: EuiComboBoxOptionOption[]) {
   }
 }
 
-export const ModelTagField = ({
-  formControl,
-  index,
-  tagKeys,
-  tagValues,
-  onDelete,
-}: ModelTagFieldProps) => {
+export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagFieldProps) => {
   const rowEleRef = useRef<HTMLDivElement>(null);
-  const { trigger } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { trigger, control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const tags = useWatch({
-    control: formControl,
+    control,
     name: 'tags',
   });
 
   const tagKeyController = useController({
     name: `tags.${index}.key` as const,
-    control: formControl,
+    control,
     rules: {
       validate: (tagKey) => {
         const tag = tags?.[index];
@@ -76,7 +69,7 @@ export const ModelTagField = ({
 
   const tagValueController = useController({
     name: `tags.${index}.value` as const,
-    control: formControl,
+    control,
     rules: {
       validate: (tagValue) => {
         const tag = tags?.[index];
@@ -117,7 +110,7 @@ export const ModelTagField = ({
 
   const onKeyCreate = useCallback(
     (value: string) => {
-      if (value.length > MAX_TAG_SIZE) {
+      if (value.length > MAX_TAG_LENGTH) {
         return;
       }
       tagKeyController.field.onChange(value);
@@ -127,7 +120,7 @@ export const ModelTagField = ({
 
   const onValueCreate = useCallback(
     (value: string) => {
-      if (value.length > MAX_TAG_SIZE) {
+      if (value.length > MAX_TAG_LENGTH) {
         return;
       }
       tagValueController.field.onChange(value);
@@ -183,7 +176,7 @@ export const ModelTagField = ({
             }
             onChange={onKeyChange}
             onCreateOption={onKeyCreate}
-            customOptionText="Add {searchValue} as new tag key. (80 characters allowed)"
+            customOptionText={`Add {searchValue} as new tag key. (${MAX_TAG_LENGTH} characters allowed)`}
             onBlur={tagKeyController.field.onBlur}
             inputRef={tagKeyController.field.ref}
           />
@@ -206,7 +199,7 @@ export const ModelTagField = ({
             }
             onChange={onValueChange}
             onCreateOption={onValueCreate}
-            customOptionText="Add {searchValue} as new tag name. (80 characters allowed)"
+            customOptionText={`Add {searchValue} as new tag name. (${MAX_TAG_LENGTH} characters allowed)`}
             onBlur={tagValueController.field.onBlur}
             inputRef={tagValueController.field.ref}
           />

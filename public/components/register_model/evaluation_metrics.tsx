@@ -15,18 +15,15 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import { useController } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { useMetricNames } from './register_model.hooks';
 
 const METRIC_VALUE_STEP = 0.01;
 
-export const EvaluationMetricsPanel = (props: {
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
-  ordinalNumber: number;
-}) => {
+export const EvaluationMetricsPanel = (props: { ordinalNumber: number }) => {
+  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [metricNamesLoading, metricNames] = useMetricNames();
 
   // TODO: this has to be hooked with data from BE API
@@ -36,12 +33,12 @@ export const EvaluationMetricsPanel = (props: {
 
   const metricFieldController = useController({
     name: 'metricName',
-    control: props.formControl,
+    control,
   });
 
   const trainingMetricFieldController = useController({
     name: 'trainingMetricValue',
-    control: props.formControl,
+    control,
     rules: {
       max: 1,
       min: 0,
@@ -50,7 +47,7 @@ export const EvaluationMetricsPanel = (props: {
 
   const validationMetricFieldController = useController({
     name: 'validationMetricValue',
-    control: props.formControl,
+    control,
     rules: {
       max: 1,
       min: 0,
@@ -59,7 +56,7 @@ export const EvaluationMetricsPanel = (props: {
 
   const testingMetricFieldController = useController({
     name: 'testingMetricValue',
-    control: props.formControl,
+    control,
     rules: {
       max: 1,
       min: 0,
