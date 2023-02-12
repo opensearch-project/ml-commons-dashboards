@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState, useCallback, Fragment } from 'react';
+import React, { useState, useCallback, Fragment, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -19,49 +19,57 @@ import {
   EuiSelectable,
   EuiTextColor,
   EuiLink,
+  EuiSelectableOption,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
-import { i18n } from '@osd/i18n';
 import { routerPaths } from '../../../common/router_paths';
+import { MODEL_FILTER, MODEL_VALUE } from '../../../common/registry_modal_option';
 enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
 }
-interface RegisterModelTypeProps {
+export interface IOption {
+  value: MODEL_VALUE;
+  checked: 'on' | undefined;
+}
+interface Props {
+  options: IOption[];
   onCloseModal: () => void;
 }
-interface OptionsType {
+export interface IItem {
   label: string;
-  'data-test-subj'?: string;
-  checked?: string;
+  'data-test-subj': string;
+  checked?: 'on' | undefined;
+  value: MODEL_VALUE;
 }
-export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
-  const { onCloseModal } = props;
+
+export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
+  const items = useMemo<IItem[]>(() => {
+    return options.map((item) => {
+      const status = MODEL_FILTER.find((option) => option.value === item.value);
+      return {
+        ...item,
+        label: status!.label,
+        'data-test-subj': status!['data-test-subj'],
+      };
+    });
+  }, [options]);
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
-  const options = [
-    {
-      label: 'Titan',
-      'data-test-subj': 'titanOption',
-    },
-    {
-      label: 'WSSS',
-    },
-    {
-      label: 'T33',
-    },
-  ];
-  const [modelRepoSelection, setModelRepoSelection] = useState(options);
-  const onChange = useCallback((modelSelection: OptionsType[]) => {
-    let selectedOption: OptionsType = { label: '' };
+  const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
+    items
+  );
+  const onChange = useCallback((modelSelection: Array<EuiSelectableOption<IItem>>) => {
+    let selectedOption = {};
     setModelRepoSelection(modelSelection);
-    modelSelection.map((u: OptionsType) => {
-      if (u.checked) {
+    modelSelection.map((u: IItem) => {
+      if (u.checked === 'on') {
         selectedOption = u;
       }
     });
     return selectedOption;
   }, []);
+
   const handleContinue = useCallback(
     (selectedOption) => {
       selectedOption = onChange(modelRepoSelection);
@@ -157,16 +165,13 @@ export function RegisterModelTypeModal(props: RegisterModelTypeProps) {
               searchable
               searchProps={{
                 'data-test-subj': 'selectableSearchHere',
-                placeholder: i18n.translate(
-                  'indexPatternManagement.createIndexPattern.stepDataSource.searchPlaceHolder',
-                  {
-                    defaultMessage: 'Find model',
-                  }
-                ),
+                placeholder: 'Find model',
               }}
               options={modelRepoSelection}
               onChange={onChange}
               singleSelection={true}
+              noMatchesMessage="No model found"
+              listProps={{ onFocusBadge: false, 'data-test-subj': 'selectableListHere' }}
             >
               {(list, search) => (
                 <Fragment>
