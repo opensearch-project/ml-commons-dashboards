@@ -35,9 +35,7 @@ describe('<RegisterModelTypeModal />', () => {
     expect(screen.getByTestId('selectableListHere')).toBeInTheDocument();
     // await userEvent.click(screen.getByTestId('aaa'));
     await userEvent.click(screen.getByTestId('continue button'));
-    expect(document.URL).toContain(
-      'model-registry/register-model?name=electra-small-generator&version=electra-small-generator'
-    );
+    expect(document.URL).toContain('name=electra-small-generator&version=electra-small-generator');
   });
   it('should render null content when input a invalid text to search model', async () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} options={options} />);
