@@ -5,22 +5,18 @@
 
 import React from 'react';
 import { EuiFieldText, EuiFormRow, EuiTitle, EuiTextArea, EuiText } from '@elastic/eui';
-import { useController } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
-
-import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { useController, useFormContext } from 'react-hook-form';
+import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
 const NAME_MAX_LENGTH = 60;
 const DESCRIPTION_MAX_LENGTH = 200;
 const ANNOTATION_MAX_LENGTH = 200;
 
-export const ModelDetailsPanel = (props: {
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
-  ordinalNumber: number;
-}) => {
+export const ModelDetailsPanel = (props: { ordinalNumber: number }) => {
+  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const nameFieldController = useController({
     name: 'name',
-    control: props.formControl,
+    control,
     rules: {
       required: { value: true, message: 'Name can not be empty' },
       maxLength: { value: NAME_MAX_LENGTH, message: 'Text exceed max length' },
@@ -29,7 +25,7 @@ export const ModelDetailsPanel = (props: {
 
   const descriptionFieldController = useController({
     name: 'description',
-    control: props.formControl,
+    control,
     rules: {
       required: { value: true, message: 'Description can not be empty' },
       maxLength: { value: DESCRIPTION_MAX_LENGTH, message: 'Text exceed max length' },
@@ -38,7 +34,7 @@ export const ModelDetailsPanel = (props: {
 
   const annotationsFieldController = useController({
     name: 'annotations',
-    control: props.formControl,
+    control,
     rules: { maxLength: { value: ANNOTATION_MAX_LENGTH, message: 'Text exceed max length' } },
   });
 
