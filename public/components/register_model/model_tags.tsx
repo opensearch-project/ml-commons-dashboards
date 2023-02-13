@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { EuiButton, EuiTitle, EuiHorizontalRule, EuiSpacer, EuiText } from '@elastic/eui';
+import { EuiButton, EuiTitle, EuiSpacer, EuiText } from '@elastic/eui';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
@@ -13,7 +13,7 @@ import { useModelTags } from './register_model.hooks';
 
 const MAX_TAG_NUM = 25;
 
-export const ModelTagsPanel = (props: { ordinalNumber: number }) => {
+export const ModelTagsPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [, { keys, values }] = useModelTags();
   const { fields, append, remove } = useFieldArray({
@@ -29,10 +29,13 @@ export const ModelTagsPanel = (props: { ordinalNumber: number }) => {
     <div>
       <EuiTitle size="s">
         <h3>
-          {props.ordinalNumber}. Tags - <i style={{ fontWeight: 300 }}>optional</i>
+          Tags - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
       </EuiTitle>
-      <EuiHorizontalRule margin="m" />
+      <EuiText>
+        <small>Add tags to facilitate model discovery and tracking across your organization.</small>
+      </EuiText>
+      <EuiSpacer size="m" />
       {fields.map((field, index) => {
         return (
           <ModelTagField
