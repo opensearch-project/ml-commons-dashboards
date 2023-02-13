@@ -5,19 +5,17 @@
 
 import React from 'react';
 import { EuiFormRow, htmlIdGenerator, EuiFieldText } from '@elastic/eui';
-import { useController } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 
 import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { URL_REGEX } from '../../utils/regex';
 
-export const ArtifactUrl = (props: {
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
-}) => {
+export const ArtifactUrl = () => {
+  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const modelUrlFieldController = useController({
     name: 'modelURL',
-    control: props.formControl,
+    control,
     rules: {
       required: { value: true, message: 'URL is required. Enter a URL.' },
       pattern: { value: URL_REGEX, message: 'URL is invalid. Enter a valid URL.' },

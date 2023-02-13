@@ -7,14 +7,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { RegisterModelForm } from '../register_model';
-import type { RegisterModelFormProps } from '../register_model';
 import { render, RenderWithRouteProps, screen } from '../../../../test/test_utils';
 
 jest.mock('../../../apis/model');
 jest.mock('../../../apis/task');
 
-export async function setup({ onSubmit }: RegisterModelFormProps, options?: RenderWithRouteProps) {
-  render(<RegisterModelForm onSubmit={onSubmit} />, { route: options?.route ?? '/' });
+export async function setup(options?: RenderWithRouteProps) {
+  render(<RegisterModelForm />, { route: options?.route ?? '/' });
   const nameInput = screen.getByLabelText<HTMLInputElement>(/^name$/i);
   const descriptionInput = screen.getByLabelText<HTMLTextAreaElement>(/description/i);
   const annotationsInput = screen.getByLabelText<HTMLTextAreaElement>(/annotation/i);
@@ -22,8 +21,6 @@ export async function setup({ onSubmit }: RegisterModelFormProps, options?: Rend
     name: /register model/i,
   });
   const modelFileInput = screen.queryByLabelText<HTMLInputElement>(/file/i);
-  const tagKeyInput = screen.getByLabelText(/^key$/i);
-  const tagValueInput = screen.getByLabelText(/^value$/i);
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
 
@@ -44,8 +41,6 @@ export async function setup({ onSubmit }: RegisterModelFormProps, options?: Rend
     descriptionInput,
     annotationsInput,
     submitButton,
-    tagKeyInput,
-    tagValueInput,
     form,
     user,
   };

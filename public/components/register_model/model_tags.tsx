@@ -4,22 +4,21 @@
  */
 
 import React, { useCallback } from 'react';
-import { EuiButton, EuiTitle, EuiHorizontalRule, EuiSpacer } from '@elastic/eui';
-import { useFieldArray } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { EuiButton, EuiTitle, EuiHorizontalRule, EuiSpacer, EuiText } from '@elastic/eui';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ModelTagField } from './tag_field';
 import { useModelTags } from './register_model.hooks';
 
-export const ModelTagsPanel = (props: {
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
-  ordinalNumber: number;
-}) => {
+const MAX_TAG_NUM = 25;
+
+export const ModelTagsPanel = (props: { ordinalNumber: number }) => {
+  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [, { keys, values }] = useModelTags();
   const { fields, append, remove } = useFieldArray({
     name: 'tags',
-    control: props.formControl,
+    control,
   });
 
   const addNewTag = useCallback(() => {
@@ -38,9 +37,7 @@ export const ModelTagsPanel = (props: {
         return (
           <ModelTagField
             key={field.id}
-            name="tags"
             index={index}
-            formControl={props.formControl}
             tagKeys={keys}
             tagValues={values}
             onDelete={remove}
@@ -48,7 +45,13 @@ export const ModelTagsPanel = (props: {
         );
       })}
       <EuiSpacer />
-      <EuiButton onClick={addNewTag}>Add new tag</EuiButton>
+      <EuiButton disabled={fields.length >= MAX_TAG_NUM} onClick={addNewTag}>
+        Add new tag
+      </EuiButton>
+      <EuiSpacer size="xs" />
+      <EuiText color="subdued">
+        <small>{`You can add up to ${MAX_TAG_NUM - fields.length} more tags.`}</small>
+      </EuiText>
     </div>
   );
 };

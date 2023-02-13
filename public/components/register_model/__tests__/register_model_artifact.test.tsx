@@ -5,25 +5,39 @@
 
 import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
+import * as formHooks from '../register_model.hooks';
 
 describe('<RegisterModel /> Artifact', () => {
+  const onSubmitMock = jest.fn();
+
+  beforeEach(() => {
+    jest
+      .spyOn(formHooks, 'useMetricNames')
+      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
+    jest
+      .spyOn(formHooks, 'useModelTags')
+      .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
+    jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should render an artifact panel', async () => {
-    const onSubmitMock = jest.fn();
-    await setup({ onSubmit: onSubmitMock });
+    await setup();
     expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeInTheDocument();
     expect(screen.getByLabelText(/from computer/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/from url/i)).toBeInTheDocument();
   });
 
   it('should not render an artifact panel if importing an opensearch defined model', async () => {
-    const onSubmitMock = jest.fn();
-    await setup({ onSubmit: onSubmitMock }, { route: '/?type=import' });
+    await setup({ route: '/?type=import' });
     expect(screen.queryByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeNull();
   });
 
   it('should submit the register model form', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
     expect(onSubmitMock).not.toHaveBeenCalled();
 
     await result.user.click(result.submitButton);
@@ -32,8 +46,7 @@ describe('<RegisterModel /> Artifact', () => {
   });
 
   it('should NOT submit the register model form if model file size exceed 80MB', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     // Empty model file selection by clicking the `Remove` button on EuiFilePicker
     await result.user.click(screen.getByLabelText(/clear selected files/i));
@@ -50,8 +63,7 @@ describe('<RegisterModel /> Artifact', () => {
   });
 
   it('should NOT submit the register model form if model file is empty', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     // Empty model file selection by clicking the `Remove` button on EuiFilePicker
     await result.user.click(screen.getByLabelText(/clear selected files/i));
@@ -62,8 +74,7 @@ describe('<RegisterModel /> Artifact', () => {
   });
 
   it('should NOT submit the register model form if model url is empty', async () => {
-    const onSubmitMock = jest.fn();
-    const result = await setup({ onSubmit: onSubmitMock });
+    const result = await setup();
 
     // select option: From URL
     await result.user.click(screen.getByLabelText(/from url/i));

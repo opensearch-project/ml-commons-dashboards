@@ -5,8 +5,7 @@
 
 import React from 'react';
 import { EuiFormRow, EuiFilePicker } from '@elastic/eui';
-import { useController } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
@@ -20,12 +19,11 @@ function validateFile(file: File) {
   return true;
 }
 
-export const ModelFileUploader = (props: {
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
-}) => {
+export const ModelFileUploader = () => {
+  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const modelFileFieldController = useController({
     name: 'modelFile',
-    control: props.formControl,
+    control,
     rules: {
       required: { value: true, message: 'A file is required. Add a file.' },
       validate: validateFile,

@@ -12,8 +12,7 @@ import {
   EuiButtonEmpty,
   EuiSpacer,
 } from '@elastic/eui';
-import { useController } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 
 import '../../ace-themes/sql_console.js';
 import { FORM_ITEM_WIDTH } from './form_constants';
@@ -29,14 +28,12 @@ function validateConfigurationObject(value: string) {
   return true;
 }
 
-export const ConfigurationPanel = (props: {
-  formControl: Control<ModelFileFormData | ModelUrlFormData>;
-  ordinalNumber: number;
-}) => {
+export const ConfigurationPanel = (props: { ordinalNumber: number }) => {
+  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [isHelpVisible, setIsHelpVisible] = useState(false);
   const configurationFieldController = useController({
     name: 'configuration',
-    control: props.formControl,
+    control,
     rules: {
       required: { value: true, message: 'Configuration is required.' },
       validate: validateConfigurationObject,
