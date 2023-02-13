@@ -28,7 +28,7 @@ function validateConfigurationObject(value: string) {
   return true;
 }
 
-export const ConfigurationPanel = (props: { ordinalNumber: number }) => {
+export const ConfigurationPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [isHelpVisible, setIsHelpVisible] = useState(false);
   const configurationFieldController = useController({
@@ -43,7 +43,7 @@ export const ConfigurationPanel = (props: { ordinalNumber: number }) => {
   return (
     <div>
       <EuiTitle size="s">
-        <h3>{props.ordinalNumber}. Configuration</h3>
+        <h3>Configuration</h3>
       </EuiTitle>
       <EuiText style={{ maxWidth: 450 }}>
         <small>

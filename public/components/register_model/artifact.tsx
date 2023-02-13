@@ -9,7 +9,7 @@ import { EuiTitle, htmlIdGenerator, EuiSpacer, EuiText, EuiRadio, EuiLink } from
 import { ModelFileUploader } from './artifact_file';
 import { ArtifactUrl } from './artifact_url';
 
-export const ArtifactPanel = (props: { ordinalNumber: number }) => {
+export const ArtifactPanel = () => {
   const [selectedSource, setSelectedSource] = useState<'source_from_computer' | 'source_from_url'>(
     'source_from_computer'
   );
@@ -17,7 +17,7 @@ export const ArtifactPanel = (props: { ordinalNumber: number }) => {
   return (
     <div>
       <EuiTitle size="s">
-        <h3>{props.ordinalNumber}. Artifact</h3>
+        <h3>Artifact</h3>
       </EuiTitle>
       <EuiText style={{ maxWidth: 450 }}>
         <small>
