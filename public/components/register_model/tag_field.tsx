@@ -54,16 +54,11 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
           }
           // If a tag has both key and value, validate if the same tag was added before
           if (tagKey && tag.value) {
-            for (let i = 0; i < tags.length; i++) {
-              // Found the same tag
+            // Find if the same tag appears before the current tag
+            for (let i = 0; i < index; i++) {
+              // If found the same tag, then the current tag is invalid
               if (tags[i].key === tagKey && tags[i].value === tag.value) {
-                // The same tag appears before the current tag
-                // Display error message on the current tag
-                if (index > i) {
-                  return 'This tag has already been added. Remove the duplicate tag.';
-                } else {
-                  break;
-                }
+                return 'This tag has already been added. Remove the duplicate tag.';
               }
             }
           }
@@ -86,17 +81,12 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
           }
           // If a tag has both key and value, validate if the same tag was added before
           if (tag.key && tagValue) {
-            for (let i = 0; i < tags.length; i++) {
-              // Found the same tag
+            // Find if the same tag appears before the current tag
+            for (let i = 0; i < index; i++) {
+              // If found the same tag, then the current tag is invalid
               if (tags[i].key === tag.key && tags[i].value === tagValue) {
-                // The same tag appears before the current tag
-                // Display error message on the current tag
-                if (index > i) {
-                  // return `false` instead of error message because we don't show error message on value field
-                  return false;
-                } else {
-                  break;
-                }
+                // return `false` instead of error message because we don't show error message on value field
+                return false;
               }
             }
           }
