@@ -17,7 +17,7 @@ export const profileRouter = (router: IRouter) => {
           modelId: schema.string({
             validate: (value) => {
               if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
-                return `a-z, A-Z, 0-9, '_', and '-' are allowed`;
+                return 'Invalid model id';
               }
             },
           }),
