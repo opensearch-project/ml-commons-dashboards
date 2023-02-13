@@ -49,15 +49,15 @@ describe('<RegisterModel /> Details', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should NOT submit the register model form if model name length exceeded 60', async () => {
+  it('should NOT submit the register model form if model name length exceeded 80', async () => {
     const result = await setup();
 
     await result.user.clear(result.nameInput);
-    await result.user.type(result.nameInput, 'x'.repeat(60));
+    await result.user.type(result.nameInput, 'x'.repeat(80));
     expect(result.nameInput).toBeValid();
 
     await result.user.clear(result.nameInput);
-    await result.user.type(result.nameInput, 'x'.repeat(61));
+    await result.user.type(result.nameInput, 'x'.repeat(81));
     expect(result.nameInput).toBeInvalid();
 
     await result.user.click(result.submitButton);

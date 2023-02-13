@@ -22,7 +22,7 @@ import { useMetricNames } from './register_model.hooks';
 
 const METRIC_VALUE_STEP = 0.01;
 
-export const EvaluationMetricsPanel = (props: { ordinalNumber: number }) => {
+export const EvaluationMetricsPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [metricNamesLoading, metricNames] = useMetricNames();
 
@@ -99,7 +99,7 @@ export const EvaluationMetricsPanel = (props: { ordinalNumber: number }) => {
     <div style={{ width: 475 }}>
       <EuiTitle size="s">
         <h3>
-          {props.ordinalNumber}. Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
+          Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
       </EuiTitle>
       <EuiText>

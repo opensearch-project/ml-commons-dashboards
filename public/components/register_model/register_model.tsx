@@ -98,7 +98,7 @@ export const RegisterModelForm = () => {
           <EuiSpacer />
           {partials.map((FormPartial, i) => (
             <React.Fragment key={i}>
-              <FormPartial ordinalNumber={i + 1} />
+              <FormPartial />
               <EuiSpacer size="xl" />
             </React.Fragment>
           ))}
