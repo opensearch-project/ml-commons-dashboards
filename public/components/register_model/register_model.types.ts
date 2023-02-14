@@ -8,16 +8,20 @@ export interface Tag {
   value: string;
 }
 
+interface Metric {
+  key: string;
+  trainingValue: string;
+  validationValue: string;
+  testingValue: string;
+}
+
 interface ModelFormBase {
   name: string;
   version: string;
   description: string;
   annotations?: string;
   configuration: string;
-  metricName?: string;
-  trainingMetricValue?: string;
-  validationMetricValue?: string;
-  testingMetricValue?: string;
+  metric?: Metric;
   tags?: Tag[];
 }
 

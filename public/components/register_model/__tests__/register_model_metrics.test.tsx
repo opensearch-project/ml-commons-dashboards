@@ -59,13 +59,14 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
-  it('should submit the form if metric name is selected but metric value are empty', async () => {
+  it('should NOT submit the form if metric name is selected but metric value are empty and error message in screen', async () => {
     const result = await setup();
     await result.user.click(screen.getByLabelText(/^metric$/i));
     await result.user.click(screen.getByText('Metric 1'));
     await result.user.click(result.submitButton);
 
-    expect(onSubmitMock).toHaveBeenCalled();
+    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(screen.getByText('At least one value is required. Enter a value')).toBeInTheDocument();
   });
 
   it('should submit the form if metric name and all metric value are selected', async () => {
@@ -116,5 +117,14 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
     await result.user.click(result.submitButton);
 
     expect(onSubmitMock).not.toHaveBeenCalled();
+  });
+
+  it('should keep metric value not more than 2 decimal point', async () => {
+    const result = await setup();
+    await result.user.click(screen.getByLabelText(/^metric$/i));
+    await result.user.click(screen.getByText('Metric 1'));
+
+    await result.user.type(screen.getByLabelText(/training value/i), '1.111');
+    expect(screen.getByLabelText(/training value/i)).toHaveValue(1.11);
   });
 });
