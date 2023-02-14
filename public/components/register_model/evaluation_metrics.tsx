@@ -24,7 +24,7 @@ import { fixTwoDecimalPoint } from '../../utils';
 const METRIC_VALUE_STEP = 0.01;
 const MAX_METRIC_NAME_LENGTH = 50;
 
-export const EvaluationMetricsPanel = (props: { ordinalNumber: number }) => {
+export const EvaluationMetricsPanel = () => {
   const { trigger, control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [isRequiredValueText, setIsRequiredValueText] = useState(false);
   const [metricNamesLoading, metricNames] = useMetricNames();
@@ -143,7 +143,7 @@ export const EvaluationMetricsPanel = (props: { ordinalNumber: number }) => {
     <div style={{ width: 475 }} onBlur={onBlur}>
       <EuiTitle size="s">
         <h3>
-          {props.ordinalNumber}. Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
+          Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
       </EuiTitle>
       <EuiText>

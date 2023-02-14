@@ -8,11 +8,11 @@ import { EuiFieldText, EuiFormRow, EuiTitle, EuiTextArea, EuiText } from '@elast
 import { useController, useFormContext } from 'react-hook-form';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
-const NAME_MAX_LENGTH = 60;
+const NAME_MAX_LENGTH = 80;
 const DESCRIPTION_MAX_LENGTH = 200;
 const ANNOTATION_MAX_LENGTH = 200;
 
-export const ModelDetailsPanel = (props: { ordinalNumber: number }) => {
+export const ModelDetailsPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const nameFieldController = useController({
     name: 'name',
@@ -45,7 +45,7 @@ export const ModelDetailsPanel = (props: { ordinalNumber: number }) => {
   return (
     <div>
       <EuiTitle size="s">
-        <h3>{props.ordinalNumber}. Model Details</h3>
+        <h3>Model Details</h3>
       </EuiTitle>
       <EuiFormRow
         label="Name"
