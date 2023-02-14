@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   EuiFormRow,
   EuiTitle,
@@ -15,15 +15,18 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import { useController, useFormContext } from 'react-hook-form';
+import { useController, useFormContext, useWatch } from 'react-hook-form';
 
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { useMetricNames } from './register_model.hooks';
+import { fixTwoDecimalPoint } from '../../utils';
 
 const METRIC_VALUE_STEP = 0.01;
+const MAX_METRIC_NAME_LENGTH = 50;
 
 export const EvaluationMetricsPanel = () => {
-  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { trigger, control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const [isRequiredValueText, setIsRequiredValueText] = useState(false);
   const [metricNamesLoading, metricNames] = useMetricNames();
 
   // TODO: this has to be hooked with data from BE API
@@ -31,35 +34,56 @@ export const EvaluationMetricsPanel = () => {
     return metricNames.map((n) => ({ label: n }));
   }, [metricNames]);
 
-  const metricFieldController = useController({
-    name: 'metricName',
+  const metricKeyController = useController({
+    name: 'metric.key',
     control,
   });
 
+  const metric = useWatch({
+    control,
+    name: 'metric',
+  });
+
+  const valueValidateFn = () => {
+    if (metric) {
+      const { trainingValue, validationValue, testingValue, key } = metric;
+      if (key && !trainingValue && !validationValue && !testingValue) {
+        setIsRequiredValueText(true);
+        return false;
+      } else {
+        setIsRequiredValueText(false);
+        return true;
+      }
+    }
+    return true;
+  };
   const trainingMetricFieldController = useController({
-    name: 'trainingMetricValue',
+    name: 'metric.trainingValue',
     control,
     rules: {
       max: 1,
       min: 0,
+      validate: valueValidateFn,
     },
   });
 
   const validationMetricFieldController = useController({
-    name: 'validationMetricValue',
+    name: 'metric.validationValue',
     control,
     rules: {
       max: 1,
       min: 0,
+      validate: valueValidateFn,
     },
   });
 
   const testingMetricFieldController = useController({
-    name: 'testingMetricValue',
+    name: 'metric.testingValue',
     control,
     rules: {
       max: 1,
       min: 0,
+      validate: valueValidateFn,
     },
   });
 
@@ -69,13 +93,13 @@ export const EvaluationMetricsPanel = () => {
         trainingMetricFieldController.field.onChange('');
         validationMetricFieldController.field.onChange('');
         testingMetricFieldController.field.onChange('');
-        metricFieldController.field.onChange('');
+        metricKeyController.field.onChange('');
       } else {
-        metricFieldController.field.onChange(data[0].label);
+        metricKeyController.field.onChange(data[0].label);
       }
     },
     [
-      metricFieldController,
+      metricKeyController,
       trainingMetricFieldController,
       validationMetricFieldController,
       testingMetricFieldController,
@@ -84,9 +108,12 @@ export const EvaluationMetricsPanel = () => {
 
   const onCreateMetricName = useCallback(
     (metricName: string) => {
-      metricFieldController.field.onChange(metricName);
+      if (metricName.length > MAX_METRIC_NAME_LENGTH) {
+        return;
+      }
+      metricKeyController.field.onChange(metricName);
     },
-    [metricFieldController]
+    [metricKeyController.field]
   );
 
   const metricValueFields = [
@@ -95,8 +122,25 @@ export const EvaluationMetricsPanel = () => {
     { label: 'Testing value', controller: testingMetricFieldController },
   ];
 
+  const onBlur = useCallback(
+    (e: React.FocusEvent<HTMLDivElement>) => {
+      // The blur could happen when selecting combo box dropdown
+      // But we don't want to trigger form validation in this case
+      if (
+        (e.relatedTarget?.getAttribute('role') === 'option' &&
+          e.relatedTarget?.tagName === 'BUTTON') ||
+        e.relatedTarget?.getAttribute('role') === 'textbox'
+      ) {
+        return;
+      }
+      // Validate the form only when the current tag row blurred
+      trigger('metric');
+    },
+    [trigger]
+  );
+
   return (
-    <div style={{ width: 475 }}>
+    <div style={{ width: 475 }} onBlur={onBlur}>
       <EuiTitle size="s">
         <h3>
           Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
@@ -111,22 +155,23 @@ export const EvaluationMetricsPanel = () => {
       <EuiFormRow
         fullWidth
         label="Metric"
-        isInvalid={Boolean(metricFieldController.fieldState.error)}
+        isInvalid={Boolean(metricKeyController.fieldState.error)}
       >
         <EuiComboBox
           fullWidth
           isLoading={metricNamesLoading}
+          isInvalid={Boolean(metricKeyController.fieldState.error)}
           placeholder='Select or add a metric, like "Accuracy"'
           singleSelection={{ asPlainText: true }}
           options={options}
           selectedOptions={
-            metricFieldController.field.value ? [{ label: metricFieldController.field.value }] : []
+            metricKeyController.field.value ? [{ label: metricKeyController.field.value }] : []
           }
           onChange={onMetricNameChange}
           onCreateOption={onCreateMetricName}
-          customOptionText="Add {searchValue} as new metric name"
-          onBlur={metricFieldController.field.onBlur}
-          inputRef={metricFieldController.field.ref}
+          customOptionText={`Add {searchValue} as new metric name. (${MAX_METRIC_NAME_LENGTH} characters allowed)`}
+          onBlur={metricKeyController.field.onBlur}
+          inputRef={metricKeyController.field.ref}
         />
       </EuiFormRow>
       <EuiSpacer />
@@ -141,11 +186,13 @@ export const EvaluationMetricsPanel = () => {
               <EuiFieldNumber
                 placeholder="Enter a value"
                 isInvalid={Boolean(controller.fieldState.error)}
-                disabled={!metricFieldController.field.value}
+                disabled={!metricKeyController.field.value}
                 step={METRIC_VALUE_STEP}
                 name={controller.field.name}
                 value={controller.field.value ?? ''}
-                onChange={controller.field.onChange}
+                onChange={(value) =>
+                  controller.field.onChange(fixTwoDecimalPoint(value.target.value))
+                }
                 onBlur={controller.field.onBlur}
                 inputRef={controller.field.ref}
               />
@@ -153,6 +200,11 @@ export const EvaluationMetricsPanel = () => {
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
+      {isRequiredValueText && (
+        <EuiText color="danger" size="xs">
+          At least one value is required. Enter a value
+        </EuiText>
+      )}
     </div>
   );
 };
