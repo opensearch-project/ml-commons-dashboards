@@ -133,7 +133,7 @@ export const useMonitoring = () => {
   const handleTableChange = useCallback(
     (criteria: {
       pagination?: { currentPage: number; pageSize: number };
-      sort?: { field: 'name'; direction: 'asc' | 'desc' };
+      sort?: { field: 'name' | 'model_state' | 'id'; direction: 'asc' | 'desc' };
     }) => {
       setParams((previousValue) => {
         if (
