@@ -21,7 +21,7 @@ interface ModelFormBase {
   description: string;
   annotations?: string;
   configuration: string;
-  metric: Metric;
+  metric?: Metric;
   tags?: Tag[];
 }
 
