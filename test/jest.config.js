@@ -9,7 +9,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/test/setup.jest.ts'],
   roots: ['<rootDir>'],
   moduleNameMapper: {
-    '\\.(css|less|scss)$': '<rootDir>/test/mocks/styleMock.ts',
+    '\\.(css|less|scss|svg)$': '<rootDir>/test/mocks/styleMock.ts',
     '^ui/(.*)': '<rootDir>/../../src/legacy/ui/public/$1/',
   },
   testMatch: ['**/*.test.{js,mjs,ts,tsx}'],
