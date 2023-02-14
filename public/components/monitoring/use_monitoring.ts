@@ -39,8 +39,8 @@ const fetchDeployedModels = async (params: Params) => {
     }
   });
   const result = await APIProvider.getAPI('model').search({
-    currentPage: params.currentPage,
-    pageSize: params.pageSize,
+    from: (params.currentPage - 1) * params.pageSize,
+    size: params.pageSize,
     nameOrId: params.nameOrId,
     states:
       !states || states.length === 0
@@ -48,8 +48,14 @@ const fetchDeployedModels = async (params: Params) => {
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
   });
+  const totalPages = Math.ceil(result.total_models / params.pageSize);
   return {
-    ...result,
+    pagination: {
+      currentPage: params.currentPage,
+      pageSize: params.pageSize,
+      totalRecords: result.total_models,
+      totalPages,
+    },
     data: result.data.map(
       ({
         id,

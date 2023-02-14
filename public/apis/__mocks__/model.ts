@@ -15,12 +15,7 @@ export class Model {
           planning_worker_nodes: ['node1', 'node2', 'node3'],
         },
       ],
-      pagination: {
-        currentPage: 1,
-        pageSize: 15,
-        totalRecords: 1,
-        totalPages: 1,
-      },
+      total_models: 1,
     });
   }
 }

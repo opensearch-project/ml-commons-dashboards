@@ -21,7 +21,6 @@
 import { IScopedClusterClient } from '../../../../src/core/server';
 import { MODEL_STATE, ModelSearchSort } from '../../common';
 
-import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { generateModelSearchQuery } from './utils/model';
 import { MODEL_BASE_API } from './utils/constants';
 
@@ -32,13 +31,15 @@ const modelSortFieldMapping: { [key: string]: string } = {
 
 export class ModelService {
   public static async search({
-    pagination,
+    from,
+    size,
     sort,
     client,
     ...restParams
   }: {
     client: IScopedClusterClient;
-    pagination: RequestPagination;
+    from: number;
+    size: number;
     sort?: ModelSearchSort[];
     states?: MODEL_STATE[];
     nameOrId?: string;
@@ -50,7 +51,8 @@ export class ModelService {
       path: `${MODEL_BASE_API}/_search`,
       body: {
         query: generateModelSearchQuery(restParams),
-        ...getQueryFromSize(pagination),
+        from,
+        size,
         ...(sort
           ? {
               sort: sort.map((sorting) => {
@@ -69,7 +71,7 @@ export class ModelService {
         id: _id,
         ..._source,
       })),
-      pagination: getPagination(pagination.currentPage, pagination.pageSize, hits.total.value),
+      total_models: hits.total.value,
     };
   }
 }
