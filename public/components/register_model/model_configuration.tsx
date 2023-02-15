@@ -20,6 +20,7 @@ import '../../ace-themes/sql_console.js';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { HelpFlyout } from './help_flyout';
+import { CUSTOM_FORM_ERROR_TYPES } from './constants';
 
 function validateConfigurationObject(value: string) {
   try {
@@ -38,7 +39,7 @@ export const ConfigurationPanel = () => {
     control,
     rules: {
       required: { value: true, message: 'Configuration is required.' },
-      validate: validateConfigurationObject,
+      validate: { [CUSTOM_FORM_ERROR_TYPES.INVALID_CONFIGURATION]: validateConfigurationObject },
     },
   });
 
