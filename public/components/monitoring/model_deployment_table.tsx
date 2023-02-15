@@ -224,7 +224,6 @@ export const ModelDeploymentTable = ({
         <EuiBasicTable
           columns={columns}
           sorting={sorting}
-          loading={loading}
           onChange={handleChange}
           items={items}
           pagination={items.length > 0 ? pagination : undefined}
