@@ -15,14 +15,12 @@ import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
-import { ModelTypes } from './register_model_types';
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
     sort: ModelTableSort;
     currentPage: number;
     pageSize: number;
-    status?: ModelTypes[];
     filterValue: ModelListFilterFilterValue;
   }>({
     currentPage: 1,
@@ -91,10 +89,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }, []);
   return (
     <EuiPanel>
-      <EuiPageHeader
-        pageTitle={<>Models</>}
-        rightSideItems={[<RegisterNewModelButton selection={params.status} />]}
-      />
+      <EuiPageHeader pageTitle={<>Models</>} rightSideItems={[<RegisterNewModelButton />]} />
       <EuiSpacer />
       <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
       <EuiSpacer />
