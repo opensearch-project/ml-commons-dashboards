@@ -35,8 +35,8 @@ export const modelRouter = (router: IRouter) => {
       path: MODEL_API_ENDPOINT,
       validate: {
         query: schema.object({
-          currentPage: schema.number(),
-          pageSize: schema.number(),
+          from: schema.number({ min: 0 }),
+          size: schema.number({ max: 50 }),
           sort: schema.maybe(
             schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
           ),
@@ -46,11 +46,12 @@ export const modelRouter = (router: IRouter) => {
       },
     },
     async (context, request) => {
-      const { currentPage, pageSize, sort, states, nameOrId } = request.query;
+      const { from, size, sort, states, nameOrId } = request.query;
       try {
         const payload = await ModelService.search({
           client: context.core.opensearch.client,
-          pagination: { currentPage, pageSize },
+          from,
+          size,
           sort: typeof sort === 'string' ? [sort] : sort,
           states: typeof states === 'string' ? [states] : states,
           nameOrId,

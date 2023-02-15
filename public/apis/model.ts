@@ -5,7 +5,6 @@
 
 import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
 import { MODEL_STATE, ModelSearchSort } from '../../common';
-import { Pagination } from '../../server/services/utils/pagination';
 import { InnerHttpProvider } from './inner_http_provider';
 
 export interface ModelSearchItem {
@@ -21,14 +20,14 @@ export interface ModelSearchItem {
 
 export interface ModelSearchResponse {
   data: ModelSearchItem[];
-  pagination: Pagination;
+  total_models: number;
 }
 
 export class Model {
   public search(query: {
     sort?: ModelSearchSort[];
-    currentPage: number;
-    pageSize: number;
+    from: number;
+    size: number;
     states?: MODEL_STATE[];
     nameOrId?: string;
   }) {

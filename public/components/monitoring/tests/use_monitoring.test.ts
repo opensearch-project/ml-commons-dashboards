@@ -13,12 +13,7 @@ jest.mock('../../../apis/model');
 const mockEmptyRecords = () =>
   jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
     data: [],
-    pagination: {
-      currentPage: 0,
-      pageSize: 15,
-      totalRecords: 0,
-      totalPages: 0,
-    },
+    total_models: 0,
   });
 
 describe('useMonitoring', () => {
@@ -36,12 +31,7 @@ describe('useMonitoring', () => {
           planning_worker_nodes: ['node1', 'node2', 'node3'],
         },
       ],
-      pagination: {
-        currentPage: 1,
-        pageSize: 15,
-        totalRecords: 1,
-        totalPages: 1,
-      },
+      total_models: 1,
     });
   });
 
@@ -101,8 +91,8 @@ describe('useMonitoring', () => {
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: ['model_state-asc'],
-          currentPage: 1,
-          pageSize: 10,
+          from: 0,
+          size: 10,
         })
       )
     );
@@ -117,8 +107,8 @@ describe('useMonitoring', () => {
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: ['name-desc'],
-          currentPage: 2,
-          pageSize: 10,
+          from: 10,
+          size: 10,
         })
       )
     );
@@ -154,12 +144,7 @@ describe('useMonitoring.pageStatus', () => {
               planning_worker_nodes: ['node1', 'node2', 'node3'],
             },
           ],
-          pagination: {
-            currentPage: 1,
-            pageSize: 15,
-            totalRecords: 1,
-            totalPages: 1,
-          },
+          total_models: 1,
         });
       };
     });
