@@ -1,7 +1,7 @@
 {
-  "id": "mlCommonsPlugin",
-  "version": "1.0.0",
-  "opensearchDashboardsVersion": "opensearchDashboards",
+  "id": "mlCommonsDashboards",
+  "version": "2.6.0.0",
+  "opensearchDashboardsVersion": "2.6.0",
   "server": true,
   "ui": true,
   "requiredPlugins": [
