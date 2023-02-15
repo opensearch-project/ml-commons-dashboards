@@ -5,17 +5,28 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { EuiButton } from '@elastic/eui';
 import { RegisterModelTypeModal } from '../register_model_type_modal';
-import { ModelTypes } from './register_model_types';
-interface Props {
-  selection: ModelTypes[] | undefined;
-}
-const MODEL_STATUS: ModelTypes[] = [
-  'tapas-tiny',
-  'electra-small-generator',
-  'flan-T5-large-grammer-synthesis',
-  'BEiT',
+const MODEL_LIST = [
+  {
+    name: 'tapas-tiny',
+    description:
+      'TAPAS is a BERT-like transformers model pretrained on a large corpus of English data from Wikipedia in a self-supervised fashion',
+  },
+  {
+    name: 'electra-small-generator',
+    description: 'ELECTRA is a new method for self-supervised language representation learning',
+  },
+  {
+    name: 'flan-T5-large-grammer-synthesis',
+    description:
+      'A fine-tuned version of google/flan-t5-large for grammer correction on an expanded version of the JFLEG dataset',
+  },
+  {
+    name: 'BEiT',
+    description:
+      'The BEiT model is a version Transformer(ViT),which is a transformer encoder model(BERT-like)',
+  },
 ];
-export function RegisterNewModelButton({ selection = [] }: Props) {
+export function RegisterNewModelButton() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const showModal = useCallback(() => {
     setIsModalVisible(true);
@@ -25,11 +36,12 @@ export function RegisterNewModelButton({ selection = [] }: Props) {
   }, []);
   const statusFilterOptions = useMemo(
     () =>
-      MODEL_STATUS.map((status) => ({
-        value: status,
-        checked: selection.includes(status) ? ('on' as const) : undefined,
+      MODEL_LIST.map((status) => ({
+        name: status.name,
+
+        description: status.description,
       })),
-    [selection]
+    []
   );
   return (
     <>

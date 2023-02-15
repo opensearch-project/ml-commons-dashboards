@@ -20,17 +20,19 @@ import {
   EuiTextColor,
   EuiLink,
   EuiSelectableOption,
+  EuiHighlight,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
 import { routerPaths } from '../../../common/router_paths';
-import { MODEL_FILTER, MODEL_VALUE } from '../../../common/registry_modal_option';
+
 enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
 }
 export interface IOption {
-  value: MODEL_VALUE;
-  checked: 'on' | undefined;
+  name: string;
+  checked?: 'on' | undefined;
+  description: string;
 }
 interface Props {
   options: IOption[];
@@ -38,43 +40,59 @@ interface Props {
 }
 export interface IItem {
   label: string;
-  'data-test-subj': string;
   checked?: 'on' | undefined;
-  value: MODEL_VALUE;
+
+  description: string;
 }
 
 export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
   const items = useMemo<IItem[]>(() => {
     return options.map((item) => {
-      const status = MODEL_FILTER.find((option) => option.value === item.value);
       return {
-        ...item,
-        label: status!.label,
-        'data-test-subj': status!['data-test-subj'],
+        checked: item.checked,
+        label: item.name,
+        description: item.description,
       };
     });
   }, [options]);
+  const renderModelOption = (option: IItem, searchValue: string) => {
+    return (
+      <>
+        <EuiHighlight search={searchValue}>{option.label}</EuiHighlight>
+        <br />
+        <EuiTextColor color="subdued">
+          <small>
+            <EuiHighlight search={searchValue}>{option.description}</EuiHighlight>
+          </small>
+        </EuiTextColor>
+      </>
+    );
+  };
+
+  const customProps = {
+    height: 240,
+    renderOption: renderModelOption,
+    listProps: {
+      rowHeight: 50,
+      // showIcons: false,
+      'data-test-subj': 'selectableListHere',
+      showIcons: true,
+    },
+  };
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
   const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
     items
   );
   const onChange = useCallback((modelSelection: Array<EuiSelectableOption<IItem>>) => {
-    let selectedOption = {};
     setModelRepoSelection(modelSelection);
-    modelSelection.map((u: IItem) => {
-      if (u.checked === 'on') {
-        selectedOption = u;
-      }
-    });
-    return selectedOption;
   }, []);
-
   const handleContinue = useCallback(
     (selectedOption) => {
       selectedOption = onChange(modelRepoSelection);
       switch (modelSource) {
         case ModelSource.USER_MODEL:
+          selectedOption = modelRepoSelection.find((option) => option.checked === 'on');
           if (selectedOption?.label) {
             history.push(
               `${routerPaths.registerModel}?name=${selectedOption?.label}&version=${selectedOption?.label}`
@@ -88,6 +106,7 @@ export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
     },
     [history, modelSource, modelRepoSelection, onChange]
   );
+
   return (
     <div>
       <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
@@ -171,7 +190,7 @@ export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
               onChange={onChange}
               singleSelection={true}
               noMatchesMessage="No model found"
-              listProps={{ onFocusBadge: false, 'data-test-subj': 'selectableListHere' }}
+              {...customProps}
             >
               {(list, search) => (
                 <Fragment>

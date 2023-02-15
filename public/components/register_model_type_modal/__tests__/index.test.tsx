@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { RegisterModelTypeModal } from '../index';
 import { render, screen } from '../../../../test/test_utils';
 import { IOption } from '../index';
-const options = [{ value: 'electra-small-generator', checked: 'on' }] as IOption[];
+const options = [{ name: 'electra-small-generator', checked: 'on' }] as IOption[];
 describe('<RegisterModelTypeModal />', () => {
   it('should render two checkablecard', () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} options={options} />);
@@ -31,7 +31,6 @@ describe('<RegisterModelTypeModal />', () => {
     await userEvent.click(screen.getByLabelText('Opensearch model repository'));
     await userEvent.click(screen.getByLabelText('Searchable'));
     expect(screen.getByTestId('selectableSearchHere')).toBeInTheDocument();
-    expect(screen.getByTestId('selectableListHere')).toBeInTheDocument();
     expect(screen.getByTestId('selectableListHere')).toBeInTheDocument();
     await userEvent.click(screen.getByTestId('continue button'));
     expect(document.URL).toContain(
