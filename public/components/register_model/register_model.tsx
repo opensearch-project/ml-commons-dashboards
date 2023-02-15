@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FieldErrors, useForm, FormProvider } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import {
@@ -32,6 +32,7 @@ import { upgradeModelVersion } from '../../utils';
 import { useSearchParams } from '../../hooks/use_search_params';
 import { isValidModelRegisterFormType } from './utils';
 import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { ErrorCallOut } from './error_call_out';
 
 const DEFAULT_VALUES = {
   name: '',
@@ -44,6 +45,7 @@ const DEFAULT_VALUES = {
 const FORM_ID = 'mlModelUploadForm';
 
 export const RegisterModelForm = () => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const typeParams = useSearchParams().get('type');
 
@@ -70,9 +72,18 @@ export const RegisterModelForm = () => {
   });
   const submitModel = useModelUpload();
 
-  const onSubmit = async (data: ModelFileFormData | ModelUrlFormData) => {
-    await submitModel(data);
-  };
+  const onSubmit = useCallback(
+    async (data: ModelFileFormData | ModelUrlFormData) => {
+      await submitModel(data);
+    },
+    [submitModel]
+  );
+
+  const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
+    // TODO
+    // eslint-disable-next-line no-console
+    console.log(errors);
+  }, []);
 
   useEffect(() => {
     if (!latestVersionId) return;
@@ -94,12 +105,6 @@ export const RegisterModelForm = () => {
     initializeForm();
   }, [latestVersionId, form]);
 
-  const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
-    // TODO
-    // eslint-disable-next-line no-console
-    console.log(errors);
-  }, []);
-
   const errorCount = Object.keys(form.formState.errors).length;
 
   return (
@@ -118,6 +123,8 @@ export const RegisterModelForm = () => {
               discovery across your organization.
             </small>
           </EuiText>
+          <EuiSpacer />
+          {isSubmitted && !form.formState.isValid && <ErrorCallOut />}
           <EuiSpacer />
           {partials.map((FormPartial, i) => (
             <React.Fragment key={i}>
@@ -149,6 +156,7 @@ export const RegisterModelForm = () => {
                 disabled={form.formState.isSubmitting}
                 isLoading={form.formState.isSubmitting}
                 type="submit"
+                onClick={() => setIsSubmitted(true)}
                 fill
               >
                 {latestVersionId ? 'Register version' : 'Register model'}
