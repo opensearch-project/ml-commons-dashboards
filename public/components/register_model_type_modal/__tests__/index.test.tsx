@@ -34,7 +34,7 @@ describe('<RegisterModelTypeModal />', () => {
     expect(screen.getByTestId('opensearchModelList')).toBeInTheDocument();
     await userEvent.click(screen.getByTestId('continueRegister'));
     expect(document.URL).toContain(
-      '/model-registry/register-model/:id??name=electra-small-generator&version=electra-small-generator'
+      'model-registry/register-model/?type=import&name=electra-small-generator&version=electra-small-generator'
     );
   });
   it('should render no model found when input a invalid text to search model', async () => {
@@ -46,6 +46,6 @@ describe('<RegisterModelTypeModal />', () => {
   it('should link href after selecting "add your own model" and continue ', async () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} options={options} />);
     await userEvent.click(screen.getByTestId('continueRegister'));
-    expect(document.URL).toEqual('http://localhost/model-registry/register-model/:id');
+    expect(document.URL).toEqual('http://localhost/model-registry/register-model/?type=upload');
   });
 });
