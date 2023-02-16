@@ -45,6 +45,7 @@ export const StatusFilter = ({ onUpdateFilters, options, loading }: Props) => {
       };
     });
   }, [options]);
+
   const onButtonClick = () => {
     setIsPopoverOpen((previous) => !previous);
   };
@@ -52,6 +53,7 @@ export const StatusFilter = ({ onUpdateFilters, options, loading }: Props) => {
   const onClosePopover = () => {
     setIsPopoverOpen(false);
   };
+
   const handleSelectableChange = useCallback(
     (newOptions: Array<EuiSelectableOption<IItem>>) => {
       const filters = newOptions.map(({ value, checked }) => ({

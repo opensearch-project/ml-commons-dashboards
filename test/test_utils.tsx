@@ -2,13 +2,14 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
+
 import React, { FC, ReactElement } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { render, RenderOptions } from '@testing-library/react';
+
 import { createBrowserHistory } from 'history';
 import { Router } from 'react-router-dom';
-
 import { store } from '../redux/store';
 
 export interface RenderWithRouteProps {
