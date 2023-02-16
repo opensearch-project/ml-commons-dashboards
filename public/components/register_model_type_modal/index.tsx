@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState, useCallback, Fragment, useMemo } from 'react';
+import React, { useState, useCallback, Fragment } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -23,8 +23,8 @@ import {
   EuiHighlight,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
+import { generatePath } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
-
 enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
@@ -41,49 +41,41 @@ interface Props {
 export interface IItem {
   label: string;
   checked?: 'on' | undefined;
-
   description: string;
 }
-
+const renderModelOption = (option: IItem, searchValue: string) => {
+  return (
+    <>
+      <EuiHighlight search={searchValue}>{option.label}</EuiHighlight>
+      <br />
+      <EuiTextColor color="subdued">
+        <small>
+          <EuiHighlight search={searchValue}>{option.description}</EuiHighlight>
+        </small>
+      </EuiTextColor>
+    </>
+  );
+};
 export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
-  const items = useMemo<IItem[]>(() => {
-    return options.map((item) => {
-      return {
+  const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
+    () =>
+      options.map((item) => ({
         checked: item.checked,
         label: item.name,
         description: item.description,
-      };
-    });
-  }, [options]);
-  const renderModelOption = (option: IItem, searchValue: string) => {
-    return (
-      <>
-        <EuiHighlight search={searchValue}>{option.label}</EuiHighlight>
-        <br />
-        <EuiTextColor color="subdued">
-          <small>
-            <EuiHighlight search={searchValue}>{option.description}</EuiHighlight>
-          </small>
-        </EuiTextColor>
-      </>
-    );
-  };
-
+      }))
+  );
   const customProps = {
     height: 240,
     renderOption: renderModelOption,
     listProps: {
       rowHeight: 50,
-      // showIcons: false,
-      'data-test-subj': 'selectableListHere',
+      'data-test-subj': 'opensearchModelList',
       showIcons: true,
     },
   };
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
-  const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
-    items
-  );
   const onChange = useCallback((modelSelection: Array<EuiSelectableOption<IItem>>) => {
     setModelRepoSelection(modelSelection);
   }, []);
@@ -95,12 +87,16 @@ export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
           selectedOption = modelRepoSelection.find((option) => option.checked === 'on');
           if (selectedOption?.label) {
             history.push(
-              `${routerPaths.registerModel}?name=${selectedOption?.label}&version=${selectedOption?.label}`
+              `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import&name=${
+                selectedOption?.label
+              }&version=${selectedOption?.label}`
             );
           }
           break;
         case ModelSource.PRE_TRAINED_MODEL:
-          history.push(routerPaths.registerModel);
+          history.push(
+            `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=upload`
+          );
           break;
       }
     },
@@ -167,7 +163,7 @@ export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
             <small>
               <strong>Model</strong>
             </small>
-            <EuiSpacer size="m" />
+            <EuiSpacer size="s" />
             <div>
               <EuiTextColor color="subdued">
                 <small>For more information on each model, see </small>
@@ -178,12 +174,12 @@ export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
                 </EuiLink>
               </small>
             </div>
-            <EuiSpacer size="s" />
+            <EuiSpacer size="m" />
             <EuiSelectable
-              aria-label="Searchable"
+              aria-label="OpenSearch model repository models"
               searchable
               searchProps={{
-                'data-test-subj': 'selectableSearchHere',
+                'data-test-subj': 'findModel',
                 placeholder: 'Find model',
               }}
               options={modelRepoSelection}
@@ -206,11 +202,16 @@ export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
             color="primary"
             iconSide="right"
             onClick={onCloseModal}
-            data-test-subj="cancel button"
+            data-test-subj="cancelRegister"
           >
             Cancel
           </EuiButton>
-          <EuiButton color="primary" fill onClick={handleContinue} data-test-subj="continue button">
+          <EuiButton
+            color="primary"
+            fill
+            onClick={handleContinue}
+            data-test-subj="continueRegister"
+          >
             Continue
           </EuiButton>
         </EuiModalFooter>

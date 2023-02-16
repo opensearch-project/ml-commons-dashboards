@@ -18,34 +18,34 @@ describe('<RegisterModelTypeModal />', () => {
   it('should render select with Opensearch model repository', () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} options={options} />);
     expect(screen.getByLabelText('Opensearch model repository')).toBeInTheDocument();
-    expect(screen.getByLabelText('Searchable')).toBeInTheDocument();
+    expect(screen.getByLabelText('OpenSearch model repository models')).toBeInTheDocument();
   });
   it('should call onCloseModal after click "cancel"', async () => {
     const onClickMock = jest.fn();
     render(<RegisterModelTypeModal onCloseModal={onClickMock} options={options} />);
-    await userEvent.click(screen.getByTestId('cancel button'));
+    await userEvent.click(screen.getByTestId('cancelRegister'));
     expect(onClickMock).toHaveBeenCalled();
   });
-  it('should call drop-down list and link to url with selected option after click "Find model" and continue', async () => {
+  it('should call opensearch model repository model list and link to url with selected option after click "Find model" and continue', async () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} options={options} />);
     await userEvent.click(screen.getByLabelText('Opensearch model repository'));
-    await userEvent.click(screen.getByLabelText('Searchable'));
-    expect(screen.getByTestId('selectableSearchHere')).toBeInTheDocument();
-    expect(screen.getByTestId('selectableListHere')).toBeInTheDocument();
-    await userEvent.click(screen.getByTestId('continue button'));
+    await userEvent.click(screen.getByLabelText('OpenSearch model repository models'));
+    expect(screen.getByTestId('findModel')).toBeInTheDocument();
+    expect(screen.getByTestId('opensearchModelList')).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId('continueRegister'));
     expect(document.URL).toContain(
       '/model-registry/register-model/:id??name=electra-small-generator&version=electra-small-generator'
     );
   });
-  it('should render null content when input a invalid text to search model', async () => {
+  it('should render no model found when input a invalid text to search model', async () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} options={options} />);
     await userEvent.click(screen.getByLabelText('Opensearch model repository'));
-    await userEvent.type(screen.getByLabelText('Searchable'), '1');
+    await userEvent.type(screen.getByLabelText('OpenSearch model repository models'), '1');
     expect(screen.getByText('No model found')).toBeInTheDocument();
   });
   it('should link href after selecting "add your own model" and continue ', async () => {
     render(<RegisterModelTypeModal onCloseModal={() => {}} options={options} />);
-    await userEvent.click(screen.getByTestId('continue button'));
+    await userEvent.click(screen.getByTestId('continueRegister'));
     expect(document.URL).toEqual('http://localhost/model-registry/register-model/:id');
   });
 });
