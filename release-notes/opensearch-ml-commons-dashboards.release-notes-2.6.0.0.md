@@ -23,7 +23,6 @@ Compatible with OpenSearch 2.6.0
 
 * Rename searchByName to searchByNameOrId ([#44](https://github.com/opensearch-project/ml-commons-dashboards/pull/44))
 * Update status filter change fired event and parameters ([#47](https://github.com/opensearch-project/ml-commons-dashboards/pull/47))
-* Pass planning worker nodes to preview panel enhance model not responding content ([#79](https://github.com/opensearch-project/ml-commons-dashboards/pull/79))
 * Add model id restriction in model profile API ([#94](https://github.com/opensearch-project/ml-commons-dashboards/pull/94))
 
 ### Bug Fixes
@@ -33,20 +32,21 @@ Compatible with OpenSearch 2.6.0
 * Fix no node count pass to model search API ([#65](https://github.com/opensearch-project/ml-commons-dashboards/pull/65))
 * Fix redirect index pattern when no sample data ([#70](https://github.com/opensearch-project/ml-commons-dashboards/pull/70))
 * Fix model name search tokenization and case ([#71](https://github.com/opensearch-project/ml-commons-dashboards/pull/71))
-* Fix blank page after profile API return empty object ([#73](https://github.com/opensearch-project/ml-commons-dashboards/pull/73))
+* Fix blank page after profile API returns empty object ([#73](https://github.com/opensearch-project/ml-commons-dashboards/pull/73))
 * Fix route redirect for monitoring page ([#74](https://github.com/opensearch-project/ml-commons-dashboards/pull/74))
 * Fix model state PARTIAL_LOADED not aligned with ml-commons API ([#75](https://github.com/opensearch-project/ml-commons-dashboards/pull/75))
 * Fix ModelSearchItem model_version field not aligned with ml-commons API ([#76](https://github.com/opensearch-project/ml-commons-dashboards/pull/76))
+* Fix blank preview panel caused by model not responding ([#79](https://github.com/opensearch-project/ml-commons-dashboards/pull/79))
 * Fix refresh interval and model table responsive UI ([#86](https://github.com/opensearch-project/ml-commons-dashboards/pull/86))
 * Fix URL address, experimental banner, model table UI and sorting ([#87](https://github.com/opensearch-project/ml-commons-dashboards/pull/87))
 * Fix preview panel UI and sorting ([#88](https://github.com/opensearch-project/ml-commons-dashboards/pull/88))
-* Fix always show "Copied" after mouse re-enter ([#89](https://github.com/opensearch-project/ml-commons-dashboards/pull/89))
+* Fix always show "Copied" after mouse re-enters ([#89](https://github.com/opensearch-project/ml-commons-dashboards/pull/89))
 
 ### Infrastructure
 
 * Add unit tests workflow ([#3](https://github.com/opensearch-project/ml-commons-dashboards/pull/3))
 * Use husky@3.1.0 and lint-staged@10.5.4 ([#5](https://github.com/opensearch-project/ml-commons-dashboards/pull/5))
-* Add github lint workflow ([#39](https://github.com/opensearch-project/ml-commons-dashboards/pull/39))
+* Add GitHub lint workflow ([#39](https://github.com/opensearch-project/ml-commons-dashboards/pull/39))
 
 ### Documentation
 
