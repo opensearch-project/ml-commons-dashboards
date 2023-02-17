@@ -2,6 +2,7 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
+
 import {
   PluginInitializerContext,
   CoreSetup,
@@ -12,26 +13,16 @@ import {
 
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
 import { modelRouter, profileRouter } from './routes';
-import { ConfigSchema } from '../common/config';
 
 export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPluginStart> {
   private readonly logger: Logger;
-  private enabled = false;
 
-  constructor(initializerContext: PluginInitializerContext<ConfigSchema>) {
+  constructor(initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
-    initializerContext.config.create().subscribe((config) => {
-      this.enabled = config.enabled;
-    });
   }
 
   public setup(core: CoreSetup) {
     this.logger.debug('mlCommons: Setup');
-
-    if (!this.enabled) {
-      return {};
-    }
-
     const router = core.http.createRouter();
 
     modelRouter(router);

@@ -3,13 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  AppMountParameters,
-  CoreSetup,
-  CoreStart,
-  Plugin,
-  PluginInitializerContext,
-} from '../../../src/core/public';
+import { AppMountParameters, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
 import {
   MlCommonsPluginPluginSetup,
   MlCommonsPluginPluginStart,
@@ -17,22 +11,12 @@ import {
   MLServices,
 } from './types';
 import { PLUGIN_NAME, PLUGIN_ID } from '../common';
-import { ConfigSchema } from '../common/config';
 
 export class MlCommonsPluginPlugin
   implements Plugin<MlCommonsPluginPluginSetup, MlCommonsPluginPluginStart> {
-  private enabled = false;
-
-  constructor(initializerContext: PluginInitializerContext<ConfigSchema>) {
-    this.enabled = initializerContext.config.get().enabled;
-  }
-
   public setup(
     core: CoreSetup<AppPluginStartDependencies, AppPluginStartDependencies>
   ): MlCommonsPluginPluginSetup {
-    if (!this.enabled) {
-      return {};
-    }
     // Register an application into the side navigation menu
     core.application.register({
       id: PLUGIN_ID,
