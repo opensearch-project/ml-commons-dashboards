@@ -76,14 +76,27 @@ export const RegisterModelForm = () => {
     async (data: ModelFileFormData | ModelUrlFormData) => {
       try {
         await submitModel(data);
-        notifications?.toasts.addSuccess({
-          title: mountReactNode(
-            <EuiText>
-              <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> was created
-            </EuiText>
-          ),
-          text: 'The model artifact is uploading. Once it uploads, a new version will be created.',
-        });
+        if (latestVersionId) {
+          notifications?.toasts.addSuccess({
+            title: mountReactNode(
+              <EuiText>
+                A model artifact for{' '}
+                <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> is uploading
+              </EuiText>
+            ),
+            text: 'Once it uploads, a new version will be created.',
+          });
+        } else {
+          notifications?.toasts.addSuccess({
+            title: mountReactNode(
+              <EuiText>
+                <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> was created
+              </EuiText>
+            ),
+            text:
+              'The model artifact is uploading. Once it uploads, a new version will be created.',
+          });
+        }
       } catch (e) {
         if (e instanceof Error) {
           notifications?.toasts.addDanger({
@@ -98,7 +111,7 @@ export const RegisterModelForm = () => {
         }
       }
     },
-    [submitModel, notifications, form]
+    [submitModel, notifications, form, latestVersionId]
   );
 
   useEffect(() => {
