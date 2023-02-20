@@ -11,6 +11,18 @@ import { RegisterModelForm } from '../register_model';
 import { APIProvider } from '../../../apis/api_provider';
 import { routerPaths } from '../../../../common/router_paths';
 import { setup } from './setup';
+import * as formHooks from '../register_model.hooks';
+import * as PluginContext from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+
+// Cannot spyOn(PluginContext, 'useOpenSearchDashboards') directly as it results in error:
+// TypeError: Cannot redefine property: useOpenSearchDashboards
+// So we have to mock the entire module first as a workaround
+jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('../../../../../../src/plugins/opensearch_dashboards_react/public'),
+  };
+});
 
 const MOCKED_DATA = {
   data: [
@@ -42,6 +54,28 @@ const MOCKED_DATA = {
 };
 
 describe('<RegisterModel /> Form', () => {
+  const addDangerMock = jest.fn();
+  const addSuccessMock = jest.fn();
+  const onSubmitMock = jest.fn();
+
+  beforeEach(() => {
+    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockReturnValue({
+      services: {
+        notifications: {
+          toasts: {
+            addDanger: addDangerMock,
+            addSuccess: addSuccessMock,
+          },
+        },
+      },
+    });
+    jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should init form when id param in url route', async () => {
     const request = jest.spyOn(APIProvider.getAPI('model'), 'search');
     const mockResult = MOCKED_DATA;
@@ -105,5 +139,20 @@ describe('<RegisterModel /> Form', () => {
 
     await user.type(nameInput, 'test model name');
     expect(screen.queryByText(/1 form error/i)).toBeInTheDocument();
+  });
+
+  it('should call addSuccess to display a success toast', async () => {
+    const { user } = await setup();
+    await user.click(screen.getByRole('button', { name: /register model/i }));
+    expect(addSuccessMock).toHaveBeenCalled();
+  });
+
+  it('should call addDanger to display an error toast', async () => {
+    jest
+      .spyOn(formHooks, 'useModelUpload')
+      .mockReturnValue(jest.fn().mockRejectedValue(new Error('error')));
+    const { user } = await setup();
+    await user.click(screen.getByRole('button', { name: /register model/i }));
+    expect(addDangerMock).toHaveBeenCalled();
   });
 });
