@@ -29,20 +29,39 @@ enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
 }
-export interface IOption {
-  name: string;
-  checked?: 'on' | undefined;
-  description: string;
-}
 interface Props {
-  options: IOption[];
   onCloseModal: () => void;
 }
-export interface IItem {
+interface IItem {
   label: string;
   checked?: 'on' | undefined;
   description: string;
 }
+const MODEL_LIST = [
+  {
+    name: 'tapas-tiny',
+    description:
+      'TAPAS is a BERT-like transformers model pretrained on a large corpus of English data from Wikipedia in a self-supervised fashion',
+    checked: undefined,
+  },
+  {
+    name: 'electra-small-generator',
+    description: 'ELECTRA is a new method for self-supervised language representation learning',
+    checked: undefined,
+  },
+  {
+    name: 'flan-T5-large-grammer-synthesis',
+    description:
+      'A fine-tuned version of google/flan-t5-large for grammer correction on an expanded version of the JFLEG dataset',
+    checked: undefined,
+  },
+  {
+    name: 'BEiT',
+    description:
+      'The BEiT model is a version Transformer(ViT),which is a transformer encoder model(BERT-like)',
+    checked: undefined,
+  },
+];
 const renderModelOption = (option: IItem, searchValue: string) => {
   return (
     <>
@@ -56,10 +75,10 @@ const renderModelOption = (option: IItem, searchValue: string) => {
     </>
   );
 };
-export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
+export function RegisterModelTypeModal({ onCloseModal }: Props) {
   const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
     () =>
-      options.map((item) => ({
+      MODEL_LIST.map((item) => ({
         checked: item.checked,
         label: item.name,
         description: item.description,
@@ -102,7 +121,6 @@ export function RegisterModelTypeModal({ onCloseModal, options }: Props) {
     },
     [history, modelSource, modelRepoSelection, onChange]
   );
-
   return (
     <div>
       <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
