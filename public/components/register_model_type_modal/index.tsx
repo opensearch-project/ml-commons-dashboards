@@ -84,15 +84,6 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
         description: item.description,
       }))
   );
-  const customProps = {
-    height: 240,
-    renderOption: renderModelOption,
-    listProps: {
-      rowHeight: 50,
-      'data-test-subj': 'opensearchModelList',
-      showIcons: true,
-    },
-  };
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
   const onChange = useCallback((modelSelection: Array<EuiSelectableOption<IItem>>) => {
@@ -204,7 +195,13 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
               onChange={onChange}
               singleSelection={true}
               noMatchesMessage="No model found"
-              {...customProps}
+              height={240}
+              renderOption={renderModelOption}
+              listProps={{
+                rowHeight: 50,
+                'data-test-subj': 'opensearchModelList',
+                showIcons: true,
+              }}
             >
               {(list, search) => (
                 <Fragment>
