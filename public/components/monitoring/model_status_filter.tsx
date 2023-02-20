@@ -23,11 +23,11 @@ export const ModelStatusFilter = ({ selection = [], onChange }: Props) => {
       })),
     [selection]
   );
+
   const handleFilterUpdate = useCallback(
     (newOptions: IOption[]) => {
       onChange(newOptions.filter(({ checked }) => checked === 'on').map(({ value }) => value));
     },
-
     [onChange]
   );
 
