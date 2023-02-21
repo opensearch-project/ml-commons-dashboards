@@ -13,13 +13,15 @@ import {
   EuiButton,
   EuiPanel,
   EuiText,
-  EuiLink,
   EuiBottomBar,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiTextColor,
+  EuiLink,
 } from '@elastic/eui';
 import useObservable from 'react-use/lib/useObservable';
 import { from } from 'rxjs';
+
 import { ModelDetailsPanel } from './model_details';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';
@@ -32,6 +34,8 @@ import { upgradeModelVersion } from '../../utils';
 import { useSearchParams } from '../../hooks/use_search_params';
 import { isValidModelRegisterFormType } from './utils';
 import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { mountReactNode } from '../../../../../src/core/public/utils';
+
 const DEFAULT_VALUES = {
   name: '',
   description: '',
@@ -39,14 +43,18 @@ const DEFAULT_VALUES = {
   configuration: '{}',
   tags: [{ key: '', value: '' }],
 };
+
 const FORM_ID = 'mlModelUploadForm';
+
 export const RegisterModelForm = () => {
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const typeParams = useSearchParams().get('type');
+
   const {
-    services: { chrome },
+    services: { chrome, notifications },
   } = useOpenSearchDashboards();
   const isLocked = useObservable(chrome?.getIsNavDrawerLocked$() ?? from([false]));
+
   const formType = isValidModelRegisterFormType(typeParams) ? typeParams : 'upload';
   const partials =
     formType === 'import'
@@ -58,14 +66,55 @@ export const RegisterModelForm = () => {
           EvaluationMetricsPanel,
           ModelTagsPanel,
         ];
+
   const form = useForm<ModelFileFormData | ModelUrlFormData>({
     mode: 'onChange',
     defaultValues: DEFAULT_VALUES,
   });
   const submitModel = useModelUpload();
-  const onSubmit = async (data: ModelFileFormData | ModelUrlFormData) => {
-    await submitModel(data);
-  };
+
+  const onSubmit = useCallback(
+    async (data: ModelFileFormData | ModelUrlFormData) => {
+      try {
+        await submitModel(data);
+        if (latestVersionId) {
+          notifications?.toasts.addSuccess({
+            title: mountReactNode(
+              <EuiText>
+                A model artifact for{' '}
+                <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> is uploading
+              </EuiText>
+            ),
+            text: 'Once it uploads, a new version will be created.',
+          });
+        } else {
+          notifications?.toasts.addSuccess({
+            title: mountReactNode(
+              <EuiText>
+                <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> was created
+              </EuiText>
+            ),
+            text:
+              'The model artifact is uploading. Once it uploads, a new version will be created.',
+          });
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          notifications?.toasts.addDanger({
+            title: 'Model creation failed',
+            text: e.message,
+          });
+        } else {
+          notifications?.toasts.addDanger({
+            title: 'Model creation failed',
+            text: 'Unknown error',
+          });
+        }
+      }
+    },
+    [submitModel, notifications, form, latestVersionId]
+  );
+
   useEffect(() => {
     if (!latestVersionId) return;
     const initializeForm = async () => {
@@ -85,12 +134,15 @@ export const RegisterModelForm = () => {
     };
     initializeForm();
   }, [latestVersionId, form]);
+
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
     // TODO
     // eslint-disable-next-line no-console
     console.log(errors);
   }, []);
+
   const errorCount = Object.keys(form.formState.errors).length;
+
   return (
     <FormProvider {...form}>
       <EuiForm
@@ -147,14 +199,6 @@ export const RegisterModelForm = () => {
               <EuiSpacer size="xl" />
             </React.Fragment>
           ))}
-          {/* <EuiButton
-            disabled={form.formState.isSubmitting}
-            isLoading={form.formState.isSubmitting}
-            type="submit"
-            fill
-          >
-            Register model
-          </EuiButton> */}
         </EuiPanel>
         <EuiSpacer size="xxl" />
         <EuiSpacer size="xxl" />
