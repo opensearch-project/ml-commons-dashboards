@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { APIProvider } from '../../apis/api_provider';
+import { MAX_CHUNK_SIZE } from './constants';
 import { getModelContentHashValue } from './get_model_content_hash_value';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
@@ -104,7 +105,6 @@ export const useModelUpload = () => {
       });
     }
     const { modelFile } = model;
-    const MAX_CHUNK_SIZE = 10 * 1000 * 1000;
     const totalChunks = Math.ceil(modelFile.size / MAX_CHUNK_SIZE);
     const modelContentHashValue = await getModelContentHashValue(modelFile);
 
@@ -116,13 +116,13 @@ export const useModelUpload = () => {
       })
     ).model_id;
 
-    for (let i = 0; i < totalChunks; i++) {
+    /* for (let i = 0; i < totalChunks; i++) {
       const chunk = modelFile.slice(
         MAX_CHUNK_SIZE * i,
         Math.min(MAX_CHUNK_SIZE * (i + 1), modelFile.size)
       );
       await APIProvider.getAPI('model').uploadChunk(modelId, `${i}`, chunk);
-    }
+    }*/
     return modelId;
   }, []);
 };
