@@ -57,7 +57,9 @@ describe('<DeployedModelTable />', () => {
       loading: false,
     });
     expect(screen.getByRole('link')).toBeInTheDocument();
-    expect(screen.getByRole('link').getAttribute('href')).toEqual('/todo');
+    expect(screen.getByRole('link').getAttribute('href')).toEqual(
+      'https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashbaord/'
+    );
     expect(screen.queryByRole('columnheader')).not.toBeInTheDocument();
   });
 

@@ -209,9 +209,12 @@ export const ModelDeploymentTable = ({
               <>
                 <EuiSpacer size="l" />
                 Deployed models will appear here. For more information, see{' '}
-                <EuiLink role="link" href="/todo">
-                  Model Serving Framework Documentation
-                  <EuiIcon type="popout" />
+                <EuiLink
+                  role="link"
+                  href="https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashbaord/"
+                  external
+                >
+                  Machine Learning Documentation
                 </EuiLink>
                 .
                 <EuiSpacer size="xl" />
