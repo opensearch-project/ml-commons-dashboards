@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import './nodes_table.scss';
+
 import React, { useMemo, useCallback, useState } from 'react';
 import {
   EuiBasicTable,
@@ -10,9 +12,10 @@ import {
   CriteriaWithPagination,
   EuiHealth,
   EuiEmptyPrompt,
+  EuiCopy,
+  EuiText,
 } from '@elastic/eui';
 import { INode } from './';
-import { CopyableText } from '../common';
 
 export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
   const { nodes, loading } = props;
@@ -64,7 +67,15 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
         name: 'Node ID',
         sortable: true,
         render: (id: string) => {
-          return <CopyableText text={id} iconLeft={true} tooltipText="Copy node ID" />;
+          return (
+            <EuiCopy textToCopy={id} beforeMessage="Copy node ID">
+              {(copy) => (
+                <EuiText onClick={copy} className="ml-nodesTableNodeIdCellText" size="s">
+                  {id}
+                </EuiText>
+              )}
+            </EuiCopy>
+          );
         },
       },
     ],

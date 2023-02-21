@@ -122,7 +122,7 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
     });
 
-    it('should render Model ID at third column and copy to clipboard after button clicked', async () => {
+    it('should render Model ID at third column and copy to clipboard after text clicked', async () => {
       const execCommandOrigin = document.execCommand;
       document.execCommand = jest.fn(() => true);
 
@@ -139,9 +139,7 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[1] as HTMLElement).getByText('model-2-id')).toBeInTheDocument();
       expect(within(cells[2] as HTMLElement).getByText('model-3-id')).toBeInTheDocument();
 
-      const firstCopyButton = within(cells[0] as HTMLElement).getByRole('button');
-      expect(firstCopyButton).toBeInTheDocument();
-      await userEvent.click(firstCopyButton);
+      await userEvent.click(within(cells[0] as HTMLElement).getByText('model-1-id'));
       expect(document.execCommand).toHaveBeenCalledWith('copy');
 
       document.execCommand = execCommandOrigin;

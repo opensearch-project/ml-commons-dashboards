@@ -9,3 +9,15 @@
     }
   }
 }
+
+.ml-modelModelIdCell{
+  overflow: hidden;
+  .ml-modelModelIdText {
+    &:hover{
+      cursor: pointer;
+      color: #006BB4;
+      text-decoration: underline;
+    }
+  }
+}
+
