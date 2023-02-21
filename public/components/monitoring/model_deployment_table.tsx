@@ -15,7 +15,6 @@ import {
   EuiCopy,
   EuiEmptyPrompt,
   EuiHealth,
-  EuiIcon,
   EuiSpacer,
   EuiLink,
   EuiText,
@@ -131,21 +130,18 @@ export const ModelDeploymentTable = ({
         width: '25%',
         sortable: true,
         render: (id: string) => (
-          <>
-            <EuiCopy textToCopy={id} beforeMessage="Copy model ID">
-              {(copy) => (
-                <EuiButtonIcon
-                  aria-label="copy"
-                  iconType="copy"
-                  style={{ marginRight: 4 }}
-                  onClick={copy}
-                />
-              )}
-            </EuiCopy>
-            <EuiText className="eui-textTruncate" size="s">
-              {id}
-            </EuiText>
-          </>
+          <EuiCopy
+            className="ml-modelModelIdCellTextWrapper"
+            textToCopy={id}
+            beforeMessage="Copy model ID"
+            anchorClassName="ml-modelModelIdCell"
+          >
+            {(copy) => (
+              <EuiText onClick={copy} className="eui-textTruncate ml-modelModelIdText" size="s">
+                {id}
+              </EuiText>
+            )}
+          </EuiCopy>
         ),
       },
       {
