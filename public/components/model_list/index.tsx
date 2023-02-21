@@ -2,24 +2,19 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
-
 import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
-import { routerPaths } from '../../../common/router_paths';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
-import { EuiLinkButton } from '../common';
-
 import { ModelTable, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
+import { RegisterNewModelButton } from './regsister_new_model_button';
 import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
-
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
@@ -92,17 +87,9 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   const handleFilterChange = useCallback((filterValue: ModelListFilterFilterValue) => {
     setParams((prevValue) => ({ ...prevValue, filterValue, currentPage: 1 }));
   }, []);
-
   return (
     <EuiPanel>
-      <EuiPageHeader
-        pageTitle={<>Models</>}
-        rightSideItems={[
-          <EuiLinkButton to={routerPaths.registerModel} fill iconType="plusInCircle">
-            Register new model
-          </EuiLinkButton>,
-        ]}
-      />
+      <EuiPageHeader pageTitle={<>Models</>} rightSideItems={[<RegisterNewModelButton />]} />
       <EuiSpacer />
       <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
       <EuiSpacer />
