@@ -5,7 +5,7 @@
 
 import React, { useCallback, useEffect } from 'react';
 import { FieldErrors, useForm, FormProvider } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import {
   EuiPageHeader,
   EuiSpacer,
@@ -35,6 +35,9 @@ import { useSearchParams } from '../../hooks/use_search_params';
 import { isValidModelRegisterFormType } from './utils';
 import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { mountReactNode } from '../../../../../src/core/public/utils';
+import { modelFileUploadManager } from './model_file_upload_manager';
+import { MAX_CHUNK_SIZE } from './constants';
+import { routerPaths } from '../../../common/router_paths';
 
 const DEFAULT_VALUES = {
   name: '',
@@ -47,6 +50,7 @@ const DEFAULT_VALUES = {
 const FORM_ID = 'mlModelUploadForm';
 
 export const RegisterModelForm = () => {
+  const history = useHistory();
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const typeParams = useSearchParams().get('type');
 
@@ -76,7 +80,41 @@ export const RegisterModelForm = () => {
   const onSubmit = useCallback(
     async (data: ModelFileFormData | ModelUrlFormData) => {
       try {
-        await submitModel(data);
+        const modelId = await submitModel(data);
+        // Navigate to model list if form submit successfully
+        history.push(routerPaths.modelList);
+
+        // Upload model artifact
+        if ('modelFile' in data) {
+          modelFileUploadManager.upload({
+            file: data.modelFile,
+            modelId,
+            chunkSize: MAX_CHUNK_SIZE,
+            onComplete: () => {
+              notifications?.toasts.addSuccess({
+                title: mountReactNode(
+                  <EuiText>
+                    Artifact for{' '}
+                    <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> uploaded
+                  </EuiText>
+                ),
+                text: `The artifact for ${form.getValues('name')} uploaded successfully`,
+              });
+            },
+            onError: () => {
+              notifications?.toasts.addDanger({
+                title: mountReactNode(
+                  <EuiText>
+                    <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> artifact
+                    upload failed.
+                  </EuiText>
+                ),
+                text: 'The new version was not created.',
+              });
+            },
+          });
+        }
+
         if (latestVersionId) {
           notifications?.toasts.addSuccess({
             title: mountReactNode(
@@ -112,7 +150,7 @@ export const RegisterModelForm = () => {
         }
       }
     },
-    [submitModel, notifications, form, latestVersionId]
+    [submitModel, notifications, form, latestVersionId, history]
   );
 
   useEffect(() => {

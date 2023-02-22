@@ -11,6 +11,7 @@ import { RegisterModelForm } from '../register_model';
 import { APIProvider } from '../../../apis/api_provider';
 import { routerPaths } from '../../../../common/router_paths';
 import { setup } from './setup';
+import { Model } from '../../../../public/apis/model';
 import * as formHooks from '../register_model.hooks';
 import * as PluginContext from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -70,6 +71,7 @@ describe('<RegisterModel /> Form', () => {
       },
     });
     jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+    jest.spyOn(Model.prototype, 'uploadChunk').mockResolvedValue({});
   });
 
   afterEach(() => {
