@@ -89,6 +89,22 @@ describe('<RegisterModel /> Artifact', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
+  it('should NOT submit the register model form if model file is not ZIP', async () => {
+    const result = await setup();
+
+    // Empty model file selection by clicking the `Remove` button on EuiFilePicker
+    await result.user.click(screen.getByLabelText(/clear selected files/i));
+
+    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/file/i);
+    // Only ZIP(.zip) file is allowed
+    const invalidFile = new File(['test model file'], 'model.json', { type: 'application/json' });
+    await result.user.upload(modelFileInput, invalidFile);
+
+    expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeInvalid();
+    await result.user.click(result.submitButton);
+    expect(onSubmitMock).not.toHaveBeenCalled();
+  });
+
   it('should NOT submit the register model form if model file is empty', async () => {
     const result = await setup();
 

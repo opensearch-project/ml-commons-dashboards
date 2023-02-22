@@ -17,6 +17,9 @@ function validateFile(file: File) {
   if (file.size > MAX_MODEL_FILE_SIZE) {
     return 'Maximum file size exceeded. Add a smaller file.';
   }
+  if (!file.name.endsWith('.zip')) {
+    return 'Invalid file format. Add a ZIP(.zip) file.';
+  }
   return true;
 }
 
