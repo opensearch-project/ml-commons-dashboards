@@ -7,6 +7,7 @@ import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
 import { ModelFileUploadManager } from '../model_file_upload_manager';
+import { ONE_GB } from '../../../../common/constant';
 
 describe('<RegisterModel /> Artifact', () => {
   const onSubmitMock = jest.fn();
@@ -54,20 +55,37 @@ describe('<RegisterModel /> Artifact', () => {
     expect(uploadMock).toHaveBeenCalled();
   });
 
-  it('should NOT submit the register model form if model file size exceed 80MB', async () => {
+  it('should submit the register model form if model file size is 4GB', async () => {
     const result = await setup();
 
     // Empty model file selection by clicking the `Remove` button on EuiFilePicker
     await result.user.click(screen.getByLabelText(/clear selected files/i));
-    await result.user.click(result.submitButton);
 
     const modelFileInput = screen.getByLabelText<HTMLInputElement>(/file/i);
-    // File size can not exceed 80MB
+    // User select a file with maximum accepted size
+    const validFile = new File(['test model file'], 'model.zip', { type: 'application/zip' });
+    Object.defineProperty(validFile, 'size', { value: 4 * ONE_GB });
+    await result.user.upload(modelFileInput, validFile);
+
+    expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeValid();
+    await result.user.click(result.submitButton);
+    expect(onSubmitMock).toHaveBeenCalled();
+  });
+
+  it('should NOT submit the register model form if model file size exceed 4GB', async () => {
+    const result = await setup();
+
+    // Empty model file selection by clicking the `Remove` button on EuiFilePicker
+    await result.user.click(screen.getByLabelText(/clear selected files/i));
+
+    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/file/i);
+    // File size can not exceed 4GB
     const invalidFile = new File(['test model file'], 'model.zip', { type: 'application/zip' });
-    Object.defineProperty(invalidFile, 'size', { value: 81 * 1000 * 1000 });
+    Object.defineProperty(invalidFile, 'size', { value: 4 * ONE_GB + 1 });
     await result.user.upload(modelFileInput, invalidFile);
 
     expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeInvalid();
+    await result.user.click(result.submitButton);
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 

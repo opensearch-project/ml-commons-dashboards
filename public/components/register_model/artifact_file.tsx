@@ -8,12 +8,13 @@ import { EuiFormRow, EuiFilePicker } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { ONE_GB } from '../../../common/constant';
 
-const ONE_MB = 1000 * 1000;
-const MAX_FILE_SIZE = 80 * ONE_MB;
+// 4GB
+export const MAX_MODEL_FILE_SIZE = 4 * ONE_GB;
 
 function validateFile(file: File) {
-  if (file.size > MAX_FILE_SIZE) {
+  if (file.size > MAX_MODEL_FILE_SIZE) {
     return 'Maximum file size exceeded. Add a smaller file.';
   }
   return true;
@@ -34,7 +35,6 @@ export const ModelFileUploader = () => {
   return (
     <EuiFormRow
       label="File"
-      helpText={`Accepted file format: TorchScript. Maximum file size, ${MAX_FILE_SIZE / ONE_MB}MB`}
       error={modelFileFieldController.fieldState.error?.message}
       isInvalid={Boolean(modelFileFieldController.fieldState.error)}
     >
