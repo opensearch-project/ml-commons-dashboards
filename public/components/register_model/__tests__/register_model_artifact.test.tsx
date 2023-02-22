@@ -6,9 +6,11 @@
 import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
+import { ModelFileUploadManager } from '../model_file_upload_manager';
 
 describe('<RegisterModel /> Artifact', () => {
   const onSubmitMock = jest.fn();
+  const uploadMock = jest.fn();
 
   beforeEach(() => {
     jest
@@ -18,6 +20,7 @@ describe('<RegisterModel /> Artifact', () => {
       .spyOn(formHooks, 'useModelTags')
       .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
     jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+    jest.spyOn(ModelFileUploadManager.prototype, 'upload').mockImplementation(uploadMock);
   });
 
   afterEach(() => {
@@ -41,8 +44,14 @@ describe('<RegisterModel /> Artifact', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
 
     await result.user.click(result.submitButton);
-
     expect(onSubmitMock).toHaveBeenCalled();
+  });
+
+  it('should upload the model file', async () => {
+    const result = await setup();
+    await result.user.click(result.submitButton);
+    expect(onSubmitMock).toHaveBeenCalled();
+    expect(uploadMock).toHaveBeenCalled();
   });
 
   it('should NOT submit the register model form if model file size exceed 80MB', async () => {

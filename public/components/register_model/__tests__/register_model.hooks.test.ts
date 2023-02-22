@@ -176,13 +176,5 @@ describe('useModelUpload', () => {
         totalChunks: 3,
       });
     });
-
-    it('should call model uploadChunk for 3 times', async () => {
-      const { result } = renderHook(() => useModelUpload());
-
-      await result.current(modelFileFormData);
-
-      expect(jest.spyOn(Model.prototype, 'uploadChunk')).toHaveBeenCalledTimes(3);
-    });
   });
 });
