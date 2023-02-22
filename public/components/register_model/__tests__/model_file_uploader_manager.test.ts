@@ -44,9 +44,9 @@ describe('ModelFileUploadManager', () => {
       onUpdate: onUpdateMock,
     });
     await waitFor(() => {
-      expect(onUpdateMock).toHaveBeenCalledWith({ total: 3, current: 1 });
-      expect(onUpdateMock).toHaveBeenCalledWith({ total: 3, current: 2 });
-      expect(onUpdateMock).toHaveBeenCalledWith({ total: 3, current: 3 });
+      expect(onUpdateMock).toHaveBeenNthCalledWith(1, { total: 3, current: 1 });
+      expect(onUpdateMock).toHaveBeenNthCalledWith(2, { total: 3, current: 2 });
+      expect(onUpdateMock).toHaveBeenNthCalledWith(3, { total: 3, current: 3 });
     });
   });
 
