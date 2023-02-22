@@ -17,6 +17,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiTextColor,
+  EuiLink,
 } from '@elastic/eui';
 import useObservable from 'react-use/lib/useObservable';
 import { from } from 'rxjs';
@@ -151,11 +152,34 @@ export const RegisterModelForm = () => {
         component="form"
       >
         <EuiPanel>
-          <EuiPageHeader pageTitle="Register Model" />
+          <EuiPageHeader pageTitle={latestVersionId ? 'Register version' : 'Register model'} />
           <EuiText style={{ maxWidth: 420 }}>
             <small>
-              Register your model to collaboratively manage its life cycle, and facilitate model
-              discovery across your organization.
+              {latestVersionId && (
+                <>
+                  Register a new version of Image-classifiar.The version number will be
+                  automatically incremented. For more information on versioning, see{' '}
+                  <EuiLink href="#" external>
+                    Model Registry Documentation
+                  </EuiLink>
+                  .
+                </>
+              )}
+              {formType === 'import' && !latestVersionId && (
+                <>
+                  Register a pre-trained model. For more information, see{' '}
+                  <EuiLink href="#" external>
+                    OpenSearch model repository documentation
+                  </EuiLink>
+                  .
+                </>
+              )}
+              {formType === 'upload' && !latestVersionId && (
+                <>
+                  Register your model to collaboratively manage its life cycle, and facilitate model
+                  discovery across your organization.
+                </>
+              )}
             </small>
           </EuiText>
           <EuiSpacer />
