@@ -7,10 +7,12 @@ import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
 import { ModelFileUploadManager } from '../model_file_upload_manager';
+import * as formAPI from '../register_model_api';
 import { ONE_GB } from '../../../../common/constant';
 
 describe('<RegisterModel /> Artifact', () => {
-  const onSubmitMock = jest.fn();
+  const onSubmitWithFileMock = jest.fn();
+  const onSubmitWithURLMock = jest.fn();
   const uploadMock = jest.fn();
 
   beforeEach(() => {
@@ -20,7 +22,8 @@ describe('<RegisterModel /> Artifact', () => {
     jest
       .spyOn(formHooks, 'useModelTags')
       .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
-    jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+    jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitWithFileMock);
+    jest.spyOn(formAPI, 'submitModelWithURL').mockImplementation(onSubmitWithURLMock);
     jest.spyOn(ModelFileUploadManager.prototype, 'upload').mockImplementation(uploadMock);
   });
 
@@ -42,16 +45,16 @@ describe('<RegisterModel /> Artifact', () => {
 
   it('should submit the register model form', async () => {
     const result = await setup();
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(onSubmitWithFileMock).not.toHaveBeenCalled();
 
     await result.user.click(result.submitButton);
-    expect(onSubmitMock).toHaveBeenCalled();
+    expect(onSubmitWithFileMock).toHaveBeenCalled();
   });
 
   it('should upload the model file', async () => {
     const result = await setup();
     await result.user.click(result.submitButton);
-    expect(onSubmitMock).toHaveBeenCalled();
+    expect(onSubmitWithFileMock).toHaveBeenCalled();
     expect(uploadMock).toHaveBeenCalled();
   });
 
@@ -69,7 +72,7 @@ describe('<RegisterModel /> Artifact', () => {
 
     expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeValid();
     await result.user.click(result.submitButton);
-    expect(onSubmitMock).toHaveBeenCalled();
+    expect(onSubmitWithFileMock).toHaveBeenCalled();
   });
 
   it('should NOT submit the register model form if model file size exceed 4GB', async () => {
@@ -86,7 +89,7 @@ describe('<RegisterModel /> Artifact', () => {
 
     expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeInvalid();
     await result.user.click(result.submitButton);
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(onSubmitWithFileMock).not.toHaveBeenCalled();
   });
 
   it('should NOT submit the register model form if model file is not ZIP', async () => {
@@ -102,7 +105,7 @@ describe('<RegisterModel /> Artifact', () => {
 
     expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeInvalid();
     await result.user.click(result.submitButton);
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(onSubmitWithFileMock).not.toHaveBeenCalled();
   });
 
   it('should NOT submit the register model form if model file is empty', async () => {
@@ -113,7 +116,7 @@ describe('<RegisterModel /> Artifact', () => {
     await result.user.click(result.submitButton);
 
     expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeInvalid();
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(onSubmitWithFileMock).not.toHaveBeenCalled();
   });
 
   it('should NOT submit the register model form if model url is empty', async () => {
@@ -131,6 +134,6 @@ describe('<RegisterModel /> Artifact', () => {
     await result.user.click(result.submitButton);
 
     expect(urlInput).toBeInvalid();
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(onSubmitWithURLMock).not.toHaveBeenCalled();
   });
 });
