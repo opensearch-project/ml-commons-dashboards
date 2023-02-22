@@ -43,6 +43,7 @@ export const ModelFileUploader = () => {
     >
       <EuiFilePicker
         display="default"
+        accept=".zip"
         initialPromptText="Select or drag and drop a file"
         isInvalid={Boolean(modelFileFieldController.fieldState.error)}
         onChange={(fileList) => {
