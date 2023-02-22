@@ -152,46 +152,36 @@ export const RegisterModelForm = () => {
         component="form"
       >
         <EuiPanel>
-          {latestVersionId && (
-            <div>
-              <EuiPageHeader pageTitle="Register version" />
-              <EuiText style={{ maxWidth: 420 }}>
-                <small>
+          <EuiPageHeader pageTitle={latestVersionId ? 'Register version' : 'Register model'} />
+          <EuiText style={{ maxWidth: 420 }}>
+            <small>
+              {latestVersionId && (
+                <>
                   Register a new version of Image-classifiar.The version number will be
                   automatically incremented. For more information on versioning, see{' '}
                   <EuiLink href="#" external>
                     Model Registry Documentation
                   </EuiLink>
                   .
-                </small>
-              </EuiText>
-            </div>
-          )}
-          {formType === 'import' && !latestVersionId && (
-            <div>
-              <EuiPageHeader pageTitle="Register model" />
-              <EuiText style={{ maxWidth: 420 }}>
-                <small>
+                </>
+              )}
+              {formType === 'import' && !latestVersionId && (
+                <>
                   Register a pre-trained model. For more information, see{' '}
                   <EuiLink href="#" external>
                     OpenSearch model repository documentation
                   </EuiLink>
                   .
-                </small>
-              </EuiText>
-            </div>
-          )}
-          {formType === 'upload' && !latestVersionId && (
-            <div>
-              <EuiPageHeader pageTitle="Register model" />
-              <EuiText style={{ maxWidth: 420 }}>
-                <small>
+                </>
+              )}
+              {formType === 'upload' && !latestVersionId && (
+                <>
                   Register your model to collaboratively manage its life cycle, and facilitate model
                   discovery across your organization.
-                </small>
-              </EuiText>
-            </div>
-          )}
+                </>
+              )}
+            </small>
+          </EuiText>
           <EuiSpacer />
           {partials.map((FormPartial, i) => (
             <React.Fragment key={i}>
