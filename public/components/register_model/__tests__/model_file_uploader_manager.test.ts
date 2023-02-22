@@ -51,7 +51,10 @@ describe('ModelFileUploadManager', () => {
   });
 
   it('should call onComplete', async () => {
-    const onCompleteMock = jest.fn();
+    const functionCallOrder: string[] = [];
+    const onCompleteMock = jest.fn().mockImplementation(() => functionCallOrder.push('onComplete'));
+    const onUpdateMock = jest.fn().mockImplementation(() => functionCallOrder.push('onUpdate'));
+
     const uploader = new ModelFileUploadManager();
     const file = new File(['test model file'], 'model.zip', { type: 'application/zip' });
     Object.defineProperty(file, 'size', { value: 30 * 1000 * 1000 });
@@ -61,8 +64,10 @@ describe('ModelFileUploadManager', () => {
       file,
       chunkSize: 10 * 1000 * 1000,
       onComplete: onCompleteMock,
+      onUpdate: onUpdateMock,
     });
     await waitFor(() => expect(onCompleteMock).toHaveBeenCalled());
+    expect(functionCallOrder).toEqual(['onUpdate', 'onUpdate', 'onUpdate', 'onComplete']);
   });
 
   it('should call onError', async () => {
