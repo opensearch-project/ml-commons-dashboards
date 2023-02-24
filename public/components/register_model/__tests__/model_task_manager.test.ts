@@ -63,7 +63,7 @@ describe('ModelTaskManager', () => {
     });
   });
 
-  it('should call call task API util model is created', async () => {
+  it('should poll get task API util model is created', async () => {
     const onCompleteMock = jest.fn();
     const onErrorMock = jest.fn();
     const onUpdateMock = jest.fn();
@@ -89,5 +89,6 @@ describe('ModelTaskManager', () => {
       },
       { timeout: 8000 }
     );
+    expect(getOneMock).toHaveBeenCalledTimes(3);
   });
 });
