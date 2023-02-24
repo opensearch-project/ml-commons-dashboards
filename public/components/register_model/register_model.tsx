@@ -38,7 +38,7 @@ import { mountReactNode } from '../../../../../src/core/public/utils';
 import { modelFileUploadManager } from './model_file_upload_manager';
 import { MAX_CHUNK_SIZE } from './constants';
 import { routerPaths } from '../../../common/router_paths';
-import { modelTaskManager } from '../model_list/model_task_manager';
+import { modelTaskManager } from './model_task_manager';
 
 const DEFAULT_VALUES = {
   name: '',

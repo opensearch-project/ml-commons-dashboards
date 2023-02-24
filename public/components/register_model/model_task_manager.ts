@@ -32,11 +32,13 @@ export class ModelTaskManager {
     if (!this.tasks.getValue().has(options.taskId)) {
       const observable = timer(0, 2000)
         .pipe(switchMap((_) => APIProvider.getAPI('task').getOne(options.taskId)))
+        // TODO: should it also check res.state?
+        // The intention here is to stop polling once a model is created
         .pipe(takeWhile((res) => !Boolean(res.model_id), true));
 
       observable.subscribe({
         next: (res) => {
-          if (options.onUpdate) {
+          if (options.onUpdate && !res.error) {
             options.onUpdate(res);
           }
           // Model download task is still running if
