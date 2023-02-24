@@ -58,6 +58,26 @@ describe('<RegisterModel /> Artifact', () => {
     expect(uploadMock).toHaveBeenCalled();
   });
 
+  it('should upload with model url', async () => {
+    const result = await setup();
+
+    // select option: From URL
+    await result.user.click(screen.getByLabelText(/from url/i));
+
+    const urlInput = screen.getByLabelText<HTMLInputElement>(/url/i, {
+      selector: 'input[type="text"]',
+    });
+
+    await result.user.clear(urlInput);
+    await result.user.type(
+      urlInput,
+      'https://artifacts.opensearch.org/models/ml-models/huggingface/sentence-transformers/all-MiniLM-L6-v2/1.0.1/torch_script/sentence-transformers_all-MiniLM-L6-v2-1.0.1-torch_script.zip'
+    );
+    await result.user.click(result.submitButton);
+
+    expect(onSubmitWithURLMock).toHaveBeenCalled();
+  });
+
   it('should submit the register model form if model file size is 4GB', async () => {
     const result = await setup();
 

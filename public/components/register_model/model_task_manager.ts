@@ -15,6 +15,13 @@ interface TaskQueryOptions {
   onComplete?: (status: TaskGetOneResponse) => void;
 }
 
+// Model download task is still running if
+// 1. model id doesn't exist
+// 2. the current task is running fine without error
+function isTaskRunning(res: TaskGetOneResponse) {
+  return !Boolean(res.model_id) && !Boolean(res.error);
+}
+
 export class ModelTaskManager {
   /**
    * The model download tasks which are still running in BE
@@ -28,39 +35,44 @@ export class ModelTaskManager {
     this.tasks.next(this.tasks.getValue());
   }
 
+  add(taskId: string, taskObservable: Observable<TaskGetOneResponse>) {
+    if (!this.tasks.getValue().has(taskId)) {
+      this.tasks.next(this.tasks.getValue().set(taskId, taskObservable));
+    }
+  }
+
   query(options: TaskQueryOptions) {
     if (!this.tasks.getValue().has(options.taskId)) {
       const observable = timer(0, 2000)
         .pipe(switchMap((_) => APIProvider.getAPI('task').getOne(options.taskId)))
         // TODO: should it also check res.state?
         // The intention here is to stop polling once a model is created
-        .pipe(takeWhile((res) => !Boolean(res.model_id), true));
+        .pipe(takeWhile((res) => !Boolean(res.model_id) && !Boolean(res.error), true));
 
       observable.subscribe({
         next: (res) => {
           if (options.onUpdate && !res.error) {
             options.onUpdate(res);
           }
-          // Model download task is still running if
-          // 1. model id doesn't exist
-          // 2. the current task is running fine without error
-          if (!res.model_id && !res.error) {
-            this.tasks.next(this.tasks.getValue().set(options.taskId, observable));
+
+          if (isTaskRunning(res)) {
+            this.add(options.taskId, observable);
+          } else {
+            this.remove(options.taskId);
           }
           // Model download task is complete if model id exists
-          if (res.model_id && options?.onComplete) {
-            options?.onComplete(res);
-            this.remove(options.taskId);
+          if (res.model_id && options.onComplete) {
+            options.onComplete(res);
           }
-          if (res.error && options?.onError) {
-            options?.onError(new Error(res.error));
-            this.remove(options.taskId);
+
+          if (res.error && options.onError) {
+            options.onError(new Error(res.error));
           }
         },
         error: (err: Error) => {
+          this.remove(options.taskId);
           if (options.onError) {
             options.onError(err);
-            this.remove(options.taskId);
           }
         },
       });
