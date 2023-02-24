@@ -2,7 +2,7 @@
 
 Compatible with OpenSearch 2.6.0
 
-### Features
+### Experimental Features
 
 * Add RefreshInterval component ([#32](https://github.com/opensearch-project/ml-commons-dashboards/pull/32))
 * Add useMonitoring hook ([#33](https://github.com/opensearch-project/ml-commons-dashboards/pull/33))
