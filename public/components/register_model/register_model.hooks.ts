@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { APIProvider } from '../../apis/api_provider';
-import { MAX_CHUNK_SIZE } from './constants';
-import { getModelContentHashValue } from './get_model_content_hash_value';
-import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { useEffect, useState } from 'react';
 
 const metricNames = ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4'];
 
@@ -50,79 +46,4 @@ export const useModelTags = () => {
   }, []);
 
   return [loading, { keys, values }] as const;
-};
-
-export const useModelUpload = () => {
-  const timeoutIdRef = useRef(-1);
-  const mountedRef = useRef(true);
-
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-      window.clearTimeout(timeoutIdRef.current);
-    };
-  }, []);
-
-  return useCallback(async (model: ModelFileFormData | ModelUrlFormData) => {
-    const modelUploadBase = {
-      name: model.name,
-      version: model.version,
-      description: model.description,
-      // TODO: Need to confirm if we have the model format input
-      modelFormat: 'TORCH_SCRIPT',
-      modelConfig: JSON.parse(model.configuration),
-    };
-    if ('modelURL' in model) {
-      const { task_id: taskId } = await APIProvider.getAPI('model').upload({
-        ...modelUploadBase,
-        url: model.modelURL,
-      });
-      return new Promise<string>((resolve, reject) => {
-        const refreshTaskStatus = () => {
-          APIProvider.getAPI('task')
-            .getOne(taskId)
-            .then(({ model_id: modelId, error }) => {
-              if (error) {
-                reject(error);
-                return;
-              }
-              if (modelId === undefined) {
-                if (!mountedRef.current) {
-                  reject('component unmounted');
-                  return;
-                }
-                timeoutIdRef.current = window.setTimeout(refreshTaskStatus, 1000);
-                return;
-              }
-              resolve(modelId);
-            });
-        };
-        if (!mountedRef.current) {
-          reject('component unmounted');
-          return;
-        }
-        refreshTaskStatus();
-      });
-    }
-    const { modelFile } = model;
-    const totalChunks = Math.ceil(modelFile.size / MAX_CHUNK_SIZE);
-    const modelContentHashValue = await getModelContentHashValue(modelFile);
-
-    const modelId = (
-      await APIProvider.getAPI('model').upload({
-        ...modelUploadBase,
-        totalChunks,
-        modelContentHashValue,
-      })
-    ).model_id;
-
-    /* for (let i = 0; i < totalChunks; i++) {
-      const chunk = modelFile.slice(
-        MAX_CHUNK_SIZE * i,
-        Math.min(MAX_CHUNK_SIZE * (i + 1), modelFile.size)
-      );
-      await APIProvider.getAPI('model').uploadChunk(modelId, `${i}`, chunk);
-    }*/
-    return modelId;
-  }, []);
 };
