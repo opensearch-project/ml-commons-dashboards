@@ -12,8 +12,8 @@ import { APIProvider } from '../../../apis/api_provider';
 import { routerPaths } from '../../../../common/router_paths';
 import { setup } from './setup';
 import { Model } from '../../../../public/apis/model';
-import * as formHooks from '../register_model.hooks';
 import * as PluginContext from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import * as formAPI from '../register_model_api';
 
 // Cannot spyOn(PluginContext, 'useOpenSearchDashboards') directly as it results in error:
 // TypeError: Cannot redefine property: useOpenSearchDashboards
@@ -70,7 +70,7 @@ describe('<RegisterModel /> Form', () => {
         },
       },
     });
-    jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+    jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
     jest.spyOn(Model.prototype, 'uploadChunk').mockResolvedValue({});
   });
 
@@ -150,9 +150,7 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('should call addDanger to display an error toast', async () => {
-    jest
-      .spyOn(formHooks, 'useModelUpload')
-      .mockReturnValue(jest.fn().mockRejectedValue(new Error('error')));
+    jest.spyOn(formAPI, 'submitModelWithFile').mockRejectedValue(new Error('error'));
     const { user } = await setup();
     await user.click(screen.getByRole('button', { name: /register model/i }));
     expect(addDangerMock).toHaveBeenCalled();
