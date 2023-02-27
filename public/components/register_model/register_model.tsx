@@ -28,7 +28,7 @@ import { ArtifactPanel } from './artifact';
 import { ConfigurationPanel } from './model_configuration';
 import { EvaluationMetricsPanel } from './evaluation_metrics';
 import { ModelTagsPanel } from './model_tags';
-import { useModelUpload } from './register_model.hooks';
+import { submitModelWithFile, submitModelWithURL } from './register_model_api';
 import { APIProvider } from '../../apis/api_provider';
 import { upgradeModelVersion } from '../../utils';
 import { useSearchParams } from '../../hooks/use_search_params';
@@ -38,6 +38,7 @@ import { mountReactNode } from '../../../../../src/core/public/utils';
 import { modelFileUploadManager } from './model_file_upload_manager';
 import { MAX_CHUNK_SIZE } from './constants';
 import { routerPaths } from '../../../common/router_paths';
+import { modelTaskManager } from './model_task_manager';
 
 const DEFAULT_VALUES = {
   name: '',
@@ -75,45 +76,50 @@ export const RegisterModelForm = () => {
     mode: 'onChange',
     defaultValues: DEFAULT_VALUES,
   });
-  const submitModel = useModelUpload();
 
   const onSubmit = useCallback(
     async (data: ModelFileFormData | ModelUrlFormData) => {
       try {
-        const modelId = await submitModel(data);
-        // Navigate to model list if form submit successfully
-        history.push(routerPaths.modelList);
+        const onComplete = () => {
+          notifications?.toasts.addSuccess({
+            title: mountReactNode(
+              <EuiText>
+                Artifact for <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor>{' '}
+                uploaded
+              </EuiText>
+            ),
+            text: `The artifact for ${form.getValues('name')} uploaded successfully`,
+          });
+        };
 
-        // Upload model artifact
+        const onError = () => {
+          notifications?.toasts.addDanger({
+            title: mountReactNode(
+              <EuiText>
+                <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> artifact
+                upload failed.
+              </EuiText>
+            ),
+            text: 'The new version was not created.',
+          });
+        };
+
         if ('modelFile' in data) {
+          const modelId = await submitModelWithFile(data);
           modelFileUploadManager.upload({
             file: data.modelFile,
             modelId,
             chunkSize: MAX_CHUNK_SIZE,
-            onComplete: () => {
-              notifications?.toasts.addSuccess({
-                title: mountReactNode(
-                  <EuiText>
-                    Artifact for{' '}
-                    <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> uploaded
-                  </EuiText>
-                ),
-                text: `The artifact for ${form.getValues('name')} uploaded successfully`,
-              });
-            },
-            onError: () => {
-              notifications?.toasts.addDanger({
-                title: mountReactNode(
-                  <EuiText>
-                    <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> artifact
-                    upload failed.
-                  </EuiText>
-                ),
-                text: 'The new version was not created.',
-              });
-            },
+            onComplete,
+            onError,
           });
+        } else {
+          const taskId = await submitModelWithURL(data);
+          modelTaskManager.query({ taskId, onComplete, onError });
         }
+
+        // Navigate to model list if form submit successfully
+        history.push(routerPaths.modelList);
 
         if (latestVersionId) {
           notifications?.toasts.addSuccess({
@@ -150,7 +156,7 @@ export const RegisterModelForm = () => {
         }
       }
     },
-    [submitModel, notifications, form, latestVersionId, history]
+    [notifications, form, latestVersionId, history]
   );
 
   useEffect(() => {

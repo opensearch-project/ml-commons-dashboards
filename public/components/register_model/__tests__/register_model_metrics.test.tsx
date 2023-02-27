@@ -6,6 +6,7 @@
 import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
+import * as formAPI from '../register_model_api';
 
 describe('<RegisterModel /> Evaluation Metrics', () => {
   const onSubmitMock = jest.fn();
@@ -17,7 +18,7 @@ describe('<RegisterModel /> Evaluation Metrics', () => {
     jest
       .spyOn(formHooks, 'useModelTags')
       .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
-    jest.spyOn(formHooks, 'useModelUpload').mockReturnValue(onSubmitMock);
+    jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
   });
 
   afterEach(() => {
