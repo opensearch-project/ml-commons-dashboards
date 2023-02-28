@@ -9,16 +9,15 @@ import {
   EuiTitle,
   EuiCodeEditor,
   EuiText,
-  EuiButtonEmpty,
+  EuiTextColor,
+  EuiCode,
   EuiSpacer,
 } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
-
 import '../../ace-themes/sql_console.js';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { HelpFlyout } from './help_flyout';
-
 function validateConfigurationObject(value: string) {
   try {
     JSON.parse(value.trim());
@@ -27,7 +26,6 @@ function validateConfigurationObject(value: string) {
   }
   return true;
 }
-
 export const ConfigurationPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [isHelpVisible, setIsHelpVisible] = useState(false);
@@ -39,7 +37,6 @@ export const ConfigurationPanel = () => {
       validate: validateConfigurationObject,
     },
   });
-
   return (
     <div>
       <EuiTitle size="s">
@@ -47,15 +44,19 @@ export const ConfigurationPanel = () => {
       </EuiTitle>
       <EuiText style={{ maxWidth: 450 }}>
         <small>
-          The model configuration JSON object.{' '}
-          <EuiButtonEmpty
-            onClick={() => setIsHelpVisible(true)}
-            size="xs"
-            color="primary"
-            data-test-subj="model-configuration-help-button"
-          >
-            Help.
-          </EuiButtonEmpty>
+          The model configuration specifies the{' '}
+          <EuiTextColor color="default">
+            <EuiCode className="eui-textInheritColor">model_type</EuiCode>
+          </EuiTextColor>
+          ,
+          <EuiTextColor color="default">
+            <EuiCode className="eui-textInheritColor">embedding_dimension</EuiCode>
+          </EuiTextColor>{' '}
+          , and{' '}
+          <EuiTextColor color="default">
+            <EuiCode className="eui-textInheritColor">framework_type</EuiCode>
+          </EuiTextColor>{' '}
+          of the model.
         </small>
       </EuiText>
       <EuiSpacer size="m" />
