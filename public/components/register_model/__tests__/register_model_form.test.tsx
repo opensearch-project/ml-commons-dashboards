@@ -24,6 +24,7 @@ jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', ()
     ...jest.requireActual('../../../../../../src/plugins/opensearch_dashboards_react/public'),
   };
 });
+jest.mock('../../../../public/apis/model');
 
 const MOCKED_DATA = {
   data: [
@@ -72,6 +73,10 @@ describe('<RegisterModel /> Form', () => {
     });
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
     jest.spyOn(Model.prototype, 'uploadChunk').mockResolvedValue({});
+    jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+      data: [],
+      pagination: { totalRecords: 0, currentPage: 1, pageSize: 1, totalPages: 0 },
+    });
   });
 
   afterEach(() => {

@@ -7,6 +7,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { RegisterModelForm } from '../register_model';
+import { Model } from '../../../apis/model';
 import { render, RenderWithRouteProps, screen } from '../../../../test/test_utils';
 
 jest.mock('../../../apis/model');
@@ -24,6 +25,11 @@ export async function setup(options?: RenderWithRouteProps) {
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
 
+  // Mock model name unique
+  jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+    data: [],
+    pagination: { totalRecords: 0, currentPage: 1, pageSize: 1, totalPages: 0 },
+  });
   // fill model name
   await user.type(nameInput, 'test model name');
   // fill model description
