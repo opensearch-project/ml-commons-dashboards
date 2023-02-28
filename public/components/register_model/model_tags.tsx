@@ -29,11 +29,11 @@ export const ModelTagsPanel = () => {
     <div>
       <EuiTitle size="s">
         <h3>
-          Tags - <i style={{ fontWeight: 300 }}>optional</i>
+          Model tags - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
       </EuiTitle>
       <EuiText>
-        <small>Add tags to facilitate model discovery and tracking across your organization.</small>
+        <small>Add tags to help your organization discover and compare models.</small>
       </EuiText>
       <EuiSpacer size="m" />
       {fields.map((field, index) => {
