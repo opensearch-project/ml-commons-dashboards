@@ -5,18 +5,18 @@
 
 import React, { useState } from 'react';
 import { EuiTitle, htmlIdGenerator, EuiSpacer, EuiText, EuiRadio, EuiLink } from '@elastic/eui';
-
 import { MAX_MODEL_FILE_SIZE, ModelFileUploader } from './artifact_file';
 import { ArtifactUrl } from './artifact_url';
 import { ONE_GB } from '../../../common/constant';
-
 export const ArtifactPanel = () => {
   const [selectedSource, setSelectedSource] = useState<'source_from_computer' | 'source_from_url'>(
     'source_from_computer'
   );
-
   return (
     <div>
+      <EuiTitle size="m">
+        <h1>File and version information</h1>
+      </EuiTitle>
       <EuiTitle size="s">
         <h2>File and version information</h2>
       </EuiTitle>
