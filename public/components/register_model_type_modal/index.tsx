@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState, useCallback, Fragment } from 'react';
+import React, { useState, useCallback, Fragment, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -25,6 +25,8 @@ import {
 import { htmlIdGenerator } from '@elastic/eui';
 import { generatePath } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
+import { modelRepositoryManager } from '../../utils/model_repository_manager';
+
 enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
@@ -37,31 +39,6 @@ interface IItem {
   checked?: 'on' | undefined;
   description: string;
 }
-const MODEL_LIST = [
-  {
-    name: 'tapas-tiny',
-    description:
-      'TAPAS is a BERT-like transformers model pretrained on a large corpus of English data from Wikipedia in a self-supervised fashion',
-    checked: undefined,
-  },
-  {
-    name: 'electra-small-generator',
-    description: 'ELECTRA is a new method for self-supervised language representation learning',
-    checked: undefined,
-  },
-  {
-    name: 'flan-T5-large-grammer-synthesis',
-    description:
-      'A fine-tuned version of google/flan-t5-large for grammer correction on an expanded version of the JFLEG dataset',
-    checked: undefined,
-  },
-  {
-    name: 'BEiT',
-    description:
-      'The BEiT model is a version Transformer(ViT),which is a transformer encoder model(BERT-like)',
-    checked: undefined,
-  },
-];
 const renderModelOption = (option: IItem, searchValue: string) => {
   return (
     <>
@@ -77,12 +54,7 @@ const renderModelOption = (option: IItem, searchValue: string) => {
 };
 export function RegisterModelTypeModal({ onCloseModal }: Props) {
   const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
-    () =>
-      MODEL_LIST.map((item) => ({
-        checked: item.checked,
-        label: item.name,
-        description: item.description,
-      }))
+    []
   );
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
@@ -112,6 +84,21 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
     },
     [history, modelSource, modelRepoSelection, onChange]
   );
+
+  useEffect(() => {
+    const subscribe = modelRepositoryManager.getPreTrainedModels$().subscribe((models) => {
+      setModelRepoSelection(
+        Object.keys(models).map((name) => ({
+          label: name,
+          description: models[name].description,
+          checked: undefined,
+        }))
+      );
+    });
+    return () => {
+      subscribe.unsubscribe();
+    };
+  }, []);
   return (
     <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
       <EuiModalHeader>
@@ -201,6 +188,7 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
               'data-test-subj': 'opensearchModelList',
               showIcons: true,
             }}
+            isLoading={modelRepoSelection.length === 0}
           >
             {(list, search) => (
               <Fragment>
