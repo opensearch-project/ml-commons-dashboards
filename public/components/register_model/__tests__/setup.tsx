@@ -10,7 +10,6 @@ import { RegisterModelForm } from '../register_model';
 import { Model } from '../../../apis/model';
 import { render, RenderWithRouteProps, screen } from '../../../../test/test_utils';
 
-jest.mock('../../../apis/model');
 jest.mock('../../../apis/task');
 
 export async function setup(options?: RenderWithRouteProps) {
