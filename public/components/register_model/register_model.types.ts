@@ -23,6 +23,7 @@ interface ModelFormBase {
   configuration: string;
   metric?: Metric;
   tags?: Tag[];
+  versionNotes?: string;
 }
 
 /**

@@ -39,6 +39,7 @@ import { modelFileUploadManager } from './model_file_upload_manager';
 import { MAX_CHUNK_SIZE } from './constants';
 import { routerPaths } from '../../../common/router_paths';
 import { modelTaskManager } from './model_task_manager';
+import { ModelVersionNotesPanel } from './model_version_notes';
 
 const DEFAULT_VALUES = {
   name: '',
@@ -63,13 +64,14 @@ export const RegisterModelForm = () => {
   const formType = isValidModelRegisterFormType(typeParams) ? typeParams : 'upload';
   const partials =
     formType === 'import'
-      ? [ModelDetailsPanel, ModelTagsPanel]
+      ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
       : [
           ModelDetailsPanel,
           ArtifactPanel,
           ConfigurationPanel,
           EvaluationMetricsPanel,
           ModelTagsPanel,
+          ModelVersionNotesPanel,
         ];
 
   const form = useForm<ModelFileFormData | ModelUrlFormData>({

@@ -23,6 +23,7 @@ export async function setup(options?: RenderWithRouteProps) {
   const modelFileInput = screen.queryByLabelText<HTMLInputElement>(/file/i);
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
+  const versionNotesInput = screen.getByLabelText<HTMLTextAreaElement>(/notes/i);
 
   // fill model name
   await user.type(nameInput, 'test model name');
@@ -43,5 +44,6 @@ export async function setup(options?: RenderWithRouteProps) {
     submitButton,
     form,
     user,
+    versionNotesInput,
   };
 }
