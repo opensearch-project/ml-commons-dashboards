@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { EuiTitle, htmlIdGenerator, EuiSpacer, EuiText, EuiRadio, EuiLink } from '@elastic/eui';
+
 import { MAX_MODEL_FILE_SIZE, ModelFileUploader } from './artifact_file';
 import { ArtifactUrl } from './artifact_url';
 import { ONE_GB } from '../../../common/constant';
@@ -14,8 +15,8 @@ export const ArtifactPanel = () => {
   );
   return (
     <div>
-      <EuiTitle size="m">
-        <h1>File and version information</h1>
+      <EuiTitle>
+        <h1 style={{ fontSize: '24.5px' }}>File and version information</h1>
       </EuiTitle>
       <EuiTitle size="s">
         <h3>Artifact</h3>
