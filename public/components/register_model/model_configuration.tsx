@@ -46,15 +46,15 @@ export const ConfigurationPanel = () => {
         <small>
           The model configuration specifies the{' '}
           <EuiTextColor color="default">
-            <EuiCode className="eui-textInheritColor">model_type</EuiCode>
+            <EuiCode>model_type</EuiCode>
           </EuiTextColor>
           ,
           <EuiTextColor color="default">
-            <EuiCode className="eui-textInheritColor">embedding_dimension</EuiCode>
+            <EuiCode>embedding_dimension</EuiCode>
           </EuiTextColor>{' '}
           , and{' '}
           <EuiTextColor color="default">
-            <EuiCode className="eui-textInheritColor">framework_type</EuiCode>
+            <EuiCode>framework_type</EuiCode>
           </EuiTextColor>{' '}
           of the model.
         </small>
