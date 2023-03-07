@@ -16,13 +16,13 @@ export async function setup(options?: RenderWithRouteProps) {
   render(<RegisterModelForm />, { route: options?.route ?? '/' });
   const nameInput = screen.getByLabelText<HTMLInputElement>(/^name$/i);
   const descriptionInput = screen.getByLabelText<HTMLTextAreaElement>(/description/i);
-  const annotationsInput = screen.getByLabelText<HTMLTextAreaElement>(/annotation/i);
   const submitButton = screen.getByRole<HTMLButtonElement>('button', {
     name: /register model/i,
   });
   const modelFileInput = screen.queryByLabelText<HTMLInputElement>(/file/i);
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
+  const versionNotesInput = screen.getByLabelText<HTMLTextAreaElement>(/notes/i);
 
   // Mock model name unique
   jest.spyOn(Model.prototype, 'search').mockResolvedValue({
@@ -44,9 +44,9 @@ export async function setup(options?: RenderWithRouteProps) {
   return {
     nameInput,
     descriptionInput,
-    annotationsInput,
     submitButton,
     form,
     user,
+    versionNotesInput,
   };
 }

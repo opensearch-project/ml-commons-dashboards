@@ -19,10 +19,10 @@ interface ModelFormBase {
   name: string;
   version: string;
   description: string;
-  annotations?: string;
   configuration: string;
   metric?: Metric;
   tags?: Tag[];
+  versionNotes?: string;
 }
 
 /**

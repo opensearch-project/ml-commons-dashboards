@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FieldErrors, useForm, FormProvider } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
 import {
@@ -39,6 +39,7 @@ import { modelFileUploadManager } from './model_file_upload_manager';
 import { MAX_CHUNK_SIZE } from './constants';
 import { routerPaths } from '../../../common/router_paths';
 import { modelTaskManager } from './model_task_manager';
+import { ModelVersionNotesPanel } from './model_version_notes';
 
 const DEFAULT_VALUES = {
   name: '',
@@ -53,6 +54,7 @@ const FORM_ID = 'mlModelUploadForm';
 export const RegisterModelForm = () => {
   const history = useHistory();
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
+  const [modelGroupName, setModelGroupName] = useState<string>();
   const typeParams = useSearchParams().get('type');
 
   const {
@@ -63,13 +65,14 @@ export const RegisterModelForm = () => {
   const formType = isValidModelRegisterFormType(typeParams) ? typeParams : 'upload';
   const partials =
     formType === 'import'
-      ? [ModelDetailsPanel, ModelTagsPanel]
+      ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
       : [
-          ModelDetailsPanel,
+          ...(latestVersionId ? [] : [ModelDetailsPanel]),
           ArtifactPanel,
           ConfigurationPanel,
           EvaluationMetricsPanel,
           ModelTagsPanel,
+          ModelVersionNotesPanel,
         ];
 
   const form = useForm<ModelFileFormData | ModelUrlFormData>({
@@ -174,6 +177,7 @@ export const RegisterModelForm = () => {
         form.setValue('name', name);
         form.setValue('version', newVersion);
         form.setValue('configuration', modelConfig?.all_config ?? '');
+        setModelGroupName(name);
       }
     };
     initializeForm();
@@ -197,31 +201,23 @@ export const RegisterModelForm = () => {
       >
         <EuiPanel>
           <EuiPageHeader pageTitle={latestVersionId ? 'Register version' : 'Register model'} />
-          <EuiText style={{ maxWidth: 420 }}>
+          <EuiText style={{ maxWidth: 725 }}>
             <small>
               {latestVersionId && (
                 <>
-                  Register a new version of Image-classifiar.The version number will be
-                  automatically incremented. For more information on versioning, see{' '}
+                  Register a new version of <b>{modelGroupName}</b>. The version number will be
+                  automatically incremented.&nbsp;
                   <EuiLink href="#" external>
-                    Model Registry Documentation
+                    Learn More
                   </EuiLink>
                   .
                 </>
               )}
-              {formType === 'import' && !latestVersionId && (
-                <>
-                  Register a pre-trained model. For more information, see{' '}
-                  <EuiLink href="#" external>
-                    OpenSearch model repository documentation
-                  </EuiLink>
-                  .
-                </>
-              )}
+              {formType === 'import' && !latestVersionId && <>Register a pre-trained model.</>}
               {formType === 'upload' && !latestVersionId && (
                 <>
-                  Register your model to collaboratively manage its life cycle, and facilitate model
-                  discovery across your organization.
+                  Register your model to manage its life cycle, and facilitate model discovery
+                  across your organization.
                 </>
               )}
             </small>
