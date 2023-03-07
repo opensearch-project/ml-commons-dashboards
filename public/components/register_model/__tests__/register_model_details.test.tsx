@@ -29,7 +29,6 @@ describe('<RegisterModel /> Details', () => {
     const result = await setup();
     expect(result.nameInput).toBeInTheDocument();
     expect(result.descriptionInput).toBeInTheDocument();
-    expect(result.annotationsInput).toBeInTheDocument();
   });
 
   it('should submit the register model form', async () => {
@@ -101,21 +100,6 @@ describe('<RegisterModel /> Details', () => {
     await result.user.clear(result.descriptionInput);
     await result.user.type(result.descriptionInput, 'x'.repeat(201));
     expect(result.descriptionInput).toBeInvalid();
-
-    await result.user.click(result.submitButton);
-    expect(onSubmitMock).not.toHaveBeenCalled();
-  });
-
-  it('annotation text length should not exceed 200', async () => {
-    const result = await setup();
-
-    await result.user.clear(result.annotationsInput);
-    await result.user.type(result.annotationsInput, 'x'.repeat(200));
-    expect(result.annotationsInput).toBeValid();
-
-    await result.user.clear(result.annotationsInput);
-    await result.user.type(result.annotationsInput, 'x'.repeat(201));
-    expect(result.annotationsInput).toBeInvalid();
 
     await result.user.click(result.submitButton);
     expect(onSubmitMock).not.toHaveBeenCalled();
