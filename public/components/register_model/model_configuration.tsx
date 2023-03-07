@@ -65,41 +65,38 @@ export const ConfigurationPanel = () => {
         </small>
       </EuiText>
       <EuiSpacer size="m" />
-      <div>
-        <EuiFormRow
-          style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
-          label="Configuration in JSON"
-          isInvalid={Boolean(configurationFieldController.fieldState.error)}
-          error={configurationFieldController.fieldState.error?.message}
-          labelAppend={
-            <EuiButtonEmpty
-              onClick={() => setIsHelpVisible(true)}
-              size="xs"
-              color="primary"
-              data-test-subj="model-configuration-help-button"
-            >
-              Help
-            </EuiButtonEmpty>
-          }
-        >
-          <EuiCodeEditor
-            tabSize={2}
-            theme="sql_console"
-            width="100%"
-            showPrintMargin={false}
-            height="10rem"
-            mode="json"
-            value={configurationFieldController.field.value}
-            onChange={(value) => configurationFieldController.field.onChange(value)}
-            setOptions={{
-              fontSize: '14px',
-              enableBasicAutocompletion: true,
-              enableLiveAutocompletion: true,
-            }}
-          />
-        </EuiFormRow>
-      </div>
-
+      <EuiFormRow
+        style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
+        label="Configuration in JSON"
+        isInvalid={Boolean(configurationFieldController.fieldState.error)}
+        error={configurationFieldController.fieldState.error?.message}
+        labelAppend={
+          <EuiButtonEmpty
+            onClick={() => setIsHelpVisible(true)}
+            size="xs"
+            color="primary"
+            data-test-subj="model-configuration-help-button"
+          >
+            Help
+          </EuiButtonEmpty>
+        }
+      >
+        <EuiCodeEditor
+          tabSize={2}
+          theme="sql_console"
+          width="100%"
+          showPrintMargin={false}
+          height="10rem"
+          mode="json"
+          value={configurationFieldController.field.value}
+          onChange={(value) => configurationFieldController.field.onChange(value)}
+          setOptions={{
+            fontSize: '14px',
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+          }}
+        />
+      </EuiFormRow>
       {isHelpVisible && <HelpFlyout onClose={() => setIsHelpVisible(false)} />}
     </div>
   );
