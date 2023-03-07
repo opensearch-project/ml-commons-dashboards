@@ -12,9 +12,11 @@ import {
   EuiTextColor,
   EuiCode,
   EuiSpacer,
+  EuiButtonEmpty,
 } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 import '../../ace-themes/sql_console.js';
+import { JUSTIFY_CONTENTS } from '@opensearch-project/oui/src/eui_components/flex/flex_group';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { HelpFlyout } from './help_flyout';
@@ -60,28 +62,41 @@ export const ConfigurationPanel = () => {
         </small>
       </EuiText>
       <EuiSpacer size="m" />
-      <EuiFormRow
-        style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
-        label="Configuration in JSON"
-        isInvalid={Boolean(configurationFieldController.fieldState.error)}
-        error={configurationFieldController.fieldState.error?.message}
-      >
-        <EuiCodeEditor
-          tabSize={2}
-          theme="sql_console"
-          width="100%"
-          showPrintMargin={false}
-          height="10rem"
-          mode="json"
-          value={configurationFieldController.field.value}
-          onChange={(value) => configurationFieldController.field.onChange(value)}
-          setOptions={{
-            fontSize: '14px',
-            enableBasicAutocompletion: true,
-            enableLiveAutocompletion: true,
-          }}
-        />
-      </EuiFormRow>
+      <div>
+        <EuiFormRow
+          style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
+          label="Configuration in JSON"
+          isInvalid={Boolean(configurationFieldController.fieldState.error)}
+          error={configurationFieldController.fieldState.error?.message}
+          labelAppend={
+            <EuiButtonEmpty
+              onClick={() => setIsHelpVisible(true)}
+              size="xs"
+              color="primary"
+              data-test-subj="model-configuration-help-button"
+            >
+              Help
+            </EuiButtonEmpty>
+          }
+        >
+          <EuiCodeEditor
+            tabSize={2}
+            theme="sql_console"
+            width="100%"
+            showPrintMargin={false}
+            height="10rem"
+            mode="json"
+            value={configurationFieldController.field.value}
+            onChange={(value) => configurationFieldController.field.onChange(value)}
+            setOptions={{
+              fontSize: '14px',
+              enableBasicAutocompletion: true,
+              enableLiveAutocompletion: true,
+            }}
+          />
+        </EuiFormRow>
+      </div>
+
       {isHelpVisible && <HelpFlyout onClose={() => setIsHelpVisible(false)} />}
     </div>
   );
