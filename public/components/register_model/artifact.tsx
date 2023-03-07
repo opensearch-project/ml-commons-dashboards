@@ -15,8 +15,8 @@ export const ArtifactPanel = () => {
   );
   return (
     <div>
-      <EuiTitle>
-        <h1 style={{ fontSize: '24.5px' }}>File and version information</h1>
+      <EuiTitle size="s">
+        <h2>File and version information</h2>
       </EuiTitle>
       <EuiTitle size="s">
         <h2>File and version information</h2>
