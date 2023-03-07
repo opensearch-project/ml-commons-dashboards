@@ -3,22 +3,38 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { EuiFieldText, EuiFormRow, EuiTitle, EuiTextArea, EuiText } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { APIProvider } from '../../apis/api_provider';
 
 const NAME_MAX_LENGTH = 80;
 const DESCRIPTION_MAX_LENGTH = 200;
 const ANNOTATION_MAX_LENGTH = 200;
 
+const isUniqueModelName = async (name: string) => {
+  const searchResult = await APIProvider.getAPI('model').search({
+    name,
+    pageSize: 1,
+    currentPage: 1,
+  });
+  return searchResult.pagination.totalRecords >= 1;
+};
+
 export const ModelDetailsPanel = () => {
-  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { control, trigger } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const modelNameFocusedRef = useRef(false);
   const nameFieldController = useController({
     name: 'name',
     control,
     rules: {
       required: { value: true, message: 'Name can not be empty' },
+      validate: async (name) => {
+        return !modelNameFocusedRef.current && !!name && (await isUniqueModelName(name))
+          ? 'This name is already in use. Use a unique name for the model.'
+          : undefined;
+      },
       maxLength: { value: NAME_MAX_LENGTH, message: 'Text exceed max length' },
     },
   });
@@ -42,6 +58,16 @@ export const ModelDetailsPanel = () => {
   const { ref: descriptionInputRef, ...descriptionField } = descriptionFieldController.field;
   const { ref: annotationsInputRef, ...annotationsField } = annotationsFieldController.field;
 
+  const handleModelNameFocus = useCallback(() => {
+    modelNameFocusedRef.current = true;
+  }, []);
+
+  const handleModelNameBlur = useCallback(() => {
+    nameField.onBlur();
+    modelNameFocusedRef.current = false;
+    trigger('name');
+  }, [nameField, trigger]);
+
   return (
     <div>
       <EuiTitle size="s">
@@ -63,6 +89,8 @@ export const ModelDetailsPanel = () => {
           inputRef={nameInputRef}
           isInvalid={Boolean(nameFieldController.fieldState.error)}
           {...nameField}
+          onFocus={handleModelNameFocus}
+          onBlur={handleModelNameBlur}
         />
       </EuiFormRow>
       <EuiFormRow

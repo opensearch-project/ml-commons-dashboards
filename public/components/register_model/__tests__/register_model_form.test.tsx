@@ -8,7 +8,6 @@ import { Route } from 'react-router-dom';
 
 import { render, screen, waitFor } from '../../../../test/test_utils';
 import { RegisterModelForm } from '../register_model';
-import { APIProvider } from '../../../apis/api_provider';
 import { routerPaths } from '../../../../common/router_paths';
 import { setup } from './setup';
 import { Model } from '../../../../public/apis/model';
@@ -79,9 +78,8 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('should init form when id param in url route', async () => {
-    const request = jest.spyOn(APIProvider.getAPI('model'), 'search');
     const mockResult = MOCKED_DATA;
-    request.mockResolvedValue(mockResult);
+    jest.spyOn(Model.prototype, 'search').mockResolvedValue(mockResult);
     render(
       <Route path={routerPaths.registerModel}>
         <RegisterModelForm />
@@ -98,9 +96,7 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('submit button label should be `Register version` when register new version', async () => {
-    const request = jest.spyOn(APIProvider.getAPI('model'), 'search');
-    const mockResult = MOCKED_DATA;
-    request.mockResolvedValue(mockResult);
+    jest.spyOn(Model.prototype, 'search').mockResolvedValue(MOCKED_DATA);
 
     render(
       <Route path={routerPaths.registerModel}>

@@ -6,6 +6,7 @@
 import { setup } from './setup';
 import * as formHooks from '../register_model.hooks';
 import * as formAPI from '../register_model_api';
+import { Model } from '../../../apis/model';
 
 describe('<RegisterModel /> Details', () => {
   const onSubmitMock = jest.fn();
@@ -62,6 +63,21 @@ describe('<RegisterModel /> Details', () => {
     expect(result.nameInput).toBeInvalid();
 
     await result.user.click(result.submitButton);
+    expect(onSubmitMock).not.toHaveBeenCalled();
+  });
+
+  it('should NOT submit the register model form if model name is duplicated', async () => {
+    const result = await setup();
+    jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+      data: [],
+      pagination: { totalPages: 1, totalRecords: 1, currentPage: 1, pageSize: 1 },
+    });
+
+    await result.user.clear(result.nameInput);
+    await result.user.type(result.nameInput, 'a-duplicated-model-name');
+    await result.user.click(result.submitButton);
+
+    expect(result.nameInput).toBeInvalid();
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
