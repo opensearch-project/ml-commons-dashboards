@@ -15,11 +15,12 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
+
 import '../../ace-themes/sql_console.js';
-import { JUSTIFY_CONTENTS } from '@opensearch-project/oui/src/eui_components/flex/flex_group';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { HelpFlyout } from './help_flyout';
+
 function validateConfigurationObject(value: string) {
   try {
     JSON.parse(value.trim());
@@ -28,6 +29,7 @@ function validateConfigurationObject(value: string) {
   }
   return true;
 }
+
 export const ConfigurationPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [isHelpVisible, setIsHelpVisible] = useState(false);
@@ -39,6 +41,7 @@ export const ConfigurationPanel = () => {
       validate: validateConfigurationObject,
     },
   });
+
   return (
     <div>
       <EuiTitle size="s">
