@@ -11,7 +11,6 @@ import { APIProvider } from '../../apis/api_provider';
 
 const NAME_MAX_LENGTH = 80;
 const DESCRIPTION_MAX_LENGTH = 200;
-const ANNOTATION_MAX_LENGTH = 200;
 
 const isUniqueModelName = async (name: string) => {
   const searchResult = await APIProvider.getAPI('model').search({
@@ -48,15 +47,8 @@ export const ModelDetailsPanel = () => {
     },
   });
 
-  const annotationsFieldController = useController({
-    name: 'annotations',
-    control,
-    rules: { maxLength: { value: ANNOTATION_MAX_LENGTH, message: 'Text exceed max length' } },
-  });
-
   const { ref: nameInputRef, ...nameField } = nameFieldController.field;
   const { ref: descriptionInputRef, ...descriptionField } = descriptionFieldController.field;
-  const { ref: annotationsInputRef, ...annotationsField } = annotationsFieldController.field;
 
   const handleModelNameFocus = useCallback(() => {
     modelNameFocusedRef.current = true;
@@ -106,25 +98,6 @@ export const ModelDetailsPanel = () => {
           inputRef={descriptionInputRef}
           isInvalid={Boolean(descriptionFieldController.fieldState.error)}
           {...descriptionField}
-        />
-      </EuiFormRow>
-      <EuiFormRow
-        helpText={`${Math.max(
-          ANNOTATION_MAX_LENGTH - (annotationsField.value?.length ?? 0),
-          0
-        )} characters allowed.`}
-        isInvalid={Boolean(annotationsFieldController.fieldState.error)}
-        error={annotationsFieldController.fieldState.error?.message}
-        label={
-          <>
-            Annotation - <i style={{ fontWeight: 'normal' }}>Optional</i>
-          </>
-        }
-      >
-        <EuiTextArea
-          inputRef={annotationsInputRef}
-          isInvalid={Boolean(annotationsFieldController.fieldState.error)}
-          {...annotationsField}
         />
       </EuiFormRow>
     </div>

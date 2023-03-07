@@ -90,8 +90,7 @@ describe('<RegisterModel /> Form', () => {
     const { name } = mockResult.data[0];
 
     await waitFor(() => {
-      const nameInput = screen.getByLabelText<HTMLInputElement>(/^name$/i);
-      expect(nameInput.value).toBe(name);
+      expect(screen.getByText<HTMLInputElement>(name)).toBeInTheDocument();
     });
   });
 
