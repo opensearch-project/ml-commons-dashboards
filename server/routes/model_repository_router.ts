@@ -13,14 +13,15 @@ import {
   MODEL_REPOSITORY_CONFIG_URL_API_ENDPOINT,
 } from './constants';
 
+const PRE_TRAINED_MODELS_URL =
+  'https://raw.githubusercontent.com/opensearch-project/ml-commons/main/ml-algorithms/src/test/resources/org/opensearch/ml/engine/algorithms/text_embedding/pre_trained_models_list.json';
+
 const fetchURLAsJSONData = (url: string) => fetch(url).then((response: any) => response.json());
 
 export const modelRepositoryRouter = (router: IRouter) => {
   router.get({ path: MODEL_REPOSITORY_API_ENDPOINT, validate: false }, async () => {
     try {
-      const data = await fetchURLAsJSONData(
-        'https://raw.githubusercontent.com/opensearch-project/ml-commons/2.x/ml-algorithms/src/test/resources/org/opensearch/ml/engine/algorithms/text_embedding/pre_trained_models_list.json'
-      );
+      const data = await fetchURLAsJSONData(PRE_TRAINED_MODELS_URL);
       return opensearchDashboardsResponseFactory.ok({ body: data });
     } catch (error) {
       return opensearchDashboardsResponseFactory.badRequest({ body: error.message });
