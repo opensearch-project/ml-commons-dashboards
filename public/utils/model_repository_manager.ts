@@ -4,7 +4,7 @@
  */
 
 import { Observable, of, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { APIProvider } from '../apis/api_provider';
 
 interface PreTrainedModelInfo {
@@ -49,12 +49,10 @@ export class ModelRepositoryManager {
           this.preTrainedModelConfigs.set(modelInfo.config_url, modelConfig$);
         }
         return modelConfig$.pipe(
-          switchMap((config) =>
-            of({
-              url: modelInfo.model_url,
-              config,
-            })
-          )
+          map((config) => ({
+            url: modelInfo.model_url,
+            config,
+          }))
         );
       })
     );
