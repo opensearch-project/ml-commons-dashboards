@@ -6,7 +6,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { RegisterModelTypeModal } from '../index';
-import { render, screen } from '../../../../test/test_utils';
+import { render, screen, waitFor } from '../../../../test/test_utils';
+
+jest.mock('../../../apis/model_repository');
 
 const mockOffsetMethods = () => {
   const originalOffsetHeight = Object.getOwnPropertyDescriptor(
@@ -62,20 +64,27 @@ describe('<RegisterModelTypeModal />', () => {
     await userEvent.click(screen.getByLabelText('Opensearch model repository'));
     expect(screen.getByTestId('findModel')).toBeInTheDocument();
     expect(screen.getByTestId('opensearchModelList')).toBeInTheDocument();
-    expect(screen.getByText('tapas-tiny')).toBeInTheDocument();
-    await userEvent.click(screen.getByText('tapas-tiny'));
+    await waitFor(() =>
+      expect(screen.getByText('sentence-transformers/all-distilroberta-v1')).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByText('sentence-transformers/all-distilroberta-v1'));
     await userEvent.click(screen.getByTestId('continueRegister'));
     expect(document.URL).toContain(
-      'model-registry/register-model/?type=import&name=tapas-tiny&version=tapas-tiny'
+      'model-registry/register-model/?type=import&name=sentence-transformers/all-distilroberta-v1&version=sentence-transformers/all-distilroberta-v1'
     );
     mockReset();
   });
 
   it('should render no model found when input a invalid text to search model', async () => {
+    const mockReset = mockOffsetMethods();
     render(<RegisterModelTypeModal onCloseModal={() => {}} />);
     await userEvent.click(screen.getByLabelText('Opensearch model repository'));
-    await userEvent.type(screen.getByLabelText('OpenSearch model repository models'), '1');
+    await waitFor(() =>
+      expect(screen.getByText('sentence-transformers/all-distilroberta-v1')).toBeInTheDocument()
+    );
+    await userEvent.type(screen.getByTestId('findModel'), 'foo');
     expect(screen.getByText('No model found')).toBeInTheDocument();
+    mockReset();
   });
 
   it('should link href after selecting "add your own model" and continue ', async () => {
