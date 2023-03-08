@@ -20,6 +20,7 @@ import {
   profileRouter,
   securityRouter,
   taskRouter,
+  modelRepositoryRouter,
 } from './routes';
 import { ModelService } from './services';
 
@@ -48,6 +49,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     connectorRouter(router);
     securityRouter(router);
     taskRouter(router);
+    modelRepositoryRouter(router);
 
     return {};
   }
