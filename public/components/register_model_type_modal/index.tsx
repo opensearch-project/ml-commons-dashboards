@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState, useCallback, Fragment } from 'react';
+import React, { useState, useCallback, Fragment, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -25,6 +25,8 @@ import {
 import { htmlIdGenerator } from '@elastic/eui';
 import { generatePath } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
+import { modelRepositoryManager } from '../../utils/model_repository_manager';
+
 enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
@@ -37,31 +39,6 @@ interface IItem {
   checked?: 'on' | undefined;
   description: string;
 }
-const MODEL_LIST = [
-  {
-    name: 'tapas-tiny',
-    description:
-      'TAPAS is a BERT-like transformers model pretrained on a large corpus of English data from Wikipedia in a self-supervised fashion',
-    checked: undefined,
-  },
-  {
-    name: 'electra-small-generator',
-    description: 'ELECTRA is a new method for self-supervised language representation learning',
-    checked: undefined,
-  },
-  {
-    name: 'flan-T5-large-grammer-synthesis',
-    description:
-      'A fine-tuned version of google/flan-t5-large for grammer correction on an expanded version of the JFLEG dataset',
-    checked: undefined,
-  },
-  {
-    name: 'BEiT',
-    description:
-      'The BEiT model is a version Transformer(ViT),which is a transformer encoder model(BERT-like)',
-    checked: undefined,
-  },
-];
 const renderModelOption = (option: IItem, searchValue: string) => {
   return (
     <>
@@ -77,12 +54,7 @@ const renderModelOption = (option: IItem, searchValue: string) => {
 };
 export function RegisterModelTypeModal({ onCloseModal }: Props) {
   const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
-    () =>
-      MODEL_LIST.map((item) => ({
-        checked: item.checked,
-        label: item.name,
-        description: item.description,
-      }))
+    []
   );
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
@@ -112,125 +84,134 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
     },
     [history, modelSource, modelRepoSelection, onChange]
   );
+
+  useEffect(() => {
+    const subscribe = modelRepositoryManager.getPreTrainedModels$().subscribe((models) => {
+      setModelRepoSelection(
+        Object.keys(models).map((name) => ({
+          label: name,
+          description: models[name].description,
+          checked: undefined,
+        }))
+      );
+    });
+    return () => {
+      subscribe.unsubscribe();
+    };
+  }, []);
   return (
-    <div>
-      <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>
-            <h1>Register model</h1>
-          </EuiModalHeaderTitle>
-        </EuiModalHeader>
-        <EuiModalBody>
-          <div style={{ overflow: 'hidden' }}>
-            <EuiText size="s">
-              <strong>Model source</strong>
-            </EuiText>
-            <EuiFlexGroup gutterSize="l">
-              <EuiFlexItem>
-                <EuiCheckableCard
-                  id={htmlIdGenerator()()}
-                  label={
-                    <div>
-                      <span style={{ fontSize: 20 }}>Opensearch model repository</span>
-                      <EuiSpacer />
-                      <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
-                        <small>
-                          Select from a curated list of pre-trained models for search use cases.
-                        </small>
-                      </EuiTextColor>
-                    </div>
-                  }
-                  aria-label="Opensearch model repository"
-                  checked={modelSource === ModelSource.USER_MODEL}
-                  onChange={() => setModelSource(ModelSource.USER_MODEL)}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiCheckableCard
-                  id={htmlIdGenerator()()}
-                  label={
-                    <div>
-                      <span style={{ fontSize: 20 }}>Add your own model</span>
-                      <EuiSpacer />
-                      <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
-                        <small>
-                          Upload your own model in Torchscript format, as a local file via URL.
-                        </small>
-                      </EuiTextColor>
-                    </div>
-                  }
-                  aria-label="Add your own model"
-                  checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
-                  onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </div>
-          <EuiSpacer />
-          <EuiSpacer />
-          <div style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}>
+    <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
+      <EuiModalHeader>
+        <EuiModalHeaderTitle>
+          <h1>Register model</h1>
+        </EuiModalHeaderTitle>
+      </EuiModalHeader>
+      <EuiModalBody>
+        <div style={{ overflow: 'hidden' }}>
+          <EuiText size="s">
+            <strong>Model source</strong>
+          </EuiText>
+          <EuiFlexGroup gutterSize="l">
+            <EuiFlexItem>
+              <EuiCheckableCard
+                id={htmlIdGenerator()()}
+                label={
+                  <div>
+                    <span style={{ fontSize: 20 }}>Opensearch model repository</span>
+                    <EuiSpacer />
+                    <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
+                      <small>
+                        Select from a curated list of pre-trained models for search use cases.
+                      </small>
+                    </EuiTextColor>
+                  </div>
+                }
+                aria-label="Opensearch model repository"
+                checked={modelSource === ModelSource.USER_MODEL}
+                onChange={() => setModelSource(ModelSource.USER_MODEL)}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiCheckableCard
+                id={htmlIdGenerator()()}
+                label={
+                  <div>
+                    <span style={{ fontSize: 20 }}>Add your own model</span>
+                    <EuiSpacer />
+                    <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
+                      <small>
+                        Upload your own model in Torchscript format, as a local file via URL.
+                      </small>
+                    </EuiTextColor>
+                  </div>
+                }
+                aria-label="Add your own model"
+                checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
+                onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </div>
+        <EuiSpacer />
+        <EuiSpacer />
+        <div style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}>
+          <small>
+            <strong>Model</strong>
+          </small>
+          <EuiSpacer size="s" />
+          <div>
+            <EuiTextColor color="subdued">
+              <small>For more information on each model, see </small>
+            </EuiTextColor>
             <small>
-              <strong>Model</strong>
+              <EuiLink href="#" external>
+                OpenSearch model repository documentation
+              </EuiLink>
             </small>
-            <EuiSpacer size="s" />
-            <div>
-              <EuiTextColor color="subdued">
-                <small>For more information on each model, see </small>
-              </EuiTextColor>
-              <small>
-                <EuiLink href="#" external>
-                  OpenSearch model repository documentation
-                </EuiLink>
-              </small>
-            </div>
-            <EuiSpacer size="m" />
-            <EuiSelectable
-              aria-label="OpenSearch model repository models"
-              searchable
-              searchProps={{
-                'data-test-subj': 'findModel',
-                placeholder: 'Find model',
-              }}
-              options={modelRepoSelection}
-              onChange={onChange}
-              singleSelection={true}
-              noMatchesMessage="No model found"
-              height={240}
-              renderOption={renderModelOption}
-              listProps={{
-                rowHeight: 50,
-                'data-test-subj': 'opensearchModelList',
-                showIcons: true,
-              }}
-            >
-              {(list, search) => (
-                <Fragment>
-                  {search}
-                  {list}
-                </Fragment>
-              )}
-            </EuiSelectable>
           </div>
-        </EuiModalBody>
-        <EuiModalFooter>
-          <EuiButton
-            color="primary"
-            iconSide="right"
-            onClick={onCloseModal}
-            data-test-subj="cancelRegister"
+          <EuiSpacer size="m" />
+          <EuiSelectable
+            aria-label="OpenSearch model repository models"
+            searchable
+            searchProps={{
+              'data-test-subj': 'findModel',
+              placeholder: 'Find model',
+            }}
+            options={modelRepoSelection}
+            onChange={onChange}
+            singleSelection={true}
+            noMatchesMessage="No model found"
+            height={240}
+            renderOption={renderModelOption}
+            listProps={{
+              rowHeight: 50,
+              'data-test-subj': 'opensearchModelList',
+              showIcons: true,
+            }}
+            isLoading={modelRepoSelection.length === 0}
           >
-            Cancel
-          </EuiButton>
-          <EuiButton
-            color="primary"
-            fill
-            onClick={handleContinue}
-            data-test-subj="continueRegister"
-          >
-            Continue
-          </EuiButton>
-        </EuiModalFooter>
-      </EuiModal>
-    </div>
+            {(list, search) => (
+              <Fragment>
+                {search}
+                {list}
+              </Fragment>
+            )}
+          </EuiSelectable>
+        </div>
+      </EuiModalBody>
+      <EuiModalFooter>
+        <EuiButton
+          color="primary"
+          iconSide="right"
+          onClick={onCloseModal}
+          data-test-subj="cancelRegister"
+        >
+          Cancel
+        </EuiButton>
+        <EuiButton color="primary" fill onClick={handleContinue} data-test-subj="continueRegister">
+          Continue
+        </EuiButton>
+      </EuiModalFooter>
+    </EuiModal>
   );
 }

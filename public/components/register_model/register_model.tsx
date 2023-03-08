@@ -40,6 +40,7 @@ import { MAX_CHUNK_SIZE } from './constants';
 import { routerPaths } from '../../../common/router_paths';
 import { modelTaskManager } from './model_task_manager';
 import { ModelVersionNotesPanel } from './model_version_notes';
+import { modelRepositoryManager } from '../../utils/model_repository_manager';
 
 const DEFAULT_VALUES = {
   name: '',
@@ -55,7 +56,9 @@ export const RegisterModelForm = () => {
   const history = useHistory();
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const [modelGroupName, setModelGroupName] = useState<string>();
-  const typeParams = useSearchParams().get('type');
+  const searchParams = useSearchParams();
+  const typeParams = searchParams.get('type');
+  const nameParams = searchParams.get('name');
 
   const {
     services: { chrome, notifications },
@@ -182,6 +185,22 @@ export const RegisterModelForm = () => {
     };
     initializeForm();
   }, [latestVersionId, form]);
+
+  useEffect(() => {
+    if (!nameParams) {
+      return;
+    }
+    const subscriber = modelRepositoryManager
+      .getPreTrainedModel$(nameParams, 'torch_script')
+      .subscribe((preTrainedModel) => {
+        // TODO: store pre-trained model data
+        // eslint-disable-next-line no-console
+        console.log(preTrainedModel);
+      });
+    return () => {
+      subscriber.unsubscribe();
+    };
+  }, [nameParams]);
 
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
     // TODO
