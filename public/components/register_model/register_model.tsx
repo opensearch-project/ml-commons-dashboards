@@ -195,14 +195,23 @@ export const RegisterModelForm = () => {
     const subscriber = modelRepositoryManager
       .getPreTrainedModel$(nameParams, 'torch_script')
       .subscribe((preTrainedModel) => {
-        // TODO: store pre-trained model data
-        // eslint-disable-next-line no-console
-        console.log(preTrainedModel);
+        // TODO: Fill model format here
+        const { config, url } = preTrainedModel;
+        form.setValue('modelURL', url);
+        if (config.name) {
+          form.setValue('name', config.name);
+        }
+        if (config.description) {
+          form.setValue('description', config.description);
+        }
+        if (config.model_config) {
+          form.setValue('configuration', JSON.stringify(config.model_config));
+        }
       });
     return () => {
       subscriber.unsubscribe();
     };
-  }, [nameParams]);
+  }, [nameParams, form]);
 
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
     // TODO

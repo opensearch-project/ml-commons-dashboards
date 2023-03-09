@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Route } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../test/test_utils';
 import { RegisterModelForm } from '../register_model';
@@ -23,6 +24,7 @@ jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', ()
     ...jest.requireActual('../../../../../../src/plugins/opensearch_dashboards_react/public'),
   };
 });
+jest.mock('../../../apis/model_repository');
 
 const MOCKED_DATA = {
   id: 'C7jN0YQBjgpeQQ_RmiDE',
@@ -111,6 +113,42 @@ describe('<RegisterModel /> Form', () => {
       { route: '/model-registry/register-model?type=import' }
     );
     expect(screen.getByRole('button', { name: /register model/i })).toBeInTheDocument();
+  });
+
+  it('should call submitModelWithURL with pre-filled model data after register model button clicked', async () => {
+    // Mock model name unique
+    jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+      data: [],
+      pagination: { totalRecords: 0, currentPage: 1, pageSize: 1, totalPages: 0 },
+    });
+    jest.spyOn(formAPI, 'submitModelWithURL').mockImplementation(onSubmitMock);
+    const user = userEvent.setup();
+    render(
+      <Route path={routerPaths.registerModel}>
+        <RegisterModelForm />
+      </Route>,
+      {
+        route:
+          '/model-registry/register-model?type=import&name=sentence-transformers/all-distilroberta-v1',
+      }
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText<HTMLInputElement>(/^name$/i).value).toEqual(
+        'sentence-transformers/all-distilroberta-v1'
+      )
+    );
+    expect(onSubmitMock).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /register model/i }));
+    expect(onSubmitMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'sentence-transformers/all-distilroberta-v1',
+        description:
+          'This is a sentence-transformers model: It maps sentences & paragraphs to a 768 dimensional dense vector space and can be used for tasks like clustering or semantic search.',
+        modelURL:
+          'https://artifacts.opensearch.org/models/ml-models/huggingface/sentence-transformers/all-distilroberta-v1/1.0.1/torch_script/sentence-transformers_all-distilroberta-v1-1.0.1-torch_script.zip',
+        configuration: expect.stringContaining('sentence_transformers'),
+      })
+    );
   });
 
   it('submit button label should be `Register model` when register new model', async () => {
