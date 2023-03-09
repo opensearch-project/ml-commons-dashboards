@@ -60,7 +60,7 @@ describe('ModelRepositoryManager', () => {
           'https://artifacts.opensearch.org/models/ml-models/huggingface/sentence-transformers/all-distilroberta-v1/1.0.1/torch_script/sentence-transformers_all-distilroberta-v1-1.0.1-torch_script.zip',
         config: expect.objectContaining({
           model_content_hash_value:
-            'acdc81b652b83121f914c5912ae27c0fca8fabf270e6f191ace6979a19830413',
+            '92bc10216c720b57a6bab1d7ca2cc2e559156997212a7f0d8bb70f2edfedc78b',
         }),
       })
     );
