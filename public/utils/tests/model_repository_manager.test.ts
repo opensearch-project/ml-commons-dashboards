@@ -36,6 +36,16 @@ describe('ModelRepositoryManager', () => {
     expect(ModelRepository.prototype.getPreTrainedModels).toHaveBeenCalledTimes(1);
   });
 
+  it('should call getPreTrainedModels twice after getPreTrainedModels throw error first time and call getPreTrainedModels$ multi times', async () => {
+    const manager = new ModelRepositoryManager();
+    const mockError = new Error();
+    jest.spyOn(ModelRepository.prototype, 'getPreTrainedModels').mockRejectedValueOnce(mockError);
+    await expect(manager.getPreTrainedModels$().toPromise()).rejects.toThrowError(mockError);
+    expect(ModelRepository.prototype.getPreTrainedModels).toHaveBeenCalledTimes(1);
+    await manager.getPreTrainedModels$().toPromise();
+    expect(ModelRepository.prototype.getPreTrainedModels).toHaveBeenCalledTimes(2);
+  });
+
   it('should call getPreTrainedModelConfig with consistent config URL and return consistent config', async () => {
     const manager = new ModelRepositoryManager();
     const result = await manager
@@ -67,5 +77,23 @@ describe('ModelRepositoryManager', () => {
       .getPreTrainedModel$('sentence-transformers/all-distilroberta-v1', 'torch_script')
       .toPromise();
     expect(ModelRepository.prototype.getPreTrainedModelConfig).toHaveBeenCalledTimes(1);
+  });
+
+  it('should call getPreTrainedModelConfig twice after after getPreTrainedModelConfig throw error first time and call getPreTrainedModel$ multi times', async () => {
+    const manager = new ModelRepositoryManager();
+    const mockError = new Error();
+    jest
+      .spyOn(ModelRepository.prototype, 'getPreTrainedModelConfig')
+      .mockRejectedValueOnce(mockError);
+    await expect(
+      manager
+        .getPreTrainedModel$('sentence-transformers/all-distilroberta-v1', 'torch_script')
+        .toPromise()
+    ).rejects.toThrowError(mockError);
+    expect(ModelRepository.prototype.getPreTrainedModelConfig).toHaveBeenCalledTimes(1);
+    await manager
+      .getPreTrainedModel$('sentence-transformers/all-distilroberta-v1', 'torch_script')
+      .toPromise();
+    expect(ModelRepository.prototype.getPreTrainedModelConfig).toHaveBeenCalledTimes(2);
   });
 });
