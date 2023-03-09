@@ -10,6 +10,8 @@ import { ModelFileUploadManager } from '../model_file_upload_manager';
 import * as formAPI from '../register_model_api';
 import { ONE_GB } from '../../../../common/constant';
 
+jest.mock('../../../apis/model_repository');
+
 describe('<RegisterModel /> Artifact', () => {
   const onSubmitWithFileMock = jest.fn();
   const onSubmitWithURLMock = jest.fn();
@@ -39,7 +41,7 @@ describe('<RegisterModel /> Artifact', () => {
   });
 
   it('should not render an artifact panel if importing an opensearch defined model', async () => {
-    await setup({ route: '/?type=import' });
+    await setup({ route: '/?type=import&name=sentence-transformers/all-distilroberta-v1' });
     expect(screen.queryByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeNull();
   });
 

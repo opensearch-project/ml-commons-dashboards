@@ -18,6 +18,7 @@ import {
   EuiFlexItem,
   EuiTextColor,
   EuiLink,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import useObservable from 'react-use/lib/useObservable';
 import { from } from 'rxjs';
@@ -66,6 +67,7 @@ export const RegisterModelForm = () => {
   const isLocked = useObservable(chrome?.getIsNavDrawerLocked$() ?? from([false]));
 
   const formType = isValidModelRegisterFormType(typeParams) ? typeParams : 'upload';
+  const [preTrainedModelLoading, setPreTrainedModelLoading] = useState(formType === 'import');
   const partials =
     formType === 'import'
       ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
@@ -207,6 +209,7 @@ export const RegisterModelForm = () => {
         if (config.model_config) {
           form.setValue('configuration', JSON.stringify(config.model_config));
         }
+        setPreTrainedModelLoading(false);
       });
     return () => {
       subscriber.unsubscribe();
@@ -220,6 +223,42 @@ export const RegisterModelForm = () => {
   }, []);
 
   const errorCount = Object.keys(form.formState.errors).length;
+  const formHeader = (
+    <>
+      <EuiPageHeader pageTitle={latestVersionId ? 'Register version' : 'Register model'} />
+      <EuiText style={{ maxWidth: 725 }}>
+        <small>
+          {latestVersionId && (
+            <>
+              Register a new version of <b>{modelGroupName}</b>. The version number will be
+              automatically incremented.&nbsp;
+              <EuiLink href="#" external>
+                Learn More
+              </EuiLink>
+              .
+            </>
+          )}
+          {formType === 'import' && !latestVersionId && <>Register a pre-trained model.</>}
+          {formType === 'upload' && !latestVersionId && (
+            <>
+              Register your model to manage its life cycle, and facilitate model discovery across
+              your organization.
+            </>
+          )}
+        </small>
+      </EuiText>
+    </>
+  );
+
+  if (preTrainedModelLoading) {
+    return (
+      <EuiPanel>
+        {formHeader}
+        <EuiSpacer size="s" />
+        <EuiLoadingSpinner aria-label="Model Form Loading" size="l" />
+      </EuiPanel>
+    );
+  }
 
   return (
     <FormProvider {...form}>
@@ -230,28 +269,7 @@ export const RegisterModelForm = () => {
         component="form"
       >
         <EuiPanel>
-          <EuiPageHeader pageTitle={latestVersionId ? 'Register version' : 'Register model'} />
-          <EuiText style={{ maxWidth: 725 }}>
-            <small>
-              {latestVersionId && (
-                <>
-                  Register a new version of <b>{modelGroupName}</b>. The version number will be
-                  automatically incremented.&nbsp;
-                  <EuiLink href="#" external>
-                    Learn More
-                  </EuiLink>
-                  .
-                </>
-              )}
-              {formType === 'import' && !latestVersionId && <>Register a pre-trained model.</>}
-              {formType === 'upload' && !latestVersionId && (
-                <>
-                  Register your model to manage its life cycle, and facilitate model discovery
-                  across your organization.
-                </>
-              )}
-            </small>
-          </EuiText>
+          {formHeader}
           <EuiSpacer />
           {partials.map((FormPartial, i) => (
             <React.Fragment key={i}>

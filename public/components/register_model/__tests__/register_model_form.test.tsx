@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { Route } from 'react-router-dom';
-import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../test/test_utils';
 import { RegisterModelForm } from '../register_model';
@@ -106,32 +105,19 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('submit button label should be `Register model` when import a model', async () => {
-    render(
-      <Route path={routerPaths.registerModel}>
-        <RegisterModelForm />
-      </Route>,
-      { route: '/model-registry/register-model?type=import' }
-    );
+    await setup({
+      route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
+      ignoreFillFields: ['name', 'description'],
+    });
     expect(screen.getByRole('button', { name: /register model/i })).toBeInTheDocument();
   });
 
   it('should call submitModelWithURL with pre-filled model data after register model button clicked', async () => {
-    // Mock model name unique
-    jest.spyOn(Model.prototype, 'search').mockResolvedValue({
-      data: [],
-      pagination: { totalRecords: 0, currentPage: 1, pageSize: 1, totalPages: 0 },
-    });
     jest.spyOn(formAPI, 'submitModelWithURL').mockImplementation(onSubmitMock);
-    const user = userEvent.setup();
-    render(
-      <Route path={routerPaths.registerModel}>
-        <RegisterModelForm />
-      </Route>,
-      {
-        route:
-          '/model-registry/register-model?type=import&name=sentence-transformers/all-distilroberta-v1',
-      }
-    );
+    const { user } = await setup({
+      route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
+      ignoreFillFields: ['name', 'description'],
+    });
     await waitFor(() =>
       expect(screen.getByLabelText<HTMLInputElement>(/^name$/i).value).toEqual(
         'sentence-transformers/all-distilroberta-v1'
