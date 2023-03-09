@@ -25,7 +25,6 @@ import {
 } from '../../../../src/core/server';
 import { MODEL_STATE, ModelSearchSort } from '../../common';
 
-import { getQueryFromSize, RequestPagination, getPagination } from './utils/pagination';
 import { convertModelSource, generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
 import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
@@ -33,6 +32,7 @@ import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/consta
 const modelSortFieldMapping: { [key: string]: string } = {
   version: 'model_version',
   name: 'name.keyword',
+  id: '_id',
 };
 
 interface UploadModelBase {
@@ -74,7 +74,8 @@ export class ModelService {
   }
 
   public static async search({
-    pagination,
+    from,
+    size,
     sort,
     client,
     ...restParams
@@ -82,7 +83,8 @@ export class ModelService {
     client: IScopedClusterClient;
     algorithms?: string[];
     ids?: string[];
-    pagination: RequestPagination;
+    from: number;
+    size: number;
     sort?: ModelSearchSort[];
     name?: string;
     states?: MODEL_STATE[];
@@ -95,7 +97,8 @@ export class ModelService {
       path: `${MODEL_BASE_API}/_search`,
       body: {
         query: generateModelSearchQuery(restParams),
-        ...getQueryFromSize(pagination),
+        from,
+        size,
         ...(sort
           ? {
               sort: sort.map((sorting) => {
@@ -114,7 +117,7 @@ export class ModelService {
         id: _id,
         ..._source,
       })),
-      pagination: getPagination(pagination.currentPage, pagination.pageSize, hits.total.value),
+      total_models: hits.total.value,
     };
   }
 

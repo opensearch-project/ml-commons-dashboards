@@ -9,6 +9,7 @@ import {
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
+  EuiHealth,
   EuiDescriptionList,
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
@@ -29,6 +30,7 @@ export interface INode {
 export interface PreviewModel {
   name: string;
   id: string;
+  planningWorkerNodes: string[];
 }
 
 interface Props {
@@ -40,13 +42,13 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
   const { id, name } = model;
   const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
-    const targetNodes = data?.target_worker_nodes ?? [];
+    const targetNodes = data?.target_worker_nodes ?? model.planningWorkerNodes ?? [];
     const deployedNodes = data?.worker_nodes ?? [];
     return targetNodes.map((item) => ({
       id: item,
       deployed: deployedNodes.indexOf(item) > -1 ? true : false,
     }));
-  }, [data]);
+  }, [data, model]);
 
   const respondingStatus = useMemo(() => {
     if (loading) {
@@ -56,16 +58,28 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
         </EuiTextColor>
       );
     }
-    const deployedNodesNum = data?.worker_nodes?.length ?? 0;
-    const targetNodesNum = data?.target_worker_nodes?.length ?? 0;
-    if (deployedNodesNum < targetNodesNum) {
-      return `Partially responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
-    } else if (deployedNodesNum === 0) {
-      return `Not responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
-    } else {
-      return `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`;
+    const deployedNodesNum = nodes.filter(({ deployed }) => deployed).length;
+    const targetNodesNum = nodes.length;
+    if (deployedNodesNum === 0) {
+      return (
+        <EuiHealth className="ml-modelStatusCell" color="danger">
+          Not responding on {targetNodesNum} of {targetNodesNum} nodes
+        </EuiHealth>
+      );
     }
-  }, [data, loading]);
+    if (deployedNodesNum < targetNodesNum) {
+      return (
+        <EuiHealth className="ml-modelStatusCell" color="warning">
+          Partially responding on {deployedNodesNum} of {targetNodesNum} nodes
+        </EuiHealth>
+      );
+    }
+    return (
+      <EuiHealth className="ml-modelStatusCell" color="success">
+        Responding on {deployedNodesNum} of {targetNodesNum} nodes
+      </EuiHealth>
+    );
+  }, [nodes, loading]);
 
   const onCloseFlyout = useCallback(() => {
     onClose(data);
@@ -80,11 +94,13 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         <EuiDescriptionList>
-          <EuiDescriptionListTitle>Model ID</EuiDescriptionListTitle>
+          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>Model ID</EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
-            <CopyableText text={id} iconLeft={false} />
+            <CopyableText text={id} iconLeft={false} tooltipText="Copy model ID" />
           </EuiDescriptionListDescription>
-          <EuiDescriptionListTitle>Model status by node</EuiDescriptionListTitle>
+          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>
+            Model status by node
+          </EuiDescriptionListTitle>
           <EuiDescriptionListDescription>{respondingStatus}</EuiDescriptionListDescription>
         </EuiDescriptionList>
         <EuiSpacer />

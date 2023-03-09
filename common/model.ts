@@ -10,7 +10,7 @@ export enum MODEL_STATE {
   uploaded = 'UPLOADED',
   uploading = 'UPLOADING',
   loading = 'LOADING',
-  partialLoaded = 'PARTIAL_LOADED',
+  partiallyLoaded = 'PARTIALLY_LOADED',
   loadFailed = 'LOAD_FAILED',
 }
 
@@ -45,6 +45,15 @@ export interface OpenSearchCustomerModel extends OpenSearchModelBase {
   model_format: string;
   total_chunks: number;
   version: number;
+  planning_worker_nodes: string[];
 }
 
-export type ModelSearchSort = 'version-desc' | 'version-asc' | 'name-asc' | 'name-desc';
+export type ModelSearchSort =
+  | 'version-desc'
+  | 'version-asc'
+  | 'name-asc'
+  | 'name-desc'
+  | 'id-asc'
+  | 'model_state-asc'
+  | 'model_state-desc'
+  | 'id-desc';

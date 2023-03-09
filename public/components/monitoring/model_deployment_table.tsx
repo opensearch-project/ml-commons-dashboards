@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import './index.scss';
+
 import React, { useCallback, useMemo } from 'react';
 import {
   Criteria,
@@ -13,13 +15,16 @@ import {
   EuiCopy,
   EuiEmptyPrompt,
   EuiHealth,
-  EuiIcon,
   EuiSpacer,
   EuiLink,
+  EuiText,
+  EuiToolTip,
 } from '@elastic/eui';
 
+import { MODEL_STATE } from '../../../common';
+
 export interface ModelDeploymentTableSort {
-  field: 'name';
+  field: 'name' | 'model_state' | 'id';
   direction: Direction;
 }
 
@@ -31,9 +36,11 @@ export interface ModelDeploymentTableCriteria {
 export interface ModelDeploymentItem {
   id: string;
   name: string;
+  model_state?: MODEL_STATE;
   respondingNodesCount: number | undefined;
   planningNodesCount: number | undefined;
   notRespondingNodesCount: number | undefined;
+  planningWorkerNodes: string[];
 }
 
 export interface ModelDeploymentTableProps {
@@ -66,15 +73,18 @@ export const ModelDeploymentTable = ({
       {
         field: 'name',
         name: 'Name',
-        width: '299px',
+        width: '27.5%',
         sortable: true,
+        truncateText: true,
       },
       {
-        field: 'id',
+        field: 'model_state',
         name: 'Status',
-        width: '338px',
+        width: '37.5%',
+        sortable: true,
+        truncateText: true,
         render: (
-          _id: string,
+          _model_state: string,
           { planningNodesCount, respondingNodesCount, notRespondingNodesCount }: ModelDeploymentItem
         ) => {
           if (
@@ -86,8 +96,8 @@ export const ModelDeploymentTable = ({
           }
           if (respondingNodesCount === 0) {
             return (
-              <EuiHealth color="danger">
-                <div>
+              <EuiHealth className="ml-modelStatusCell" color="danger">
+                <div className="eui-textTruncate">
                   <span style={{ fontWeight: 600 }}>Not responding</span> on {planningNodesCount} of{' '}
                   {planningNodesCount} nodes
                 </div>
@@ -96,8 +106,8 @@ export const ModelDeploymentTable = ({
           }
           if (notRespondingNodesCount === 0) {
             return (
-              <EuiHealth color="success">
-                <div>
+              <EuiHealth className="ml-modelStatusCell" color="success">
+                <div className="eui-textTruncate">
                   <span style={{ fontWeight: 600 }}>Responding</span> on {planningNodesCount} of{' '}
                   {planningNodesCount} nodes
                 </div>
@@ -105,8 +115,8 @@ export const ModelDeploymentTable = ({
             );
           }
           return (
-            <EuiHealth color="warning">
-              <div>
+            <EuiHealth className="ml-modelStatusCell" color="warning">
+              <div className="eui-textTruncate">
                 <span style={{ fontWeight: 600 }}>Partially responding</span> on{' '}
                 {respondingNodesCount} of {planningNodesCount} nodes
               </div>
@@ -116,39 +126,41 @@ export const ModelDeploymentTable = ({
       },
       {
         field: 'id',
-        name: 'ID',
-        width: '266px',
-        render: (id) => (
-          <>
-            <EuiCopy textToCopy={id}>
-              {(copy) => (
-                <EuiButtonIcon
-                  aria-label="copy"
-                  iconType="copy"
-                  style={{ marginRight: 4 }}
-                  onClick={copy}
-                />
-              )}
-            </EuiCopy>
-            {id}
-          </>
+        name: 'Model ID',
+        width: '25%',
+        sortable: true,
+        render: (id: string) => (
+          <EuiCopy
+            className="ml-modelModelIdCellTextWrapper"
+            textToCopy={id}
+            beforeMessage="Copy model ID"
+            anchorClassName="ml-modelModelIdCell"
+          >
+            {(copy) => (
+              <EuiText onClick={copy} className="eui-textTruncate ml-modelModelIdText" size="s">
+                {id}
+              </EuiText>
+            )}
+          </EuiCopy>
         ),
       },
       {
         field: 'id',
         name: 'Action',
         align: 'right' as const,
-        width: '120px',
+        width: '10%',
         render: (id: string, modelDeploymentItem: ModelDeploymentItem) => {
           return (
-            <EuiButtonIcon
-              onClick={() => {
-                onViewDetail?.(modelDeploymentItem);
-              }}
-              role="button"
-              aria-label="view detail"
-              iconType="inspect"
-            />
+            <EuiToolTip content="View status details">
+              <EuiButtonIcon
+                onClick={() => {
+                  onViewDetail?.(modelDeploymentItem);
+                }}
+                role="button"
+                aria-label="view detail"
+                iconType="inspect"
+              />
+            </EuiToolTip>
           );
         },
       },
@@ -193,9 +205,12 @@ export const ModelDeploymentTable = ({
               <>
                 <EuiSpacer size="l" />
                 Deployed models will appear here. For more information, see{' '}
-                <EuiLink role="link" href="/todo">
-                  Model Serving Framework Documentation
-                  <EuiIcon type="popout" />
+                <EuiLink
+                  role="link"
+                  href="https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashbaord/"
+                  external
+                >
+                  Machine Learning Documentation
                 </EuiLink>
                 .
                 <EuiSpacer size="xl" />
@@ -208,7 +223,6 @@ export const ModelDeploymentTable = ({
         <EuiBasicTable
           columns={columns}
           sorting={sorting}
-          loading={loading}
           onChange={handleChange}
           items={items}
           pagination={items.length > 0 ? pagination : undefined}

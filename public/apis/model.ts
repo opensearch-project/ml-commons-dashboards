@@ -11,7 +11,6 @@ import {
   MODEL_UPLOAD_API_ENDPOINT,
   MODEL_PROFILE_API_ENDPOINT,
 } from '../../server/routes/constants';
-import { Pagination } from '../../server/services/utils/pagination';
 import { InnerHttpProvider } from './inner_http_provider';
 
 export interface ModelSearchItem {
@@ -22,6 +21,7 @@ export interface ModelSearchItem {
   model_version: string;
   current_worker_node_count: number;
   planning_worker_node_count: number;
+  planning_worker_nodes: string[];
   model_config?: {
     all_config?: string;
     embedding_dimension: number;
@@ -36,7 +36,7 @@ export interface ModelDetail extends ModelSearchItem {
 
 export interface ModelSearchResponse {
   data: ModelSearchItem[];
-  pagination: Pagination;
+  total_models: number;
 }
 
 export interface ModelLoadResponse {
@@ -89,8 +89,8 @@ export class Model {
     ids?: string[];
     sort?: ModelSearchSort[];
     name?: string;
-    currentPage: number;
-    pageSize: number;
+    from: number;
+    size: number;
     states?: MODEL_STATE[];
     nameOrId?: string;
   }) {

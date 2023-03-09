@@ -12,14 +12,10 @@ export class Model {
           name: 'model-1-name',
           current_worker_node_count: 1,
           planning_worker_node_count: 3,
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
         },
       ],
-      pagination: {
-        currentPage: 1,
-        pageSize: 15,
-        totalRecords: 1,
-        totalPages: 1,
-      },
+      total_models: 1,
     });
   }
 

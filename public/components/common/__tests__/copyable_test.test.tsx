@@ -10,7 +10,7 @@ import { CopyableText } from '../';
 
 async function setup({ text = '', iconLeft = true }) {
   const user = userEvent.setup({});
-  render(<CopyableText text={text} iconLeft={iconLeft} />);
+  render(<CopyableText text={text} iconLeft={iconLeft} tooltipText="copy id" />);
   return { user };
 }
 

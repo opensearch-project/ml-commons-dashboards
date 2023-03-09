@@ -14,7 +14,13 @@ export const profileRouter = (router: IRouter) => {
       path: `${DEPLOYED_MODEL_PROFILE_API_ENDPOINT}/{modelId}`,
       validate: {
         params: schema.object({
-          modelId: schema.string(),
+          modelId: schema.string({
+            validate: (value) => {
+              if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
+                return 'Invalid model id';
+              }
+            },
+          }),
         }),
       },
     },

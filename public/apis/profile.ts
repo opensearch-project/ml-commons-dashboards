@@ -7,10 +7,10 @@ import { DEPLOYED_MODEL_PROFILE_API_ENDPOINT } from '../../server/routes/constan
 import { InnerHttpProvider } from './inner_http_provider';
 
 export interface ModelDeploymentProfile {
-  id: string;
-  target_worker_nodes: string[];
-  worker_nodes: string[];
-  not_worker_nodes: string[];
+  id?: string;
+  target_worker_nodes?: string[];
+  worker_nodes?: string[];
+  not_worker_nodes?: string[];
 }
 
 export class Profile {

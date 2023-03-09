@@ -12,6 +12,7 @@ import { APIProvider } from '../../../apis/api_provider';
 const MODEL = {
   id: 'id1',
   name: 'test',
+  planningWorkerNodes: ['node-1', 'node-2', 'node-3'],
 };
 
 function setup({ model = MODEL, onClose = jest.fn() }) {
@@ -49,5 +50,37 @@ describe('<PreviewPanel />', () => {
     await waitFor(() =>
       expect(screen.getByText('Partially responding on 2 of 3 nodes')).toBeInTheDocument()
     );
+  });
+
+  it('should render not responding when no model profile API response', async () => {
+    jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockResolvedValueOnce({});
+    setup({});
+    await waitFor(() =>
+      expect(screen.getByText('Not responding on 3 of 3 nodes')).toBeInTheDocument()
+    );
+  });
+
+  it('should render not responding when model profile API return no worker nodes', async () => {
+    jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockResolvedValueOnce({
+      id: 'model-1-id',
+      target_worker_nodes: ['node-1', 'node-2', 'node-3'],
+      worker_nodes: [],
+      not_worker_nodes: ['node-1', 'node-2', 'node-3'],
+    });
+    setup({});
+    await waitFor(() =>
+      expect(screen.getByText('Not responding on 3 of 3 nodes')).toBeInTheDocument()
+    );
+  });
+
+  it('should render responding when model profile API return all worker node responding', async () => {
+    jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockResolvedValueOnce({
+      id: 'model-1-id',
+      target_worker_nodes: ['node-1', 'node-2', 'node-3'],
+      worker_nodes: ['node-1', 'node-2', 'node-3'],
+      not_worker_nodes: [],
+    });
+    setup({});
+    await waitFor(() => expect(screen.getByText('Responding on 3 of 3 nodes')).toBeInTheDocument());
   });
 });

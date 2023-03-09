@@ -20,13 +20,17 @@ const modelSortQuerySchema = schema.oneOf([
   schema.literal('version-asc'),
   schema.literal('name-asc'),
   schema.literal('name-desc'),
+  schema.literal('model_state-asc'),
+  schema.literal('model_state-desc'),
+  schema.literal('id-asc'),
+  schema.literal('id-desc'),
 ]);
 
 const modelStateSchema = schema.oneOf([
   schema.literal(MODEL_STATE.loadFailed),
   schema.literal(MODEL_STATE.loaded),
   schema.literal(MODEL_STATE.loading),
-  schema.literal(MODEL_STATE.partialLoaded),
+  schema.literal(MODEL_STATE.partiallyLoaded),
   schema.literal(MODEL_STATE.trained),
   schema.literal(MODEL_STATE.uploaded),
   schema.literal(MODEL_STATE.unloaded),
@@ -65,8 +69,8 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
             schema.oneOf([schema.string(), schema.arrayOf(schema.string())])
           ),
           ids: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
-          currentPage: schema.number(),
-          pageSize: schema.number(),
+          from: schema.number({ min: 0 }),
+          size: schema.number({ max: 50 }),
           sort: schema.maybe(
             schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
           ),
@@ -76,22 +80,14 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
       },
     },
     async (context, request) => {
-      const {
-        algorithms,
-        ids,
-        currentPage,
-        pageSize,
-        sort,
-        name,
-        states,
-        nameOrId,
-      } = request.query;
+      const { algorithms, ids, from, size, sort, name, states, nameOrId } = request.query;
       try {
         const payload = await ModelService.search({
           client: context.core.opensearch.client,
           algorithms: typeof algorithms === 'string' ? [algorithms] : algorithms,
           ids: typeof ids === 'string' ? [ids] : ids,
-          pagination: { currentPage, pageSize },
+          from,
+          size,
           sort: typeof sort === 'string' ? [sort] : sort,
           name,
           states: typeof states === 'string' ? [states] : states,

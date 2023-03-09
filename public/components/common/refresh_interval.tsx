@@ -128,7 +128,7 @@ export const RefreshInterval = ({
 
   let errors: string[] = [];
   if (isInvalid) {
-    errors = ['Enter a refresh rate greater than 10 seconds.'];
+    errors = ['Enter an auto-refresh rate greater than 10 seconds.'];
   }
 
   return (
@@ -144,7 +144,9 @@ export const RefreshInterval = ({
         >
           <EuiFormRow
             label="Refresh every"
-            helpText="Enter an auto-refresh rate for the page greater than 10 seconds"
+            helpText={
+              errors.length > 0 ? '' : 'Enter an auto-refresh rate greater than 10 seconds.'
+            }
             isInvalid={isInvalid}
             error={errors}
           >
@@ -170,7 +172,7 @@ export const RefreshInterval = ({
                 <EuiButton
                   aria-label={`${isPaused ? 'start' : 'stop'} refresh interval`}
                   disabled={isInvalid}
-                  iconType={isPaused ? 'play' : 'pause'}
+                  iconType={isPaused ? 'play' : 'stop'}
                   onClick={() => setIsPaused(!isPaused)}
                 >
                   {isPaused ? 'Start' : 'Stop'}

@@ -5,7 +5,7 @@
 
 import { act, renderHook } from '@testing-library/react-hooks';
 
-import { ModelSearchItem, Model, ModelSearchResponse } from '../../../apis/model';
+import { Model, ModelSearchResponse } from '../../../apis/model';
 import { useMonitoring } from '../use_monitoring';
 
 jest.mock('../../../apis/model');
@@ -13,12 +13,7 @@ jest.mock('../../../apis/model');
 const mockEmptyRecords = () =>
   jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
     data: [],
-    pagination: {
-      currentPage: 0,
-      pageSize: 15,
-      totalRecords: 0,
-      totalPages: 0,
-    },
+    total_models: 0,
   });
 
 describe('useMonitoring', () => {
@@ -33,14 +28,10 @@ describe('useMonitoring', () => {
           algorithm: '',
           model_state: '',
           model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
         },
       ],
-      pagination: {
-        currentPage: 1,
-        pageSize: 15,
-        totalRecords: 1,
-        totalPages: 1,
-      },
+      total_models: 1,
     });
   });
 
@@ -60,7 +51,7 @@ describe('useMonitoring', () => {
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
-          states: ['LOAD_FAILED', 'LOADED', 'PARTIAL_LOADED'],
+          states: ['LOAD_FAILED', 'LOADED', 'PARTIALLY_LOADED'],
         })
       )
     );
@@ -87,7 +78,7 @@ describe('useMonitoring', () => {
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
-          states: ['PARTIAL_LOADED'],
+          states: ['PARTIALLY_LOADED'],
         })
       )
     );
@@ -99,9 +90,9 @@ describe('useMonitoring', () => {
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
-          sort: ['name-asc'],
-          currentPage: 1,
-          pageSize: 10,
+          sort: ['model_state-asc'],
+          from: 0,
+          size: 10,
         })
       )
     );
@@ -116,8 +107,8 @@ describe('useMonitoring', () => {
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: ['name-desc'],
-          currentPage: 2,
-          pageSize: 10,
+          from: 10,
+          size: 10,
         })
       )
     );
@@ -145,16 +136,15 @@ describe('useMonitoring.pageStatus', () => {
             {
               id: 'model-1-id',
               name: 'model-1-name',
+              algorithm: 'TEXT_EMBEDDING',
+              model_state: 'LOADED',
+              model_version: '1.0.0',
               current_worker_node_count: 1,
               planning_worker_node_count: 3,
-            } as ModelSearchItem,
+              planning_worker_nodes: ['node1', 'node2', 'node3'],
+            },
           ],
-          pagination: {
-            currentPage: 1,
-            pageSize: 15,
-            totalRecords: 1,
-            totalPages: 1,
-          },
+          total_models: 1,
         });
       };
     });
@@ -217,6 +207,7 @@ describe('useMonitoring.pageStatus', () => {
           respondingNodesCount: 1,
           notRespondingNodesCount: 2,
           planningNodesCount: 3,
+          planningWorkerNodes: ['node1', 'node2', 'node3'],
         },
       ])
     );

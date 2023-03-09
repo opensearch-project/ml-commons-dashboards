@@ -6,11 +6,11 @@
 import {
   EuiPanel,
   EuiPageHeader,
-  EuiTitle,
   EuiSpacer,
   EuiTextColor,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiText,
 } from '@elastic/eui';
 import React, { useState, useRef, useCallback } from 'react';
 
@@ -57,8 +57,8 @@ export const Monitoring = () => {
     (modelProfile: ModelDeploymentProfile | null) => {
       if (
         modelProfile !== null &&
-        (previewModel?.planningNodesCount !== modelProfile.target_worker_nodes.length ||
-          previewModel?.respondingNodesCount !== modelProfile.worker_nodes.length)
+        (previewModel?.planningNodesCount !== modelProfile.target_worker_nodes?.length ||
+          previewModel?.respondingNodesCount !== modelProfile.worker_nodes?.length)
       ) {
         reload();
       }
@@ -82,20 +82,16 @@ export const Monitoring = () => {
       />
       <EuiSpacer size="m" />
       <EuiPanel>
-        <EuiTitle size="s">
-          <h3>
+        <EuiText size="s">
+          <h2>
             Deployed models{' '}
             {pageStatus !== 'empty' && (
-              <EuiTextColor
-                aria-label="total number of results"
-                style={{ fontWeight: 'normal' }}
-                color="subdued"
-              >
+              <EuiTextColor aria-label="total number of results" color="subdued">
                 ({pagination?.totalRecords ?? 0})
               </EuiTextColor>
             )}
-          </h3>
-        </EuiTitle>
+          </h2>
+        </EuiText>
 
         <EuiSpacer size="m" />
         {pageStatus !== 'empty' && (
@@ -122,7 +118,7 @@ export const Monitoring = () => {
           onViewDetail={handleViewDetail}
           onResetSearchClick={onResetSearch}
         />
-        {previewModel ? <PreviewPanel model={previewModel} onClose={onCloseModelPreview} /> : null}
+        {previewModel && <PreviewPanel model={previewModel} onClose={onCloseModelPreview} />}
       </EuiPanel>
     </div>
   );

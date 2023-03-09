@@ -16,7 +16,7 @@ interface Params {
   status?: ModelDeployStatus[];
   currentPage: number;
   pageSize: number;
-  sort: { field: 'name'; direction: 'asc' | 'desc' };
+  sort: { field: 'name' | 'model_state' | 'id'; direction: 'asc' | 'desc' };
 }
 
 const isValidNameOrIdFilter = (nameOrId: string | undefined): nameOrId is string => !!nameOrId;
@@ -35,27 +35,34 @@ const fetchDeployedModels = async (params: Params) => {
       case 'responding':
         return MODEL_STATE.loaded;
       case 'partial-responding':
-        return MODEL_STATE.partialLoaded;
+        return MODEL_STATE.partiallyLoaded;
     }
   });
   const result = await APIProvider.getAPI('model').search({
-    currentPage: params.currentPage,
-    pageSize: params.pageSize,
+    from: (params.currentPage - 1) * params.pageSize,
+    size: params.pageSize,
     nameOrId: params.nameOrId,
     states:
       !states || states.length === 0
-        ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partialLoaded]
+        ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partiallyLoaded]
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
   });
+  const totalPages = Math.ceil(result.total_models / params.pageSize);
   return {
-    ...result,
+    pagination: {
+      currentPage: params.currentPage,
+      pageSize: params.pageSize,
+      totalRecords: result.total_models,
+      totalPages,
+    },
     data: result.data.map(
       ({
         id,
         name,
         current_worker_node_count: workerCount,
         planning_worker_node_count: planningCount,
+        planning_worker_nodes: planningWorkerNodes,
       }) => {
         return {
           id,
@@ -66,6 +73,7 @@ const fetchDeployedModels = async (params: Params) => {
             workerCount !== undefined && planningCount !== undefined
               ? planningCount - workerCount
               : undefined,
+          planningWorkerNodes,
         };
       }
     ),
@@ -76,7 +84,7 @@ export const useMonitoring = () => {
   const [params, setParams] = useState<Params>({
     currentPage: 1,
     pageSize: 10,
-    sort: { field: 'name', direction: 'asc' },
+    sort: { field: 'model_state', direction: 'asc' },
   });
   const { data, loading, reload } = useFetcher(fetchDeployedModels, params);
   const filterExists = checkFilterExists(params);
@@ -125,7 +133,7 @@ export const useMonitoring = () => {
   const handleTableChange = useCallback(
     (criteria: {
       pagination?: { currentPage: number; pageSize: number };
-      sort?: { field: 'name'; direction: 'asc' | 'desc' };
+      sort?: { field: 'name' | 'model_state' | 'id'; direction: 'asc' | 'desc' };
     }) => {
       setParams((previousValue) => {
         if (

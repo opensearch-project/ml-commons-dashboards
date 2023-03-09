@@ -18,6 +18,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         respondingNodesCount: 1,
         notRespondingNodesCount: 2,
         planningNodesCount: 3,
+        planningWorkerNodes: [],
       },
       {
         id: 'model-2-id',
@@ -25,6 +26,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         respondingNodesCount: 3,
         notRespondingNodesCount: 0,
         planningNodesCount: 3,
+        planningWorkerNodes: [],
       },
       {
         id: 'model-3-id',
@@ -32,6 +34,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         respondingNodesCount: 0,
         notRespondingNodesCount: 3,
         planningNodesCount: 3,
+        planningWorkerNodes: [],
       },
     ],
     pagination: { currentPage: 1, pageSize: 10, totalRecords: 100 },
@@ -54,7 +57,9 @@ describe('<DeployedModelTable />', () => {
       loading: false,
     });
     expect(screen.getByRole('link')).toBeInTheDocument();
-    expect(screen.getByRole('link').getAttribute('href')).toEqual('/todo');
+    expect(screen.getByRole('link').getAttribute('href')).toEqual(
+      'https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashbaord/'
+    );
     expect(screen.queryByRole('columnheader')).not.toBeInTheDocument();
   });
 
@@ -117,7 +122,7 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
     });
 
-    it('should render ID at third column and copy to clipboard after button clicked', async () => {
+    it('should render Model ID at third column and copy to clipboard after text clicked', async () => {
       const execCommandOrigin = document.execCommand;
       document.execCommand = jest.fn(() => true);
 
@@ -127,16 +132,14 @@ describe('<DeployedModelTable />', () => {
       const columnContent = header
         .closest('table')
         ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
-      expect(within(header).getByText('ID')).toBeInTheDocument();
+      expect(within(header).getByText('Model ID')).toBeInTheDocument();
       expect(columnContent?.length).toBe(3);
       const cells = columnContent!;
       expect(within(cells[0] as HTMLElement).getByText('model-1-id')).toBeInTheDocument();
       expect(within(cells[1] as HTMLElement).getByText('model-2-id')).toBeInTheDocument();
       expect(within(cells[2] as HTMLElement).getByText('model-3-id')).toBeInTheDocument();
 
-      const firstCopyButton = within(cells[0] as HTMLElement).getByRole('button');
-      expect(firstCopyButton).toBeInTheDocument();
-      await userEvent.click(firstCopyButton);
+      await userEvent.click(within(cells[0] as HTMLElement).getByText('model-1-id'));
       expect(document.execCommand).toHaveBeenCalledWith('copy');
 
       document.execCommand = execCommandOrigin;
@@ -167,7 +170,7 @@ describe('<DeployedModelTable />', () => {
     });
   });
 
-  it('should call onChange with consistent sort parameters', async () => {
+  it('should call onChange with consistent name sort parameters', async () => {
     const {
       finalProps,
       result: { rerender },
@@ -197,6 +200,88 @@ describe('<DeployedModelTable />', () => {
       expect.objectContaining({
         sort: {
           field: 'name',
+          direction: 'asc',
+        },
+      })
+    );
+  });
+
+  it('should call onChange with consistent status sort parameters', async () => {
+    const {
+      finalProps,
+      result: { rerender },
+    } = setup({
+      sort: {
+        field: 'model_state',
+        direction: 'asc',
+      },
+    });
+
+    await userEvent.click(within(screen.getAllByRole('columnheader')[1]).getByText('Status'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'model_state',
+          direction: 'desc',
+        },
+      })
+    );
+
+    rerender(
+      <ModelDeploymentTable
+        {...finalProps}
+        sort={{
+          field: 'model_state',
+          direction: 'desc',
+        }}
+      />
+    );
+    await userEvent.click(within(screen.getAllByRole('columnheader')[1]).getByText('Status'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'model_state',
+          direction: 'asc',
+        },
+      })
+    );
+  });
+
+  it('should call onChange with consistent model id sort parameters', async () => {
+    const {
+      finalProps,
+      result: { rerender },
+    } = setup({
+      sort: {
+        field: 'id',
+        direction: 'asc',
+      },
+    });
+
+    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('Model ID'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'id',
+          direction: 'desc',
+        },
+      })
+    );
+
+    rerender(
+      <ModelDeploymentTable
+        {...finalProps}
+        sort={{
+          field: 'id',
+          direction: 'desc',
+        }}
+      />
+    );
+    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('Model ID'));
+    expect(finalProps.onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: {
+          field: 'id',
           direction: 'asc',
         },
       })
