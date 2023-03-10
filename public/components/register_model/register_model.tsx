@@ -5,7 +5,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { FieldErrors, useForm, FormProvider } from 'react-hook-form';
-import { useHistory, useParams } from 'react-router-dom';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 import {
   EuiPageHeader,
   EuiSpacer,
@@ -86,7 +86,10 @@ export const RegisterModelForm = () => {
   const onSubmit = useCallback(
     async (data: ModelFileFormData | ModelUrlFormData) => {
       try {
-        const onComplete = () => {
+        const onComplete = (modelId: string) => {
+          // Navigate to model group page
+          history.push(generatePath(routerPaths.modelGroup, { id: modelId }));
+
           notifications?.toasts.addSuccess({
             title: mountReactNode(
               <EuiText>
@@ -141,7 +144,8 @@ export const RegisterModelForm = () => {
           notifications?.toasts.addSuccess({
             title: mountReactNode(
               <EuiText>
-                <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> was created
+                <EuiTextColor color="success">{form.getValues('name')}</EuiTextColor> model creation
+                complete.
               </EuiText>
             ),
             text:
@@ -168,19 +172,17 @@ export const RegisterModelForm = () => {
   useEffect(() => {
     if (!latestVersionId) return;
     const initializeForm = async () => {
-      const { data } = await APIProvider.getAPI('model').search({
-        ids: [latestVersionId],
-        currentPage: 1,
-        pageSize: 1,
-      });
-      if (data?.[0]) {
+      try {
+        const data = await APIProvider.getAPI('model').getOne(latestVersionId);
         // TODO:  clarify which fields to pre-populate
-        const { model_version: modelVersion, name, model_config: modelConfig } = data?.[0];
+        const { model_version: modelVersion, name, model_config: modelConfig } = data;
         const newVersion = upgradeModelVersion(modelVersion);
         form.setValue('name', name);
         form.setValue('version', newVersion);
         form.setValue('configuration', modelConfig?.all_config ?? '');
         setModelGroupName(name);
+      } catch (e) {
+        // TODO: handle error here
       }
     };
     initializeForm();

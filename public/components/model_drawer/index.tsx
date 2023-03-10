@@ -34,8 +34,8 @@ export const ModelDrawer = ({ onClose, name }: Props) => {
   const [sort, setSort] = useState<VersionTableSort>('version-desc');
   const { data: model } = useFetcher(APIProvider.getAPI('model').search, {
     name,
-    currentPage: 1,
-    pageSize: 50,
+    from: 0,
+    size: 50,
     sort: [sort],
   });
   const latestVersion = useMemo(() => {

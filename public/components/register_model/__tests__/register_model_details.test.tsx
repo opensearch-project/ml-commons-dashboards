@@ -69,7 +69,7 @@ describe('<RegisterModel /> Details', () => {
     const result = await setup();
     jest.spyOn(Model.prototype, 'search').mockResolvedValue({
       data: [],
-      pagination: { totalPages: 1, totalRecords: 1, currentPage: 1, pageSize: 1 },
+      total_models: 1,
     });
 
     await result.user.clear(result.nameInput);
