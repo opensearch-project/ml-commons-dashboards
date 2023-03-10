@@ -23,6 +23,7 @@ jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', ()
     ...jest.requireActual('../../../../../../src/plugins/opensearch_dashboards_react/public'),
   };
 });
+jest.mock('../../../apis/model_repository');
 
 const MOCKED_DATA = {
   id: 'C7jN0YQBjgpeQQ_RmiDE',
@@ -104,13 +105,36 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('submit button label should be `Register model` when import a model', async () => {
-    render(
-      <Route path={routerPaths.registerModel}>
-        <RegisterModelForm />
-      </Route>,
-      { route: '/model-registry/register-model?type=import' }
-    );
+    await setup({
+      route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
+      ignoreFillFields: ['name', 'description'],
+    });
     expect(screen.getByRole('button', { name: /register model/i })).toBeInTheDocument();
+  });
+
+  it('should call submitModelWithURL with pre-filled model data after register model button clicked', async () => {
+    jest.spyOn(formAPI, 'submitModelWithURL').mockImplementation(onSubmitMock);
+    const { user } = await setup({
+      route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
+      ignoreFillFields: ['name', 'description'],
+    });
+    await waitFor(() =>
+      expect(screen.getByLabelText<HTMLInputElement>(/^name$/i).value).toEqual(
+        'sentence-transformers/all-distilroberta-v1'
+      )
+    );
+    expect(onSubmitMock).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /register model/i }));
+    expect(onSubmitMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'sentence-transformers/all-distilroberta-v1',
+        description:
+          'This is a sentence-transformers model: It maps sentences & paragraphs to a 768 dimensional dense vector space and can be used for tasks like clustering or semantic search.',
+        modelURL:
+          'https://artifacts.opensearch.org/models/ml-models/huggingface/sentence-transformers/all-distilroberta-v1/1.0.1/torch_script/sentence-transformers_all-distilroberta-v1-1.0.1-torch_script.zip',
+        configuration: expect.stringContaining('sentence_transformers'),
+      })
+    );
   });
 
   it('submit button label should be `Register model` when register new model', async () => {
