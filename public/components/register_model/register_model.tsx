@@ -172,19 +172,17 @@ export const RegisterModelForm = () => {
   useEffect(() => {
     if (!latestVersionId) return;
     const initializeForm = async () => {
-      const { data } = await APIProvider.getAPI('model').search({
-        ids: [latestVersionId],
-        from: 0,
-        size: 1,
-      });
-      if (data?.[0]) {
+      try {
+        const data = await APIProvider.getAPI('model').getOne(latestVersionId);
         // TODO:  clarify which fields to pre-populate
-        const { model_version: modelVersion, name, model_config: modelConfig } = data?.[0];
+        const { model_version: modelVersion, name, model_config: modelConfig } = data;
         const newVersion = upgradeModelVersion(modelVersion);
         form.setValue('name', name);
         form.setValue('version', newVersion);
         form.setValue('configuration', modelConfig?.all_config ?? '');
         setModelGroupName(name);
+      } catch (e) {
+        // TODO: handle error here
       }
     };
     initializeForm();
