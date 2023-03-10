@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Observable, from } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, from, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { APIProvider } from '../apis/api_provider';
 
 interface PreTrainedModelInfo {
@@ -25,13 +25,20 @@ interface PreTrainedModels {
 
 export class ModelRepositoryManager {
   private preTrainedModels: Observable<PreTrainedModels> | null = null;
-  private preTrainedModelConfigs: Map<string, Observable<any>> = new Map();
+  private preTrainedModelConfigs: Map<string, Observable<{ url: string; config: any }>> = new Map();
 
   constructor() {}
 
   getPreTrainedModels$() {
     if (!this.preTrainedModels) {
-      this.preTrainedModels = from(APIProvider.getAPI('modelRepository').getPreTrainedModels());
+      this.preTrainedModels = from(
+        APIProvider.getAPI('modelRepository').getPreTrainedModels()
+      ).pipe(
+        catchError((err) => {
+          this.preTrainedModels = null;
+          return throwError(err);
+        })
+      );
     }
     return this.preTrainedModels;
   }
@@ -45,15 +52,22 @@ export class ModelRepositoryManager {
         if (!modelConfig$) {
           modelConfig$ = from(
             APIProvider.getAPI('modelRepository').getPreTrainedModelConfig(modelInfo.config_url)
-          );
+          )
+            .pipe(
+              map((config) => ({
+                url: modelInfo.model_url,
+                config,
+              }))
+            )
+            .pipe(
+              catchError((err) => {
+                this.preTrainedModelConfigs.delete(modelInfo.config_url);
+                return throwError(err);
+              })
+            );
           this.preTrainedModelConfigs.set(modelInfo.config_url, modelConfig$);
         }
-        return modelConfig$.pipe(
-          map((config) => ({
-            url: modelInfo.model_url,
-            config,
-          }))
-        );
+        return modelConfig$;
       })
     );
   }
