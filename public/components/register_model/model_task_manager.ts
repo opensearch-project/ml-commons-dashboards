@@ -12,7 +12,7 @@ interface TaskQueryOptions {
   taskId: string;
   onUpdate?: (status: TaskGetOneResponse) => void;
   onError?: (err: Error) => void;
-  onComplete?: (status: TaskGetOneResponse) => void;
+  onComplete?: (modelId: string) => void;
 }
 
 // Model download task is still running if
@@ -62,7 +62,7 @@ export class ModelTaskManager {
           }
           // Model download task is complete if model id exists
           if (res.model_id && options.onComplete) {
-            options.onComplete(res);
+            options.onComplete(res.model_id);
           }
 
           if (res.error && options.onError) {

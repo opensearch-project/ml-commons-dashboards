@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { ModelGroup } from '../public/components/model_group';
 import { ModelList } from '../public/components/model_list';
 import { Monitoring } from '../public/components/monitoring';
 import { RegisterModelForm } from '../public/components/register_model/register_model';
@@ -13,6 +14,10 @@ interface RouteConfig {
   Component: React.ComponentType<any>;
   label: string;
   exact?: boolean;
+  /**
+   * true: display route in nav bar
+   */
+  nav: boolean;
 }
 
 export const ROUTES: RouteConfig[] = [
@@ -20,16 +25,26 @@ export const ROUTES: RouteConfig[] = [
     path: routerPaths.overview,
     Component: Monitoring,
     label: 'Overview',
+    nav: true,
   },
   {
     path: routerPaths.registerModel,
     label: 'Register Model',
     Component: RegisterModelForm,
+    nav: true,
   },
   {
     path: routerPaths.modelList,
     label: 'Model List',
     Component: ModelList,
+    nav: true,
+  },
+  {
+    path: routerPaths.modelGroup,
+    // TODO: refactor label to be dynamic so that we can display group name in breadcrumb
+    label: 'Model Group',
+    Component: ModelGroup,
+    nav: false,
   },
 ];
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Observable, of, from } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { APIProvider } from '../apis/api_provider';
 

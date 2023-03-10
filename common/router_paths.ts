@@ -9,4 +9,5 @@ export const routerPaths = {
   monitoring: '/monitoring',
   registerModel: '/model-registry/register-model/:id?',
   modelList: '/model-registry/model-list',
+  modelGroup: '/model-registry/model/:id',
 };

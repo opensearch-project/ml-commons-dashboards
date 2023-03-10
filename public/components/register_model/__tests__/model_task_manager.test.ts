@@ -35,7 +35,7 @@ describe('ModelTaskManager', () => {
     });
 
     await waitFor(() => {
-      expect(onCompleteMock).toHaveBeenCalledWith(res);
+      expect(onCompleteMock).toHaveBeenCalledWith('model_id');
       expect(onUpdateMock).toHaveBeenCalledWith(res);
       expect(onErrorMock).not.toHaveBeenCalled();
     });
@@ -83,7 +83,7 @@ describe('ModelTaskManager', () => {
 
     await waitFor(
       () => {
-        expect(onCompleteMock).toHaveBeenCalledWith(res);
+        expect(onCompleteMock).toHaveBeenCalledWith('model_id');
         expect(onUpdateMock).toHaveBeenCalledWith(res);
         expect(onErrorMock).not.toHaveBeenCalled();
       },

@@ -13,7 +13,7 @@ export function NavPanel() {
   const location = useLocation();
   const items = useMemo(
     () =>
-      ROUTES.filter((item) => !!item.label).map((item) => {
+      ROUTES.filter((item) => !!item.label && item.nav).map((item) => {
         const href = generatePath(item.path);
         return {
           id: href,
