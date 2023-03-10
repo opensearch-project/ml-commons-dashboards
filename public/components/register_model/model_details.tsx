@@ -15,10 +15,10 @@ const DESCRIPTION_MAX_LENGTH = 200;
 const isUniqueModelName = async (name: string) => {
   const searchResult = await APIProvider.getAPI('model').search({
     name,
-    pageSize: 1,
-    currentPage: 1,
+    from: 0,
+    size: 1,
   });
-  return searchResult.pagination.totalRecords >= 1;
+  return searchResult.total_models >= 1;
 };
 
 export const ModelDetailsPanel = () => {

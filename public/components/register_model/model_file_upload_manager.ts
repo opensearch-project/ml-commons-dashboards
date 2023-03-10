@@ -19,7 +19,7 @@ interface UploadOptions {
   modelId: string;
   onUpdate?: (status: FileUploadStatus) => void;
   onError?: () => void;
-  onComplete?: () => void;
+  onComplete?: (modelId: string) => void;
 }
 
 const MIN_CHUNK_SIZE = 10 * 1000 * 1000;
@@ -63,7 +63,7 @@ export class ModelFileUploadManager {
         this.uploads.next(this.uploads.getValue().filter((obs) => obs !== observable));
 
         if (options.onComplete) {
-          options.onComplete();
+          options.onComplete(options.modelId);
         }
       },
     });
