@@ -9,8 +9,10 @@ import {
   EuiTitle,
   EuiCodeEditor,
   EuiText,
-  EuiButtonEmpty,
+  EuiTextColor,
+  EuiCode,
   EuiSpacer,
+  EuiButtonEmpty,
 } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
@@ -47,15 +49,19 @@ export const ConfigurationPanel = () => {
       </EuiTitle>
       <EuiText style={{ maxWidth: 450 }}>
         <small>
-          The model configuration JSON object.{' '}
-          <EuiButtonEmpty
-            onClick={() => setIsHelpVisible(true)}
-            size="xs"
-            color="primary"
-            data-test-subj="model-configuration-help-button"
-          >
-            Help.
-          </EuiButtonEmpty>
+          The model configuration specifies the{' '}
+          <EuiTextColor color="default">
+            <EuiCode>model_type</EuiCode>
+          </EuiTextColor>
+          ,
+          <EuiTextColor color="default">
+            <EuiCode>embedding_dimension</EuiCode>
+          </EuiTextColor>{' '}
+          , and{' '}
+          <EuiTextColor color="default">
+            <EuiCode>framework_type</EuiCode>
+          </EuiTextColor>{' '}
+          of the model.
         </small>
       </EuiText>
       <EuiSpacer size="m" />
@@ -64,6 +70,16 @@ export const ConfigurationPanel = () => {
         label="Configuration in JSON"
         isInvalid={Boolean(configurationFieldController.fieldState.error)}
         error={configurationFieldController.fieldState.error?.message}
+        labelAppend={
+          <EuiButtonEmpty
+            onClick={() => setIsHelpVisible(true)}
+            size="xs"
+            color="primary"
+            data-test-subj="model-configuration-help-button"
+          >
+            Help
+          </EuiButtonEmpty>
+        }
       >
         <EuiCodeEditor
           tabSize={2}
