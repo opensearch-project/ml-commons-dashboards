@@ -9,7 +9,7 @@ import * as formAPI from '../register_model_api';
 import { Model } from '../../../apis/model';
 
 describe('<RegisterModel /> Details', () => {
-  const onSubmitMock = jest.fn();
+  const onSubmitMock = jest.fn().mockResolvedValue('model_id');
 
   beforeEach(() => {
     jest
