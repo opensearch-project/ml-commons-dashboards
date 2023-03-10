@@ -129,7 +129,7 @@ export class ModelService {
       });
     return {
       id: modelId,
-      ...convertModelSource(modelSource),
+      ...modelSource,
     };
   }
 

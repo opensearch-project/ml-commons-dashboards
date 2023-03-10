@@ -174,8 +174,8 @@ export const RegisterModelForm = () => {
     const initializeForm = async () => {
       const { data } = await APIProvider.getAPI('model').search({
         ids: [latestVersionId],
-        currentPage: 1,
-        pageSize: 1,
+        from: 0,
+        size: 1,
       });
       if (data?.[0]) {
         // TODO:  clarify which fields to pre-populate

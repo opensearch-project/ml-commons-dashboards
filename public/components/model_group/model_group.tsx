@@ -6,11 +6,12 @@
 import { EuiButton, EuiLoadingSpinner, EuiPageHeader, EuiPanel, EuiText } from '@elastic/eui';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useModel } from '../../hooks/use_model';
+import { useFetcher } from '../../hooks';
+import { APIProvider } from '../../apis/api_provider';
 
 export const ModelGroup = () => {
   const { id: modelId } = useParams<{ id: string }>();
-  const { data, loading, error } = useModel(modelId);
+  const { data, loading, error } = useFetcher(APIProvider.getAPI('model').getOne, modelId);
 
   if (loading) {
     // TODO: need to update per design

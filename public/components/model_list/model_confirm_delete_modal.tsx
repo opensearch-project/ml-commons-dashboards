@@ -30,10 +30,10 @@ export const ModelConfirmDeleteModal = React.forwardRef<
         (
           await APIProvider.getAPI('model').search({
             ids: [deleteIdRef.current],
-            pageSize: 1,
-            currentPage: 1,
+            from: 0,
+            size: 1,
           })
-        ).pagination.totalRecords === 1
+        ).total_models === 1
       );
     },
     onGiveUp: () => {
