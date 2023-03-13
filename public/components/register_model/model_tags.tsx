@@ -32,7 +32,7 @@ export const ModelTagsPanel = () => {
           Tags - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
       </EuiTitle>
-      <EuiText>
+      <EuiText style={{ maxWidth: 725 }}>
         <small>Add tags to facilitate model discovery and tracking across your organization.</small>
       </EuiText>
       <EuiSpacer size="m" />
