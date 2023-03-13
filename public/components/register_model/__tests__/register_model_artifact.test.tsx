@@ -13,7 +13,7 @@ import { ONE_GB } from '../../../../common/constant';
 jest.mock('../../../apis/model_repository');
 
 describe('<RegisterModel /> Artifact', () => {
-  const onSubmitWithFileMock = jest.fn();
+  const onSubmitWithFileMock = jest.fn().mockResolvedValue('model_id');
   const onSubmitWithURLMock = jest.fn();
   const uploadMock = jest.fn();
 

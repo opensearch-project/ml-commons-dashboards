@@ -9,7 +9,7 @@ import * as formHooks from '../register_model.hooks';
 import * as formAPI from '../register_model_api';
 
 describe('<RegisterModel /> Evaluation Metrics', () => {
-  const onSubmitMock = jest.fn();
+  const onSubmitMock = jest.fn().mockResolvedValue('model_id');
 
   beforeEach(() => {
     jest
