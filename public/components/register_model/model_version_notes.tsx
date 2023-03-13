@@ -32,7 +32,7 @@ export const ModelVersionNotesPanel = () => {
         helpText={`${Math.max(
           VERSION_NOTES_MAX_LENGTH - (versionNotesField.value?.length ?? 0),
           0
-        )} characters allowed.`}
+        )} characters ${versionNotesField.value?.length ? 'left' : 'allowed'}.`}
         isInvalid={Boolean(fieldController.fieldState.error)}
         error={fieldController.fieldState.error?.message}
         label="Notes"

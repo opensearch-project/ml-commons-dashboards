@@ -69,7 +69,8 @@ export const ModelDetailsPanel = () => {
         error={nameFieldController.fieldState.error?.message}
         helpText={
           <EuiText color="subdued" size="xs">
-            {Math.max(NAME_MAX_LENGTH - nameField.value.length, 0)} characters allowed.
+            {Math.max(NAME_MAX_LENGTH - nameField.value.length, 0)} characters{' '}
+            {nameField.value.length ? 'left' : 'allowed'}.
             <br />
             Use a unique for the model.
           </EuiText>
@@ -91,7 +92,7 @@ export const ModelDetailsPanel = () => {
         helpText={`${Math.max(
           DESCRIPTION_MAX_LENGTH - descriptionField.value.length,
           0
-        )} characters allowed.`}
+        )} characters ${descriptionField.value.length ? 'left' : 'allowed'}.`}
       >
         <EuiTextArea
           inputRef={descriptionInputRef}
