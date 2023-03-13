@@ -17,7 +17,6 @@ export const ModelVersionNotesPanel = () => {
   const fieldController = useController({
     name: 'versionNotes',
     control,
-    rules: { maxLength: { value: VERSION_NOTES_MAX_LENGTH, message: 'Text exceed max length' } },
   });
   const { ref, ...versionNotesField } = fieldController.field;
 

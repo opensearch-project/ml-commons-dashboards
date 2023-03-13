@@ -12,7 +12,7 @@ import { APIProvider } from '../../apis/api_provider';
 const NAME_MAX_LENGTH = 80;
 const DESCRIPTION_MAX_LENGTH = 200;
 
-const isUniqueModelName = async (name: string) => {
+const isDuplicateModelName = async (name: string) => {
   const searchResult = await APIProvider.getAPI('model').search({
     name,
     from: 0,
@@ -30,11 +30,10 @@ export const ModelDetailsPanel = () => {
     rules: {
       required: { value: true, message: 'Name can not be empty' },
       validate: async (name) => {
-        return !modelNameFocusedRef.current && !!name && (await isUniqueModelName(name))
+        return !modelNameFocusedRef.current && !!name && (await isDuplicateModelName(name))
           ? 'This name is already in use. Use a unique name for the model.'
           : undefined;
       },
-      maxLength: { value: NAME_MAX_LENGTH, message: 'Text exceed max length' },
     },
   });
 
@@ -43,7 +42,6 @@ export const ModelDetailsPanel = () => {
     control,
     rules: {
       required: { value: true, message: 'Description can not be empty' },
-      maxLength: { value: DESCRIPTION_MAX_LENGTH, message: 'Text exceed max length' },
     },
   });
 
