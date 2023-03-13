@@ -30,11 +30,7 @@ export async function setup(options?: SetupOptions) {
   const versionNotesInput = screen.getByLabelText<HTMLTextAreaElement>(/notes/i);
 
   // Mock model name unique
-  jest.spyOn(Model.prototype, 'search').mockResolvedValue({
-    data: [],
-    pagination: { totalRecords: 0, currentPage: 1, pageSize: 1, totalPages: 0 },
-  });
-
+  jest.spyOn(Model.prototype, 'search').mockResolvedValue({ data: [], total_models: 0 });
   // fill model name
   if (!options?.ignoreFillFields?.includes('name')) {
     await user.type(nameInput, 'test model name');
