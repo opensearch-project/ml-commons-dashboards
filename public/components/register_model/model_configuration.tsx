@@ -47,7 +47,7 @@ export const ConfigurationPanel = () => {
       <EuiTitle size="s">
         <h3>Configuration</h3>
       </EuiTitle>
-      <EuiText style={{ maxWidth: 450 }}>
+      <EuiText style={{ maxWidth: 725 }}>
         <small>
           The model configuration specifies the{' '}
           <EuiTextColor color="default">

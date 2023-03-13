@@ -146,7 +146,7 @@ export const EvaluationMetricsPanel = () => {
           Evaluation Metrics - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
       </EuiTitle>
-      <EuiText>
+      <EuiText style={{ maxWidth: 725 }}>
         <small>
           Track training, validation, and testing metrics to compare across versions and models.
         </small>

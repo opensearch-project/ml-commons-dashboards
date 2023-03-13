@@ -23,7 +23,7 @@ export const ArtifactPanel = () => {
       <EuiTitle size="s">
         <h3>Artifact</h3>
       </EuiTitle>
-      <EuiText style={{ maxWidth: 450 }}>
+      <EuiText style={{ maxWidth: 725 }}>
         <small>
           The zipped artifact must include a model file and a tokenizer file. If uploading with a
           local file, keep this browser open util the upload completes.{' '}
