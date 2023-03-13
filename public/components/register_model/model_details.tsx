@@ -80,6 +80,7 @@ export const ModelDetailsPanel = () => {
         <EuiFieldText
           inputRef={nameInputRef}
           isInvalid={Boolean(nameFieldController.fieldState.error)}
+          maxLength={NAME_MAX_LENGTH}
           {...nameField}
           onFocus={handleModelNameFocus}
           onBlur={handleModelNameBlur}
@@ -97,6 +98,7 @@ export const ModelDetailsPanel = () => {
         <EuiTextArea
           inputRef={descriptionInputRef}
           isInvalid={Boolean(descriptionFieldController.fieldState.error)}
+          maxLength={DESCRIPTION_MAX_LENGTH}
           {...descriptionField}
         />
       </EuiFormRow>

@@ -41,6 +41,7 @@ export const ModelVersionNotesPanel = () => {
         <EuiTextArea
           inputRef={ref}
           isInvalid={Boolean(fieldController.fieldState.error)}
+          maxLength={VERSION_NOTES_MAX_LENGTH}
           style={{ height: 80 }}
           {...versionNotesField}
         />
