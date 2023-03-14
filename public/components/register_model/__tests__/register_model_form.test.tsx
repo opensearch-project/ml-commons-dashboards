@@ -107,7 +107,7 @@ describe('<RegisterModel /> Form', () => {
   it('submit button label should be `Register model` when import a model', async () => {
     await setup({
       route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
-      ignoreFillFields: ['name', 'description'],
+      mode: 'import',
     });
     expect(screen.getByRole('button', { name: /register model/i })).toBeInTheDocument();
   });
@@ -116,7 +116,7 @@ describe('<RegisterModel /> Form', () => {
     jest.spyOn(formAPI, 'submitModelWithURL').mockImplementation(onSubmitMock);
     const { user } = await setup({
       route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
-      ignoreFillFields: ['name', 'description'],
+      mode: 'import',
     });
     await waitFor(() =>
       expect(screen.getByLabelText<HTMLInputElement>(/^name$/i).value).toEqual(
