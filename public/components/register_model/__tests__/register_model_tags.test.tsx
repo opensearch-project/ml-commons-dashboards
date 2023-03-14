@@ -13,9 +13,6 @@ describe('<RegisterModel /> Tags', () => {
 
   beforeEach(() => {
     jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-    jest
       .spyOn(formHooks, 'useModelTags')
       .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
