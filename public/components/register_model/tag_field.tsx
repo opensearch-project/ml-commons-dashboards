@@ -77,12 +77,12 @@ export const ModelTagField = ({
             return 'A key is required. Enter a key.';
           }
           // If a tag has both key and value, validate if the same tag was added before
-          if (tagKey && tag.value) {
+          if (tagKey) {
             // Find if the same tag appears before the current tag
             for (let i = 0; i < index; i++) {
               // If found the same tag, then the current tag is invalid
-              if (tags[i].key === tagKey && tags[i].value === tag.value) {
-                return 'This tag has already been added. Remove the duplicate tag.';
+              if (tags[i].key === tagKey) {
+                return 'Tag keys must be unique. Use a unique key.';
               }
             }
           }
@@ -106,17 +106,6 @@ export const ModelTagField = ({
           // If it has key, value cannot be empty
           if (!tagValue && tag.key) {
             return 'A value is required. Enter a value.';
-          }
-          // If a tag has both key and value, validate if the same tag was added before
-          if (tag.key && tagValue) {
-            // Find if the same tag appears before the current tag
-            for (let i = 0; i < index; i++) {
-              // If found the same tag, then the current tag is invalid
-              if (tags[i].key === tag.key && tags[i].value === tagValue) {
-                // return `false` instead of error message because we don't show error message on value field
-                return false;
-              }
-            }
           }
         }
         return true;

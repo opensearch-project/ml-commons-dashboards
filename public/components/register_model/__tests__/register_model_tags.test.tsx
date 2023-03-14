@@ -118,7 +118,7 @@ describe('<RegisterModel /> Tags', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should NOT allow to submit if it has duplicate tags', async () => {
+  it('should NOT allow to submit if it has duplicate tags key', async () => {
     const result = await setup();
 
     // input tag key: 'Key 1'
@@ -138,18 +138,16 @@ describe('<RegisterModel /> Tags', () => {
     const keyInput2 = within(keyContainer2).getByRole('textbox');
     await result.user.type(keyInput2, 'Key 1');
 
-    // input tag key: 'Value 1'
+    // input tag key: 'Value 2'
     const valueContainer2 = screen.getByTestId('ml-tagValue2');
     const valueInput2 = within(valueContainer2).getByRole('textbox');
-    await result.user.type(valueInput2, 'Value 1');
+    await result.user.type(valueInput2, 'Value 2');
 
     await result.user.click(result.submitButton);
 
     // Display error message
     expect(
-      within(keyContainer2).queryByText(
-        'This tag has already been added. Remove the duplicate tag.'
-      )
+      within(keyContainer2).queryByText('Tag keys must be unique. Use a unique key.')
     ).toBeInTheDocument();
     // it should not submit the form
     expect(onSubmitMock).not.toHaveBeenCalled();
