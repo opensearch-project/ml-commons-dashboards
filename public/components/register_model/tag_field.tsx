@@ -159,10 +159,8 @@ export const ModelTagField = ({
   }, [tagKeys, tags]);
 
   const valueOptions = useMemo(() => {
-    return tagValues
-      .filter((value) => !tags?.find((tag) => tag.value === value))
-      .map((value) => ({ label: value }));
-  }, [tagValues, tags]);
+    return tagValues.map((value) => ({ label: value }));
+  }, [tagValues]);
 
   const onBlur = useCallback(
     (e: React.FocusEvent<HTMLDivElement>) => {
