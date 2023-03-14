@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { EuiButton, EuiTitle, EuiSpacer, EuiText } from '@elastic/eui';
+import { EuiButton, EuiTitle, EuiSpacer, EuiText, EuiLink } from '@elastic/eui';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
@@ -22,7 +22,8 @@ export const ModelTagsPanel = () => {
     name: 'tags',
     control,
   });
-  const maxTagNum = !!latestVersionId ? keys.length : MAX_TAG_NUM;
+  const isRegisterNewVersion = !!latestVersionId;
+  const maxTagNum = isRegisterNewVersion ? keys.length : MAX_TAG_NUM;
 
   const addNewTag = useCallback(() => {
     append({ key: '', value: '' });
@@ -36,7 +37,24 @@ export const ModelTagsPanel = () => {
         </h3>
       </EuiTitle>
       <EuiText style={{ maxWidth: 725 }}>
-        <small>Add tags to facilitate model discovery and tracking across your organization.</small>
+        <small>
+          {isRegisterNewVersion ? (
+            <>
+              Add tags to help your organization discover and compare models, and track information
+              related to new versions of this model, such as evaluation metrics.
+            </>
+          ) : (
+            <>
+              Add tags to help your organization discover, compare, and track information related to
+              your model. The tag keys used here will define the available keys for all versions of
+              this model.{' '}
+              <EuiLink external href="#">
+                Learn more
+              </EuiLink>
+              .
+            </>
+          )}
+        </small>
       </EuiText>
       <EuiSpacer size="m" />
       {fields.map((field, index) => {
