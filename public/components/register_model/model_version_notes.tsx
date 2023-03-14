@@ -17,7 +17,6 @@ export const ModelVersionNotesPanel = () => {
   const fieldController = useController({
     name: 'versionNotes',
     control,
-    rules: { maxLength: { value: VERSION_NOTES_MAX_LENGTH, message: 'Text exceed max length' } },
   });
   const { ref, ...versionNotesField } = fieldController.field;
 
@@ -33,7 +32,7 @@ export const ModelVersionNotesPanel = () => {
         helpText={`${Math.max(
           VERSION_NOTES_MAX_LENGTH - (versionNotesField.value?.length ?? 0),
           0
-        )} characters allowed.`}
+        )} characters ${versionNotesField.value?.length ? 'left' : 'allowed'}.`}
         isInvalid={Boolean(fieldController.fieldState.error)}
         error={fieldController.fieldState.error?.message}
         label="Notes"
@@ -41,6 +40,7 @@ export const ModelVersionNotesPanel = () => {
         <EuiTextArea
           inputRef={ref}
           isInvalid={Boolean(fieldController.fieldState.error)}
+          maxLength={VERSION_NOTES_MAX_LENGTH}
           style={{ height: 80 }}
           {...versionNotesField}
         />

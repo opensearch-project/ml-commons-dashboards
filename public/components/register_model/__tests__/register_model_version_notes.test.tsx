@@ -36,18 +36,11 @@ describe('<RegisterModel /> Version notes', () => {
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
-  it('should NOT submit the register model form if model version notes length exceed 200', async () => {
+  it('should NOT allow to input a model note which exceed max length: 200', async () => {
     const result = await setup();
 
     await result.user.clear(result.versionNotesInput);
-    await result.user.type(result.versionNotesInput, 'x'.repeat(200));
-    expect(result.versionNotesInput).toBeValid();
-
-    await result.user.clear(result.versionNotesInput);
     await result.user.type(result.versionNotesInput, 'x'.repeat(201));
-    expect(result.versionNotesInput).toBeInvalid();
-
-    await result.user.click(result.submitButton);
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(result.versionNotesInput.value).toHaveLength(200);
   });
 });
