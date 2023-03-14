@@ -12,11 +12,10 @@ import type { ModelFileFormData, ModelUrlFormData } from './register_model.types
 
 export const ErrorCallOut = () => {
   const form = useFormContext<ModelFileFormData | ModelUrlFormData>();
-  console.log(form.formState.errors);
 
   const errors = useMemo(() => {
     const messages: string[] = [];
-    for (const errorField in form.formState.errors) {
+    Object.keys(form.formState.errors).forEach((errorField) => {
       const error = form.formState.errors[errorField as keyof typeof form.formState.errors];
       const errorMessage = FORM_ERRORS.find(
         (e) => e.field === errorField && e.type === error?.type
@@ -24,7 +23,7 @@ export const ErrorCallOut = () => {
       if (errorMessage) {
         messages.push(errorMessage.message);
       }
-    }
+    });
     return messages;
   }, [form]);
 
