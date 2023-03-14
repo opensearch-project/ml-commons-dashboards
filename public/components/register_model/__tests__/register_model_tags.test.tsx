@@ -276,4 +276,21 @@ describe('<RegisterModel /> Tags', () => {
     await result.user.click(valueInput);
     expect(screen.getByText('No values found. Add a value.')).toBeInTheDocument();
   });
+
+  it('should only display "Key2" in the option list after "Key1" selected', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.click(keyInput);
+    const optionListContainer = screen.getByTestId('comboBoxOptionsList');
+
+    expect(within(optionListContainer).getByTitle('Key2')).toBeInTheDocument();
+    expect(within(optionListContainer).getByTitle('Key1')).toBeInTheDocument();
+
+    await result.user.click(within(optionListContainer).getByTitle('Key1'));
+
+    expect(within(optionListContainer).getByTitle('Key2')).toBeInTheDocument();
+    expect(within(optionListContainer).queryByTitle('Key1')).toBe(null);
+  });
 });
