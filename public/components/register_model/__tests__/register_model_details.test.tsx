@@ -50,19 +50,12 @@ describe('<RegisterModel /> Details', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should NOT submit the register model form if model name length exceeded 80', async () => {
+  it('should NOT allow to input a model name which exceed max length: 80', async () => {
     const result = await setup();
 
     await result.user.clear(result.nameInput);
-    await result.user.type(result.nameInput, 'x'.repeat(80));
-    expect(result.nameInput).toBeValid();
-
-    await result.user.clear(result.nameInput);
     await result.user.type(result.nameInput, 'x'.repeat(81));
-    expect(result.nameInput).toBeInvalid();
-
-    await result.user.click(result.submitButton);
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(result.nameInput.value).toHaveLength(80);
   });
 
   it('should NOT submit the register model form if model name is duplicated', async () => {
@@ -90,18 +83,11 @@ describe('<RegisterModel /> Details', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should NOT submit the register model form if model description length exceed 200', async () => {
+  it('should NOT allow to input a model description which exceed max length: 200', async () => {
     const result = await setup();
 
     await result.user.clear(result.descriptionInput);
-    await result.user.type(result.descriptionInput, 'x'.repeat(200));
-    expect(result.descriptionInput).toBeValid();
-
-    await result.user.clear(result.descriptionInput);
     await result.user.type(result.descriptionInput, 'x'.repeat(201));
-    expect(result.descriptionInput).toBeInvalid();
-
-    await result.user.click(result.submitButton);
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(result.descriptionInput.value).toHaveLength(200);
   });
 });

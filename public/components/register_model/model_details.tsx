@@ -12,7 +12,7 @@ import { APIProvider } from '../../apis/api_provider';
 const NAME_MAX_LENGTH = 80;
 const DESCRIPTION_MAX_LENGTH = 200;
 
-const isUniqueModelName = async (name: string) => {
+const isDuplicateModelName = async (name: string) => {
   const searchResult = await APIProvider.getAPI('model').search({
     name,
     from: 0,
@@ -30,11 +30,10 @@ export const ModelDetailsPanel = () => {
     rules: {
       required: { value: true, message: 'Name can not be empty' },
       validate: async (name) => {
-        return !modelNameFocusedRef.current && !!name && (await isUniqueModelName(name))
+        return !modelNameFocusedRef.current && !!name && (await isDuplicateModelName(name))
           ? 'This name is already in use. Use a unique name for the model.'
           : undefined;
       },
-      maxLength: { value: NAME_MAX_LENGTH, message: 'Text exceed max length' },
     },
   });
 
@@ -43,7 +42,6 @@ export const ModelDetailsPanel = () => {
     control,
     rules: {
       required: { value: true, message: 'Description can not be empty' },
-      maxLength: { value: DESCRIPTION_MAX_LENGTH, message: 'Text exceed max length' },
     },
   });
 
@@ -71,7 +69,8 @@ export const ModelDetailsPanel = () => {
         error={nameFieldController.fieldState.error?.message}
         helpText={
           <EuiText color="subdued" size="xs">
-            {Math.max(NAME_MAX_LENGTH - nameField.value.length, 0)} characters allowed.
+            {Math.max(NAME_MAX_LENGTH - nameField.value.length, 0)} characters{' '}
+            {nameField.value.length ? 'left' : 'allowed'}.
             <br />
             Use a unique for the model.
           </EuiText>
@@ -80,6 +79,7 @@ export const ModelDetailsPanel = () => {
         <EuiFieldText
           inputRef={nameInputRef}
           isInvalid={Boolean(nameFieldController.fieldState.error)}
+          maxLength={NAME_MAX_LENGTH}
           {...nameField}
           onFocus={handleModelNameFocus}
           onBlur={handleModelNameBlur}
@@ -92,11 +92,12 @@ export const ModelDetailsPanel = () => {
         helpText={`${Math.max(
           DESCRIPTION_MAX_LENGTH - descriptionField.value.length,
           0
-        )} characters allowed.`}
+        )} characters ${descriptionField.value.length ? 'left' : 'allowed'}.`}
       >
         <EuiTextArea
           inputRef={descriptionInputRef}
           isInvalid={Boolean(descriptionFieldController.fieldState.error)}
+          maxLength={DESCRIPTION_MAX_LENGTH}
           {...descriptionField}
         />
       </EuiFormRow>
