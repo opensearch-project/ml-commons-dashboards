@@ -10,8 +10,8 @@ import { useController, useFormContext } from 'react-hook-form';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { CUSTOM_FORM_ERROR_TYPES, MAX_MODEL_FILE_SIZE } from './constants';
 
-function validateFileSize(file: File) {
-  if (file.size > MAX_MODEL_FILE_SIZE) {
+function validateFileSize(file?: File) {
+  if (file && file.size > MAX_MODEL_FILE_SIZE) {
     return 'Maximum file size exceeded. Add a smaller file.';
   }
   return true;
@@ -24,7 +24,9 @@ export const ModelFileUploader = () => {
     control,
     rules: {
       required: { value: true, message: 'A file is required. Add a file.' },
-      validate: { [CUSTOM_FORM_ERROR_TYPES.FILE_SIZE_EXCEED_LIMIT]: validateFileSize },
+      validate: {
+        [CUSTOM_FORM_ERROR_TYPES.FILE_SIZE_EXCEED_LIMIT]: validateFileSize,
+      },
     },
     shouldUnregister: true,
   });

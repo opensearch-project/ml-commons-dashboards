@@ -9,7 +9,7 @@ import * as formHooks from '../register_model.hooks';
 import * as formAPI from '../register_model_api';
 import { ModelFileUploadManager } from '../model_file_upload_manager';
 
-describe('<RegisterModel /> Artifact', () => {
+describe('<RegisterModel /> ErrorCallOut', () => {
   const onSubmitWithFileMock = jest.fn().mockResolvedValue('model_id');
   const onSubmitWithURLMock = jest.fn();
   const uploadMock = jest.fn();
