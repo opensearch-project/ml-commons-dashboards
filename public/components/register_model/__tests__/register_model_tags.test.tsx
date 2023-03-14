@@ -159,10 +159,10 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it(
-    'should only allow to add maximum 25 tags',
+    'should only allow to add maximum 10 tags',
     async () => {
       const result = await setup();
-      const MAX_TAG_NUM = 25;
+      const MAX_TAG_NUM = 10;
 
       // It has one tag by default, we can add 24 more tags
       const addNewTagButton = screen.getByText(/add new tag/i);
@@ -170,8 +170,8 @@ describe('<RegisterModel /> Tags', () => {
         await result.user.click(addNewTagButton);
       }
 
-      // 25 tags are displayed
-      await waitFor(() => expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(25));
+      // 10 tags are displayed
+      await waitFor(() => expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(10));
       // add new tag button should not be displayed
       await waitFor(() =>
         expect(screen.getByRole('button', { name: /add new tag/i })).toBeDisabled()
@@ -207,5 +207,76 @@ describe('<RegisterModel /> Tags', () => {
         tags: [{ key: '', value: '' }],
       })
     );
+  });
+
+  it('should allow adding one more tag when registering new version if model group has only two tags', async () => {
+    const result = await setup({
+      route: '/foo',
+      mode: 'version',
+    });
+
+    await result.user.click(screen.getByText(/add new tag/i));
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /add new tag/i })).toBeDisabled()
+    );
+  });
+
+  it('should prevent creating new tag key when registering new version', async () => {
+    const result = await setup({
+      route: '/foo',
+      mode: 'version',
+    });
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.type(keyInput, 'foo{enter}');
+    expect(
+      screen.getByText((content, element) => {
+        return (
+          element?.tagName.toLowerCase() === 'strong' &&
+          content === 'foo' &&
+          element?.nextSibling?.textContent?.trim() === "doesn't match any options"
+        );
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('should display error when creating new tag key with more than 80 characters', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.type(keyInput, `${'x'.repeat(81)}{enter}`);
+    expect(
+      within(keyContainer).queryByText('80 characters allowed. Use 80 characters or less.')
+    ).toBeInTheDocument();
+  });
+
+  it('should display error when creating new tag value with more than 80 characters', async () => {
+    const result = await setup();
+
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const valueInput = within(valueContainer).getByRole('textbox');
+    await result.user.type(valueInput, `${'x'.repeat(81)}{enter}`);
+    expect(
+      within(valueContainer).queryByText('80 characters allowed. Use 80 characters or less.')
+    ).toBeInTheDocument();
+  });
+
+  it('should display "No keys found" and "No values found" if no tag keys and no tag values are provided', async () => {
+    jest.spyOn(formHooks, 'useModelTags').mockReturnValue([false, { keys: [], values: [] }]);
+
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.click(keyInput);
+    expect(screen.getByText('No keys found. Add a key.')).toBeInTheDocument();
+
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const valueInput = within(valueContainer).getByRole('textbox');
+    await result.user.click(valueInput);
+    expect(screen.getByText('No values found. Add a value.')).toBeInTheDocument();
   });
 });

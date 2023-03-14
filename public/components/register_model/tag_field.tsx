@@ -10,6 +10,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiContext,
 } from '@elastic/eui';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useController, useWatch, useFormContext } from 'react-hook-form';
@@ -21,9 +22,22 @@ interface ModelTagFieldProps {
   onDelete: (index: number) => void;
   tagKeys: string[];
   tagValues: string[];
+  allowKeyCreate?: boolean;
 }
 
 const MAX_TAG_LENGTH = 80;
+
+const KEY_COMBOBOX_I18N = {
+  mapping: {
+    'euiComboBoxOptionsList.noAvailableOptions': 'No keys found. Add a key.',
+  },
+};
+
+const VALUE_COMBOBOX_I18N = {
+  mapping: {
+    'euiComboBoxOptionsList.noAvailableOptions': 'No values found. Add a value.',
+  },
+};
 
 function getComboBoxValue(data: EuiComboBoxOptionOption[]) {
   if (data.length === 0) {
@@ -33,7 +47,13 @@ function getComboBoxValue(data: EuiComboBoxOptionOption[]) {
   }
 }
 
-export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagFieldProps) => {
+export const ModelTagField = ({
+  index,
+  tagKeys,
+  tagValues,
+  allowKeyCreate,
+  onDelete,
+}: ModelTagFieldProps) => {
   const rowEleRef = useRef<HTMLDivElement>(null);
   const { trigger, control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const tags = useWatch({
@@ -45,6 +65,10 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
     name: `tags.${index}.key` as const,
     control,
     rules: {
+      maxLength: {
+        value: MAX_TAG_LENGTH,
+        message: '80 characters allowed. Use 80 characters or less.',
+      },
       validate: (tagKey) => {
         if (tags) {
           const tag = tags[index];
@@ -72,6 +96,10 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
     name: `tags.${index}.value` as const,
     control,
     rules: {
+      maxLength: {
+        value: MAX_TAG_LENGTH,
+        message: '80 characters allowed. Use 80 characters or less.',
+      },
       validate: (tagValue) => {
         if (tags) {
           const tag = tags[index];
@@ -112,9 +140,6 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
 
   const onKeyCreate = useCallback(
     (value: string) => {
-      if (value.length > MAX_TAG_LENGTH) {
-        return;
-      }
       tagKeyController.field.onChange(value);
     },
     [tagKeyController.field]
@@ -122,21 +147,22 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
 
   const onValueCreate = useCallback(
     (value: string) => {
-      if (value.length > MAX_TAG_LENGTH) {
-        return;
-      }
       tagValueController.field.onChange(value);
     },
     [tagValueController.field]
   );
 
   const keyOptions = useMemo(() => {
-    return tagKeys.map((key) => ({ label: key }));
-  }, [tagKeys]);
+    return tagKeys
+      .filter((key) => !tags?.find((tag) => tag.key === key))
+      .map((key) => ({ label: key }));
+  }, [tagKeys, tags]);
 
   const valueOptions = useMemo(() => {
-    return tagValues.map((value) => ({ label: value }));
-  }, [tagValues]);
+    return tagValues
+      .filter((value) => !tags?.find((tag) => tag.value === value))
+      .map((value) => ({ label: value }));
+  }, [tagValues, tags]);
 
   const onBlur = useCallback(
     (e: React.FocusEvent<HTMLDivElement>) => {
@@ -162,50 +188,54 @@ export const ModelTagField = ({ index, tagKeys, tagValues, onDelete }: ModelTagF
   return (
     <EuiFlexGroup ref={rowEleRef} tabIndex={-1} onBlur={onBlur}>
       <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
-        <EuiFormRow
-          label={index === 0 ? 'Key' : ''}
-          data-test-subj={`ml-tagKey${index + 1}`}
-          isInvalid={Boolean(tagKeyController.fieldState.error)}
-          error={tagKeyController.fieldState.error?.message}
-        >
-          <EuiComboBox
-            placeholder="Select or add a key"
+        <EuiContext i18n={KEY_COMBOBOX_I18N}>
+          <EuiFormRow
+            label={index === 0 ? 'Key' : ''}
+            data-test-subj={`ml-tagKey${index + 1}`}
             isInvalid={Boolean(tagKeyController.fieldState.error)}
-            singleSelection={{ asPlainText: true }}
-            options={keyOptions}
-            selectedOptions={
-              tagKeyController.field.value ? [{ label: tagKeyController.field.value }] : []
-            }
-            onChange={onKeyChange}
-            onCreateOption={onKeyCreate}
-            customOptionText={`Add {searchValue} as new tag key. (${MAX_TAG_LENGTH} characters allowed)`}
-            onBlur={tagKeyController.field.onBlur}
-            inputRef={tagKeyController.field.ref}
-          />
-        </EuiFormRow>
+            error={tagKeyController.fieldState.error?.message}
+          >
+            <EuiComboBox
+              placeholder="Select or add a key"
+              isInvalid={Boolean(tagKeyController.fieldState.error)}
+              singleSelection={{ asPlainText: true }}
+              options={keyOptions}
+              selectedOptions={
+                tagKeyController.field.value ? [{ label: tagKeyController.field.value }] : []
+              }
+              onChange={onKeyChange}
+              onCreateOption={allowKeyCreate ? onKeyCreate : undefined}
+              customOptionText="Add {searchValue} as a key."
+              onBlur={tagKeyController.field.onBlur}
+              inputRef={tagKeyController.field.ref}
+            />
+          </EuiFormRow>
+        </EuiContext>
       </EuiFlexItem>
       <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
-        <EuiFormRow
-          label={index === 0 ? 'Value' : ''}
-          data-test-subj={`ml-tagValue${index + 1}`}
-          isInvalid={Boolean(tagValueController.fieldState.error)}
-          error={tagValueController.fieldState.error?.message}
-        >
-          <EuiComboBox
-            placeholder="Select or add a value"
+        <EuiContext i18n={VALUE_COMBOBOX_I18N}>
+          <EuiFormRow
+            label={index === 0 ? 'Value' : ''}
+            data-test-subj={`ml-tagValue${index + 1}`}
             isInvalid={Boolean(tagValueController.fieldState.error)}
-            singleSelection={{ asPlainText: true }}
-            options={valueOptions}
-            selectedOptions={
-              tagValueController.field.value ? [{ label: tagValueController.field.value }] : []
-            }
-            onChange={onValueChange}
-            onCreateOption={onValueCreate}
-            customOptionText={`Add {searchValue} as new tag name. (${MAX_TAG_LENGTH} characters allowed)`}
-            onBlur={tagValueController.field.onBlur}
-            inputRef={tagValueController.field.ref}
-          />
-        </EuiFormRow>
+            error={tagValueController.fieldState.error?.message}
+          >
+            <EuiComboBox
+              placeholder="Select or add a value"
+              isInvalid={Boolean(tagValueController.fieldState.error)}
+              singleSelection={{ asPlainText: true }}
+              options={valueOptions}
+              selectedOptions={
+                tagValueController.field.value ? [{ label: tagValueController.field.value }] : []
+              }
+              onChange={onValueChange}
+              onCreateOption={onValueCreate}
+              customOptionText="Add {searchValue} as a value."
+              onBlur={tagValueController.field.onBlur}
+              inputRef={tagValueController.field.ref}
+            />
+          </EuiFormRow>
+        </EuiContext>
       </EuiFlexItem>
       <EuiFlexItem grow={false} style={index === 0 ? { transform: 'translateY(22px)' } : undefined}>
         <EuiButton aria-label={`Remove tag at row ${index + 1}`} onClick={() => onDelete(index)}>

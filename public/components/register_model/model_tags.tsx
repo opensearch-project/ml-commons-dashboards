@@ -6,20 +6,23 @@
 import React, { useCallback } from 'react';
 import { EuiButton, EuiTitle, EuiSpacer, EuiText } from '@elastic/eui';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ModelTagField } from './tag_field';
 import { useModelTags } from './register_model.hooks';
 
-const MAX_TAG_NUM = 25;
+const MAX_TAG_NUM = 10;
 
 export const ModelTagsPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const [, { keys, values }] = useModelTags();
   const { fields, append, remove } = useFieldArray({
     name: 'tags',
     control,
   });
+  const maxTagNum = !!latestVersionId ? keys.length : MAX_TAG_NUM;
 
   const addNewTag = useCallback(() => {
     append({ key: '', value: '' });
@@ -44,16 +47,17 @@ export const ModelTagsPanel = () => {
             tagKeys={keys}
             tagValues={values}
             onDelete={remove}
+            allowKeyCreate={!latestVersionId}
           />
         );
       })}
       <EuiSpacer />
-      <EuiButton disabled={fields.length >= MAX_TAG_NUM} onClick={addNewTag}>
+      <EuiButton disabled={fields.length >= maxTagNum} onClick={addNewTag}>
         Add new tag
       </EuiButton>
       <EuiSpacer size="xs" />
       <EuiText color="subdued">
-        <small>{`You can add up to ${MAX_TAG_NUM - fields.length} more tags.`}</small>
+        <small>{`You can add up to ${maxTagNum - fields.length} more tags.`}</small>
       </EuiText>
     </div>
   );
