@@ -72,9 +72,10 @@ export const RegisterModelForm = () => {
       ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
       : [
           ...(latestVersionId ? [] : [ModelDetailsPanel]),
+          ...(latestVersionId ? [] : [ModelTagsPanel]),
           ArtifactPanel,
           ConfigurationPanel,
-          ModelTagsPanel,
+          ...(latestVersionId ? [ModelTagsPanel] : []),
           ModelVersionNotesPanel,
         ];
 
