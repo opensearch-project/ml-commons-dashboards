@@ -76,10 +76,10 @@ export async function setup(
   }
 
   if (!nameInput) {
-    throw new Error('Name input for found for');
+    throw new Error('Name input not found');
   }
   if (!descriptionInput) {
-    throw new Error('Description input for found');
+    throw new Error('Description input not found');
   }
 
   // Mock model name unique
