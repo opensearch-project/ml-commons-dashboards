@@ -76,11 +76,11 @@ export const ModelTagField = ({
           if (!tagKey && tag.value) {
             return 'A key is required. Enter a key.';
           }
-          // If a tag has both key and value, validate if the same tag was added before
+          // If a tag has key, validate if the same tag key was added before
           if (tagKey) {
-            // Find if the same tag appears before the current tag
+            // Find if the same tag key appears before the current tag key
             for (let i = 0; i < index; i++) {
-              // If found the same tag, then the current tag is invalid
+              // If found the same tag key, then the current tag key is invalid
               if (tags[i].key === tagKey) {
                 return 'Tag keys must be unique. Use a unique key.';
               }
