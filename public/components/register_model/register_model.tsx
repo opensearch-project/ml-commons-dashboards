@@ -47,13 +47,17 @@ const DEFAULT_VALUES = {
   name: '',
   description: '',
   version: '1',
-  configuration: '{}',
+  configuration: '',
   tags: [{ key: '', value: '' }],
 };
 
 const FORM_ID = 'mlModelUploadForm';
 
-export const RegisterModelForm = () => {
+interface RegisterModelFormProps {
+  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+}
+
+export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterModelFormProps) => {
   const history = useHistory();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
@@ -83,7 +87,8 @@ export const RegisterModelForm = () => {
 
   const form = useForm<ModelFileFormData | ModelUrlFormData>({
     mode: 'onChange',
-    defaultValues: DEFAULT_VALUES,
+    defaultValues,
+    criteriaMode: 'all',
   });
 
   const onSubmit = useCallback(
@@ -279,8 +284,12 @@ export const RegisterModelForm = () => {
         <EuiPanel>
           {formHeader}
           <EuiSpacer />
-          {isSubmitted && !form.formState.isValid && <ErrorCallOut />}
-          <EuiSpacer />
+          {isSubmitted && !form.formState.isValid && (
+            <>
+              <ErrorCallOut />
+              <EuiSpacer />
+            </>
+          )}
           {partials.map((FormPartial, i) => (
             <React.Fragment key={i}>
               <FormPartial />

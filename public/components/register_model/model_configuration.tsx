@@ -21,12 +21,62 @@ import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { HelpFlyout } from './help_flyout';
 import { CUSTOM_FORM_ERROR_TYPES } from './constants';
+import { ErrorMessage } from './error_message';
 
 function validateConfigurationObject(value: string) {
   try {
     JSON.parse(value.trim());
   } catch {
     return 'JSON is invalid. Enter a valid JSON';
+  }
+  return true;
+}
+
+function validateModelType(value: string) {
+  try {
+    const config = JSON.parse(value.trim());
+    if (!('model_type' in config)) {
+      return 'model_type is required. Specify the model_type';
+    }
+  } catch {
+    return true;
+  }
+  return true;
+}
+
+function validateModelTypeValue(value: string) {
+  try {
+    const config = JSON.parse(value.trim());
+    if ('model_type' in config && typeof config.model_type !== 'string') {
+      return 'model_type must be a string';
+    }
+  } catch {
+    return true;
+  }
+  return true;
+}
+
+function validateEmbeddingDimensionValue(value: string) {
+  try {
+    const config = JSON.parse(value.trim());
+    if ('embedding_dimension' in config && typeof config.embedding_dimension !== 'number') {
+      return 'embedding_dimension must be a number';
+    }
+  } catch {
+    return true;
+  }
+
+  return true;
+}
+
+function validateFrameworkTypeValue(value: string) {
+  try {
+    const config = JSON.parse(value.trim());
+    if ('framework_type' in config && typeof config.framework_type !== 'string') {
+      return 'framework_type must be a string';
+    }
+  } catch {
+    return true;
   }
   return true;
 }
@@ -39,12 +89,18 @@ export const ConfigurationPanel = () => {
     control,
     rules: {
       required: { value: true, message: 'Configuration is required.' },
-      validate: { [CUSTOM_FORM_ERROR_TYPES.INVALID_CONFIGURATION]: validateConfigurationObject },
+      validate: {
+        [CUSTOM_FORM_ERROR_TYPES.INVALID_CONFIGURATION]: validateConfigurationObject,
+        [CUSTOM_FORM_ERROR_TYPES.CONFIGURATION_MISSING_MODEL_TYPE]: validateModelType,
+        [CUSTOM_FORM_ERROR_TYPES.INVALID_MODEL_TYPE_VALUE]: validateModelTypeValue,
+        [CUSTOM_FORM_ERROR_TYPES.INVALID_EMBEDDING_DIMENSION_VALUE]: validateEmbeddingDimensionValue,
+        [CUSTOM_FORM_ERROR_TYPES.INVALID_FRAMEWORK_TYPE_VALUE]: validateFrameworkTypeValue,
+      },
     },
   });
 
   return (
-    <div>
+    <div data-test-subj="ml-registerModelConfiguration">
       <EuiTitle size="s">
         <h3>Configuration</h3>
       </EuiTitle>
@@ -70,7 +126,7 @@ export const ConfigurationPanel = () => {
         style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
         label="Configuration in JSON"
         isInvalid={Boolean(configurationFieldController.fieldState.error)}
-        error={configurationFieldController.fieldState.error?.message}
+        error={<ErrorMessage error={configurationFieldController.fieldState.error} />}
         labelAppend={
           <EuiButtonEmpty
             onClick={() => setIsHelpVisible(true)}

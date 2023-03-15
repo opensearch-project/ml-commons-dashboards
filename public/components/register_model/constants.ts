@@ -11,6 +11,10 @@ export enum CUSTOM_FORM_ERROR_TYPES {
   DUPLICATE_NAME = 'duplicateName',
   FILE_SIZE_EXCEED_LIMIT = 'fileSizeExceedLimit',
   INVALID_CONFIGURATION = 'invalidConfiguration',
+  CONFIGURATION_MISSING_MODEL_TYPE = 'configurationMissingModelType',
+  INVALID_MODEL_TYPE_VALUE = 'invalidModelTypeValue',
+  INVALID_EMBEDDING_DIMENSION_VALUE = 'invalidEmbeddingDimensionValue',
+  INVALID_FRAMEWORK_TYPE_VALUE = 'invalidFrameworkTypeValue',
 }
 
 export const FORM_ERRORS = [
@@ -58,5 +62,20 @@ export const FORM_ERRORS = [
     field: 'configuration',
     type: CUSTOM_FORM_ERROR_TYPES.INVALID_CONFIGURATION,
     message: 'JSON configuration: Add valid JSON.',
+  },
+  {
+    field: 'configuration',
+    type: CUSTOM_FORM_ERROR_TYPES.CONFIGURATION_MISSING_MODEL_TYPE,
+    message: 'JSON configuration: specify the model_type.',
+  },
+  {
+    field: 'configuration',
+    type: CUSTOM_FORM_ERROR_TYPES.INVALID_EMBEDDING_DIMENSION_VALUE,
+    message: 'JSON configuration: embedding_dimension must be a number.',
+  },
+  {
+    field: 'configuration',
+    type: CUSTOM_FORM_ERROR_TYPES.INVALID_FRAMEWORK_TYPE_VALUE,
+    message: 'JSON configuration: framework_type must be a string.',
   },
 ];
