@@ -70,6 +70,11 @@ export const FORM_ERRORS = [
   },
   {
     field: 'configuration',
+    type: CUSTOM_FORM_ERROR_TYPES.INVALID_MODEL_TYPE_VALUE,
+    message: 'JSON configuration: model_type must be a string.',
+  },
+  {
+    field: 'configuration',
     type: CUSTOM_FORM_ERROR_TYPES.INVALID_EMBEDDING_DIMENSION_VALUE,
     message: 'JSON configuration: embedding_dimension must be a number.',
   },
