@@ -130,14 +130,13 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('should display number of form errors in form footer', async () => {
-    const { user, nameInput, descriptionInput } = await setup();
+    const { user, nameInput } = await setup();
     await user.clear(nameInput);
-    await user.clear(descriptionInput);
     await user.click(screen.getByRole('button', { name: /register model/i }));
-    expect(screen.queryByText(/2 form errors/i)).toBeInTheDocument();
+    expect(screen.queryByText(/1 form error/i)).toBeInTheDocument();
 
     await user.type(nameInput, 'test model name');
-    expect(screen.queryByText(/1 form error/i)).toBeInTheDocument();
+    expect(screen.queryByText(/1 form error/i)).not.toBeInTheDocument();
   });
 
   it('should call addSuccess to display a success toast', async () => {

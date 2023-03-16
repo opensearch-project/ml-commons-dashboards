@@ -41,19 +41,25 @@ import { routerPaths } from '../../../common/router_paths';
 import { modelTaskManager } from './model_task_manager';
 import { ModelVersionNotesPanel } from './model_version_notes';
 import { modelRepositoryManager } from '../../utils/model_repository_manager';
+import { ErrorCallOut } from './error_call_out';
 
 const DEFAULT_VALUES = {
   name: '',
   description: '',
   version: '1',
-  configuration: '{}',
+  configuration: '',
   tags: [{ key: '', value: '' }],
 };
 
 const FORM_ID = 'mlModelUploadForm';
 
-export const RegisterModelForm = () => {
+interface RegisterModelFormProps {
+  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+}
+
+export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterModelFormProps) => {
   const history = useHistory();
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const [modelGroupName, setModelGroupName] = useState<string>();
   const searchParams = useSearchParams();
@@ -81,7 +87,8 @@ export const RegisterModelForm = () => {
 
   const form = useForm<ModelFileFormData | ModelUrlFormData>({
     mode: 'onChange',
-    defaultValues: DEFAULT_VALUES,
+    defaultValues,
+    criteriaMode: 'all',
   });
 
   const onSubmit = useCallback(
@@ -277,6 +284,12 @@ export const RegisterModelForm = () => {
         <EuiPanel>
           {formHeader}
           <EuiSpacer />
+          {isSubmitted && !form.formState.isValid && (
+            <>
+              <ErrorCallOut />
+              <EuiSpacer />
+            </>
+          )}
           {partials.map((FormPartial, i) => (
             <React.Fragment key={i}>
               <FormPartial />
@@ -307,6 +320,7 @@ export const RegisterModelForm = () => {
                 disabled={form.formState.isSubmitting}
                 isLoading={form.formState.isSubmitting}
                 type="submit"
+                onClick={() => setIsSubmitted(true)}
                 fill
               >
                 {latestVersionId ? 'Register version' : 'Register model'}
