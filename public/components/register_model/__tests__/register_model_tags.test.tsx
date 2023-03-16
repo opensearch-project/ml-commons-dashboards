@@ -13,9 +13,6 @@ describe('<RegisterModel /> Tags', () => {
 
   beforeEach(() => {
     jest
-      .spyOn(formHooks, 'useMetricNames')
-      .mockReturnValue([false, ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']]);
-    jest
       .spyOn(formHooks, 'useModelTags')
       .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
@@ -121,7 +118,7 @@ describe('<RegisterModel /> Tags', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should NOT allow to submit if it has duplicate tags', async () => {
+  it('should NOT allow to submit if it has duplicate tags key', async () => {
     const result = await setup();
 
     // input tag key: 'Key 1'
@@ -141,28 +138,26 @@ describe('<RegisterModel /> Tags', () => {
     const keyInput2 = within(keyContainer2).getByRole('textbox');
     await result.user.type(keyInput2, 'Key 1');
 
-    // input tag key: 'Value 1'
+    // input tag key: 'Value 2'
     const valueContainer2 = screen.getByTestId('ml-tagValue2');
     const valueInput2 = within(valueContainer2).getByRole('textbox');
-    await result.user.type(valueInput2, 'Value 1');
+    await result.user.type(valueInput2, 'Value 2');
 
     await result.user.click(result.submitButton);
 
     // Display error message
     expect(
-      within(keyContainer2).queryByText(
-        'This tag has already been added. Remove the duplicate tag.'
-      )
+      within(keyContainer2).queryByText('Tag keys must be unique. Use a unique key.')
     ).toBeInTheDocument();
     // it should not submit the form
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
   it(
-    'should only allow to add maximum 25 tags',
+    'should only allow to add maximum 10 tags',
     async () => {
       const result = await setup();
-      const MAX_TAG_NUM = 25;
+      const MAX_TAG_NUM = 10;
 
       // It has one tag by default, we can add 24 more tags
       const addNewTagButton = screen.getByText(/add new tag/i);
@@ -170,8 +165,8 @@ describe('<RegisterModel /> Tags', () => {
         await result.user.click(addNewTagButton);
       }
 
-      // 25 tags are displayed
-      await waitFor(() => expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(25));
+      // 10 tags are displayed
+      await waitFor(() => expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(10));
       // add new tag button should not be displayed
       await waitFor(() =>
         expect(screen.getByRole('button', { name: /add new tag/i })).toBeDisabled()
@@ -207,5 +202,93 @@ describe('<RegisterModel /> Tags', () => {
         tags: [{ key: '', value: '' }],
       })
     );
+  });
+
+  it('should allow adding one more tag when registering new version if model group has only two tags', async () => {
+    const result = await setup({
+      route: '/foo',
+      mode: 'version',
+    });
+
+    await result.user.click(screen.getByText(/add new tag/i));
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /add new tag/i })).toBeDisabled()
+    );
+  });
+
+  it('should prevent creating new tag key when registering new version', async () => {
+    const result = await setup({
+      route: '/foo',
+      mode: 'version',
+    });
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.type(keyInput, 'foo{enter}');
+    expect(
+      screen.getByText((content, element) => {
+        return (
+          element?.tagName.toLowerCase() === 'strong' &&
+          content === 'foo' &&
+          element?.nextSibling?.textContent?.trim() === "doesn't match any options"
+        );
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('should display error when creating new tag key with more than 80 characters', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.type(keyInput, `${'x'.repeat(81)}{enter}`);
+    expect(
+      within(keyContainer).queryByText('80 characters allowed. Use 80 characters or less.')
+    ).toBeInTheDocument();
+  });
+
+  it('should display error when creating new tag value with more than 80 characters', async () => {
+    const result = await setup();
+
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const valueInput = within(valueContainer).getByRole('textbox');
+    await result.user.type(valueInput, `${'x'.repeat(81)}{enter}`);
+    expect(
+      within(valueContainer).queryByText('80 characters allowed. Use 80 characters or less.')
+    ).toBeInTheDocument();
+  });
+
+  it('should display "No keys found" and "No values found" if no tag keys and no tag values are provided', async () => {
+    jest.spyOn(formHooks, 'useModelTags').mockReturnValue([false, { keys: [], values: [] }]);
+
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.click(keyInput);
+    expect(screen.getByText('No keys found. Add a key.')).toBeInTheDocument();
+
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const valueInput = within(valueContainer).getByRole('textbox');
+    await result.user.click(valueInput);
+    expect(screen.getByText('No values found. Add a value.')).toBeInTheDocument();
+  });
+
+  it('should only display "Key2" in the option list after "Key1" selected', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.click(keyInput);
+    const optionListContainer = screen.getByTestId('comboBoxOptionsList');
+
+    expect(within(optionListContainer).getByTitle('Key2')).toBeInTheDocument();
+    expect(within(optionListContainer).getByTitle('Key1')).toBeInTheDocument();
+
+    await result.user.click(within(optionListContainer).getByTitle('Key1'));
+
+    expect(within(optionListContainer).getByTitle('Key2')).toBeInTheDocument();
+    expect(within(optionListContainer).queryByTitle('Key1')).toBe(null);
   });
 });
