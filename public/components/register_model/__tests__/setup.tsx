@@ -11,11 +11,13 @@ import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 import { RegisterModelForm } from '../register_model';
 import { Model } from '../../../apis/model';
 import { render, RenderWithRouteProps, screen, waitFor } from '../../../../test/test_utils';
+import { ModelFileFormData, ModelUrlFormData } from '../register_model.types';
 
 jest.mock('../../../apis/task');
 
-interface SetupOptions extends RenderWithRouteProps {
+interface SetupOptions extends Partial<RenderWithRouteProps> {
   mode?: 'model' | 'version' | 'import';
+  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
 }
 
 interface SetupReturn {
@@ -27,25 +29,41 @@ interface SetupReturn {
   versionNotesInput: HTMLTextAreaElement;
 }
 
+const CONFIGURATION = `{
+  "model_type": "bert",
+  "embedding_dimension": 384,
+  "framework_type": "sentence_transformers"
+}`;
+
+const DEFAULT_VALUES = {
+  name: '',
+  description: '',
+  version: '1',
+  configuration: CONFIGURATION,
+  tags: [{ key: '', value: '' }],
+};
+
 export async function setup(options: {
-  route: string;
+  route?: string;
   mode: 'version';
+  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
 }): Promise<Omit<SetupReturn, 'nameInput' | 'descriptionInput'>>;
 export async function setup(options?: {
-  route: string;
-  mode: 'model' | 'import';
+  route?: string;
+  mode?: 'model' | 'import';
+  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
 }): Promise<SetupReturn>;
 export async function setup(
-  { route, mode }: SetupOptions = {
+  { route, mode, defaultValues }: SetupOptions = {
     route: '/',
     mode: 'model',
   }
 ) {
   render(
     <Route path="/:id?">
-      <RegisterModelForm />
+      <RegisterModelForm defaultValues={{ ...DEFAULT_VALUES, ...defaultValues }} />
     </Route>,
-    { route }
+    { route: route ?? '/' }
   );
   await waitFor(() => expect(screen.queryByLabelText('Model Form Loading')).toBe(null));
   const nameInput = screen.queryByLabelText<HTMLInputElement>(/^name$/i);

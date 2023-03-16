@@ -8,6 +8,7 @@ import { EuiFieldText, EuiFormRow, EuiTitle, EuiTextArea, EuiText } from '@elast
 import { useController, useFormContext } from 'react-hook-form';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { APIProvider } from '../../apis/api_provider';
+import { CUSTOM_FORM_ERROR_TYPES } from './constants';
 
 const NAME_MAX_LENGTH = 80;
 const DESCRIPTION_MAX_LENGTH = 200;
@@ -29,10 +30,12 @@ export const ModelDetailsPanel = () => {
     control,
     rules: {
       required: { value: true, message: 'Name can not be empty' },
-      validate: async (name) => {
-        return !modelNameFocusedRef.current && !!name && (await isDuplicateModelName(name))
-          ? 'This name is already in use. Use a unique name for the model.'
-          : undefined;
+      validate: {
+        [CUSTOM_FORM_ERROR_TYPES.DUPLICATE_NAME]: async (name) => {
+          return !modelNameFocusedRef.current && !!name && (await isDuplicateModelName(name))
+            ? 'This name is already in use. Use a unique name for the model.'
+            : undefined;
+        },
       },
     },
   });
@@ -40,9 +43,6 @@ export const ModelDetailsPanel = () => {
   const descriptionFieldController = useController({
     name: 'description',
     control,
-    rules: {
-      required: { value: true, message: 'Description can not be empty' },
-    },
   });
 
   const { ref: nameInputRef, ...nameField } = nameFieldController.field;
@@ -86,7 +86,11 @@ export const ModelDetailsPanel = () => {
         />
       </EuiFormRow>
       <EuiFormRow
-        label="Description"
+        label={
+          <>
+            Description - <i style={{ fontWeight: 300 }}>optional</i>
+          </>
+        }
         isInvalid={Boolean(descriptionFieldController.fieldState.error)}
         error={descriptionFieldController.fieldState.error?.message}
         helpText={`${Math.max(

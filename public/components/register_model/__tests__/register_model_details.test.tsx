@@ -70,14 +70,13 @@ describe('<RegisterModel /> Details', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should NOT submit the register model form if model description is empty', async () => {
+  it('should submit the register model form if model description is empty', async () => {
     const result = await setup();
 
     await result.user.clear(result.descriptionInput);
     await result.user.click(result.submitButton);
 
-    expect(result.descriptionInput).toBeInvalid();
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(onSubmitMock).toHaveBeenCalled();
   });
 
   it('should NOT allow to input a model description which exceed max length: 200', async () => {
