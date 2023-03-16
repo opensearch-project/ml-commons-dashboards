@@ -10,7 +10,7 @@ import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 
 import { RegisterModelForm } from '../register_model';
 import { Model } from '../../../apis/model';
-import { render, RenderWithRouteProps, screen, waitFor } from '../../../../test/test_utils';
+import { render, RenderWithRouteProps, screen, waitFor, within } from '../../../../test/test_utils';
 import { ModelFileFormData, ModelUrlFormData } from '../register_model.types';
 
 jest.mock('../../../apis/task');
@@ -71,7 +71,8 @@ export async function setup(
   const submitButton = screen.getByRole<HTMLButtonElement>('button', {
     name: mode === 'version' ? /register version/i : /register model/i,
   });
-  const modelFileInput = screen.queryByLabelText<HTMLInputElement>(/file/i);
+  const modelFileInput = screen.queryByLabelText<HTMLInputElement>(/^file$/i);
+  const fileFormatInput = screen.queryByLabelText(/^Model file format$/i);
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
   const versionNotesInput = screen.getByLabelText<HTMLTextAreaElement>(/notes/i);
@@ -82,6 +83,11 @@ export async function setup(
       modelFileInput,
       new File(['test model file'], 'model.zip', { type: 'application/zip' })
     );
+  }
+
+  if (fileFormatInput) {
+    await user.click(fileFormatInput);
+    await user.click(screen.getByText('ONNX(.onnx)'));
   }
 
   if (mode === 'version') {

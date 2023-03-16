@@ -3,17 +3,68 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { EuiTitle, htmlIdGenerator, EuiSpacer, EuiText, EuiRadio, EuiLink } from '@elastic/eui';
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+  EuiTitle,
+  htmlIdGenerator,
+  EuiSpacer,
+  EuiText,
+  EuiRadio,
+  EuiLink,
+  EuiFormRow,
+  EuiComboBox,
+  EuiComboBoxOptionOption,
+} from '@elastic/eui';
+import { useController, useFormContext } from 'react-hook-form';
 
 import { ModelFileUploader } from './artifact_file';
 import { ArtifactUrl } from './artifact_url';
 import { ONE_GB } from '../../../common/constant';
 import { MAX_MODEL_FILE_SIZE } from './constants';
+import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+
+const FILE_FORMAT_OPTIONS = [
+  {
+    label: 'ONNX(.onnx)',
+    value: 'ONNX',
+  },
+  {
+    label: 'Torchscript(.pt)',
+    value: 'TORCH_SCRIPT',
+  },
+];
 
 export const ArtifactPanel = () => {
+  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const [selectedSource, setSelectedSource] = useState<'source_from_computer' | 'source_from_url'>(
     'source_from_computer'
+  );
+
+  const modelFileFormatController = useController({
+    name: 'modelFileFormat',
+    control,
+    rules: {
+      required: {
+        value: true,
+        message: 'Model file format is required. Select a model file format.',
+      },
+    },
+  });
+
+  const { ref: fileFormatInputRef, ...fileFormatField } = modelFileFormatController.field;
+
+  const selectedFileFormatOption = useMemo(() => {
+    if (fileFormatField.value) {
+      return FILE_FORMAT_OPTIONS.find((fmt) => fmt.value === fileFormatField.value);
+    }
+  }, [fileFormatField]);
+
+  const onFileFormatChange = useCallback(
+    (options: Array<EuiComboBoxOptionOption<string>>) => {
+      const value = options[0]?.value;
+      fileFormatField.onChange(value);
+    },
+    [fileFormatField]
   );
 
   return (
@@ -64,6 +115,21 @@ export const ArtifactPanel = () => {
           <li>Tokenizer file, accepted format: JSON(.json)</li>
         </ul>
       </EuiText>
+      <EuiSpacer />
+      <EuiFormRow
+        label="Model file format"
+        error={modelFileFormatController.fieldState.error?.message}
+        isInvalid={Boolean(modelFileFormatController.fieldState.error)}
+      >
+        <EuiComboBox
+          inputRef={fileFormatInputRef}
+          options={FILE_FORMAT_OPTIONS}
+          singleSelection={{ asPlainText: true }}
+          selectedOptions={selectedFileFormatOption ? [selectedFileFormatOption] : []}
+          placeholder="Select a format"
+          onChange={onFileFormatChange}
+        />
+      </EuiFormRow>
     </div>
   );
 };
