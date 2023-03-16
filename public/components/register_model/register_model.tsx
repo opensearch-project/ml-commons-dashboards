@@ -27,7 +27,6 @@ import { ModelDetailsPanel } from './model_details';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';
 import { ConfigurationPanel } from './model_configuration';
-import { EvaluationMetricsPanel } from './evaluation_metrics';
 import { ModelTagsPanel } from './model_tags';
 import { submitModelWithFile, submitModelWithURL } from './register_model_api';
 import { APIProvider } from '../../apis/api_provider';
@@ -73,10 +72,10 @@ export const RegisterModelForm = () => {
       ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
       : [
           ...(latestVersionId ? [] : [ModelDetailsPanel]),
+          ...(latestVersionId ? [] : [ModelTagsPanel]),
           ArtifactPanel,
           ConfigurationPanel,
-          EvaluationMetricsPanel,
-          ModelTagsPanel,
+          ...(latestVersionId ? [ModelTagsPanel] : []),
           ModelVersionNotesPanel,
         ];
 

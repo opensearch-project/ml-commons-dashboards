@@ -4,11 +4,8 @@
  */
 
 import React from 'react';
-import { Route } from 'react-router-dom';
 
 import { render, screen, waitFor } from '../../../../test/test_utils';
-import { RegisterModelForm } from '../register_model';
-import { routerPaths } from '../../../../common/router_paths';
 import { setup } from './setup';
 import { Model } from '../../../../public/apis/model';
 import * as PluginContext from '../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -77,12 +74,7 @@ describe('<RegisterModel /> Form', () => {
   it('should init form when id param in url route', async () => {
     const mockResult = MOCKED_DATA;
     jest.spyOn(Model.prototype, 'getOne').mockResolvedValue(mockResult);
-    render(
-      <Route path={routerPaths.registerModel}>
-        <RegisterModelForm />
-      </Route>,
-      { route: '/model-registry/register-model/test_model_id' }
-    );
+    await setup({ route: '/test_model_id', mode: 'version' });
 
     const { name } = mockResult;
 
@@ -94,12 +86,7 @@ describe('<RegisterModel /> Form', () => {
   it('submit button label should be `Register version` when register new version', async () => {
     jest.spyOn(Model.prototype, 'getOne').mockResolvedValue(MOCKED_DATA);
 
-    render(
-      <Route path={routerPaths.registerModel}>
-        <RegisterModelForm />
-      </Route>,
-      { route: '/model-registry/register-model/test_model_id' }
-    );
+    await setup({ route: '/test_model_id', mode: 'version' });
 
     expect(screen.getByRole('button', { name: /register version/i })).toBeInTheDocument();
   });
@@ -107,7 +94,7 @@ describe('<RegisterModel /> Form', () => {
   it('submit button label should be `Register model` when import a model', async () => {
     await setup({
       route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
-      ignoreFillFields: ['name', 'description'],
+      mode: 'import',
     });
     expect(screen.getByRole('button', { name: /register model/i })).toBeInTheDocument();
   });
@@ -116,7 +103,7 @@ describe('<RegisterModel /> Form', () => {
     jest.spyOn(formAPI, 'submitModelWithURL').mockImplementation(onSubmitMock);
     const { user } = await setup({
       route: '/?type=import&name=sentence-transformers/all-distilroberta-v1',
-      ignoreFillFields: ['name', 'description'],
+      mode: 'import',
     });
     await waitFor(() =>
       expect(screen.getByLabelText<HTMLInputElement>(/^name$/i).value).toEqual(
@@ -138,12 +125,7 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('submit button label should be `Register model` when register new model', async () => {
-    render(
-      <Route path={routerPaths.registerModel}>
-        <RegisterModelForm />
-      </Route>,
-      { route: '/model-registry/register-model' }
-    );
+    await setup();
     expect(screen.getByRole('button', { name: /register model/i })).toBeInTheDocument();
   });
 
