@@ -52,4 +52,16 @@ describe('<RegisterModel /> Artifact', () => {
     // Error callout
     expect(screen.queryByText(/Model file format: Select a model format/i)).toBeInTheDocument();
   });
+
+  it('should submit the form with selected model file format', async () => {
+    const result = await setup();
+    const fileFormatInput = screen.getByLabelText(/^Model file format$/i);
+    await result.user.click(fileFormatInput);
+    await result.user.click(screen.getByText('Torchscript(.pt)'));
+
+    await result.user.click(result.submitButton);
+    expect(onSubmitWithFileMock).toHaveBeenCalledWith(
+      expect.objectContaining({ modelFileFormat: 'TORCH_SCRIPT' })
+    );
+  });
 });
