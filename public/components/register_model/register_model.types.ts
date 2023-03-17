@@ -13,6 +13,7 @@ interface ModelFormBase {
   version: string;
   description: string;
   configuration: string;
+  modelFileFormat: string;
   tags?: Tag[];
   versionNotes?: string;
 }

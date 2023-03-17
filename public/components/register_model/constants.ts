@@ -54,6 +54,11 @@ export const FORM_ERRORS = [
     message: 'Model file format: Select a model file format.',
   },
   {
+    field: 'modelFileFormat',
+    type: 'required',
+    message: 'Model file format: Select a model format.',
+  },
+  {
     field: 'configuration',
     type: 'required',
     message: 'JSON configuration: Add a JSON configuration.',

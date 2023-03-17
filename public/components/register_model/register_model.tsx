@@ -49,6 +49,7 @@ const DEFAULT_VALUES = {
   version: '1',
   configuration: '',
   tags: [{ key: '', value: '' }],
+  modelFileFormat: '',
 };
 
 const FORM_ID = 'mlModelUploadForm';
