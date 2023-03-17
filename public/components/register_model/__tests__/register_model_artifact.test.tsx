@@ -83,13 +83,13 @@ describe('<RegisterModel /> Artifact', () => {
     // Empty model file selection by clicking the `Remove` button on EuiFilePicker
     await result.user.click(screen.getByLabelText(/clear selected files/i));
 
-    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/file/i);
+    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/^file$/i);
     // User select a file with maximum accepted size
     const validFile = new File(['test model file'], 'model.zip', { type: 'application/zip' });
     Object.defineProperty(validFile, 'size', { value: 4 * ONE_GB });
     await result.user.upload(modelFileInput, validFile);
 
-    expect(screen.getByLabelText(/file/i, { selector: 'input[type="file"]' })).toBeValid();
+    expect(screen.getByLabelText(/^file$/i, { selector: 'input[type="file"]' })).toBeValid();
     await result.user.click(result.submitButton);
     expect(onSubmitWithFileMock).toHaveBeenCalled();
   });
@@ -100,7 +100,7 @@ describe('<RegisterModel /> Artifact', () => {
     // Empty model file selection by clicking the `Remove` button on EuiFilePicker
     await result.user.click(screen.getByLabelText(/clear selected files/i));
 
-    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/file/i);
+    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/^file$/i);
     // File size can not exceed 4GB
     const invalidFile = new File(['test model file'], 'model.zip', { type: 'application/zip' });
     Object.defineProperty(invalidFile, 'size', { value: 4 * ONE_GB + 1 });
@@ -117,7 +117,7 @@ describe('<RegisterModel /> Artifact', () => {
     // Empty model file selection by clicking the `Remove` button on EuiFilePicker
     await result.user.click(screen.getByLabelText(/clear selected files/i));
 
-    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/file/i);
+    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/^file$/i);
     // Only ZIP(.zip) file is allowed
     const invalidFile = new File(['test model file'], 'model.json', { type: 'application/json' });
     await result.user.upload(modelFileInput, invalidFile);
