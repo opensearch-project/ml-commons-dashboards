@@ -5,7 +5,6 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-  EuiTitle,
   htmlIdGenerator,
   EuiSpacer,
   EuiText,
@@ -69,12 +68,9 @@ export const ArtifactPanel = () => {
 
   return (
     <div>
-      <EuiTitle size="s">
-        <h2>File and version information</h2>
-      </EuiTitle>
-      <EuiTitle size="s">
+      <EuiText size="s">
         <h3>Artifact</h3>
-      </EuiTitle>
+      </EuiText>
       <EuiText style={{ maxWidth: 725 }}>
         <small>
           The zipped artifact must include a model file and a tokenizer file. If uploading with a

@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { EuiButton, EuiTitle, EuiSpacer, EuiText, EuiLink } from '@elastic/eui';
+import { EuiButton, EuiSpacer, EuiText, EuiLink } from '@elastic/eui';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
@@ -31,11 +31,11 @@ export const ModelTagsPanel = () => {
 
   return (
     <div>
-      <EuiTitle size="s">
+      <EuiText size="s">
         <h3>
           Tags - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
-      </EuiTitle>
+      </EuiText>
       <EuiText style={{ maxWidth: 725 }}>
         <small>
           {isRegisterNewVersion ? (

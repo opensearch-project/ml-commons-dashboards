@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback, useRef } from 'react';
-import { EuiFieldText, EuiFormRow, EuiTitle, EuiTextArea, EuiText } from '@elastic/eui';
+import { EuiFieldText, EuiFormRow, EuiTextArea, EuiText } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { APIProvider } from '../../apis/api_provider';
@@ -60,9 +60,9 @@ export const ModelDetailsPanel = () => {
 
   return (
     <div>
-      <EuiTitle size="s">
-        <h3>Model Details</h3>
-      </EuiTitle>
+      <EuiText size="s">
+        <h3>Details</h3>
+      </EuiText>
       <EuiFormRow
         label="Name"
         isInvalid={Boolean(nameFieldController.fieldState.error)}
