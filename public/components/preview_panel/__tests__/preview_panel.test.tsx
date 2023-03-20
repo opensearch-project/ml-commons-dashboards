@@ -5,7 +5,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '../../../../test/test_utils';
+import { act, render, screen, waitFor } from '../../../../test/test_utils';
 import { PreviewPanel } from '../';
 import { APIProvider } from '../../../apis/api_provider';
 
@@ -22,6 +22,10 @@ function setup({ model = MODEL, onClose = jest.fn() }) {
 }
 
 describe('<PreviewPanel />', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should render id and name in panel', () => {
     setup({});
     expect(screen.getByText('test')).toBeInTheDocument();
@@ -82,5 +86,32 @@ describe('<PreviewPanel />', () => {
     });
     setup({});
     await waitFor(() => expect(screen.getByText('Responding on 3 of 3 nodes')).toBeInTheDocument());
+  });
+
+  it('should NOT render nodes during model profile API loading', async () => {
+    const getModelMock = jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockReturnValue(
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            id: 'model-1-id',
+            target_worker_nodes: ['node-1', 'node-2', 'node-3'],
+            worker_nodes: ['node-1'],
+            not_worker_nodes: ['node-2', 'node-3'],
+          });
+        }, 100);
+      })
+    );
+    setup({});
+    expect(screen.queryByText('node-1')).not.toBeInTheDocument();
+    expect(screen.queryByText('node-2')).not.toBeInTheDocument();
+    expect(screen.queryByText('node-3')).not.toBeInTheDocument();
+
+    await act(async () => {
+      await getModelMock.mock.results[0].value;
+    });
+
+    expect(await screen.getByText('node-1')).toBeInTheDocument();
+    expect(await screen.getByText('node-2')).toBeInTheDocument();
+    expect(await screen.getByText('node-3')).toBeInTheDocument();
   });
 });
