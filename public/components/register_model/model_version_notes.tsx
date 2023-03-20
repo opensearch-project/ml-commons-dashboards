@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { EuiTitle, EuiSpacer, EuiFormRow, EuiTextArea } from '@elastic/eui';
+import { EuiText, EuiSpacer, EuiFormRow, EuiTextArea } from '@elastic/eui';
 import { useFormContext, useController } from 'react-hook-form';
 
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
@@ -22,11 +22,11 @@ export const ModelVersionNotesPanel = () => {
 
   return (
     <div>
-      <EuiTitle size="s">
+      <EuiText size="s">
         <h3>
           Version notes - <i style={{ fontWeight: 300 }}>optional</i>
         </h3>
-      </EuiTitle>
+      </EuiText>
       <EuiSpacer size="m" />
       <EuiFormRow
         helpText={`${Math.max(

@@ -6,7 +6,6 @@
 import React, { useState } from 'react';
 import {
   EuiFormRow,
-  EuiTitle,
   EuiCodeEditor,
   EuiText,
   EuiTextColor,
@@ -101,9 +100,9 @@ export const ConfigurationPanel = () => {
 
   return (
     <div data-test-subj="ml-registerModelConfiguration">
-      <EuiTitle size="s">
+      <EuiText size="s">
         <h3>Configuration</h3>
-      </EuiTitle>
+      </EuiText>
       <EuiText style={{ maxWidth: 725 }}>
         <small>
           The model configuration specifies the{' '}
