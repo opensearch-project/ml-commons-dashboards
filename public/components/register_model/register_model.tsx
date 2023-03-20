@@ -58,6 +58,22 @@ interface RegisterModelFormProps {
   defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
 }
 
+const ModelOverviewTitle = () => {
+  return (
+    <EuiText size="s">
+      <h2>Model overview</h2>
+    </EuiText>
+  );
+};
+
+const FileAndVersionTitle = () => {
+  return (
+    <EuiText size="s">
+      <h2>File and version information</h2>
+    </EuiText>
+  );
+};
+
 export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterModelFormProps) => {
   const history = useHistory();
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -78,8 +94,10 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     formType === 'import'
       ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
       : [
+          ...(latestVersionId ? [] : [ModelOverviewTitle]),
           ...(latestVersionId ? [] : [ModelDetailsPanel]),
           ...(latestVersionId ? [] : [ModelTagsPanel]),
+          ...(latestVersionId ? [] : [FileAndVersionTitle]),
           ArtifactPanel,
           ConfigurationPanel,
           ...(latestVersionId ? [ModelTagsPanel] : []),
@@ -294,7 +312,11 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
           {partials.map((FormPartial, i) => (
             <React.Fragment key={i}>
               <FormPartial />
-              <EuiSpacer size="xl" />
+              {FormPartial === ModelOverviewTitle || FormPartial === FileAndVersionTitle ? (
+                <EuiSpacer size="s" />
+              ) : (
+                <EuiSpacer size="xl" />
+              )}
             </React.Fragment>
           ))}
         </EuiPanel>
