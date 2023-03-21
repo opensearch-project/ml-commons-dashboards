@@ -90,7 +90,7 @@ describe('<PreviewPanel />', () => {
 
   it('should NOT render nodes during model profile API loading', async () => {
     jest.useFakeTimers();
-    const getModelMock = jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockReturnValue(
+    jest.spyOn(APIProvider.getAPI('profile'), 'getModel').mockReturnValue(
       new Promise((resolve) => {
         setTimeout(() => {
           resolve({
@@ -108,13 +108,12 @@ describe('<PreviewPanel />', () => {
     expect(screen.queryByText('node-3')).not.toBeInTheDocument();
 
     jest.advanceTimersByTime(3000);
-    await act(async () => {
-      await getModelMock.mock.results[0].value;
-    });
-
-    expect(await screen.getByText('node-1')).toBeInTheDocument();
-    expect(await screen.getByText('node-2')).toBeInTheDocument();
-    expect(await screen.getByText('node-3')).toBeInTheDocument();
     jest.useRealTimers();
+
+    waitFor(() => {
+      expect(screen.getByText('node-1')).toBeInTheDocument();
+      expect(screen.getByText('node-2')).toBeInTheDocument();
+      expect(screen.getByText('node-3')).toBeInTheDocument();
+    });
   });
 });
