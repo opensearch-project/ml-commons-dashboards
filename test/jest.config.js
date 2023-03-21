@@ -13,7 +13,14 @@ module.exports = {
     '^ui/(.*)': '<rootDir>/../../src/legacy/ui/public/$1/',
   },
   testMatch: ['**/*.test.{js,mjs,ts,tsx}'],
-  testPathIgnorePatterns: ['<rootDir>/target/', '<rootDir>/node_modules/'],
+  testPathIgnorePatterns: ['<rootDir>/target/', '<rootDir>/node_modules/', '<rootDir>/build/'],
+  collectCoverageFrom: [
+    '<rootDir>/public/**/*.{ts,tsx}',
+    '!<rootDir>/public/**/*.test.{ts,tsx}',
+    '!<rootDir>/public/**/*.types.ts',
+  ],
+  coverageDirectory: './coverage',
+  coverageReporters: ['lcov', 'text', 'cobertura', 'html'],
   transform: {
     '^.+\\.(js|tsx?)$': '<rootDir>/../../src/dev/jest/babel_transform.js',
   },
