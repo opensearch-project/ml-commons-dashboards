@@ -41,7 +41,9 @@ jobs:
         run: |
           cd OpenSearch-Dashboards/plugins/ml-commons-dashboards
           yarn osd bootstrap
-      - name: Run tests
+      - name: Run tests with coverage
         run: |
           cd OpenSearch-Dashboards/plugins/ml-commons-dashboards
-          yarn run test:jest --silent
+          yarn run test:jest --silent --coverage
+      - name: Uploads coverage
+        uses: codecov/codecov-action@v1
