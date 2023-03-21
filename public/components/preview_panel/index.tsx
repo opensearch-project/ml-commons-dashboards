@@ -42,13 +42,16 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
   const { id, name } = model;
   const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
+    if (loading) {
+      return [];
+    }
     const targetNodes = data?.target_worker_nodes ?? model.planningWorkerNodes ?? [];
     const deployedNodes = data?.worker_nodes ?? [];
     return targetNodes.map((item) => ({
       id: item,
       deployed: deployedNodes.indexOf(item) > -1 ? true : false,
     }));
-  }, [data, model]);
+  }, [data, model, loading]);
 
   const respondingStatus = useMemo(() => {
     if (loading) {
