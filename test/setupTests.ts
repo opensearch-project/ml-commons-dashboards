@@ -5,7 +5,7 @@
 
 import 'babel-polyfill';
 
-import './fetch-polyfill';
+import './fetch_polyfill';
 import { setupDashboard } from './setup_dashboard';
 
 setupDashboard();
