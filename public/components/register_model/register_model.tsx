@@ -19,6 +19,7 @@ import {
   EuiTextColor,
   EuiLink,
   EuiLoadingSpinner,
+  EuiPageContent,
 } from '@elastic/eui';
 import useObservable from 'react-use/lib/useObservable';
 import { from } from 'rxjs';
@@ -293,65 +294,72 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
   }
 
   return (
-    <FormProvider {...form}>
-      <EuiForm
-        id={FORM_ID}
-        data-test-subj="mlCommonsPlugin-registerModelForm"
-        onSubmit={form.handleSubmit(onSubmit, onError)}
-        component="form"
-      >
-        <EuiPanel>
-          {formHeader}
-          <EuiSpacer />
-          {isSubmitted && !form.formState.isValid && (
-            <>
-              <ErrorCallOut />
-              <EuiSpacer />
-            </>
-          )}
-          {partials.map((FormPartial, i) => (
-            <React.Fragment key={i}>
-              <FormPartial />
-              {FormPartial === ModelOverviewTitle || FormPartial === FileAndVersionTitle ? (
-                <EuiSpacer size="s" />
-              ) : (
-                <EuiSpacer size="xl" />
-              )}
-            </React.Fragment>
-          ))}
-        </EuiPanel>
-        <EuiSpacer size="xxl" />
-        <EuiSpacer size="xxl" />
-        <EuiBottomBar left={isLocked ? '320px' : 0}>
-          <EuiFlexGroup justifyContent="flexEnd">
-            {errorCount > 0 && (
-              <EuiFlexItem
-                style={{
-                  justifyContent: 'center',
-                  marginRight: 'auto',
-                }}
-                grow={false}
-              >
-                <EuiText style={{ padding: '0 8px', borderLeft: '4px solid #BD271E' }}>
-                  {errorCount} form {errorCount > 1 ? 'errors' : 'error'}
-                </EuiText>
-              </EuiFlexItem>
+    <EuiPageContent
+      verticalPosition="center"
+      horizontalPosition="center"
+      paddingSize="none"
+      style={{ maxWidth: 1000 }}
+    >
+      <FormProvider {...form}>
+        <EuiForm
+          id={FORM_ID}
+          data-test-subj="mlCommonsPlugin-registerModelForm"
+          onSubmit={form.handleSubmit(onSubmit, onError)}
+          component="form"
+        >
+          <EuiPanel>
+            {formHeader}
+            <EuiSpacer />
+            {isSubmitted && !form.formState.isValid && (
+              <>
+                <ErrorCallOut />
+                <EuiSpacer />
+              </>
             )}
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                form={FORM_ID}
-                disabled={form.formState.isSubmitting}
-                isLoading={form.formState.isSubmitting}
-                type="submit"
-                onClick={() => setIsSubmitted(true)}
-                fill
-              >
-                {latestVersionId ? 'Register version' : 'Register model'}
-              </EuiButton>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiBottomBar>
-      </EuiForm>
-    </FormProvider>
+            {partials.map((FormPartial, i) => (
+              <React.Fragment key={i}>
+                <FormPartial />
+                {FormPartial === ModelOverviewTitle || FormPartial === FileAndVersionTitle ? (
+                  <EuiSpacer size="s" />
+                ) : (
+                  <EuiSpacer size="xl" />
+                )}
+              </React.Fragment>
+            ))}
+          </EuiPanel>
+          <EuiSpacer size="xxl" />
+          <EuiSpacer size="xxl" />
+          <EuiBottomBar left={isLocked ? '320px' : 0}>
+            <EuiFlexGroup justifyContent="flexEnd">
+              {errorCount > 0 && (
+                <EuiFlexItem
+                  style={{
+                    justifyContent: 'center',
+                    marginRight: 'auto',
+                  }}
+                  grow={false}
+                >
+                  <EuiText style={{ padding: '0 8px', borderLeft: '4px solid #BD271E' }}>
+                    {errorCount} form {errorCount > 1 ? 'errors' : 'error'}
+                  </EuiText>
+                </EuiFlexItem>
+              )}
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  form={FORM_ID}
+                  disabled={form.formState.isSubmitting}
+                  isLoading={form.formState.isSubmitting}
+                  type="submit"
+                  onClick={() => setIsSubmitted(true)}
+                  fill
+                >
+                  {latestVersionId ? 'Register version' : 'Register model'}
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiBottomBar>
+        </EuiForm>
+      </FormProvider>
+    </EuiPageContent>
   );
 };
