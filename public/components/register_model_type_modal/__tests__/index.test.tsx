@@ -8,8 +8,6 @@ import userEvent from '@testing-library/user-event';
 import { RegisterModelTypeModal } from '../index';
 import { render, screen, waitFor } from '../../../../test/test_utils';
 
-jest.mock('../../../apis/model_repository');
-
 const mockOffsetMethods = () => {
   const originalOffsetHeight = Object.getOwnPropertyDescriptor(
     HTMLElement.prototype,
