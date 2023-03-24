@@ -9,4 +9,5 @@ export const routerPaths = {
   modelList: '/model-registry/model-list',
   overview: '/overview',
   modelGroup: '/model-registry/model/:id',
+  modelVersion: '/model-registry/model-version/:id',
 };
