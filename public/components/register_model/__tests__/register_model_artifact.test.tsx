@@ -10,8 +10,6 @@ import { ModelFileUploadManager } from '../model_file_upload_manager';
 import * as formAPI from '../register_model_api';
 import { ONE_GB } from '../../../../common/constant';
 
-jest.mock('../../../apis/model_repository');
-
 describe('<RegisterModel /> Artifact', () => {
   const onSubmitWithFileMock = jest.fn().mockResolvedValue('model_id');
   const onSubmitWithURLMock = jest.fn();

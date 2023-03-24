@@ -20,7 +20,6 @@ jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', ()
     ...jest.requireActual('../../../../../../src/plugins/opensearch_dashboards_react/public'),
   };
 });
-jest.mock('../../../apis/model_repository');
 
 const MOCKED_DATA = {
   id: 'C7jN0YQBjgpeQQ_RmiDE',

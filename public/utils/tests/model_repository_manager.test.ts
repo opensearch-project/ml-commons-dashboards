@@ -6,8 +6,6 @@
 import { ModelRepository } from '../../apis/model_repository';
 import { ModelRepositoryManager } from '../model_repository_manager';
 
-jest.mock('../../apis/model_repository');
-
 describe('ModelRepositoryManager', () => {
   beforeEach(() => {
     jest.spyOn(ModelRepository.prototype, 'getPreTrainedModelConfig');
