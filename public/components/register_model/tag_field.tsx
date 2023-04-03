@@ -4,15 +4,21 @@
  */
 
 import {
-  EuiButton,
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
   EuiContext,
+  EuiButtonIcon,
+  EuiPopover,
+  EuiButtonEmpty,
+  EuiPopoverTitle,
+  EuiPopoverFooter,
+  EuiButton,
+  EuiRadio,
 } from '@elastic/eui';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useController, useWatch, useFormContext } from 'react-hook-form';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
@@ -54,6 +60,7 @@ export const ModelTagField = ({
   allowKeyCreate,
   onDelete,
 }: ModelTagFieldProps) => {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const rowEleRef = useRef<HTMLDivElement>(null);
   const { trigger, control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const tags = useWatch({
@@ -173,7 +180,7 @@ export const ModelTagField = ({
   );
 
   return (
-    <EuiFlexGroup ref={rowEleRef} tabIndex={-1} onBlur={onBlur}>
+    <EuiFlexGroup gutterSize="m" ref={rowEleRef} tabIndex={-1} onBlur={onBlur}>
       <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
         <EuiContext i18n={KEY_COMBOBOX_I18N}>
           <EuiFormRow
@@ -208,6 +215,33 @@ export const ModelTagField = ({
             error={tagValueController.fieldState.error?.message}
           >
             <EuiComboBox
+              prepend={
+                <EuiPopover
+                  button={
+                    <EuiButtonEmpty
+                      onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+                      size="xs"
+                      iconType="arrowDown"
+                      iconSide="right"
+                    >
+                      String
+                    </EuiButtonEmpty>
+                  }
+                  closePopover={() => setIsPopoverOpen(false)}
+                  isOpen={isPopoverOpen}
+                  panelPaddingSize="s"
+                  panelStyle={{ minWidth: 140 }}
+                >
+                  <EuiPopoverTitle>TAG TYPE</EuiPopoverTitle>
+                  <EuiRadio label="String" id="" onChange={() => {}} />
+                  <EuiRadio label="Number" id="" onChange={() => {}} />
+                  <EuiPopoverFooter>
+                    <EuiButton fullWidth size="s">
+                      Apply
+                    </EuiButton>
+                  </EuiPopoverFooter>
+                </EuiPopover>
+              }
               placeholder="Select or add a value"
               isInvalid={Boolean(tagValueController.fieldState.error)}
               singleSelection={{ asPlainText: true }}
@@ -225,9 +259,13 @@ export const ModelTagField = ({
         </EuiContext>
       </EuiFlexItem>
       <EuiFlexItem grow={false} style={index === 0 ? { transform: 'translateY(22px)' } : undefined}>
-        <EuiButton aria-label={`Remove tag at row ${index + 1}`} onClick={() => onDelete(index)}>
-          Remove
-        </EuiButton>
+        <EuiButtonIcon
+          display="base"
+          size="m"
+          iconType="cross"
+          aria-label={`Remove tag at row ${index + 1}`}
+          onClick={() => onDelete(index)}
+        />
       </EuiFlexItem>
     </EuiFlexGroup>
   );

@@ -6,6 +6,7 @@
 export interface Tag {
   key: string;
   value: string;
+  type: 'number' | 'string';
 }
 
 interface ModelFormBase {

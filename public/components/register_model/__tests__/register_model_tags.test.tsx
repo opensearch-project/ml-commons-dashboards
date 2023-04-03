@@ -54,7 +54,7 @@ describe('<RegisterModel /> Tags', () => {
     await result.user.click(result.submitButton);
 
     expect(onSubmitMock).toHaveBeenCalledWith(
-      expect.objectContaining({ tags: [{ key: 'Key1', value: 'Value1' }] })
+      expect.objectContaining({ tags: [{ key: 'Key1', value: 'Value1', type: 'string' }] })
     );
   });
 
@@ -74,9 +74,9 @@ describe('<RegisterModel /> Tags', () => {
     expect(onSubmitMock).toHaveBeenCalledWith(
       expect.objectContaining({
         tags: [
-          { key: '', value: '' },
-          { key: '', value: '' },
-          { key: '', value: '' },
+          { key: '', value: '', type: 'string' },
+          { key: '', value: '', type: 'string' },
+          { key: '', value: '', type: 'string' },
         ],
       })
     );
@@ -199,7 +199,7 @@ describe('<RegisterModel /> Tags', () => {
 
     expect(onSubmitMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        tags: [{ key: '', value: '' }],
+        tags: [{ key: '', value: '', type: 'string' }],
       })
     );
   });

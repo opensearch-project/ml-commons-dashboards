@@ -26,7 +26,7 @@ export const ModelTagsPanel = () => {
   const maxTagNum = isRegisterNewVersion ? keys.length : MAX_TAG_NUM;
 
   const addNewTag = useCallback(() => {
-    append({ key: '', value: '' });
+    append({ key: '', value: '', type: 'string' });
   }, [append]);
 
   return (
