@@ -34,13 +34,9 @@ describe('<ModelVersion />', () => {
   });
 
   it('should display loading screen during Model.getOne calling', async () => {
-    jest.useFakeTimers();
-
     setup();
 
     expect(screen.getByTestId('modelVersionLoadingSpinner')).toBeInTheDocument();
-    jest.advanceTimersByTime(3000);
-    jest.useRealTimers();
     await waitFor(() => {
       expect(screen.queryByTestId('modelVersionLoadingSpinner')).not.toBeInTheDocument();
     });
