@@ -5,3 +5,7 @@ Compatible with OpenSearch 2.7.0
 ### Breaking Changes
 
 * ml-commons introduced a API breaking change in 2.7 which changed the API response data, FE is updated accordingly. With this change, FE will no longer compatible with OpenSearch version < 2.7 ([#154](https://github.com/opensearch-project/ml-commons-dashboards/pull/154))
+
+### Bug Fixes
+
+* Fixed an issue that model status is displayed as `Not responding` while the model status is loading ([#146](https://github.com/opensearch-project/ml-commons-dashboards/pull/146))
