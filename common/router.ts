@@ -7,6 +7,7 @@ import { ModelGroup } from '../public/components/model_group';
 import { ModelList } from '../public/components/model_list';
 import { Monitoring } from '../public/components/monitoring';
 import { RegisterModelForm } from '../public/components/register_model/register_model';
+import { ModelVersion } from '../public/components/model_version';
 import { routerPaths } from './router_paths';
 
 interface RouteConfig {
@@ -44,6 +45,12 @@ export const ROUTES: RouteConfig[] = [
     // TODO: refactor label to be dynamic so that we can display group name in breadcrumb
     label: 'Model Group',
     Component: ModelGroup,
+    nav: false,
+  },
+  {
+    path: routerPaths.modelVersion,
+    label: 'Model Version',
+    Component: ModelVersion,
     nav: false,
   },
 ];
