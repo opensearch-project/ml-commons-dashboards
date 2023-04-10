@@ -133,7 +133,7 @@ export const ModelTagField = ({
   });
 
   useEffect(() => {
-    if (selectedTagGroup) {
+    if (selectedTagGroup && tagTypeController.field.value !== selectedTagGroup.type) {
       tagTypeController.field.onChange(selectedTagGroup.type);
     }
   }, [selectedTagGroup, tagTypeController.field]);
