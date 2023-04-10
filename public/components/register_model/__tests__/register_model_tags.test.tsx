@@ -12,9 +12,13 @@ describe('<RegisterModel /> Tags', () => {
   const onSubmitMock = jest.fn().mockResolvedValue('model_id');
 
   beforeEach(() => {
-    jest
-      .spyOn(formHooks, 'useModelTags')
-      .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
+    jest.spyOn(formHooks, 'useModelTags').mockReturnValue([
+      false,
+      [
+        { name: 'Key1', type: 'string', values: ['Value1'] },
+        { name: 'Key2', type: 'number', values: [0.95] },
+      ],
+    ]);
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
   });
 
@@ -39,6 +43,20 @@ describe('<RegisterModel /> Tags', () => {
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
+  it('tag value input should be disabled if tag key is empty', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const valueInput = within(valueContainer).getByRole('textbox');
+    expect(valueInput).toBeDisabled();
+
+    await result.user.type(keyInput, 'Key1{enter}');
+    expect(valueInput).toBeEnabled();
+  });
+
   it('should submit the form with selected tags', async () => {
     const result = await setup();
 
@@ -48,8 +66,8 @@ describe('<RegisterModel /> Tags', () => {
     const valueContainer = screen.getByTestId('ml-tagValue1');
     const valueInput = within(valueContainer).getByRole('textbox');
 
-    await result.user.type(keyInput, 'Key1');
-    await result.user.type(valueInput, 'Value1');
+    await result.user.type(keyInput, 'Key1{enter}');
+    await result.user.type(valueInput, 'Value1{enter}');
 
     await result.user.click(result.submitButton);
 
@@ -103,16 +121,20 @@ describe('<RegisterModel /> Tags', () => {
   it('should NOT allow to submit tag which does NOT have key', async () => {
     const result = await setup();
 
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.type(keyInput, 'Key1{enter}');
+
     const valueContainer = screen.getByTestId('ml-tagValue1');
     const valueInput = within(valueContainer).getByRole('textbox');
-    // only input value, but NOT key
+    // Input value, then clear key
     await result.user.type(valueInput, 'Value 1');
+    await result.user.click(within(keyContainer).getByLabelText('Clear input'));
+
     await result.user.click(result.submitButton);
 
     // tag key input should be invalid
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const keyInput = within(keyContainer).queryByText('A key is required. Enter a key.');
-    expect(keyInput).toBeInTheDocument();
+    expect(within(keyContainer).queryByText('A key is required. Enter a key.')).toBeInTheDocument();
 
     // it should not submit the form
     expect(onSubmitMock).not.toHaveBeenCalled();
@@ -205,6 +227,14 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should allow adding one more tag when registering new version if model group has only two tags', async () => {
+    jest.spyOn(formHooks, 'useModelTags').mockReturnValue([
+      false,
+      [
+        { name: 'Key1', type: 'string', values: ['Value1'] },
+        { name: 'Key2', type: 'number', values: [0.95] },
+      ],
+    ]);
+
     const result = await setup({
       route: '/foo',
       mode: 'version',
@@ -251,6 +281,10 @@ describe('<RegisterModel /> Tags', () => {
   it('should display error when creating new tag value with more than 80 characters', async () => {
     const result = await setup();
 
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    await result.user.type(keyInput, 'dummy key{enter}');
+
     const valueContainer = screen.getByTestId('ml-tagValue1');
     const valueInput = within(valueContainer).getByRole('textbox');
     await result.user.type(valueInput, `${'x'.repeat(81)}{enter}`);
@@ -260,7 +294,7 @@ describe('<RegisterModel /> Tags', () => {
   });
 
   it('should display "No keys found" and "No values found" if no tag keys and no tag values are provided', async () => {
-    jest.spyOn(formHooks, 'useModelTags').mockReturnValue([false, { keys: [], values: [] }]);
+    jest.spyOn(formHooks, 'useModelTags').mockReturnValue([false, []]);
 
     const result = await setup();
 
@@ -269,26 +303,79 @@ describe('<RegisterModel /> Tags', () => {
     await result.user.click(keyInput);
     expect(screen.getByText('No keys found. Add a key.')).toBeInTheDocument();
 
+    await result.user.type(keyInput, 'dummy key{enter}');
+
     const valueContainer = screen.getByTestId('ml-tagValue1');
     const valueInput = within(valueContainer).getByRole('textbox');
     await result.user.click(valueInput);
     expect(screen.getByText('No values found. Add a value.')).toBeInTheDocument();
   });
 
-  it('should only display "Key2" in the option list after "Key1" selected', async () => {
+  it('should NOT display "Key1" in the option list after "Key1" selected', async () => {
     const result = await setup();
 
     const keyContainer = screen.getByTestId('ml-tagKey1');
     const keyInput = within(keyContainer).getByRole('textbox');
     await result.user.click(keyInput);
     const optionListContainer = screen.getByTestId('comboBoxOptionsList');
-
-    expect(within(optionListContainer).getByTitle('Key2')).toBeInTheDocument();
     expect(within(optionListContainer).getByTitle('Key1')).toBeInTheDocument();
 
     await result.user.click(within(optionListContainer).getByTitle('Key1'));
-
-    expect(within(optionListContainer).getByTitle('Key2')).toBeInTheDocument();
     expect(within(optionListContainer).queryByTitle('Key1')).toBe(null);
+  });
+
+  it('should not allow to select tag type if selected an existed tag', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+
+    await result.user.click(keyInput);
+    // selected an existed tag
+    await result.user.click(within(screen.getByTestId('comboBoxOptionsList')).getByTitle('Key1'));
+
+    expect(within(valueContainer).queryByLabelText('select tag type')).not.toBeInTheDocument();
+  });
+
+  it('should display a list of tag value for selection after selecting a tag key', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    const valueInput = within(valueContainer).getByRole('textbox');
+
+    await result.user.click(keyInput);
+    // selected an existed tag
+    await result.user.click(within(screen.getByTestId('comboBoxOptionsList')).getByTitle('Key1'));
+
+    await result.user.click(valueInput);
+    expect(
+      within(screen.getByTestId('comboBoxOptionsList')).queryByTitle('Value1')
+    ).toBeInTheDocument();
+  });
+
+  it('should clear the tag input when click remove button if there is only one tag', async () => {
+    const result = await setup();
+
+    const keyContainer = screen.getByTestId('ml-tagKey1');
+    const valueContainer = screen.getByTestId('ml-tagValue1');
+    const keyInput = within(keyContainer).getByRole('textbox');
+    const valueInput = within(valueContainer).getByRole('textbox');
+
+    await result.user.click(keyInput);
+    // selected an existed tag
+    await result.user.click(within(screen.getByTestId('comboBoxOptionsList')).getByTitle('Key1'));
+
+    await result.user.click(valueInput);
+    await result.user.click(within(screen.getByTestId('comboBoxOptionsList')).getByTitle('Value1'));
+
+    expect(screen.queryByText('Key1', { selector: '.euiComboBoxPill' })).toBeInTheDocument();
+    expect(screen.queryByText('Value1', { selector: '.euiComboBoxPill' })).toBeInTheDocument();
+
+    await result.user.click(screen.getByLabelText(/remove tag at row 1/i));
+    expect(screen.queryByText('Key1', { selector: '.euiComboBoxPill' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Value1', { selector: '.euiComboBoxPill' })).not.toBeInTheDocument();
   });
 });
