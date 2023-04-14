@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 
 import { ModelListFilter } from '../model_list_filter';
 import { render, screen } from '../../../../test/test_utils';
+import { TagFilterOperator } from '../../common';
 
 describe('<ModelListFilter />', () => {
   it('should render default search bar with tag, deployed and owner filter', () => {
@@ -23,7 +24,10 @@ describe('<ModelListFilter />', () => {
     render(
       <ModelListFilter
         defaultSearch="foo"
-        value={{ tag: ['tag1'], owner: ['owner1'] }}
+        value={{
+          tag: [{ name: 'tag1', operator: TagFilterOperator.IsNot, value: '123' }],
+          owner: ['owner1'],
+        }}
         onChange={() => {}}
       />
     );
