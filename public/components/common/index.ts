@@ -5,3 +5,4 @@
 
 export * from './custom';
 export * from './copyable_text';
+export * from './tag_filter_popover_content';
