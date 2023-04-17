@@ -16,7 +16,7 @@ import {
   EuiToken,
   EuiToolTip,
 } from '@elastic/eui';
-import React, { useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { useController, useWatch, useFormContext } from 'react-hook-form';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
@@ -132,17 +132,18 @@ export const ModelTagField = ({
     control,
   });
 
-  useEffect(() => {
-    if (selectedTagGroup && tagTypeController.field.value !== selectedTagGroup.type) {
-      tagTypeController.field.onChange(selectedTagGroup.type);
-    }
-  }, [selectedTagGroup, tagTypeController.field]);
-
   const onKeyChange = useCallback(
     (data: Array<EuiComboBoxOptionOption<TagGroup>>) => {
-      tagKeyController.field.onChange(getComboBoxValue(data));
+      const tagKey = getComboBoxValue(data);
+      tagKeyController.field.onChange(tagKey);
+
+      // update tag type if selected an existed tag
+      const tagGroup = tagGroups.find((t) => t.name === tagKey);
+      if (tagGroup) {
+        tagTypeController.field.onChange(tagGroup.type);
+      }
     },
-    [tagKeyController.field]
+    [tagKeyController.field, tagTypeController.field, tagGroups]
   );
 
   const onStringValueChange = useCallback(
