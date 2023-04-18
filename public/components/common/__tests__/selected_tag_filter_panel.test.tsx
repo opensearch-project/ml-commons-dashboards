@@ -105,35 +105,40 @@ describe('<SelectedTagFilterPanel />', () => {
     expect(onTagFiltersChangeMock).toHaveBeenCalledWith([]);
   });
 
-  it('should onTagFiltersChange after filter item updated', async () => {
-    const user = userEvent.setup();
-    const onTagFiltersChangeMock = jest.fn();
-    render(
-      <SelectedTagFiltersPanel
-        tagKeys={[{ name: 'Task', type: 'string' as const }]}
-        tagFilters={[
-          {
-            name: 'Task',
-            operator: TagFilterOperator.IsNot,
-            value: 'Computer vision',
-          },
-        ]}
-        onTagFiltersChange={onTagFiltersChangeMock}
-      />
-    );
-    expect(onTagFiltersChangeMock).not.toHaveBeenCalled();
+  it(
+    'should onTagFiltersChange after filter item updated',
+    async () => {
+      const user = userEvent.setup();
+      const onTagFiltersChangeMock = jest.fn();
+      render(
+        <SelectedTagFiltersPanel
+          tagKeys={[{ name: 'Task', type: 'string' as const }]}
+          tagFilters={[
+            {
+              name: 'Task',
+              operator: TagFilterOperator.IsNot,
+              value: 'Computer vision',
+            },
+          ]}
+          onTagFiltersChange={onTagFiltersChangeMock}
+        />
+      );
+      expect(onTagFiltersChangeMock).not.toHaveBeenCalled();
 
-    await user.click(screen.getByTitle('NOT Task: Computer vision'));
-    await user.click(screen.getByText('Computer vision'));
-    await user.click(screen.getByRole('option', { name: 'Image classification' }));
-    await user.click(screen.getByText('Save'));
+      await user.click(screen.getByTitle('NOT Task: Computer vision'));
+      await user.click(screen.getByText('Computer vision'));
+      await user.click(screen.getByRole('option', { name: 'Image classification' }));
+      await user.click(screen.getByText('Save'));
 
-    expect(onTagFiltersChangeMock).toHaveBeenCalledWith([
-      {
-        name: 'Task',
-        operator: TagFilterOperator.IsNot,
-        value: 'Image classification',
-      },
-    ]);
-  });
+      expect(onTagFiltersChangeMock).toHaveBeenCalledWith([
+        {
+          name: 'Task',
+          operator: TagFilterOperator.IsNot,
+          value: 'Image classification',
+        },
+      ]);
+    },
+    // There are too many operations, need to increase timeout
+    10 * 1000
+  );
 });

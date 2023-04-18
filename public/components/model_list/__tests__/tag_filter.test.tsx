@@ -99,38 +99,43 @@ describe('<TagFilter />', () => {
     expect(screen.getByText('Loading filters')).toBeInTheDocument();
   });
 
-  it('should reset input after popover re-open', async () => {
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    const onChangeMock = jest.fn();
-    render(
-      <TagFilter
-        tagKeysLoading={false}
-        tagKeys={[
-          { name: 'Accuracy: test', type: 'string' as const },
-          { name: 'F1', type: 'number' as const },
-        ]}
-        value={[]}
-        onChange={onChangeMock}
-      />
-    );
+  it(
+    'should reset input after popover re-open',
+    async () => {
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      const onChangeMock = jest.fn();
+      render(
+        <TagFilter
+          tagKeysLoading={false}
+          tagKeys={[
+            { name: 'Accuracy: test', type: 'string' as const },
+            { name: 'F1', type: 'number' as const },
+          ]}
+          value={[]}
+          onChange={onChangeMock}
+        />
+      );
 
-    await user.click(screen.getByText('Tags'));
+      await user.click(screen.getByText('Tags'));
 
-    await waitFor(() => {
+      await waitFor(() => {
+        expect(screen.getByText('Select a tag key')).toBeInTheDocument();
+      });
+      await user.click(screen.getByText('Select a tag key'));
+      await user.click(screen.getByRole('option', { name: 'F1' }));
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).toBeNull();
+      });
+
+      await user.click(screen.getByText('Tags'));
       expect(screen.getByText('Select a tag key')).toBeInTheDocument();
-    });
-    await user.click(screen.getByText('Select a tag key'));
-    await user.click(screen.getByRole('option', { name: 'F1' }));
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
-
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).toBeNull();
-    });
-
-    await user.click(screen.getByText('Tags'));
-    expect(screen.getByText('Select a tag key')).toBeInTheDocument();
-    expect(screen.getByText('Select operator').closest('[role="combobox"]')).toHaveClass(
-      'euiComboBox-isDisabled'
-    );
-  });
+      expect(screen.getByText('Select operator').closest('[role="combobox"]')).toHaveClass(
+        'euiComboBox-isDisabled'
+      );
+    },
+    // There are too many operations, need to increase timeout
+    10 * 1000
+  );
 });
