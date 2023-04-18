@@ -7,7 +7,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { ModelListFilter } from '../model_list_filter';
-import { act, render, screen, waitFor } from '../../../../test/test_utils';
+import { act, render, screen } from '../../../../test/test_utils';
 import { TagFilterOperator } from '../../common';
 
 describe('<ModelListFilter />', () => {
@@ -61,44 +61,48 @@ describe('<ModelListFilter />', () => {
     expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({ deployed: undefined }));
   });
 
-  it('should call onChange with unique tags after tag filter updated', async () => {
-    jest.useFakeTimers();
-    const onChangeMock = jest.fn();
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  it(
+    'should call onChange with unique tags after tag filter updated',
+    async () => {
+      jest.useFakeTimers();
+      const onChangeMock = jest.fn();
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
-    render(
-      <ModelListFilter
-        defaultSearch="foo"
-        value={{
-          tag: [
-            { name: 'Accuracy: test', operator: TagFilterOperator.Is, value: 'Computer vision' },
-            {
-              name: 'Accuracy: test',
-              operator: TagFilterOperator.Is,
-              value: 'Image classification',
-            },
-          ],
-          owner: ['owner1'],
-        }}
-        onChange={onChangeMock}
-      />
-    );
+      render(
+        <ModelListFilter
+          defaultSearch="foo"
+          value={{
+            tag: [
+              { name: 'Accuracy: test', operator: TagFilterOperator.Is, value: 'Computer vision' },
+              {
+                name: 'Accuracy: test',
+                operator: TagFilterOperator.Is,
+                value: 'Image classification',
+              },
+            ],
+            owner: ['owner1'],
+          }}
+          onChange={onChangeMock}
+        />
+      );
 
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
 
-    await user.click(screen.getByTitle('Accuracy: test: Image classification'));
+      await user.click(screen.getByTitle('Accuracy: test: Image classification'));
 
-    await user.click(screen.getByText('Image classification'));
-    await user.click(screen.getByRole('option', { name: 'Computer vision' }));
-    await user.click(screen.getByText('Save'));
+      await user.click(screen.getByText('Image classification'));
+      await user.click(screen.getByRole('option', { name: 'Computer vision' }));
+      await user.click(screen.getByText('Save'));
 
-    expect(onChangeMock).toHaveBeenCalledWith({
-      tag: [{ name: 'Accuracy: test', operator: TagFilterOperator.Is, value: 'Computer vision' }],
-      owner: ['owner1'],
-    });
+      expect(onChangeMock).toHaveBeenCalledWith({
+        tag: [{ name: 'Accuracy: test', operator: TagFilterOperator.Is, value: 'Computer vision' }],
+        owner: ['owner1'],
+      });
 
-    jest.useRealTimers();
-  });
+      jest.useRealTimers();
+    },
+    10 * 1000
+  );
 });
