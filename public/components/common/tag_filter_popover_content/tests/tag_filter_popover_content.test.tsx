@@ -6,10 +6,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-import { TagFilterPopoverContent, TagFilterPopoverProps } from '../tag_filter_popover_content';
+import {
+  TagFilterPopoverContent,
+  TagFilterPopoverContentProps,
+} from '../tag_filter_popover_content';
 import { render, screen } from '../../../../../test/test_utils';
 
-const setup = (options?: Partial<TagFilterPopoverProps>) => {
+const setup = (options?: Partial<TagFilterPopoverContentProps>) => {
   const user = userEvent.setup();
   const onCancelMock = jest.fn();
   const onSaveMock = jest.fn();

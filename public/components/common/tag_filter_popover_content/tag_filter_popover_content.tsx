@@ -40,7 +40,7 @@ export interface TagFilterValue {
   value: string | string[] | number;
 }
 
-export interface TagFilterPopoverProps {
+export interface TagFilterPopoverContentProps {
   tagFilter?: TagFilterValue;
   tagKeys: TagKey[];
   onCancel: () => void;
@@ -80,7 +80,7 @@ export const TagFilterPopoverContent = ({
   tagKeys,
   onCancel,
   tagFilter,
-}: TagFilterPopoverProps) => {
+}: TagFilterPopoverContentProps) => {
   const [value, setValue] = useState<string | string[] | number | undefined>(tagFilter?.value);
   const [selectedTagOptions, setSelectedTagOptions] = useState<
     Array<EuiComboBoxOptionOption<TagKey>>

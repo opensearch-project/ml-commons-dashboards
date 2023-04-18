@@ -6,17 +6,15 @@
 import React, { useState, useCallback } from 'react';
 import { EuiFilterButton, EuiIcon, EuiLoadingChart, EuiPopover, EuiSpacer } from '@elastic/eui';
 
-import { TagFilterPopoverContent, TagFilterValue } from '../common';
-import { useModelTagKeys } from './model_list.hooks';
+import { TagFilterPopoverContent, TagFilterValue, TagFilterPopoverContentProps } from '../common';
 
-interface TagFilterProps {
+interface TagFilterProps extends Pick<TagFilterPopoverContentProps, 'tagKeys'> {
+  tagKeysLoading: boolean;
   value: TagFilterValue[];
   onChange: (value: TagFilterValue[]) => void;
 }
 
-export const TagFilter = ({ value, onChange }: TagFilterProps) => {
-  // TODO: Change to model tags API
-  const [loading, tagKeys] = useModelTagKeys();
+export const TagFilter = ({ value, onChange, tagKeys, tagKeysLoading }: TagFilterProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const closePopover = useCallback(() => {
@@ -50,10 +48,10 @@ export const TagFilter = ({ value, onChange }: TagFilterProps) => {
       closePopover={closePopover}
       initialFocus={false}
     >
-      {!loading && tagKeys.length > 0 && (
+      {!tagKeysLoading && tagKeys.length > 0 && (
         <TagFilterPopoverContent tagKeys={tagKeys} onCancel={closePopover} onSave={handleSave} />
       )}
-      {loading && (
+      {tagKeysLoading && (
         <div className="euiFilterSelect__note">
           <div className="euiFilterSelect__noteContent">
             <EuiLoadingChart size="m" />

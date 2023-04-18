@@ -7,4 +7,5 @@ export {
   TagFilterPopoverContent,
   TagFilterValue,
   TagFilterOperator,
+  TagFilterPopoverContentProps,
 } from './tag_filter_popover_content';

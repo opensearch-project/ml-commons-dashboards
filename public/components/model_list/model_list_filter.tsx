@@ -16,6 +16,7 @@ import { TagFilterValue } from '../common';
 
 import { TagFilter } from './tag_filter';
 import { OwnerFilter } from './owner_filter';
+import { useModelTagKeys } from './model_list.hooks';
 
 export interface ModelListFilterFilterValue {
   search?: string;
@@ -33,6 +34,8 @@ export const ModelListFilter = ({
   value: Omit<ModelListFilterFilterValue, 'search'>;
   onChange: (value: ModelListFilterFilterValue) => void;
 }) => {
+  // TODO: Change to model tags API
+  const [tagKeysLoading, tagKeys] = useModelTagKeys();
   const valueRef = useRef(value);
   valueRef.current = value;
   const onChangeRef = useRef(onChange);
@@ -77,7 +80,12 @@ export const ModelListFilter = ({
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiFilterGroup>
-            <TagFilter value={value.tag} onChange={handleTagChange} />
+            <TagFilter
+              tagKeysLoading={tagKeysLoading}
+              tagKeys={tagKeys}
+              value={value.tag}
+              onChange={handleTagChange}
+            />
             <OwnerFilter value={value.owner} onChange={handleOwnerChange} />
             <EuiFilterButton
               withNext

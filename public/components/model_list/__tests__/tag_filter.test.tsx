@@ -6,14 +6,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-import { act, render, screen, waitFor } from '../../../../test/test_utils';
+import { render, screen, waitFor } from '../../../../test/test_utils';
 import { TagFilter } from '../tag_filter';
-import * as modelListHooks from '../model_list.hooks';
 import { TagFilterOperator } from '../../common';
 
 describe('<TagFilter />', () => {
   it('should render "Tags" without number count by default', () => {
-    render(<TagFilter value={[]} onChange={jest.fn()} />);
+    render(<TagFilter tagKeysLoading={false} tagKeys={[]} value={[]} onChange={jest.fn()} />);
     expect(screen.queryByText('Tags')).toBeInTheDocument();
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
@@ -21,6 +20,8 @@ describe('<TagFilter />', () => {
   it('should display active tag filters count', () => {
     render(
       <TagFilter
+        tagKeysLoading={false}
+        tagKeys={[]}
         value={[{ name: 'foo', operator: TagFilterOperator.Is, value: 'bar' }]}
         onChange={jest.fn()}
       />
@@ -31,14 +32,19 @@ describe('<TagFilter />', () => {
   it(
     'should call onChange with tag filter',
     async () => {
-      jest.useFakeTimers();
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
       const onChangeMock = jest.fn();
-      render(<TagFilter value={[]} onChange={onChangeMock} />);
-      // Make get model tag keys API return faster
-      act(() => {
-        jest.advanceTimersByTime(1000);
-      });
+      render(
+        <TagFilter
+          tagKeysLoading={false}
+          tagKeys={[
+            { name: 'Accuracy: test', type: 'string' as const },
+            { name: 'F1', type: 'number' as const },
+          ]}
+          value={[]}
+          onChange={onChangeMock}
+        />
+      );
 
       await user.click(screen.getByText('Tags'));
       await waitFor(() => {
@@ -58,46 +64,58 @@ describe('<TagFilter />', () => {
           value: 0.92,
         },
       ]);
-      jest.useRealTimers();
     },
     // There are too many operations, need to increase timeout
     10 * 1000
   );
 
   it('should render empty screen after filter button click', async () => {
-    const useModelTagKeysMock = jest
-      .spyOn(modelListHooks, 'useModelTagKeys')
-      .mockReturnValue([false, []]);
     const user = userEvent.setup();
-    render(<TagFilter value={[]} onChange={jest.fn()} />);
+    render(<TagFilter tagKeysLoading={false} tagKeys={[]} value={[]} onChange={jest.fn()} />);
     await user.click(screen.getByText('Tags'));
 
     expect(screen.getByText('No options found')).toBeInTheDocument();
-    useModelTagKeysMock.mockRestore();
   });
 
   it('should render loading screen after filter button click', async () => {
-    jest.useFakeTimers();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
-    render(<TagFilter value={[]} onChange={jest.fn()} />);
+    const { rerender } = render(
+      <TagFilter tagKeysLoading={true} tagKeys={[]} value={[]} onChange={jest.fn()} />
+    );
     await user.click(screen.getByText('Tags'));
+    rerender(
+      <TagFilter
+        tagKeysLoading={true}
+        tagKeys={[
+          { name: 'Accuracy: test', type: 'string' as const },
+          { name: 'F1', type: 'number' as const },
+        ]}
+        value={[]}
+        onChange={jest.fn()}
+      />
+    );
 
     expect(screen.getByText('Loading filters')).toBeInTheDocument();
-    jest.useRealTimers();
   });
 
   it('should reset input after popover re-open', async () => {
-    jest.useFakeTimers();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const onChangeMock = jest.fn();
-    render(<TagFilter value={[]} onChange={onChangeMock} />);
+    render(
+      <TagFilter
+        tagKeysLoading={false}
+        tagKeys={[
+          { name: 'Accuracy: test', type: 'string' as const },
+          { name: 'F1', type: 'number' as const },
+        ]}
+        value={[]}
+        onChange={onChangeMock}
+      />
+    );
 
     await user.click(screen.getByText('Tags'));
-    // Make get model tag keys API return faster
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
+
     await waitFor(() => {
       expect(screen.getByText('Select a tag key')).toBeInTheDocument();
     });
@@ -114,7 +132,5 @@ describe('<TagFilter />', () => {
     expect(screen.getByText('Select operator').closest('[role="combobox"]')).toHaveClass(
       'euiComboBox-isDisabled'
     );
-
-    jest.useRealTimers();
   });
 });
