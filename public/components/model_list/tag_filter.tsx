@@ -51,12 +51,7 @@ export const TagFilter = ({ value, onChange }: TagFilterProps) => {
       initialFocus={false}
     >
       {!loading && tagKeys.length > 0 && (
-        <TagFilterPopoverContent
-          tagKeys={tagKeys}
-          resetAfterSaveOrCancel
-          onCancel={closePopover}
-          onSave={handleSave}
-        />
+        <TagFilterPopoverContent tagKeys={tagKeys} onCancel={closePopover} onSave={handleSave} />
       )}
       {loading && (
         <div className="euiFilterSelect__note">

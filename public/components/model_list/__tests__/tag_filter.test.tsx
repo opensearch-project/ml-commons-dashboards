@@ -86,4 +86,35 @@ describe('<TagFilter />', () => {
     expect(screen.getByText('Loading filters')).toBeInTheDocument();
     jest.useRealTimers();
   });
+
+  it('should reset input after popover re-open', async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const onChangeMock = jest.fn();
+    render(<TagFilter value={[]} onChange={onChangeMock} />);
+
+    await user.click(screen.getByText('Tags'));
+    // Make get model tag keys API return faster
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Select a tag key')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Select a tag key'));
+    await user.click(screen.getByRole('option', { name: 'F1' }));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    await user.click(screen.getByText('Tags'));
+    expect(screen.getByText('Select a tag key')).toBeInTheDocument();
+    expect(screen.getByText('Select operator').closest('[role="combobox"]')).toHaveClass(
+      'euiComboBox-isDisabled'
+    );
+
+    jest.useRealTimers();
+  });
 });

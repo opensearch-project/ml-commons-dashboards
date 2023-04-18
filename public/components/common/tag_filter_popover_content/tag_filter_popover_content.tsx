@@ -43,7 +43,6 @@ export interface TagFilterValue {
 export interface TagFilterPopoverProps {
   tagFilter?: TagFilterValue;
   tagKeys: TagKey[];
-  resetAfterSaveOrCancel?: boolean;
   onCancel: () => void;
   onSave: (tagFilter: TagFilterValue) => void;
 }
@@ -81,7 +80,6 @@ export const TagFilterPopoverContent = ({
   tagKeys,
   onCancel,
   tagFilter,
-  resetAfterSaveOrCancel,
 }: TagFilterPopoverProps) => {
   const [value, setValue] = useState<string | string[] | number | undefined>(tagFilter?.value);
   const [selectedTagOptions, setSelectedTagOptions] = useState<
@@ -156,27 +154,12 @@ export const TagFilterPopoverContent = ({
     []
   );
 
-  const resetStateIfNeed = useCallback(() => {
-    if (!resetAfterSaveOrCancel) {
-      return;
-    }
-    setValue(undefined);
-    setSelectedTagOptions([]);
-    setSelectedOperatorOptions([]);
-  }, [resetAfterSaveOrCancel]);
-
-  const handleCancel = useCallback(() => {
-    onCancel();
-    resetStateIfNeed();
-  }, [onCancel, resetStateIfNeed]);
-
   const handleSave = useCallback(() => {
     if (!selectedTag || !operator || !value) {
       return;
     }
     onSave({ name: selectedTag.name, value, operator });
-    resetStateIfNeed();
-  }, [selectedTag, value, operator, onSave, resetStateIfNeed]);
+  }, [selectedTag, value, operator, onSave]);
 
   return (
     <>
@@ -228,10 +211,7 @@ export const TagFilterPopoverContent = ({
         <EuiSpacer size="m" />
         <EuiFlexGroup gutterSize="s" justifyContent="flexEnd">
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
-              data-test-subj="tag-filter-popover-cancel-button"
-              onClick={handleCancel}
-            >
+            <EuiButtonEmpty data-test-subj="tag-filter-popover-cancel-button" onClick={onCancel}>
               Cancel
             </EuiButtonEmpty>
           </EuiFlexItem>
