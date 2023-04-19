@@ -4,7 +4,6 @@
  */
 
 import { setup } from './setup';
-import * as formHooks from '../register_model.hooks';
 import * as formAPI from '../register_model_api';
 import { Model } from '../../../apis/model';
 
@@ -12,9 +11,6 @@ describe('<RegisterModel /> Details', () => {
   const onSubmitMock = jest.fn().mockResolvedValue('model_id');
 
   beforeEach(() => {
-    jest
-      .spyOn(formHooks, 'useModelTags')
-      .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
   });
 

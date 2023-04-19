@@ -49,7 +49,7 @@ const DEFAULT_VALUES = {
   description: '',
   version: '1',
   configuration: '',
-  tags: [{ key: '', value: '' }],
+  tags: [{ key: '', value: '', type: 'string' as const }],
   modelFileFormat: '',
 };
 
