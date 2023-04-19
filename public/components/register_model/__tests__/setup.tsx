@@ -10,7 +10,7 @@ import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 
 import { RegisterModelForm } from '../register_model';
 import { Model } from '../../../apis/model';
-import { render, RenderWithRouteProps, screen, waitFor, within } from '../../../../test/test_utils';
+import { render, RenderWithRouteProps, screen, waitFor } from '../../../../test/test_utils';
 import { ModelFileFormData, ModelUrlFormData } from '../register_model.types';
 
 jest.mock('../../../apis/task');
@@ -40,7 +40,7 @@ const DEFAULT_VALUES = {
   description: '',
   version: '1',
   configuration: CONFIGURATION,
-  tags: [{ key: '', value: '' }],
+  tags: [{ key: '', value: '', type: 'string' as const }],
 };
 
 export async function setup(options: {

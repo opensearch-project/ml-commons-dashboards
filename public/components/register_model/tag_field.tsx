@@ -4,25 +4,35 @@
  */
 
 import {
-  EuiButton,
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
   EuiContext,
+  EuiButtonIcon,
+  EuiFieldNumber,
+  EuiText,
+  EuiToken,
+  EuiToolTip,
 } from '@elastic/eui';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useController, useWatch, useFormContext } from 'react-hook-form';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { TagTypePopover } from './tag_type_popover';
+
+interface TagGroup {
+  name: string;
+  type: 'string' | 'number';
+  values: string[] | number[];
+}
 
 interface ModelTagFieldProps {
   index: number;
   onDelete: (index: number) => void;
-  tagKeys: string[];
-  tagValues: string[];
   allowKeyCreate?: boolean;
+  tagGroups: TagGroup[];
 }
 
 const MAX_TAG_LENGTH = 80;
@@ -39,7 +49,7 @@ const VALUE_COMBOBOX_I18N = {
   },
 };
 
-function getComboBoxValue(data: EuiComboBoxOptionOption[]) {
+function getComboBoxValue(data: Array<EuiComboBoxOptionOption<TagGroup>>) {
   if (data.length === 0) {
     return '';
   } else {
@@ -49,8 +59,7 @@ function getComboBoxValue(data: EuiComboBoxOptionOption[]) {
 
 export const ModelTagField = ({
   index,
-  tagKeys,
-  tagValues,
+  tagGroups,
   allowKeyCreate,
   onDelete,
 }: ModelTagFieldProps) => {
@@ -113,18 +122,49 @@ export const ModelTagField = ({
     },
   });
 
-  const onKeyChange = useCallback(
-    (data: EuiComboBoxOptionOption[]) => {
-      tagKeyController.field.onChange(getComboBoxValue(data));
-    },
-    [tagKeyController.field]
+  const selectedTagGroup = useMemo(
+    () => tagGroups.find((t) => t.name === tagKeyController.field.value),
+    [tagGroups, tagKeyController]
   );
 
-  const onValueChange = useCallback(
-    (data: EuiComboBoxOptionOption[]) => {
+  const tagTypeController = useController({
+    name: `tags.${index}.type` as const,
+    control,
+  });
+
+  const onKeyChange = useCallback(
+    (data: Array<EuiComboBoxOptionOption<TagGroup>>) => {
+      const tagKey = getComboBoxValue(data);
+      tagKeyController.field.onChange(tagKey);
+
+      // update tag type if selected an existed tag
+      const tagGroup = tagGroups.find((t) => t.name === tagKey);
+      if (tagGroup) {
+        tagTypeController.field.onChange(tagGroup.type);
+      }
+    },
+    [tagKeyController.field, tagTypeController.field, tagGroups]
+  );
+
+  const onStringValueChange = useCallback(
+    (data: Array<EuiComboBoxOptionOption<TagGroup>>) => {
       tagValueController.field.onChange(getComboBoxValue(data));
     },
     [tagValueController.field]
+  );
+
+  const onNumberValueChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      tagValueController.field.onChange(e.target.value);
+    },
+    [tagValueController.field]
+  );
+
+  const onApplyType = useCallback(
+    (type: 'number' | 'string') => {
+      tagTypeController.field.onChange(type);
+    },
+    [tagTypeController.field]
   );
 
   const onKeyCreate = useCallback(
@@ -142,14 +182,17 @@ export const ModelTagField = ({
   );
 
   const keyOptions = useMemo(() => {
-    return tagKeys
-      .filter((key) => !tags?.find((tag) => tag.key === key))
-      .map((key) => ({ label: key }));
-  }, [tagKeys, tags]);
+    return tagGroups
+      .filter((group) => !tags?.find((tag) => tag.key === group.name))
+      .map((group) => ({ label: group.name, value: group }));
+  }, [tagGroups, tags]);
 
   const valueOptions = useMemo(() => {
-    return tagValues.map((value) => ({ label: value }));
-  }, [tagValues]);
+    if (selectedTagGroup) {
+      return selectedTagGroup.values.map((v) => ({ label: `${v}` }));
+    }
+    return [];
+  }, [selectedTagGroup]);
 
   const onBlur = useCallback(
     (e: React.FocusEvent<HTMLDivElement>) => {
@@ -172,8 +215,38 @@ export const ModelTagField = ({
     [trigger]
   );
 
+  const renderOption = useCallback(
+    (option: EuiComboBoxOptionOption<TagGroup>, searchValue: string, contentClassName: string) => {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <EuiToken
+            style={{ marginRight: 2 }}
+            iconType={option.value?.type === 'number' ? 'tokenNumber' : 'tokenString'}
+          />
+          <span className={contentClassName}>{option.label}</span>
+          <EuiText style={{ marginLeft: 'auto' }} color="subdued" size="s">
+            {option.value?.type}
+          </EuiText>
+        </div>
+      );
+    },
+    []
+  );
+
+  const onRemove = useCallback(
+    (idx: number) => {
+      if (tags?.length && tags.length > 1) {
+        onDelete(idx);
+      } else {
+        tagValueController.field.onChange('');
+        tagKeyController.field.onChange('');
+      }
+    },
+    [tags, onDelete, tagKeyController.field, tagValueController.field]
+  );
+
   return (
-    <EuiFlexGroup ref={rowEleRef} tabIndex={-1} onBlur={onBlur}>
+    <EuiFlexGroup gutterSize="m" ref={rowEleRef} tabIndex={-1} onBlur={onBlur}>
       <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
         <EuiContext i18n={KEY_COMBOBOX_I18N}>
           <EuiFormRow
@@ -182,11 +255,12 @@ export const ModelTagField = ({
             isInvalid={Boolean(tagKeyController.fieldState.error)}
             error={tagKeyController.fieldState.error?.message}
           >
-            <EuiComboBox
+            <EuiComboBox<TagGroup>
               placeholder="Select or add a key"
               isInvalid={Boolean(tagKeyController.fieldState.error)}
               singleSelection={{ asPlainText: true }}
               options={keyOptions}
+              renderOption={renderOption}
               selectedOptions={
                 tagKeyController.field.value ? [{ label: tagKeyController.field.value }] : []
               }
@@ -207,27 +281,60 @@ export const ModelTagField = ({
             isInvalid={Boolean(tagValueController.fieldState.error)}
             error={tagValueController.fieldState.error?.message}
           >
-            <EuiComboBox
-              placeholder="Select or add a value"
-              isInvalid={Boolean(tagValueController.fieldState.error)}
-              singleSelection={{ asPlainText: true }}
-              options={valueOptions}
-              selectedOptions={
-                tagValueController.field.value ? [{ label: tagValueController.field.value }] : []
-              }
-              onChange={onValueChange}
-              onCreateOption={onValueCreate}
-              customOptionText="Add {searchValue} as a value."
-              onBlur={tagValueController.field.onBlur}
-              inputRef={tagValueController.field.ref}
-            />
+            {tagTypeController.field.value === 'string' ? (
+              <EuiComboBox
+                prepend={
+                  selectedTagGroup || !tagKeyController.field.value ? (
+                    'String'
+                  ) : (
+                    <TagTypePopover value={tagTypeController.field.value} onApply={onApplyType} />
+                  )
+                }
+                placeholder="Select or add a value"
+                isInvalid={Boolean(tagValueController.fieldState.error)}
+                singleSelection={{ asPlainText: true }}
+                options={valueOptions}
+                selectedOptions={
+                  tagValueController.field.value ? [{ label: tagValueController.field.value }] : []
+                }
+                onChange={onStringValueChange}
+                onCreateOption={onValueCreate}
+                customOptionText="Add {searchValue} as a value."
+                onBlur={tagValueController.field.onBlur}
+                inputRef={tagValueController.field.ref}
+                isDisabled={!Boolean(tagKeyController.field.value)}
+              />
+            ) : (
+              <EuiFieldNumber
+                prepend={
+                  selectedTagGroup || !tagKeyController.field.value ? (
+                    'Number'
+                  ) : (
+                    <TagTypePopover value={tagTypeController.field.value} onApply={onApplyType} />
+                  )
+                }
+                placeholder="Add a value"
+                value={tagValueController.field.value}
+                isInvalid={Boolean(tagValueController.fieldState.error)}
+                onChange={onNumberValueChange}
+                onBlur={tagValueController.field.onBlur}
+                inputRef={tagValueController.field.ref}
+                disabled={!Boolean(tagKeyController.field.value)}
+              />
+            )}
           </EuiFormRow>
         </EuiContext>
       </EuiFlexItem>
       <EuiFlexItem grow={false} style={index === 0 ? { transform: 'translateY(22px)' } : undefined}>
-        <EuiButton aria-label={`Remove tag at row ${index + 1}`} onClick={() => onDelete(index)}>
-          Remove
-        </EuiButton>
+        <EuiToolTip content={tags?.length && tags.length > 1 ? 'Remove' : 'Clear'}>
+          <EuiButtonIcon
+            display="base"
+            size="m"
+            iconType="cross"
+            aria-label={`Remove tag at row ${index + 1}`}
+            onClick={() => onRemove(index)}
+          />
+        </EuiToolTip>
       </EuiFlexItem>
     </EuiFlexGroup>
   );

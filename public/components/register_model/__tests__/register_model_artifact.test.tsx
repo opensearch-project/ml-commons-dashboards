@@ -5,7 +5,6 @@
 
 import { screen } from '../../../../test/test_utils';
 import { setup } from './setup';
-import * as formHooks from '../register_model.hooks';
 import { ModelFileUploadManager } from '../model_file_upload_manager';
 import * as formAPI from '../register_model_api';
 import { ONE_GB } from '../../../../common/constant';
@@ -16,9 +15,6 @@ describe('<RegisterModel /> Artifact', () => {
   const uploadMock = jest.fn();
 
   beforeEach(() => {
-    jest
-      .spyOn(formHooks, 'useModelTags')
-      .mockReturnValue([false, { keys: ['Key1', 'Key2'], values: ['Value1', 'Value2'] }]);
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitWithFileMock);
     jest.spyOn(formAPI, 'submitModelWithURL').mockImplementation(onSubmitWithURLMock);
     jest.spyOn(ModelFileUploadManager.prototype, 'upload').mockImplementation(uploadMock);

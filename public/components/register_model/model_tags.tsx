@@ -17,16 +17,16 @@ const MAX_TAG_NUM = 10;
 export const ModelTagsPanel = () => {
   const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
-  const [, { keys, values }] = useModelTags();
+  const [, tags] = useModelTags();
   const { fields, append, remove } = useFieldArray({
     name: 'tags',
     control,
   });
   const isRegisterNewVersion = !!latestVersionId;
-  const maxTagNum = isRegisterNewVersion ? keys.length : MAX_TAG_NUM;
+  const maxTagNum = isRegisterNewVersion ? tags.length : MAX_TAG_NUM;
 
   const addNewTag = useCallback(() => {
-    append({ key: '', value: '' });
+    append({ key: '', value: '', type: 'string' });
   }, [append]);
 
   return (
@@ -62,8 +62,7 @@ export const ModelTagsPanel = () => {
           <ModelTagField
             key={field.id}
             index={index}
-            tagKeys={keys}
-            tagValues={values}
+            tagGroups={tags}
             onDelete={remove}
             allowKeyCreate={!latestVersionId}
           />
