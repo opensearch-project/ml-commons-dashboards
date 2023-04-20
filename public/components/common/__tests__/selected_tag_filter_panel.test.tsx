@@ -20,26 +20,31 @@ describe('<SelectedTagFilterPanel />', () => {
             name: 'Task',
             operator: TagFilterOperator.Is,
             value: 'Computer vision',
+            type: 'string',
           },
           {
             name: 'Task',
             operator: TagFilterOperator.IsOneOf,
             value: ['Computer vision', 'Image classification'],
+            type: 'string',
           },
           {
             name: 'F1',
             operator: TagFilterOperator.Is,
             value: 0.98,
+            type: 'number',
           },
           {
             name: 'F1 weighted',
             operator: TagFilterOperator.IsGreaterThan,
             value: 0.99,
+            type: 'number',
           },
           {
             name: 'F2',
             operator: TagFilterOperator.IsLessThan,
             value: 0.97,
+            type: 'number',
           },
         ]}
         onTagFiltersChange={jest.fn()}
@@ -62,16 +67,19 @@ describe('<SelectedTagFilterPanel />', () => {
             name: 'Task',
             operator: TagFilterOperator.IsNot,
             value: 'Computer vision',
+            type: 'string',
           },
           {
             name: 'Task',
             operator: TagFilterOperator.IsNotOneOf,
             value: ['Computer vision', 'Image classification'],
+            type: 'string',
           },
           {
             name: 'F1',
             operator: TagFilterOperator.IsNot,
             value: 0.98,
+            type: 'number',
           },
         ]}
         onTagFiltersChange={jest.fn()}
@@ -94,6 +102,7 @@ describe('<SelectedTagFilterPanel />', () => {
             name: 'Task',
             operator: TagFilterOperator.IsNot,
             value: 'Computer vision',
+            type: 'string',
           },
         ]}
         onTagFiltersChange={onTagFiltersChangeMock}
@@ -118,6 +127,7 @@ describe('<SelectedTagFilterPanel />', () => {
               name: 'Task',
               operator: TagFilterOperator.IsNot,
               value: 'Computer vision',
+              type: 'string',
             },
           ]}
           onTagFiltersChange={onTagFiltersChangeMock}
@@ -135,6 +145,7 @@ describe('<SelectedTagFilterPanel />', () => {
           name: 'Task',
           operator: TagFilterOperator.IsNot,
           value: 'Image classification',
+          type: 'string',
         },
       ]);
     },

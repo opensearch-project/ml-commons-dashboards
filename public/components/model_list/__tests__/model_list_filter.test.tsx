@@ -25,7 +25,7 @@ describe('<ModelListFilter />', () => {
       <ModelListFilter
         defaultSearch="foo"
         value={{
-          tag: [{ name: 'tag1', operator: TagFilterOperator.IsNot, value: '123' }],
+          tag: [{ name: 'tag1', operator: TagFilterOperator.IsNot, value: '123', type: 'string' }],
           owner: ['owner1'],
         }}
         onChange={() => {}}
@@ -73,11 +73,17 @@ describe('<ModelListFilter />', () => {
           defaultSearch="foo"
           value={{
             tag: [
-              { name: 'Accuracy: test', operator: TagFilterOperator.Is, value: 'Computer vision' },
+              {
+                name: 'Accuracy: test',
+                operator: TagFilterOperator.Is,
+                value: 'Computer vision',
+                type: 'string',
+              },
               {
                 name: 'Accuracy: test',
                 operator: TagFilterOperator.Is,
                 value: 'Image classification',
+                type: 'string',
               },
             ],
             owner: ['owner1'],
@@ -97,7 +103,14 @@ describe('<ModelListFilter />', () => {
       await user.click(screen.getByText('Save'));
 
       expect(onChangeMock).toHaveBeenCalledWith({
-        tag: [{ name: 'Accuracy: test', operator: TagFilterOperator.Is, value: 'Computer vision' }],
+        tag: [
+          {
+            name: 'Accuracy: test',
+            operator: TagFilterOperator.Is,
+            value: 'Computer vision',
+            type: 'string',
+          },
+        ],
         owner: ['owner1'],
       });
 

@@ -37,6 +37,7 @@ export enum TagFilterOperator {
 export interface TagFilterValue {
   name: string;
   operator: TagFilterOperator;
+  type: 'string' | 'number';
   value: string | string[] | number;
 }
 
@@ -93,7 +94,7 @@ export const TagFilterPopoverContent = ({
         label: tagFilter.name,
         value: {
           name: tagFilter.name,
-          type: typeof tagFilter.value === 'number' ? 'number' : 'string',
+          type: tagFilter.type,
         },
       },
     ];
@@ -158,7 +159,7 @@ export const TagFilterPopoverContent = ({
     if (!selectedTag || !operator || !value) {
       return;
     }
-    onSave({ name: selectedTag.name, value, operator });
+    onSave({ name: selectedTag.name, value, operator, type: selectedTag.type });
   }, [selectedTag, value, operator, onSave]);
 
   return (

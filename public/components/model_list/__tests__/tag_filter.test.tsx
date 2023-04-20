@@ -22,7 +22,7 @@ describe('<TagFilter />', () => {
       <TagFilter
         tagKeysLoading={false}
         tagKeys={[]}
-        value={[{ name: 'foo', operator: TagFilterOperator.Is, value: 'bar' }]}
+        value={[{ name: 'foo', operator: TagFilterOperator.Is, value: 'bar', type: 'string' }]}
         onChange={jest.fn()}
       />
     );
@@ -62,6 +62,7 @@ describe('<TagFilter />', () => {
           name: 'F1',
           operator: 'is',
           value: 0.92,
+          type: 'number',
         },
       ]);
     },

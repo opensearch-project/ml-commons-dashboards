@@ -7,9 +7,9 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import {
+  TagFilterOperator,
   TagFilterPopoverContent,
   TagFilterPopoverContentProps,
-  TagFilterOperator,
 } from '../tag_filter_popover_content';
 import { render, screen } from '../../../../../test/test_utils';
 
@@ -100,6 +100,7 @@ describe('<TagFilterPopoverContent />', () => {
       name: 'bar',
       operator: 'is greater than',
       value: 0.98,
+      type: 'number',
     });
   });
 
@@ -122,6 +123,7 @@ describe('<TagFilterPopoverContent />', () => {
       name: 'foo',
       operator: 'is not',
       value: 'Computer vision',
+      type: 'string',
     });
   });
 
@@ -145,6 +147,7 @@ describe('<TagFilterPopoverContent />', () => {
       name: 'foo',
       operator: 'is one of',
       value: ['Computer vision', 'Image classification'],
+      type: 'string',
     });
   });
 
@@ -168,6 +171,7 @@ describe('<TagFilterPopoverContent />', () => {
           name: 'bar',
           operator: TagFilterOperator.IsGreaterThan,
           value: 0.98,
+          type: 'number',
         }}
       />
     );
