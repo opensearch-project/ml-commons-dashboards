@@ -3,18 +3,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { EuiFlexItem, EuiFlexGroup, EuiFieldSearch, EuiFilterGroup } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiFieldSearch,
+  EuiFilterGroup,
+  EuiFilterButton,
+} from '@elastic/eui';
 import React, { useCallback, useRef } from 'react';
 
 import { TagFilter } from './tag_filter';
 import { OwnerFilter } from './owner_filter';
-import { StageFilter } from './stage_filter';
 
 export interface ModelListFilterFilterValue {
   search?: string;
   tag: string[];
   owner: string[];
-  stage: string[];
+  deployed?: boolean;
 }
 
 export const ModelListFilter = ({
@@ -43,8 +48,18 @@ export const ModelListFilter = ({
     onChangeRef.current({ ...valueRef.current, owner });
   }, []);
 
-  const handleStageChange = useCallback((stage: string[]) => {
-    onChangeRef.current({ ...valueRef.current, stage });
+  const handleDeployedClick = useCallback(() => {
+    onChangeRef.current({
+      ...valueRef.current,
+      deployed: valueRef.current.deployed ? undefined : true,
+    });
+  }, []);
+
+  const handleUnDeployedClick = useCallback(() => {
+    onChangeRef.current({
+      ...valueRef.current,
+      deployed: valueRef.current.deployed === false ? undefined : false,
+    });
   }, []);
 
   return (
@@ -62,7 +77,19 @@ export const ModelListFilter = ({
           <EuiFilterGroup>
             <TagFilter value={value.tag} onChange={handleTagChange} />
             <OwnerFilter value={value.owner} onChange={handleOwnerChange} />
-            <StageFilter value={value.stage} onChange={handleStageChange} />
+            <EuiFilterButton
+              withNext
+              hasActiveFilters={value.deployed === true}
+              onClick={handleDeployedClick}
+            >
+              Deployed
+            </EuiFilterButton>
+            <EuiFilterButton
+              hasActiveFilters={value.deployed === false}
+              onClick={handleUnDeployedClick}
+            >
+              Undeployed
+            </EuiFilterButton>
           </EuiFilterGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
