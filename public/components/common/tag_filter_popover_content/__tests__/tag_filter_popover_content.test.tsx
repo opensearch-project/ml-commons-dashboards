@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event';
 import {
   TagFilterPopoverContent,
   TagFilterPopoverContentProps,
+  TagFilterOperator,
 } from '../tag_filter_popover_content';
 import { render, screen } from '../../../../../test/test_utils';
 
@@ -152,5 +153,28 @@ describe('<TagFilterPopoverContent />', () => {
 
     await user.click(cancelButton);
     expect(onCancelMock).toHaveBeenCalled();
+  });
+
+  it('should render edit title and value if tagFilter provided', async () => {
+    render(
+      <TagFilterPopoverContent
+        tagKeys={[
+          { name: 'foo', type: 'string' },
+          { name: 'bar', type: 'number' },
+        ]}
+        onCancel={jest.fn()}
+        onSave={jest.fn()}
+        tagFilter={{
+          name: 'bar',
+          operator: TagFilterOperator.IsGreaterThan,
+          value: 0.98,
+        }}
+      />
+    );
+
+    expect(screen.getByText('EDIT TAG FILTER')).toBeInTheDocument();
+    expect(screen.getByText('bar')).toBeInTheDocument();
+    expect(screen.getByText('is greater than')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Add a value')).toHaveValue(0.98);
   });
 });
