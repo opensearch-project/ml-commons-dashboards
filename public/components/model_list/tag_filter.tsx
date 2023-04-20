@@ -36,12 +36,8 @@ export const TagFilter = ({ value, onChange, tagKeys, tagKeysLoading }: TagFilte
   return (
     <EuiPopover
       button={
-        <EuiFilterButton
-          iconType="arrowDown"
-          {...(value.length > 0 ? { hasActiveFilters: true, numActiveFilters: value.length } : {})}
-          onClick={handleFilterButtonClick}
-        >
-          Tags
+        <EuiFilterButton iconType="plusInCircle" iconSide="left" onClick={handleFilterButtonClick}>
+          Add tag filter
         </EuiFilterButton>
       }
       isOpen={isPopoverOpen}

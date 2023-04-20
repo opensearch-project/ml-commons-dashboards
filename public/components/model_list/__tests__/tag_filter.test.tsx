@@ -8,25 +8,11 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../test/test_utils';
 import { TagFilter } from '../tag_filter';
-import { TagFilterOperator } from '../../common';
 
 describe('<TagFilter />', () => {
-  it('should render "Tags" without number count by default', () => {
+  it('should render "Add tag filter" button by default', () => {
     render(<TagFilter tagKeysLoading={false} tagKeys={[]} value={[]} onChange={jest.fn()} />);
-    expect(screen.queryByText('Tags')).toBeInTheDocument();
-    expect(screen.queryByText('0')).not.toBeInTheDocument();
-  });
-
-  it('should display active tag filters count', () => {
-    render(
-      <TagFilter
-        tagKeysLoading={false}
-        tagKeys={[]}
-        value={[{ name: 'foo', operator: TagFilterOperator.Is, value: 'bar', type: 'string' }]}
-        onChange={jest.fn()}
-      />
-    );
-    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.queryByText('Add tag filter')).toBeInTheDocument();
   });
 
   it(
@@ -46,7 +32,7 @@ describe('<TagFilter />', () => {
         />
       );
 
-      await user.click(screen.getByText('Tags'));
+      await user.click(screen.getByText('Add tag filter'));
       await waitFor(() => {
         expect(screen.getByText('Select a tag key')).toBeInTheDocument();
       });
@@ -73,7 +59,7 @@ describe('<TagFilter />', () => {
   it('should render an empty tag list if no tags', async () => {
     const user = userEvent.setup();
     render(<TagFilter tagKeysLoading={false} tagKeys={[]} value={[]} onChange={jest.fn()} />);
-    await user.click(screen.getByText('Tags'));
+    await user.click(screen.getByText('Add tag filter'));
 
     expect(screen.getByText('No options found')).toBeInTheDocument();
   });
@@ -84,7 +70,7 @@ describe('<TagFilter />', () => {
     const { rerender } = render(
       <TagFilter tagKeysLoading={true} tagKeys={[]} value={[]} onChange={jest.fn()} />
     );
-    await user.click(screen.getByText('Tags'));
+    await user.click(screen.getByText('Add tag filter'));
     rerender(
       <TagFilter
         tagKeysLoading={true}
@@ -117,7 +103,7 @@ describe('<TagFilter />', () => {
         />
       );
 
-      await user.click(screen.getByText('Tags'));
+      await user.click(screen.getByText('Add tag filter'));
 
       await waitFor(() => {
         expect(screen.getByText('Select a tag key')).toBeInTheDocument();
@@ -130,7 +116,7 @@ describe('<TagFilter />', () => {
         expect(screen.queryByRole('dialog')).toBeNull();
       });
 
-      await user.click(screen.getByText('Tags'));
+      await user.click(screen.getByText('Add tag filter'));
       expect(screen.getByText('Select a tag key')).toBeInTheDocument();
       expect(screen.getByText('Select operator').closest('[role="combobox"]')).toHaveClass(
         'euiComboBox-isDisabled'

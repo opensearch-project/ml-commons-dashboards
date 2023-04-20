@@ -96,12 +96,6 @@ export const ModelListFilter = ({
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiFilterGroup>
-            <TagFilter
-              tagKeysLoading={tagKeysLoading}
-              tagKeys={tagKeys}
-              value={value.tag}
-              onChange={handleTagChange}
-            />
             <OwnerFilter value={value.owner} onChange={handleOwnerChange} />
             <EuiFilterButton
               withNext
@@ -116,6 +110,12 @@ export const ModelListFilter = ({
             >
               Undeployed
             </EuiFilterButton>
+            <TagFilter
+              tagKeysLoading={tagKeysLoading}
+              tagKeys={tagKeys}
+              value={value.tag}
+              onChange={handleTagChange}
+            />
           </EuiFilterGroup>
         </EuiFlexItem>
       </EuiFlexGroup>

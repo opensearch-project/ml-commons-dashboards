@@ -14,7 +14,7 @@ describe('<ModelListFilter />', () => {
   it('should render default search bar with tag, deployed and owner filter', () => {
     render(<ModelListFilter value={{ tag: [], owner: [] }} onChange={() => {}} />);
     expect(screen.getByPlaceholderText('Search by name, person, or keyword')).toBeInTheDocument();
-    expect(screen.getByText('Tags')).toBeInTheDocument();
+    expect(screen.getByText('Add tag filter')).toBeInTheDocument();
     expect(screen.getByText('Owner')).toBeInTheDocument();
     expect(screen.getByText('Deployed')).toBeInTheDocument();
     expect(screen.getByText('Undeployed')).toBeInTheDocument();
@@ -32,7 +32,7 @@ describe('<ModelListFilter />', () => {
       />
     );
     expect(screen.getByDisplayValue('foo')).toBeInTheDocument();
-    expect(screen.queryAllByText('1')).toHaveLength(2);
+    expect(screen.queryAllByText('1')).toHaveLength(1);
     expect(screen.getByText('Deployed')).not.toHaveClass('euiFilterButton-hasActiveFilters');
     expect(screen.getByText('Undeployed')).not.toHaveClass('euiFilterButton-hasActiveFilters');
     expect(screen.getByTitle('NOT tag1: 123')).toBeInTheDocument();
