@@ -15,20 +15,14 @@ import {
 
 const generateFilterLabel = (tag: TagFilterValue) => {
   const texts = [tag.name];
-  switch (tag.operator) {
-    case TagFilterOperator.IsLessThan:
-      texts.push(' < ');
-      break;
-    case TagFilterOperator.IsGreaterThan:
-      texts.push(' > ');
-      break;
-    case TagFilterOperator.IsOneOf:
-    case TagFilterOperator.IsNotOneOf:
-      texts.push(' is one of ');
-      break;
-    default:
-      texts.push(': ');
-  }
+  texts.push(
+    ({
+      [TagFilterOperator.IsLessThan]: ' < ',
+      [TagFilterOperator.IsGreaterThan]: ' > ',
+      [TagFilterOperator.IsOneOf]: ' is one of ',
+      [TagFilterOperator.IsNotOneOf]: ' is one of ',
+    } as Record<TagFilterOperator, string>)[tag.operator] || ': '
+  );
   const text = `${texts.join('')}${
     Array.isArray(tag.value) ? `${tag.value.join(', ')}` : tag.value
   }`;

@@ -22,7 +22,7 @@ describe('<TagValueSelector />', () => {
     expect(screen.getByRole('option', { name: 'Image classification' })).toBeInTheDocument();
   });
 
-  it('should removed selected value in options list and display in the selector', async () => {
+  it('should remove selected value in options list and display in the selector', async () => {
     const user = userEvent.setup();
     render(<TagValueSelector value={['Computer vision']} onChange={jest.fn()} />);
 

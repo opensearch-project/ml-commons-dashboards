@@ -30,7 +30,7 @@ describe('<TagFilter />', () => {
   });
 
   it(
-    'should call onChange with tag filter',
+    'should call onChange when applying tag filter',
     async () => {
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
       const onChangeMock = jest.fn();
@@ -69,7 +69,7 @@ describe('<TagFilter />', () => {
     10 * 1000
   );
 
-  it('should render empty screen after filter button click', async () => {
+  it('should render an empty tag list if no tags', async () => {
     const user = userEvent.setup();
     render(<TagFilter tagKeysLoading={false} tagKeys={[]} value={[]} onChange={jest.fn()} />);
     await user.click(screen.getByText('Tags'));
@@ -77,7 +77,7 @@ describe('<TagFilter />', () => {
     expect(screen.getByText('No options found')).toBeInTheDocument();
   });
 
-  it('should render loading screen after filter button click', async () => {
+  it('should render loading screen when tags are loading', async () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     const { rerender } = render(
