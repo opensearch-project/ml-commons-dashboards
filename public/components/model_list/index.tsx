@@ -91,7 +91,11 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }, []);
   return (
     <EuiPanel>
-      <EuiPageHeader pageTitle={<>Models</>} rightSideItems={[<RegisterNewModelButton />]} />
+      <EuiPageHeader
+        pageTitle={<>Models</>}
+        description="Discover, manage, and track machine learning models across your organization."
+        rightSideItems={[<RegisterNewModelButton />]}
+      />
       <EuiSpacer />
       <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
       <EuiSpacer />
