@@ -15,7 +15,9 @@ export function RegisterNewModelButton() {
   }, []);
   return (
     <>
-      <EuiButton onClick={showModal}>Register new model</EuiButton>
+      <EuiButton onClick={showModal} iconType="plusInCircle" color="primary" fill>
+        Register model
+      </EuiButton>
       {isModalVisible && <RegisterModelTypeModal onCloseModal={closeModal} />}
     </>
   );
