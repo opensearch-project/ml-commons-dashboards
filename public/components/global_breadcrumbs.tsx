@@ -24,17 +24,16 @@ const getBreadcrumbs = (pathname: string, basename: string) => {
 };
 
 export const GlobalBreadcrumbs = ({
-  chrome,
+  onBreadcrumbsChange,
   basename,
 }: {
-  chrome: CoreStart['chrome'];
+  onBreadcrumbsChange: CoreStart['chrome']['setBreadcrumbs'];
   basename: string;
 }) => {
   const location = useLocation();
-  const { setBreadcrumbs } = chrome;
 
   useEffect(() => {
-    setBreadcrumbs(getBreadcrumbs(location.pathname, basename));
-  }, [location.pathname, setBreadcrumbs, basename]);
+    onBreadcrumbsChange(getBreadcrumbs(location.pathname, basename));
+  }, [location.pathname, onBreadcrumbsChange, basename]);
   return null;
 };
