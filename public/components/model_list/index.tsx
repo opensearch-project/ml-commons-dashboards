@@ -15,7 +15,6 @@ import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
-import { UploadCallout } from './upload_callout';
 
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
@@ -98,8 +97,6 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
       />
       <EuiSpacer />
       <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
-      <EuiSpacer />
-      <UploadCallout models={['image-classifier']} />
       <EuiSpacer />
       <ModelTable
         sort={params.sort}
