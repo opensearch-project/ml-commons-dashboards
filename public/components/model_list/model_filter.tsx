@@ -49,7 +49,7 @@ export const ModelFilter = ({
     [searchText, options]
   );
 
-  const hadleButtonClick = useCallback(() => {
+  const handleButtonClick = useCallback(() => {
     setIsPopoverOpen((prevState) => !prevState);
   }, []);
 
@@ -71,7 +71,7 @@ export const ModelFilter = ({
       button={
         <EuiFilterButton
           iconType="arrowDown"
-          onClick={hadleButtonClick}
+          onClick={handleButtonClick}
           isSelected={isPopoverOpen}
           numFilters={options.length}
           hasActiveFilters={value.length > 0}
