@@ -7,7 +7,7 @@ import React from 'react';
 import moment from 'moment';
 import userEvent from '@testing-library/user-event';
 
-import { ModelTable } from '../model_table';
+import { ModelTable, ModelTableProps } from '../model_table';
 import { render, screen, within } from '../../../../test/test_utils';
 import { MODEL_STATE } from '../../../../common/model';
 
@@ -32,9 +32,10 @@ const tableData = [
   },
 ];
 
-const setup = () => {
+const setup = (options?: Partial<ModelTableProps>) => {
   const onChangeMock = jest.fn();
   const onModelNameClickMock = jest.fn();
+  const onResetClickMock = jest.fn();
   const renderResult = render(
     <ModelTable
       models={tableData}
@@ -45,12 +46,17 @@ const setup = () => {
       onChange={onChangeMock}
       onModelNameClick={onModelNameClickMock}
       pagination={{ currentPage: 1, pageSize: 15, totalRecords: 300 }}
+      loading={false}
+      errored={false}
+      onResetClick={onResetClickMock}
+      {...options}
     />
   );
   return {
     renderResult,
     onChangeMock,
     onModelNameClickMock,
+    onResetClickMock,
   };
 };
 
@@ -151,5 +157,52 @@ describe('<ModelTable />', () => {
     expect(onModelNameClickMock).not.toHaveBeenCalled();
     await userEvent.click(renderResult.getByText('model1'));
     expect(onModelNameClickMock).toHaveBeenCalledWith('model1');
+  });
+
+  it('should show loading screen if property loading equal true', () => {
+    setup({
+      loading: true,
+      errored: false,
+      models: [],
+    });
+
+    expect(screen.getByText('Loading models')).toBeInTheDocument();
+  });
+
+  it('should show error screen if property errored equal true', () => {
+    setup({
+      loading: false,
+      errored: true,
+      models: [],
+    });
+
+    expect(screen.getByText('Failed to load models')).toBeInTheDocument();
+  });
+
+  it('should show no result screen if load empty data', () => {
+    setup({
+      loading: false,
+      errored: false,
+      models: [],
+    });
+
+    expect(screen.getByText('Reset search and filters')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'There are no results for your search. Reset the search criteria to view registered models.'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('should call onRestClick after reset button clicked', async () => {
+    const { onResetClickMock } = setup({
+      loading: false,
+      errored: false,
+      models: [],
+    });
+
+    expect(onResetClickMock).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByText('Reset search and filters'));
+    expect(onResetClickMock).toHaveBeenCalled();
   });
 });
