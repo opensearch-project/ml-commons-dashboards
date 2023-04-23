@@ -20,10 +20,9 @@ describe('<ModelListFilter />', () => {
     expect(screen.getByText('Undeployed')).toBeInTheDocument();
   });
 
-  it('should render default search value, filter value and selected tags panel', () => {
+  it('should render filter value and selected tags panel', () => {
     render(
       <ModelListFilter
-        defaultSearch="foo"
         value={{
           tag: [{ name: 'tag1', operator: TagFilterOperator.IsNot, value: '123', type: 'string' }],
           owner: ['owner1'],
@@ -31,7 +30,6 @@ describe('<ModelListFilter />', () => {
         onChange={() => {}}
       />
     );
-    expect(screen.getByDisplayValue('foo')).toBeInTheDocument();
     expect(screen.queryAllByText('1')).toHaveLength(1);
     expect(screen.getByText('Deployed')).not.toHaveClass('euiFilterButton-hasActiveFilters');
     expect(screen.getByText('Undeployed')).not.toHaveClass('euiFilterButton-hasActiveFilters');

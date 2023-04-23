@@ -31,6 +31,11 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     sort: { field: 'created_time', direction: 'desc' },
   });
   const [drawerModelName, setDrawerModelName] = useState('');
+  const searchInputRef = useRef<HTMLInputElement | null>();
+
+  const setSearchInputRef = useCallback((node: HTMLInputElement | null) => {
+    searchInputRef.current = node;
+  }, []);
 
   const { data, reload, loading, error } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
     currentPage: params.currentPage,
@@ -90,6 +95,9 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
       ...prevParams,
       filterValue: { tag: [], owner: [], stage: [] },
     }));
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
+    }
   }, [setParams]);
 
   const handleFilterChange = useCallback((filterValue: ModelListFilterFilterValue) => {
@@ -115,7 +123,11 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
       <EuiSpacer />
       {!showEmptyScreen && (
         <>
-          <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
+          <ModelListFilter
+            value={params.filterValue}
+            onChange={handleFilterChange}
+            searchInputRef={setSearchInputRef}
+          />
           <EuiSpacer />
           <ModelTable
             loading={loading}
