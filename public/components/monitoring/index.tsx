@@ -15,12 +15,12 @@ import {
 import React, { useState, useRef, useCallback } from 'react';
 
 import { RefreshInterval } from '../common/refresh_interval';
+import { DebouncedSearchBar } from '../common';
 import { PreviewPanel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
 import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
 import { ModelStatusFilter } from './model_status_filter';
-import { SearchBar } from './search_bar';
 import { ModelDeploymentProfile } from '../../apis/profile';
 
 export const Monitoring = () => {
@@ -98,7 +98,12 @@ export const Monitoring = () => {
           <>
             <EuiFlexGroup gutterSize="l">
               <EuiFlexItem>
-                <SearchBar inputRef={setInputRef} onSearch={searchByNameOrId} />
+                <DebouncedSearchBar
+                  inputRef={setInputRef}
+                  onSearch={searchByNameOrId}
+                  placeholder="Search by name or ID"
+                  aria-label="Search by name or ID"
+                />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
