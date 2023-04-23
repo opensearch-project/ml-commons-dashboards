@@ -50,10 +50,12 @@ export const useFetcher = <TParams extends any[], TResponse>(
           dataRef.current = null;
         }
       } finally {
-        loadingRef.current = false;
+        if (shouldUpdate) {
+          loadingRef.current = false;
+        }
         if (
-          usedRef.current.loading ||
-          (shouldUpdate && (usedRef.current.data || usedRef.current.error))
+          shouldUpdate &&
+          (usedRef.current.loading || usedRef.current.data || usedRef.current.error)
         ) {
           forceUpdate();
         }

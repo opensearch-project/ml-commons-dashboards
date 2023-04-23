@@ -20,7 +20,7 @@ describe('useFetcher', () => {
     expect(fetcher).toHaveBeenCalledWith('foo');
   });
 
-  it('should call fetcher only onece if params content not change', async () => {
+  it('should call fetcher only once if params content not change', async () => {
     const fetcher = jest.fn((_arg1: any) => Promise.resolve());
     const { result, rerender } = renderHook(({ params }) => useFetcher(fetcher, params), {
       initialProps: { params: { foo: 'bar' } },
@@ -169,5 +169,34 @@ describe('useFetcher', () => {
       [true, 'bar'], // For params modified rendering
       [false, 'bar'], // For params modified data load complete
     ]);
+  });
+
+  it('should return loading true after params changed and not response', async () => {
+    jest.useFakeTimers();
+
+    const fetcher = jest.fn(
+      (params: string) =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(params);
+          }, 1000);
+        })
+    );
+    const { result, rerender } = renderHook(({ params }) => useFetcher(fetcher, params), {
+      initialProps: { params: 'foo' },
+    });
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      jest.advanceTimersByTime(500);
+      rerender({ params: 'bar' });
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(600);
+    });
+    expect(result.current.loading).toBe(true);
+
+    jest.useRealTimers();
   });
 });
