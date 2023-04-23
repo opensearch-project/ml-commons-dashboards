@@ -10,7 +10,7 @@ import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
 import { ModelTable, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
-import { RegisterNewModelButton } from './regsister_new_model_button';
+import { RegisterNewModelButton } from './register_new_model_button';
 import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,

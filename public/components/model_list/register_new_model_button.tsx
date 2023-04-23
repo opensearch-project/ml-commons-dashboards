@@ -3,9 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import React, { useState, useCallback } from 'react';
-import { EuiButton } from '@elastic/eui';
+import { EuiButton, EuiButtonProps } from '@elastic/eui';
 import { RegisterModelTypeModal } from '../register_model_type_modal';
-export function RegisterNewModelButton() {
+
+interface RegisterNewModelButtonProps {
+  buttonProps?: Partial<EuiButtonProps>;
+}
+
+export function RegisterNewModelButton({ buttonProps }: RegisterNewModelButtonProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const showModal = useCallback(() => {
     setIsModalVisible(true);
@@ -15,7 +20,7 @@ export function RegisterNewModelButton() {
   }, []);
   return (
     <>
-      <EuiButton onClick={showModal} iconType="plusInCircle" color="primary" fill>
+      <EuiButton onClick={showModal} iconType="plusInCircle" color="primary" fill {...buttonProps}>
         Register model
       </EuiButton>
       {isModalVisible && <RegisterModelTypeModal onCloseModal={closeModal} />}
