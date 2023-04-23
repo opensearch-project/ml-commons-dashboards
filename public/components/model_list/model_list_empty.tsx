@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { EuiButton, EuiEmptyPrompt, EuiLink, EuiSpacer, EuiButtonEmpty } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiLink, EuiSpacer, EuiButtonEmpty } from '@elastic/eui';
 import React from 'react';
+
+import { RegisterNewModelButton } from './register_new_model_button';
 
 export const ModelListEmpty = () => {
   return (
@@ -15,7 +17,7 @@ export const ModelListEmpty = () => {
         actions={
           <>
             <EuiSpacer size="s" />
-            <EuiButton iconType="plusInCircle">Register model</EuiButton>
+            <RegisterNewModelButton buttonProps={{ fill: false }} />
             <EuiSpacer size="m" />
             <EuiButtonEmpty>
               <EuiLink href="/todo" external>
