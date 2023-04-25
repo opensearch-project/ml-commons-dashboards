@@ -54,7 +54,7 @@ export const ModelGroupOverviewCard = ({
             listItems={[
               {
                 title: 'Created',
-                description: renderTime(createdTime, 'MMM D, YYYY H:m A'),
+                description: renderTime(createdTime, 'MMM D, YYYY h:m A'),
               },
             ]}
           />
@@ -64,7 +64,7 @@ export const ModelGroupOverviewCard = ({
             listItems={[
               {
                 title: 'Last updated',
-                description: renderTime(updatedTime, 'MMM D, YYYY H:m A'),
+                description: renderTime(updatedTime, 'MMM D, YYYY h:m A'),
               },
             ]}
           />

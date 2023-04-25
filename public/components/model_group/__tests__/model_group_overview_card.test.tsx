@@ -17,7 +17,7 @@ describe('<ModelGroupOverviewCard />', () => {
         isModelOwner
         owner="Foo"
         createdTime={1682324310318}
-        updatedTime={1682324910318}
+        updatedTime={1682342310318}
       />
     );
 
@@ -25,11 +25,11 @@ describe('<ModelGroupOverviewCard />', () => {
     expect(screen.getByText('Foo (you)')).toBeInTheDocument();
     expect(screen.getByText('Created')).toBeInTheDocument();
     expect(
-      within(screen.getByText('Created').closest('dl')!).getByText('Apr 24, 2023 16:18 PM')
+      within(screen.getByText('Created').closest('dl')!).getByText('Apr 24, 2023 8:18 AM')
     ).toBeInTheDocument();
     expect(screen.getByText('Last updated')).toBeInTheDocument();
     expect(
-      within(screen.getByText('Last updated').closest('dl')!).getByText('Apr 24, 2023 16:28 PM')
+      within(screen.getByText('Last updated').closest('dl')!).getByText('Apr 24, 2023 1:18 PM')
     ).toBeInTheDocument();
 
     expect(screen.getByText('model-1-id')).toBeInTheDocument();

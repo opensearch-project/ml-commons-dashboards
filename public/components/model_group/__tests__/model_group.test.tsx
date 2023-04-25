@@ -31,9 +31,9 @@ describe('<ModelGroup />', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('model-group-loading-indicator')).toBeNull();
     });
-    expect(screen.getByText('model-1-name')).toBeInTheDocument();
+    expect(screen.getByText('model1')).toBeInTheDocument();
     expect(screen.getByText('Delete')).toBeInTheDocument();
-    expect(screen.getByText('Register new version')).toBeInTheDocument();
+    expect(screen.getByText('Register version')).toBeInTheDocument();
     expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
