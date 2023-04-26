@@ -37,6 +37,8 @@ export interface ModelSearchItem {
 
 export interface ModelDetail extends ModelSearchItem {
   content: string;
+  last_updated_time: number;
+  created_time: number;
 }
 
 export interface ModelSearchResponse {

@@ -10,8 +10,8 @@
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "osd": "node ../../scripts/osd",
     "lint:es": "node ../../scripts/eslint",
-    "test:jest": "../../node_modules/.bin/jest --config ./test/jest.config.js",
-    "test:watch": "../../node_modules/.bin/jest --config ./test/jest.config.js --watch",
+    "test:jest": "TZ=UTC ../../node_modules/.bin/jest --config ./test/jest.config.js",
+    "test:watch": "TZ=UTC ../../node_modules/.bin/jest --config ./test/jest.config.js --watch",
     "prepare": "husky install"
   },
   "husky": {
