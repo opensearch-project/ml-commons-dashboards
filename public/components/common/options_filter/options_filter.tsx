@@ -10,26 +10,30 @@ import {
   EuiFieldSearch,
   EuiFilterButton,
   EuiPopoverFooter,
+  EuiFlexGroup,
+  EuiFlexItem,
 } from '@elastic/eui';
 import { OptionsFilterItem } from './options_filter_item';
 
-export interface OptionsFilterProps {
+export interface OptionsFilterProps<T extends string | number = string> {
   name: string;
   searchPlaceholder: string;
-  options: Array<string | { name: string; value: string }>;
-  value: string[];
-  onChange: (value: string[]) => void;
+  searchWidth?: number;
+  options: Array<T | { name: string; value: T; prepend?: React.ReactNode }>;
+  value: T[];
+  onChange: (value: T[]) => void;
   footer?: React.ReactNode;
 }
 
-export const OptionsFilter = ({
+export const OptionsFilter = <T extends string | number = string>({
   name,
   value,
   footer,
   options,
   searchPlaceholder,
+  searchWidth,
   onChange,
-}: OptionsFilterProps) => {
+}: OptionsFilterProps<T>) => {
   const valueRef = useRef(value);
   valueRef.current = value;
   const onChangeRef = useRef(onChange);
@@ -41,7 +45,7 @@ export const OptionsFilter = ({
     () =>
       searchText
         ? options.filter((option) =>
-            (typeof option === 'string' ? option : option.name)
+            (typeof option === 'object' ? option.name : option.toString())
               .toLowerCase()
               .includes(searchText.toLowerCase())
           )
@@ -57,7 +61,7 @@ export const OptionsFilter = ({
     setIsPopoverOpen(false);
   }, []);
 
-  const handleFilterItemClick = useCallback((clickItemValue: string) => {
+  const handleFilterItemClick = useCallback((clickItemValue: T) => {
     onChangeRef.current(
       valueRef.current.includes(clickItemValue)
         ? valueRef.current.filter((item) => item !== clickItemValue)
@@ -73,9 +77,7 @@ export const OptionsFilter = ({
           iconType="arrowDown"
           onClick={handleButtonClick}
           isSelected={isPopoverOpen}
-          numFilters={options.length}
-          hasActiveFilters={value.length > 0}
-          numActiveFilters={value.length}
+          {...(value.length > 0 ? { hasActiveFilters: true, numActiveFilters: value.length } : {})}
         >
           {name}
         </EuiFilterButton>
@@ -84,11 +86,16 @@ export const OptionsFilter = ({
       closePopover={closePopover}
       panelPaddingSize="none"
     >
-      <EuiPopoverTitle paddingSize="s">
-        <EuiFieldSearch compressed placeholder={searchPlaceholder} onSearch={setSearchText} />
+      <EuiPopoverTitle style={{ padding: 12 }}>
+        <EuiFieldSearch
+          compressed
+          placeholder={searchPlaceholder}
+          onSearch={setSearchText}
+          style={typeof searchWidth !== 'undefined' ? { width: searchWidth } : {}}
+        />
       </EuiPopoverTitle>
       {filteredOptions.map((item, index) => {
-        const itemValue = typeof item === 'string' ? item : item.value;
+        const itemValue = typeof item === 'object' ? item.value : item;
         const checked = value.includes(itemValue) ? 'on' : undefined;
         return (
           <OptionsFilterItem
@@ -97,7 +104,14 @@ export const OptionsFilter = ({
             value={itemValue}
             key={`${index}${itemValue}`}
           >
-            {typeof item === 'string' ? item : item.name}
+            {typeof item === 'object' ? (
+              <EuiFlexGroup alignItems="center" gutterSize="s">
+                {item.prepend && <EuiFlexItem grow={false}>{item.prepend}</EuiFlexItem>}
+                <EuiFlexItem>{item.name}</EuiFlexItem>
+              </EuiFlexGroup>
+            ) : (
+              item
+            )}
           </OptionsFilterItem>
         );
       })}

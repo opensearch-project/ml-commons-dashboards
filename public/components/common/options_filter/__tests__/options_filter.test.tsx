@@ -14,7 +14,7 @@ describe('<OptionsFilter />', () => {
     jest.resetAllMocks();
   });
 
-  it('should render "Tags" with 0 active filter', () => {
+  it('should render "Tags" as filter name by default', () => {
     render(
       <OptionsFilter
         name="Tags"
@@ -25,7 +25,6 @@ describe('<OptionsFilter />', () => {
       />
     );
     expect(screen.getByText('Tags')).toBeInTheDocument();
-    expect(screen.getByText('0')).toBeInTheDocument();
   });
 
   it('should render Tags with 2 active filter', () => {
@@ -143,5 +142,27 @@ describe('<OptionsFilter />', () => {
     await userEvent.click(screen.getByText('bar'));
     expect(onChangeMock).toHaveBeenCalledWith(['foo']);
     onChangeMock.mockClear();
+  });
+
+  it('should call obChange with option.value after option click', async () => {
+    const onChangeMock = jest.fn();
+    render(
+      <OptionsFilter
+        name="Tags"
+        searchPlaceholder="Search Tags"
+        options={[
+          { name: 'foo', value: 1 },
+          { name: 'bar', value: 2 },
+        ]}
+        value={[]}
+        onChange={onChangeMock}
+      />
+    );
+
+    expect(onChangeMock).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByText('Tags'));
+    await userEvent.click(screen.getByText('foo'));
+    expect(onChangeMock).toHaveBeenCalledWith([1]);
   });
 });
