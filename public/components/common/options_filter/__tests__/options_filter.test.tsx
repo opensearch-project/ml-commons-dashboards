@@ -2,22 +2,21 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-jest.mock('../../../apis/security');
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-import { ModelFilter } from '../model_filter';
-import { render, screen } from '../../../../test/test_utils';
+import { OptionsFilter } from '../options_filter';
+import { render, screen } from '../../../../../test/test_utils';
 
-describe('<ModelFilter />', () => {
+describe('<OptionsFilter />', () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
 
   it('should render "Tags" with 0 active filter', () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={[]}
@@ -31,7 +30,7 @@ describe('<ModelFilter />', () => {
 
   it('should render Tags with 2 active filter', () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={[]}
@@ -45,7 +44,7 @@ describe('<ModelFilter />', () => {
 
   it('should render options filter after filter button clicked', async () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -64,7 +63,7 @@ describe('<ModelFilter />', () => {
 
   it('should render passed footer after filter button clicked', async () => {
     const { getByText, queryByText } = render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -81,7 +80,7 @@ describe('<ModelFilter />', () => {
 
   it('should only show "bar" after search', async () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -101,7 +100,7 @@ describe('<ModelFilter />', () => {
   it('should call onChange with consistent value after option click', async () => {
     const onChangeMock = jest.fn();
     const { rerender } = render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -118,7 +117,7 @@ describe('<ModelFilter />', () => {
     onChangeMock.mockClear();
 
     rerender(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -132,7 +131,7 @@ describe('<ModelFilter />', () => {
     onChangeMock.mockClear();
 
     rerender(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}

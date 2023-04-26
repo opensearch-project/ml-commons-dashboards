@@ -11,9 +11,9 @@ import {
   EuiFilterButton,
   EuiPopoverFooter,
 } from '@elastic/eui';
-import { ModelFilterItem } from './model_filter_item';
+import { OptionsFilterItem } from './options_filter_item';
 
-export interface ModelFilterProps {
+export interface OptionsFilterProps {
   name: string;
   searchPlaceholder: string;
   options: Array<string | { name: string; value: string }>;
@@ -22,14 +22,14 @@ export interface ModelFilterProps {
   footer?: React.ReactNode;
 }
 
-export const ModelFilter = ({
+export const OptionsFilter = ({
   name,
   value,
   footer,
   options,
   searchPlaceholder,
   onChange,
-}: ModelFilterProps) => {
+}: OptionsFilterProps) => {
   const valueRef = useRef(value);
   valueRef.current = value;
   const onChangeRef = useRef(onChange);
@@ -91,14 +91,14 @@ export const ModelFilter = ({
         const itemValue = typeof item === 'string' ? item : item.value;
         const checked = value.includes(itemValue) ? 'on' : undefined;
         return (
-          <ModelFilterItem
+          <OptionsFilterItem
             onClick={handleFilterItemClick}
             checked={checked}
             value={itemValue}
-            key={index}
+            key={`${index}${itemValue}`}
           >
             {typeof item === 'string' ? item : item.name}
-          </ModelFilterItem>
+          </OptionsFilterItem>
         );
       })}
       {footer && <EuiPopoverFooter>{footer}</EuiPopoverFooter>}
