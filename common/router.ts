@@ -36,7 +36,7 @@ export const ROUTES: RouteConfig[] = [
   },
   {
     path: routerPaths.modelList,
-    label: 'Model List',
+    label: 'Model Registry',
     Component: ModelList,
     nav: true,
   },
