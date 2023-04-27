@@ -103,7 +103,9 @@ export const MlCommonsPluginApp = ({
             </EuiPageBody>
           </EuiPage>
           {/* Breadcrumbs will contains dynamic content in new page header, should be provided by each page self*/}
-          {!useNewPageHeader && <GlobalBreadcrumbs chrome={chrome} basename={basename} />}
+          {!useNewPageHeader && (
+            <GlobalBreadcrumbs onBreadcrumbsChange={chrome.setBreadcrumbs} basename={basename} />
+          )}
           {dataSourceEnabled && (
             <DataSourceTopNavMenu
               notifications={notifications}
