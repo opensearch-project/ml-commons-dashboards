@@ -18,8 +18,34 @@ export interface TaskGetOneResponse {
   worker_node: string[];
 }
 
+export interface TaskSearchResponse {
+  data: TaskGetOneResponse[];
+  total_tasks: {};
+}
+
 export class Task {
   public getOne(taskId: string) {
     return InnerHttpProvider.getHttp().get<TaskGetOneResponse>(`${TASK_API_ENDPOINT}/${taskId}`);
+  }
+
+  public search(query: {
+    from: number;
+    size: number;
+    modelId?: string;
+    taskType?: string;
+    state?: string;
+    sort?:
+      | 'last_update_time-desc'
+      | 'last_update_time-asc'
+      | Array<'last_update_time-desc' | 'last_update_time-asc'>;
+  }) {
+    const { modelId, taskType, ...restQuery } = query;
+    return InnerHttpProvider.getHttp().get<TaskSearchResponse>(TASK_API_ENDPOINT, {
+      query: {
+        ...restQuery,
+        model_id: modelId,
+        task_type: taskType,
+      },
+    });
   }
 }
