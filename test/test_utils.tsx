@@ -13,7 +13,7 @@ export interface RenderWithRouteProps {
   route: string;
 }
 
-const history = {
+export const history = {
   current: createBrowserHistory(),
 };
 

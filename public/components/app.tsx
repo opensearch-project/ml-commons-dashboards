@@ -63,7 +63,7 @@ export const MlCommonsPluginApp = ({
             </Switch>
           </EuiPageBody>
         </EuiPage>
-        <GlobalBreadcrumbs chrome={chrome} basename={basename} />
+        <GlobalBreadcrumbs onBreadcrumbsChange={chrome.setBreadcrumbs} basename={basename} />
       </>
     </I18nProvider>
   );
