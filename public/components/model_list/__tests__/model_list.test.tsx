@@ -31,7 +31,7 @@ const setup = () => {
 };
 
 describe('<ModelList />', () => {
-  it('should empty screen if no models in system', async () => {
+  it('should show empty screen if no models in system', async () => {
     const modelAggregateMock = jest
       .spyOn(ModelAggregate.prototype, 'search')
       .mockImplementation(() =>

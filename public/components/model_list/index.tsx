@@ -8,7 +8,7 @@ import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
-import { ModelTable, ModelTableSort } from './model_table';
+import { ModelTable, ModelTableCriteria, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
 import { RegisterNewModelButton } from './register_new_model_button';
 import {
@@ -27,7 +27,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }>({
     currentPage: 1,
     pageSize: 15,
-    filterValue: { tag: [], owner: [], stage: [] },
+    filterValue: { tag: [], owner: [] },
     sort: { field: 'created_time', direction: 'desc' },
   });
   const [drawerModelName, setDrawerModelName] = useState('');
@@ -70,14 +70,15 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     setDrawerModelName(name);
   }, []);
 
-  const handleTableChange = useCallback((criteria) => {
+  const handleTableChange = useCallback((criteria: ModelTableCriteria) => {
     const { pagination: newPagination, sort } = criteria;
     setParams((previousValue) => {
-      if (
+      const criteriaConsistent =
         newPagination?.currentPage === previousValue.currentPage &&
         newPagination?.pageSize === previousValue.pageSize &&
-        (!sort || sort === previousValue.sort)
-      ) {
+        (!sort || sort === previousValue.sort);
+
+      if (criteriaConsistent) {
         return previousValue;
       }
       return {
@@ -93,7 +94,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   const handleReset = useCallback(() => {
     setParams((prevParams) => ({
       ...prevParams,
-      filterValue: { tag: [], owner: [], stage: [] },
+      filterValue: { tag: [], owner: [] },
     }));
     if (searchInputRef.current) {
       searchInputRef.current.value = '';
@@ -110,7 +111,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
         pageTitle={
           <>
             Models&nbsp;
-            {totalModelCounts && (
+            {typeof totalModelCounts === 'number' && (
               <EuiTextColor data-test-subj="modelTotalCount" color="subdued" component="span">
                 ({totalModelCounts})
               </EuiTextColor>
@@ -137,7 +138,7 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
             onChange={handleTableChange}
             onModelNameClick={handleViewModelDrawer}
             onResetClick={handleReset}
-            errored={!!error}
+            error={!!error}
           />
           <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
           {drawerModelName && (

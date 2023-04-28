@@ -47,7 +47,7 @@ const setup = (options?: Partial<ModelTableProps>) => {
       onModelNameClick={onModelNameClickMock}
       pagination={{ currentPage: 1, pageSize: 15, totalRecords: 300 }}
       loading={false}
-      errored={false}
+      error={false}
       onResetClick={onResetClickMock}
       {...options}
     />
@@ -162,17 +162,17 @@ describe('<ModelTable />', () => {
   it('should show loading screen if property loading equal true', () => {
     setup({
       loading: true,
-      errored: false,
+      error: false,
       models: [],
     });
 
     expect(screen.getByText('Loading models')).toBeInTheDocument();
   });
 
-  it('should show error screen if property errored equal true', () => {
+  it('should show error screen if property error equal true', () => {
     setup({
       loading: false,
-      errored: true,
+      error: true,
       models: [],
     });
 
@@ -182,7 +182,7 @@ describe('<ModelTable />', () => {
   it('should show no result screen if load empty data', () => {
     setup({
       loading: false,
-      errored: false,
+      error: false,
       models: [],
     });
 
@@ -197,7 +197,7 @@ describe('<ModelTable />', () => {
   it('should call onRestClick after reset button clicked', async () => {
     const { onResetClickMock } = setup({
       loading: false,
-      errored: false,
+      error: false,
       models: [],
     });
 

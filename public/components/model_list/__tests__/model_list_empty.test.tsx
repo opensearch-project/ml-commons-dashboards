@@ -10,7 +10,7 @@ import { render, screen } from '../../../../test/test_utils';
 import { ModelListEmpty } from '../model_list_empty';
 
 describe('<ModelListEmpty />', () => {
-  it('should tips, register model and Read documentation by default', () => {
+  it('should show tips, register model and Read documentation by default', () => {
     render(<ModelListEmpty />);
 
     expect(screen.getByText('Registered models will appear here.'));

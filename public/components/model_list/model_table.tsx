@@ -45,12 +45,12 @@ export interface ModelTableProps {
   onChange: (criteria: ModelTableCriteria) => void;
   onModelNameClick: (name: string) => void;
   loading: boolean;
-  errored: boolean;
+  error: boolean;
   onResetClick: () => void;
 }
 
 export function ModelTable(props: ModelTableProps) {
-  const { models, sort, onChange, onModelNameClick, loading, onResetClick, errored } = props;
+  const { models, sort, onChange, onModelNameClick, loading, onResetClick, error } = props;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
@@ -169,6 +169,65 @@ export function ModelTable(props: ModelTableProps) {
 
   const sorting = useMemo(() => ({ sort }), [sort]);
 
+  const noItemsMessage = useMemo(
+    () => (
+      <div style={{ padding: '8px 0 12px 0' }}>
+        {loading && (
+          <EuiEmptyPrompt
+            body={
+              <>
+                <EuiSpacer size="l" />
+                <EuiLoadingSpinner size="xl" />
+                <EuiSpacer size="s" />
+                <EuiTitle>
+                  <h2 style={{ marginTop: 0, marginBottom: 0, paddingBottom: 72 }}>
+                    Loading models
+                  </h2>
+                </EuiTitle>
+              </>
+            }
+          />
+        )}
+        {!loading && error && (
+          <EuiEmptyPrompt
+            body={
+              <>
+                <EuiSpacer size="l" />
+                <EuiIcon type="alert" size="xl" color="danger" />
+                <EuiSpacer size="m" />
+                <EuiTitle>
+                  <h2 style={{ marginTop: 0, marginBottom: 0 }}>Failed to load models</h2>
+                </EuiTitle>
+                <EuiSpacer size="m" />
+                <EuiText>Check your internet connection </EuiText>
+              </>
+            }
+          />
+        )}
+        {!loading && !error && (
+          <EuiEmptyPrompt
+            body={
+              <>
+                <EuiSpacer size="l" />
+                <EuiSpacer size="l" />
+                There are no results for your search. Reset the search criteria to view registered
+                models.
+                <EuiSpacer size="s" />
+              </>
+            }
+            actions={
+              <>
+                <EuiButton onClick={onResetClick}>Reset search and filters</EuiButton>
+                <EuiSpacer size="l" />
+              </>
+            }
+          />
+        )}
+      </div>
+    ),
+    [onResetClick, loading, error]
+  );
+
   const handleChange = useCallback((criteria: Criteria<ModelAggregateSearchItem>) => {
     onChangeRef.current({
       ...(criteria.page
@@ -186,61 +245,7 @@ export function ModelTable(props: ModelTableProps) {
       onChange={handleChange}
       sorting={sorting}
       hasActions
-      noItemsMessage={
-        <div style={{ padding: '8px 0 12px 0' }}>
-          {loading && (
-            <EuiEmptyPrompt
-              body={
-                <>
-                  <EuiSpacer size="l" />
-                  <EuiLoadingSpinner size="xl" />
-                  <EuiSpacer size="s" />
-                  <EuiTitle>
-                    <h2 style={{ marginTop: 0, marginBottom: 0, paddingBottom: 72 }}>
-                      Loading models
-                    </h2>
-                  </EuiTitle>
-                </>
-              }
-            />
-          )}
-          {!loading && errored && (
-            <EuiEmptyPrompt
-              body={
-                <>
-                  <EuiSpacer size="l" />
-                  <EuiIcon type="alert" size="xl" color="danger" />
-                  <EuiSpacer size="m" />
-                  <EuiTitle>
-                    <h2 style={{ marginTop: 0, marginBottom: 0 }}>Failed to load models</h2>
-                  </EuiTitle>
-                  <EuiSpacer size="m" />
-                  <EuiText>Check your internet connection </EuiText>
-                </>
-              }
-            />
-          )}
-          {!loading && !errored && (
-            <EuiEmptyPrompt
-              body={
-                <>
-                  <EuiSpacer size="l" />
-                  <EuiSpacer size="l" />
-                  There are no results for your search. Reset the search criteria to view registered
-                  models.
-                  <EuiSpacer size="s" />
-                </>
-              }
-              actions={
-                <>
-                  <EuiButton onClick={onResetClick}>Reset search and filters</EuiButton>
-                  <EuiSpacer size="l" />
-                </>
-              }
-            />
-          )}
-        </div>
-      }
+      noItemsMessage={noItemsMessage}
     />
   );
 }
