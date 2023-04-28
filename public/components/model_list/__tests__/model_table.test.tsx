@@ -194,6 +194,26 @@ describe('<ModelTable />', () => {
     ).toBeInTheDocument();
   });
 
+  it('should show loading screen even models provided', () => {
+    setup({
+      loading: true,
+      error: false,
+      models: tableData,
+    });
+
+    expect(screen.getByText('Loading models')).toBeInTheDocument();
+  });
+
+  it('should show error screen even models provided', () => {
+    setup({
+      loading: false,
+      error: true,
+      models: tableData,
+    });
+
+    expect(screen.getByText('Failed to load models')).toBeInTheDocument();
+  });
+
   it('should call onRestClick after reset button clicked', async () => {
     const { onResetClickMock } = setup({
       loading: false,

@@ -240,7 +240,7 @@ export function ModelTable(props: ModelTableProps) {
   return (
     <EuiBasicTable<ModelAggregateSearchItem>
       columns={columns}
-      items={models}
+      items={loading || error ? [] : models}
       pagination={models.length > 0 ? pagination : undefined}
       onChange={handleChange}
       sorting={sorting}
