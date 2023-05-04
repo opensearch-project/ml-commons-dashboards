@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// TODO: rename the enum keys accordingly
 export enum MODEL_STATE {
-  loaded = 'LOADED',
+  loaded = 'DEPLOYED',
   trained = 'TRAINED',
-  unloaded = 'UNLOADED',
-  uploaded = 'UPLOADED',
-  uploading = 'UPLOADING',
-  loading = 'LOADING',
-  partiallyLoaded = 'PARTIALLY_LOADED',
-  loadFailed = 'LOAD_FAILED',
+  unloaded = 'UNDEPLOYED',
+  uploaded = 'REGISTERED',
+  uploading = 'REGISTERING',
+  loading = 'DEPLOYING',
+  partiallyLoaded = 'PARTIALLY_DEPLOYED',
+  loadFailed = 'DEPLOY_FAILED',
 }
 
 export interface OpenSearchModelBase {

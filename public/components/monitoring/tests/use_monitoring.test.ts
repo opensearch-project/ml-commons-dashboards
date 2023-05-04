@@ -51,7 +51,7 @@ describe('useMonitoring', () => {
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
-          states: ['LOAD_FAILED', 'LOADED', 'PARTIALLY_LOADED'],
+          states: ['DEPLOY_FAILED', 'DEPLOYED', 'PARTIALLY_DEPLOYED'],
         })
       )
     );
@@ -63,7 +63,7 @@ describe('useMonitoring', () => {
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
-          states: ['LOADED'],
+          states: ['DEPLOYED'],
         })
       )
     );
@@ -78,7 +78,7 @@ describe('useMonitoring', () => {
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
-          states: ['PARTIALLY_LOADED'],
+          states: ['PARTIALLY_DEPLOYED'],
         })
       )
     );
@@ -137,7 +137,7 @@ describe('useMonitoring.pageStatus', () => {
               id: 'model-1-id',
               name: 'model-1-name',
               algorithm: 'TEXT_EMBEDDING',
-              model_state: 'LOADED',
+              model_state: 'DEPLOYED',
               model_version: '1.0.0',
               current_worker_node_count: 1,
               planning_worker_node_count: 3,
