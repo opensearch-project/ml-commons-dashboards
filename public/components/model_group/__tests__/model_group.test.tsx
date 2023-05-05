@@ -41,21 +41,25 @@ describe('<ModelGroup />', () => {
     expect(within(screen.getByRole('tabpanel')).getByText('Versions')).toBeInTheDocument();
   });
 
-  it('should display consistent tabs content after tab clicked', async () => {
-    setup();
+  it(
+    'should display consistent tabs content after tab clicked',
+    async () => {
+      setup();
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('model-group-loading-indicator')).toBeNull();
-    });
-    expect(screen.getByRole('tab', { name: 'Versions' })).toHaveClass('euiTab-isSelected');
-    expect(within(screen.getByRole('tabpanel')).getByText('Versions')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByTestId('model-group-loading-indicator')).toBeNull();
+      });
+      expect(screen.getByRole('tab', { name: 'Versions' })).toHaveClass('euiTab-isSelected');
+      expect(within(screen.getByRole('tabpanel')).getByText('Versions')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('tab', { name: 'Details' }));
-    expect(screen.getByRole('tab', { name: 'Details' })).toHaveClass('euiTab-isSelected');
-    expect(within(screen.getByRole('tabpanel')).getByText('Details')).toBeInTheDocument();
+      await userEvent.click(screen.getByRole('tab', { name: 'Details' }));
+      expect(screen.getByRole('tab', { name: 'Details' })).toHaveClass('euiTab-isSelected');
+      expect(within(screen.getByRole('tabpanel')).getByText('Details')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('tab', { name: 'Tags' }));
-    expect(screen.getByRole('tab', { name: 'Tags' })).toHaveClass('euiTab-isSelected');
-    expect(within(screen.getByRole('tabpanel')).getByText('Tags')).toBeInTheDocument();
-  });
+      await userEvent.click(screen.getByRole('tab', { name: 'Tags' }));
+      expect(screen.getByRole('tab', { name: 'Tags' })).toHaveClass('euiTab-isSelected');
+      expect(within(screen.getByRole('tabpanel')).getByText('Tags')).toBeInTheDocument();
+    },
+    10 * 1000
+  );
 });

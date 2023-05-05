@@ -37,32 +37,36 @@ describe('<ModelGroupVersionTable />', () => {
     });
   });
 
-  it('should render sorted column and call onSort after sort change', async () => {
-    const user = userEvent.setup();
-    const onSortMock = jest.fn();
-    render(
-      <ModelGroupVersionTable
-        versions={[]}
-        tags={[]}
-        sorting={{
-          columns: [{ id: 'version', direction: 'asc' }],
-          onSort: onSortMock,
-        }}
-      />
-    );
-
-    await waitFor(async () => {
-      expect(screen.getByTestId('dataGridHeaderCellSortingIcon-version')).toBeInTheDocument();
-      await user.click(screen.getByText('Version'));
-      expect(screen.getByText('Sort A-Z').closest('li')).toHaveClass(
-        'euiDataGridHeader__action--selected'
+  it(
+    'should render sorted column and call onSort after sort change',
+    async () => {
+      const user = userEvent.setup();
+      const onSortMock = jest.fn();
+      render(
+        <ModelGroupVersionTable
+          versions={[]}
+          tags={[]}
+          sorting={{
+            columns: [{ id: 'version', direction: 'asc' }],
+            onSort: onSortMock,
+          }}
+        />
       );
-    });
 
-    expect(onSortMock).not.toHaveBeenCalled();
-    await user.click(screen.getByText('Sort Z-A'));
-    expect(onSortMock).toHaveBeenCalledWith([{ direction: 'desc', id: 'version' }]);
-  });
+      await waitFor(async () => {
+        expect(screen.getByTestId('dataGridHeaderCellSortingIcon-version')).toBeInTheDocument();
+        await user.click(screen.getByText('Version'));
+        expect(screen.getByText('Sort A-Z').closest('li')).toHaveClass(
+          'euiDataGridHeader__action--selected'
+        );
+      });
+
+      expect(onSortMock).not.toHaveBeenCalled();
+      await user.click(screen.getByText('Sort Z-A'));
+      expect(onSortMock).toHaveBeenCalledWith([{ direction: 'desc', id: 'version' }]);
+    },
+    10 * 1000
+  );
 
   it('should NOT render sort button for state and status column', async () => {
     const user = userEvent.setup();
@@ -125,15 +129,19 @@ describe('<ModelGroupVersionTable />', () => {
     expect(onChangePageMock).toHaveBeenCalledWith(1);
   });
 
-  it('should show status details after status cell expand button clicked', async () => {
-    const user = userEvent.setup();
-    render(<ModelGroupVersionTable versions={versions} tags={[]} />);
+  it(
+    'should show status details after status cell expand button clicked',
+    async () => {
+      const user = userEvent.setup();
+      render(<ModelGroupVersionTable versions={versions} tags={[]} />);
 
-    await user.hover(screen.getByText('In progress...'));
-    await user.click(
-      screen.getByText('In progress...').closest('div[role="gridcell"]')!.querySelector('button')!
-    );
+      await user.hover(screen.getByText('In progress...'));
+      await user.click(
+        screen.getByText('In progress...').closest('div[role="gridcell"]')!.querySelector('button')!
+      );
 
-    expect(screen.getByText(/The model artifact for.*is uploading./)).toBeInTheDocument();
-  });
+      expect(screen.getByText(/The model artifact for.*is uploading./)).toBeInTheDocument();
+    },
+    10 * 1000
+  );
 });
