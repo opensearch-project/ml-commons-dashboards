@@ -17,7 +17,7 @@ export interface ModelSearchItem {
   id: string;
   name: string;
   algorithm: string;
-  model_state: string;
+  model_state: MODEL_STATE;
   model_version: string;
   current_worker_node_count: number;
   planning_worker_node_count: number;
@@ -28,6 +28,8 @@ export interface ModelSearchItem {
     framework_type: string;
     model_type: string;
   };
+  last_updated_time: number;
+  created_time: number;
 }
 
 export interface ModelDetail extends ModelSearchItem {

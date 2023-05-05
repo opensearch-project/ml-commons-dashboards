@@ -27,14 +27,15 @@ const modelSortQuerySchema = schema.oneOf([
 ]);
 
 const modelStateSchema = schema.oneOf([
-  schema.literal(MODEL_STATE.loadFailed),
   schema.literal(MODEL_STATE.loaded),
+  schema.literal(MODEL_STATE.trained),
+  schema.literal(MODEL_STATE.unloaded),
+  schema.literal(MODEL_STATE.uploaded),
+  schema.literal(MODEL_STATE.uploading),
   schema.literal(MODEL_STATE.loading),
   schema.literal(MODEL_STATE.partiallyLoaded),
-  schema.literal(MODEL_STATE.trained),
-  schema.literal(MODEL_STATE.uploaded),
-  schema.literal(MODEL_STATE.unloaded),
-  schema.literal(MODEL_STATE.uploading),
+  schema.literal(MODEL_STATE.loadFailed),
+  schema.literal(MODEL_STATE.registerFailed),
 ]);
 
 const modelUploadBaseSchema = {
