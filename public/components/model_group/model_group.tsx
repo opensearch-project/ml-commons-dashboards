@@ -32,7 +32,7 @@ export const ModelGroup = () => {
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelGroupVersionsPanel />
+            <ModelGroupVersionsPanel groupId={modelId} />
           </>
         ),
       },
@@ -57,7 +57,7 @@ export const ModelGroup = () => {
         ),
       },
     ],
-    []
+    [modelId]
   );
   const [selectedTab, setSelectedTab] = useState<EuiTabbedContentTab>(tabs[0]);
 
