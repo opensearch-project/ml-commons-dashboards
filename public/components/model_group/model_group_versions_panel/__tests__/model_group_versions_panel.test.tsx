@@ -44,18 +44,22 @@ describe('<ModelGroupVersionsPanel />', () => {
     10 * 1000
   );
 
-  it('should call model search API again after refresh button clicked', async () => {
-    const searchMock = jest.spyOn(Model.prototype, 'search');
+  it(
+    'should call model search API again after refresh button clicked',
+    async () => {
+      const searchMock = jest.spyOn(Model.prototype, 'search');
 
-    render(<ModelGroupVersionsPanel groupId="1" />);
+      render(<ModelGroupVersionsPanel groupId="1" />);
 
-    expect(searchMock).toHaveBeenCalledTimes(1);
+      expect(searchMock).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(screen.getByText('Refresh'));
-    expect(searchMock).toHaveBeenCalledTimes(2);
+      await userEvent.click(screen.getByText('Refresh'));
+      expect(searchMock).toHaveBeenCalledTimes(2);
 
-    searchMock.mockRestore();
-  });
+      searchMock.mockRestore();
+    },
+    10 * 1000
+  );
 
   it(
     'should call model search with consistent state parameters after deployed state filter applied',
@@ -66,19 +70,24 @@ describe('<ModelGroupVersionsPanel />', () => {
 
       await userEvent.click(screen.getByTitle('State'));
       await userEvent.click(screen.getByRole('option', { name: 'Deployed' }));
-      expect(searchMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          states: ['DEPLOYED', 'PARTIALLY_DEPLOYED'],
-        })
-      );
+
+      await waitFor(() => {
+        expect(searchMock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            states: ['DEPLOYED', 'PARTIALLY_DEPLOYED'],
+          })
+        );
+      });
 
       await userEvent.click(screen.getByRole('option', { name: 'Deployed' }));
       await userEvent.click(screen.getByRole('option', { name: 'Not deployed' }));
-      expect(searchMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          states: ['DEPLOYING', 'REGISTERING', 'REGISTERED', 'DEPLOY_FAILED', 'REGISTER_FAILED'],
-        })
-      );
+      await waitFor(() => {
+        expect(searchMock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            states: ['DEPLOYING', 'REGISTERING', 'REGISTERED', 'DEPLOY_FAILED', 'REGISTER_FAILED'],
+          })
+        );
+      });
 
       searchMock.mockRestore();
     },

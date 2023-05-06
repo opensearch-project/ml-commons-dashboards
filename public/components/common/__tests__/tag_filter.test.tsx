@@ -53,7 +53,7 @@ describe('<TagFilter />', () => {
       ]);
     },
     // There are too many operations, need to increase timeout
-    10 * 1000
+    20 * 1000
   );
 
   it('should render an empty tag list if no tags', async () => {

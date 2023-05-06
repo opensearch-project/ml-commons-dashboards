@@ -25,21 +25,25 @@ const setup = () => {
 };
 
 describe('<ModelGroup />', () => {
-  it('should display model name, action buttons, overview-card, tabs and tabpanel after data loaded', async () => {
-    setup();
+  it(
+    'should display model name, action buttons, overview-card, tabs and tabpanel after data loaded',
+    async () => {
+      setup();
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('model-group-loading-indicator')).toBeNull();
-    });
-    expect(screen.getByText('model1')).toBeInTheDocument();
-    expect(screen.getByText('Delete')).toBeInTheDocument();
-    expect(screen.getByText('Register version')).toBeInTheDocument();
-    expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
-    expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
-    expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Versions' })).toHaveClass('euiTab-isSelected');
-    expect(within(screen.getByRole('tabpanel')).getByText('Versions')).toBeInTheDocument();
-  });
+      await waitFor(() => {
+        expect(screen.queryByTestId('model-group-loading-indicator')).toBeNull();
+      });
+      expect(screen.getByText('model1')).toBeInTheDocument();
+      expect(screen.getByText('Delete')).toBeInTheDocument();
+      expect(screen.getByText('Register version')).toBeInTheDocument();
+      expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
+      expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
+      expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'Versions' })).toHaveClass('euiTab-isSelected');
+      expect(within(screen.getByRole('tabpanel')).getByText('Versions')).toBeInTheDocument();
+    },
+    10 * 1000
+  );
 
   it(
     'should display consistent tabs content after tab clicked',

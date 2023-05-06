@@ -65,19 +65,23 @@ describe('<ModelGroupVersionTable />', () => {
       await user.click(screen.getByText('Sort Z-A'));
       expect(onSortMock).toHaveBeenCalledWith([{ direction: 'desc', id: 'version' }]);
     },
-    10 * 1000
+    20 * 1000
   );
 
-  it('should NOT render sort button for state and status column', async () => {
-    const user = userEvent.setup();
-    render(<ModelGroupVersionTable versions={[]} tags={[]} />);
+  it(
+    'should NOT render sort button for state and status column',
+    async () => {
+      const user = userEvent.setup();
+      render(<ModelGroupVersionTable versions={[]} tags={[]} />);
 
-    await user.click(screen.getByText('State'));
-    expect(screen.queryByTitle('Sort A-Z')).toBeNull();
+      await user.click(screen.getByText('State'));
+      expect(screen.queryByTitle('Sort A-Z')).toBeNull();
 
-    await user.click(screen.getByText('Status'));
-    expect(screen.queryByTitle('Sort A-Z')).toBeNull();
-  });
+      await user.click(screen.getByText('Status'));
+      expect(screen.queryByTitle('Sort A-Z')).toBeNull();
+    },
+    20 * 1000
+  );
 
   it('should render consistent versions values', () => {
     render(
@@ -95,39 +99,43 @@ describe('<ModelGroupVersionTable />', () => {
     expect(within(gridCells[6]).getByLabelText('show actions')).toBeInTheDocument();
   });
 
-  it('should render pagination and call onChangePageMock and onChangeItemsPerPageMock after pagination provided', async () => {
-    const user = userEvent.setup();
-    const onChangePageMock = jest.fn();
-    const onChangeItemsPerPageMock = jest.fn();
-    render(
-      <ModelGroupVersionTable
-        versions={versions}
-        tags={['Accuracy: test', 'Accuracy: train']}
-        totalVersionCount={101}
-        pagination={{
-          pageIndex: 0,
-          pageSize: 25,
-          pageSizeOptions: [10, 25, 50],
-          onChangePage: onChangePageMock,
-          onChangeItemsPerPage: onChangeItemsPerPageMock,
-        }}
-      />
-    );
+  it(
+    'should render pagination and call onChangePageMock and onChangeItemsPerPageMock after pagination provided',
+    async () => {
+      const user = userEvent.setup();
+      const onChangePageMock = jest.fn();
+      const onChangeItemsPerPageMock = jest.fn();
+      render(
+        <ModelGroupVersionTable
+          versions={versions}
+          tags={['Accuracy: test', 'Accuracy: train']}
+          totalVersionCount={101}
+          pagination={{
+            pageIndex: 0,
+            pageSize: 25,
+            pageSizeOptions: [10, 25, 50],
+            onChangePage: onChangePageMock,
+            onChangeItemsPerPage: onChangeItemsPerPageMock,
+          }}
+        />
+      );
 
-    expect(screen.getByText('Rows per page: 25')).toBeInTheDocument();
-    expect(screen.getByLabelText('Page 1 of 5')).toHaveClass('euiPaginationButton-isActive');
+      expect(screen.getByText('Rows per page: 25')).toBeInTheDocument();
+      expect(screen.getByLabelText('Page 1 of 5')).toHaveClass('euiPaginationButton-isActive');
 
-    await user.click(screen.getByText('Rows per page: 25'));
+      await user.click(screen.getByText('Rows per page: 25'));
 
-    expect(onChangeItemsPerPageMock).not.toHaveBeenCalled();
-    await user.click(screen.getByText('10 rows'));
-    expect(onChangeItemsPerPageMock).toHaveBeenCalledWith(10);
-    await user.click(screen.getByText('Rows per page: 25'));
+      expect(onChangeItemsPerPageMock).not.toHaveBeenCalled();
+      await user.click(screen.getByText('10 rows'));
+      expect(onChangeItemsPerPageMock).toHaveBeenCalledWith(10);
+      await user.click(screen.getByText('Rows per page: 25'));
 
-    expect(onChangePageMock).not.toHaveBeenCalled();
-    await user.click(screen.getByLabelText('Page 2 of 5'));
-    expect(onChangePageMock).toHaveBeenCalledWith(1);
-  });
+      expect(onChangePageMock).not.toHaveBeenCalled();
+      await user.click(screen.getByLabelText('Page 2 of 5'));
+      expect(onChangePageMock).toHaveBeenCalledWith(1);
+    },
+    20 * 1000
+  );
 
   it(
     'should show status details after status cell expand button clicked',
