@@ -4,16 +4,16 @@
  */
 
 import React, { useCallback, useImperativeHandle, useRef, useState } from 'react';
-import { EuiConfirmModal } from '@elastic/eui';
+import { EuiConfirmModal, EuiFormRow, EuiFieldText } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { usePollingUntil } from '../../hooks/use_polling_until';
-
+import { bus } from './bus';
 export class NoIdProvideError {}
 
 export interface ModelConfirmDeleteModalInstance {
   show: (modelId: string) => void;
 }
-
+let deployedVersion: string[] = [];
 export const ModelConfirmDeleteModal = React.forwardRef<
   ModelConfirmDeleteModalInstance,
   { onDeleted: () => void }
@@ -21,6 +21,14 @@ export const ModelConfirmDeleteModal = React.forwardRef<
   const deleteIdRef = useRef<string>();
   const [visible, setVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [value, setValue] = useState('');
+  const onChange = (e: any) => {
+    setValue(e.target.value);
+  };
+  let buttonColor: 'text' | 'danger' = 'text';
+  if (value === deleteIdRef.current) {
+    buttonColor = 'danger';
+  }
   const { start: startPolling } = usePollingUntil({
     continueChecker: async () => {
       if (!deleteIdRef.current) {
@@ -39,14 +47,12 @@ export const ModelConfirmDeleteModal = React.forwardRef<
     onGiveUp: () => {
       setIsDeleting(false);
       setVisible(false);
-      onDeleted();
     },
     onMaxRetries: () => {
       setIsDeleting(false);
       setVisible(false);
     },
   });
-
   const handleConfirm = useCallback(
     async (e) => {
       if (!deleteIdRef.current) {
@@ -59,12 +65,16 @@ export const ModelConfirmDeleteModal = React.forwardRef<
     },
     [startPolling]
   );
-
+  function receiveVal() {
+    bus.on('sendVal', (data) => {
+      deployedVersion = data;
+    });
+  }
+  receiveVal();
   const handleCancel = useCallback(() => {
     setVisible(false);
     deleteIdRef.current = undefined;
   }, []);
-
   useImperativeHandle(
     ref,
     () => ({
@@ -75,19 +85,37 @@ export const ModelConfirmDeleteModal = React.forwardRef<
     }),
     []
   );
-
   if (!visible) {
     return null;
   }
-
+  const str = (
+    <span>
+      Delete <a href="xxx">{deleteIdRef.current}?</a>
+    </span>
+  );
+  const label = (
+    <span style={{ fontWeight: 400, fontSize: '16px' }}>
+      Type <span style={{ fontWeight: 600 }}>{deleteIdRef.current}</span> to confirm
+    </span>
+  );
   return (
     <EuiConfirmModal
-      title="Are you sure delete this model?"
-      cancelButtonText="Cancel"
-      confirmButtonText="Confirm"
+      style={{ width: '480px' }}
+      title={str}
       onCancel={handleCancel}
       onConfirm={handleConfirm}
       isLoading={isDeleting}
-    />
+      cancelButtonText="Cancel"
+      confirmButtonText="Delete"
+      buttonColor={buttonColor}
+    >
+      <p style={{ fontSize: '16px' }}>
+        Deleting this model will delete {deployedVersion.length} versions of this model.This is
+        irreversible.
+      </p>
+      <EuiFormRow label={label}>
+        <EuiFieldText name="delete" value={value} onChange={(e) => onChange(e)} />
+      </EuiFormRow>
+    </EuiConfirmModal>
   );
 });

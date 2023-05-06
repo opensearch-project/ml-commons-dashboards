@@ -15,8 +15,9 @@ import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
+import { bus } from './bus';
+import { ModelVersionUndeployedModal } from './model_version_undeployed_modal';
 import { UploadCallout } from './upload_callout';
-
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
@@ -41,7 +42,6 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   });
   const models = useMemo(() => data?.data || [], [data]);
   const totalModelCounts = data?.pagination.totalRecords || 0;
-
   const pagination = useMemo(
     () => ({
       currentPage: params.currentPage,
@@ -50,16 +50,13 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     }),
     [totalModelCounts, params.currentPage, params.pageSize]
   );
-
+  const handleModelDelete = useCallback((modelId: string) => {
+    confirmModelDeleteRef.current?.show(modelId);
+  }, []);
   const handleModelDeleted = useCallback(async () => {
     reload();
     notifications.toasts.addSuccess('Model has been deleted.');
   }, [reload, notifications.toasts]);
-
-  const handleModelDelete = useCallback((modelId: string) => {
-    confirmModelDeleteRef.current?.show(modelId);
-  }, []);
-
   const handleViewModelDrawer = useCallback((name: string) => {
     setDrawerModelName(name);
   }, []);
@@ -85,7 +82,13 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
       };
     });
   }, []);
-
+  let deployedVersion: string[] = [];
+  function receiveVal() {
+    bus.on('sendVersions', (version) => {
+      deployedVersion = version;
+    });
+  }
+  receiveVal();
   const handleFilterChange = useCallback((filterValue: ModelListFilterFilterValue) => {
     setParams((prevValue) => ({ ...prevValue, filterValue, currentPage: 1 }));
   }, []);
@@ -103,8 +106,13 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
         pagination={pagination}
         onChange={handleTableChange}
         onModelNameClick={handleViewModelDrawer}
+        onModelDeleteClick={handleModelDelete}
       />
-      <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
+      {deployedVersion.length === 0 ? (
+        <ModelVersionUndeployedModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
+      ) : (
+        <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
+      )}
       {drawerModelName && (
         <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
       )}

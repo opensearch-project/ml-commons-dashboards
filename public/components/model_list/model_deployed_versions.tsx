@@ -4,10 +4,14 @@
  */
 
 import React from 'react';
-
+import { bus } from './bus';
 const DISPLAY_VERSION = 3;
 
 export const ModelDeployedVersions = ({ versions }: { versions: string[] }) => {
+  function sendVersions() {
+    bus.emit('sendVersions', versions);
+  }
+  sendVersions();
   if (versions.length === 0) {
     return <span>-</span>;
   }
