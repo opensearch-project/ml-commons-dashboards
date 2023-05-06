@@ -3,14 +3,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import React, { useMemo, useCallback } from 'react';
-import { EuiCompressedFieldSearch } from '@elastic/eui';
+import { EuiCompressedFieldSearch, EuiCompressedFieldSearchProps } from '@elastic/eui';
 import { debounce } from 'lodash';
-interface SearchBarProps {
+
+interface DebouncedSearchBarProps
+  extends Pick<EuiCompressedFieldSearchProps, 'placeholder' | 'aria-label'> {
   onSearch: (value: string) => void;
+  debounceMs?: number;
   inputRef?: (node: HTMLInputElement | null) => void;
 }
-export const SearchBar = ({ onSearch, inputRef }: SearchBarProps) => {
-  const onSearchDebounce = useMemo(() => debounce(onSearch, 400), [onSearch]);
+export const DebouncedSearchBar = ({
+  onSearch,
+  inputRef,
+  debounceMs = 400,
+  ...resetProps
+}: DebouncedSearchBarProps) => {
+  const onSearchDebounce = useMemo(() => debounce(onSearch, debounceMs), [onSearch, debounceMs]);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,12 +31,11 @@ export const SearchBar = ({ onSearch, inputRef }: SearchBarProps) => {
     <EuiCompressedFieldSearch
       autoFocus
       inputRef={inputRef}
-      placeholder="Search by model name or ID"
       incremental={true}
       onSearch={onSearchDebounce}
       onChange={onChange}
-      aria-label="Search by model name or ID"
       fullWidth
+      {...resetProps}
     />
   );
 };

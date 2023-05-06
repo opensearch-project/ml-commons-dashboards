@@ -16,6 +16,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 
 import { ModelDeploymentProfile } from '../../apis/profile';
+import { DebouncedSearchBar } from '../common';
 import { PreviewPanel } from '../preview_panel';
 import { ApplicationStart, ChromeStart } from '../../../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
@@ -23,7 +24,6 @@ import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigati
 import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
 import { ModelStatusFilter } from './model_status_filter';
-import { SearchBar } from './search_bar';
 import { ModelSourceFilter } from './model_source_filter';
 import { ModelConnectorFilter } from './model_connector_filter';
 import { MonitoringPageHeader } from './monitoring_page_header';
@@ -128,7 +128,12 @@ export const Monitoring = (props: MonitoringProps) => {
           <>
             <EuiFlexGroup gutterSize={useNewPageHeader ? 's' : 'l'}>
               <EuiFlexItem>
-                <SearchBar inputRef={setInputRef} onSearch={searchByNameOrId} />
+                <DebouncedSearchBar
+                  inputRef={setInputRef}
+                  onSearch={searchByNameOrId}
+                  placeholder="Search by name or ID"
+                  aria-label="Search by name or ID"
+                />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiFilterGroup>
