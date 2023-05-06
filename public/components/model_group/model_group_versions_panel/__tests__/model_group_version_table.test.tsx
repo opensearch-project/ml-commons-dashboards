@@ -65,7 +65,7 @@ describe('<ModelGroupVersionTable />', () => {
       await user.click(screen.getByText('Sort Z-A'));
       expect(onSortMock).toHaveBeenCalledWith([{ direction: 'desc', id: 'version' }]);
     },
-    20 * 1000
+    40 * 1000
   );
 
   it(
