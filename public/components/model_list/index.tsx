@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { EuiPageHeader, EuiSpacer, EuiPanel } from '@elastic/eui';
+import { EuiPageHeader, EuiSpacer, EuiPanel, EuiTextColor } from '@elastic/eui';
 import { CoreStart } from '../../../../../src/core/public';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { ModelDrawer } from '../model_drawer';
-import { ModelTable, ModelTableSort } from './model_table';
+import { ModelTable, ModelTableCriteria, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
-import { RegisterNewModelButton } from './regsister_new_model_button';
+import { RegisterNewModelButton } from './register_new_model_button';
 import {
   ModelConfirmDeleteModal,
   ModelConfirmDeleteModalInstance,
 } from './model_confirm_delete_modal';
-import { UploadCallout } from './upload_callout';
+import { ModelListEmpty } from './model_list_empty';
 
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
@@ -27,12 +27,17 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }>({
     currentPage: 1,
     pageSize: 15,
-    filterValue: { tag: [], owner: [], stage: [] },
+    filterValue: { tag: [], owner: [] },
     sort: { field: 'created_time', direction: 'desc' },
   });
   const [drawerModelName, setDrawerModelName] = useState('');
+  const searchInputRef = useRef<HTMLInputElement | null>();
 
-  const { data, reload } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
+  const setSearchInputRef = useCallback((node: HTMLInputElement | null) => {
+    searchInputRef.current = node;
+  }, []);
+
+  const { data, reload, loading, error } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
     from: Math.max(0, (params.currentPage - 1) * params.pageSize),
     size: params.pageSize,
     sort: params.sort?.field,
@@ -46,10 +51,11 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     () => ({
       currentPage: params.currentPage,
       pageSize: params.pageSize,
-      totalRecords: totalModelCounts,
+      totalRecords: totalModelCounts || 0,
     }),
     [totalModelCounts, params.currentPage, params.pageSize]
   );
+  const showEmptyScreen = !loading && totalModelCounts === 0 && !params.filterValue.search;
 
   const handleModelDeleted = useCallback(async () => {
     reload();
@@ -64,50 +70,83 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     setDrawerModelName(name);
   }, []);
 
-  const handleTableChange = useCallback((criteria) => {
-    const {
-      pagination: { currentPage, pageSize },
-      sort,
-    } = criteria;
+  const handleTableChange = useCallback((criteria: ModelTableCriteria) => {
+    const { pagination: newPagination, sort } = criteria;
     setParams((previousValue) => {
-      if (
-        currentPage === previousValue.currentPage &&
-        pageSize === previousValue.pageSize &&
-        (!sort || sort === previousValue.sort)
-      ) {
+      const criteriaConsistent =
+        newPagination?.currentPage === previousValue.currentPage &&
+        newPagination?.pageSize === previousValue.pageSize &&
+        (!sort || sort === previousValue.sort);
+
+      if (criteriaConsistent) {
         return previousValue;
       }
       return {
         ...previousValue,
-        currentPage,
-        pageSize,
+        ...(newPagination
+          ? { currentPage: newPagination.currentPage, pageSize: newPagination.pageSize }
+          : {}),
         ...(sort ? { sort } : {}),
       };
     });
   }, []);
 
+  const handleReset = useCallback(() => {
+    setParams((prevParams) => ({
+      ...prevParams,
+      filterValue: { tag: [], owner: [] },
+    }));
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
+    }
+  }, [setParams]);
+
   const handleFilterChange = useCallback((filterValue: ModelListFilterFilterValue) => {
     setParams((prevValue) => ({ ...prevValue, filterValue, currentPage: 1 }));
   }, []);
+
   return (
     <EuiPanel>
-      <EuiPageHeader pageTitle={<>Models</>} rightSideItems={[<RegisterNewModelButton />]} />
-      <EuiSpacer />
-      <ModelListFilter value={params.filterValue} onChange={handleFilterChange} />
-      <EuiSpacer />
-      <UploadCallout models={['image-classifier']} />
-      <EuiSpacer />
-      <ModelTable
-        sort={params.sort}
-        models={models}
-        pagination={pagination}
-        onChange={handleTableChange}
-        onModelNameClick={handleViewModelDrawer}
+      <EuiPageHeader
+        pageTitle={
+          <>
+            Models&nbsp;
+            {typeof totalModelCounts === 'number' && (
+              <EuiTextColor data-test-subj="modelTotalCount" color="subdued" component="span">
+                ({totalModelCounts})
+              </EuiTextColor>
+            )}
+          </>
+        }
+        description="Discover, manage, and track machine learning models across your organization."
+        rightSideItems={[<RegisterNewModelButton />]}
       />
-      <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
-      {drawerModelName && (
-        <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
+      <EuiSpacer />
+      {!showEmptyScreen && (
+        <>
+          <ModelListFilter
+            value={params.filterValue}
+            onChange={handleFilterChange}
+            searchInputRef={setSearchInputRef}
+          />
+          <EuiSpacer />
+          <ModelTable
+            loading={loading}
+            sort={params.sort}
+            models={models}
+            pagination={pagination}
+            onChange={handleTableChange}
+            onModelNameClick={handleViewModelDrawer}
+            onResetClick={handleReset}
+            error={!!error}
+          />
+          <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
+          {drawerModelName && (
+            <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
+          )}
+        </>
       )}
+      {showEmptyScreen && <ModelListEmpty />}
     </EuiPanel>
   );
 };

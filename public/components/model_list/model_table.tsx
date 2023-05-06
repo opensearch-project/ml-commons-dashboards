@@ -5,13 +5,19 @@
 
 import React, { useMemo, useCallback, useRef } from 'react';
 import {
-  CriteriaWithPagination,
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiText,
   Direction,
+  EuiLoadingSpinner,
+  EuiTitle,
+  EuiEmptyPrompt,
+  EuiButton,
+  EuiSpacer,
+  EuiIcon,
 } from '@elastic/eui';
 
+import { Criteria } from '@elastic/eui';
 import { renderTime } from '../../utils';
 import { ModelOwner } from './model_owner';
 import { ModelDeployedVersions } from './model_deployed_versions';
@@ -24,7 +30,7 @@ export interface ModelTableSort {
 }
 
 export interface ModelTableCriteria {
-  pagination: { currentPage: number; pageSize: number };
+  pagination?: { currentPage: number; pageSize: number };
   sort?: ModelTableSort;
 }
 
@@ -38,10 +44,13 @@ export interface ModelTableProps {
   sort: ModelTableSort;
   onChange: (criteria: ModelTableCriteria) => void;
   onModelNameClick: (name: string) => void;
+  loading: boolean;
+  error: boolean;
+  onResetClick: () => void;
 }
 
 export function ModelTable(props: ModelTableProps) {
-  const { models, sort, onChange, onModelNameClick } = props;
+  const { models, sort, onChange, onModelNameClick, loading, onResetClick, error } = props;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
@@ -160,11 +169,70 @@ export function ModelTable(props: ModelTableProps) {
 
   const sorting = useMemo(() => ({ sort }), [sort]);
 
-  const handleChange = useCallback((criteria: CriteriaWithPagination<ModelAggregateSearchItem>) => {
-    const newPagination = { currentPage: criteria.page.index + 1, pageSize: criteria.page.size };
+  const noItemsMessage = useMemo(
+    () => (
+      <div style={{ padding: '8px 0 12px 0' }}>
+        {loading && (
+          <EuiEmptyPrompt
+            body={
+              <>
+                <EuiSpacer size="l" />
+                <EuiLoadingSpinner size="xl" />
+                <EuiSpacer size="s" />
+                <EuiTitle>
+                  <h2 style={{ marginTop: 0, marginBottom: 0, paddingBottom: 72 }}>
+                    Loading models
+                  </h2>
+                </EuiTitle>
+              </>
+            }
+          />
+        )}
+        {!loading && error && (
+          <EuiEmptyPrompt
+            body={
+              <>
+                <EuiSpacer size="l" />
+                <EuiIcon type="alert" size="xl" color="danger" />
+                <EuiSpacer size="m" />
+                <EuiTitle>
+                  <h2 style={{ marginTop: 0, marginBottom: 0 }}>Failed to load models</h2>
+                </EuiTitle>
+                <EuiSpacer size="m" />
+                <EuiText>Check your internet connection </EuiText>
+              </>
+            }
+          />
+        )}
+        {!loading && !error && (
+          <EuiEmptyPrompt
+            body={
+              <>
+                <EuiSpacer size="l" />
+                <EuiSpacer size="l" />
+                There are no results for your search. Reset the search criteria to view registered
+                models.
+                <EuiSpacer size="s" />
+              </>
+            }
+            actions={
+              <>
+                <EuiButton onClick={onResetClick}>Reset search and filters</EuiButton>
+                <EuiSpacer size="l" />
+              </>
+            }
+          />
+        )}
+      </div>
+    ),
+    [onResetClick, loading, error]
+  );
 
+  const handleChange = useCallback((criteria: Criteria<ModelAggregateSearchItem>) => {
     onChangeRef.current({
-      pagination: newPagination,
+      ...(criteria.page
+        ? { pagination: { currentPage: criteria.page.index + 1, pageSize: criteria.page.size } }
+        : {}),
       ...(criteria.sort ? { sort: criteria.sort as ModelTableSort } : {}),
     });
   }, []);
@@ -172,11 +240,12 @@ export function ModelTable(props: ModelTableProps) {
   return (
     <EuiBasicTable<ModelAggregateSearchItem>
       columns={columns}
-      items={models}
-      pagination={pagination}
+      items={loading || error ? [] : models}
+      pagination={models.length > 0 ? pagination : undefined}
       onChange={handleChange}
       sorting={sorting}
       hasActions
+      noItemsMessage={noItemsMessage}
     />
   );
 }
