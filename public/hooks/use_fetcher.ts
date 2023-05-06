@@ -21,6 +21,7 @@ export const useFetcher = <TParams extends any[], TResponse>(
   const paramsRef = useRef(params);
   paramsRef.current = params;
   const stringifyParams = JSON.stringify(params);
+  const lastLoadStringifyParamsRef = useRef<string>();
 
   const forceUpdate = useCallback(() => {
     setCount((prevCount) => (prevCount === Number.MAX_SAFE_INTEGER ? 0 : prevCount + 1));
@@ -28,8 +29,9 @@ export const useFetcher = <TParams extends any[], TResponse>(
 
   const loadData = useCallback(
     async (fetcherParams: TParams, shouldUpdateResult: () => boolean = () => true) => {
+      const shouldUpdateLoading = loadingRef.current !== true;
       loadingRef.current = true;
-      if (usedRef.current.loading) {
+      if (shouldUpdateLoading && usedRef.current.loading) {
         forceUpdate();
       }
       let shouldUpdate = false;
@@ -48,10 +50,12 @@ export const useFetcher = <TParams extends any[], TResponse>(
           dataRef.current = null;
         }
       } finally {
-        loadingRef.current = false;
+        if (shouldUpdate) {
+          loadingRef.current = false;
+        }
         if (
-          usedRef.current.loading ||
-          (shouldUpdate && (usedRef.current.data || usedRef.current.error))
+          shouldUpdate &&
+          (usedRef.current.loading || usedRef.current.data || usedRef.current.error)
         ) {
           forceUpdate();
         }
@@ -81,11 +85,16 @@ export const useFetcher = <TParams extends any[], TResponse>(
 
   useEffect(() => {
     let changed = false;
+    lastLoadStringifyParamsRef.current = stringifyParams;
     loadData(JSON.parse(stringifyParams), () => !changed);
     return () => {
       changed = true;
     };
   }, [stringifyParams, loadData]);
+
+  if (stringifyParams !== lastLoadStringifyParamsRef.current) {
+    loadingRef.current = true;
+  }
 
   return Object.defineProperties(
     {

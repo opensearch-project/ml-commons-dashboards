@@ -6,14 +6,13 @@
 import {
   EuiFlexItem,
   EuiFlexGroup,
-  EuiFieldSearch,
   EuiFilterGroup,
   EuiFilterButton,
   EuiSpacer,
 } from '@elastic/eui';
 import React, { useCallback, useRef } from 'react';
 
-import { TagFilterValue, SelectedTagFiltersPanel } from '../common';
+import { TagFilterValue, SelectedTagFiltersPanel, DebouncedSearchBar } from '../common';
 
 import { TagFilter } from './tag_filter';
 import { OwnerFilter } from './owner_filter';
@@ -44,9 +43,9 @@ export interface ModelListFilterFilterValue {
 export const ModelListFilter = ({
   value,
   onChange,
-  defaultSearch,
+  searchInputRef,
 }: {
-  defaultSearch?: string;
+  searchInputRef?: (node: HTMLInputElement | null) => void;
   value: Omit<ModelListFilterFilterValue, 'search'>;
   onChange: (value: ModelListFilterFilterValue) => void;
 }) => {
@@ -87,11 +86,10 @@ export const ModelListFilter = ({
     <>
       <EuiFlexGroup gutterSize="xs">
         <EuiFlexItem grow={1}>
-          <EuiFieldSearch
-            defaultValue={defaultSearch}
-            fullWidth
+          <DebouncedSearchBar
             placeholder="Search by name, person, or keyword"
             onSearch={handleSearch}
+            inputRef={searchInputRef}
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
