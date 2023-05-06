@@ -30,7 +30,7 @@ describe('<ModelGroupVersionErrorDetailModal />', () => {
     expect(screen.getByText('Error message')).toBeInTheDocument();
   });
 
-  it('should render deployment upload failed screen', () => {
+  it('should render deployment failed screen', () => {
     render(
       <ModelGroupVersionErrorDetailModal
         id="model-1-id"

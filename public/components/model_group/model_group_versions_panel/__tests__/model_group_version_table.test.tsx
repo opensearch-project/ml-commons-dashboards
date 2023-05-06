@@ -100,7 +100,7 @@ describe('<ModelGroupVersionTable />', () => {
   });
 
   it(
-    'should render pagination and call onChangePageMock and onChangeItemsPerPageMock after pagination provided',
+    'should render pagination and call onChangePageMock and onChangeItemsPerPageMock if pagination provided',
     async () => {
       const user = userEvent.setup();
       const onChangePageMock = jest.fn();

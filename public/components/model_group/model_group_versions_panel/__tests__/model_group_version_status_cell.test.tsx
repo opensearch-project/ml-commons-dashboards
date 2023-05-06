@@ -44,9 +44,7 @@ describe('<ModelGroupVersionStatusCell />', () => {
   });
 
   it('should display "Warning" when state is "partialLoaded"', async () => {
-    const { rerender } = render(
-      <ModelGroupVersionStatusCell state={MODEL_STATE.partiallyLoaded} />
-    );
+    render(<ModelGroupVersionStatusCell state={MODEL_STATE.partiallyLoaded} />);
 
     expect(screen.getByText('Warning')).toBeInTheDocument();
   });

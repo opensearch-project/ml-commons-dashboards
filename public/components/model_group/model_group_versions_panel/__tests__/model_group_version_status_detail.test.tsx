@@ -33,7 +33,7 @@ describe('<ModelGroupVersionStatusDetail />', () => {
     expect(screen.getByText('May 5, 2023 @ 08:52:53.541')).toBeInTheDocument();
   });
 
-  it('should render "-" when state provided', async () => {
+  it('should render "-" if state not supported', async () => {
     render(
       <ModelGroupVersionStatusDetail
         id="1"
@@ -47,7 +47,7 @@ describe('<ModelGroupVersionStatusDetail />', () => {
     expect(screen.getByText('-')).toBeInTheDocument();
   });
 
-  it('should render "See full error" button for "loadFailed" state ', async () => {
+  it('should render "See full error" button for "loadFailed" state', async () => {
     render(
       <ModelGroupVersionStatusDetail
         id="1"
@@ -64,7 +64,7 @@ describe('<ModelGroupVersionStatusDetail />', () => {
     expect(screen.getByText('See full error')).toBeInTheDocument();
   });
 
-  it('should display error detail after "See full error" button click', async () => {
+  it('should display error detail after "See full error" button clicked', async () => {
     const user = userEvent.setup();
     render(
       <ModelGroupVersionStatusDetail

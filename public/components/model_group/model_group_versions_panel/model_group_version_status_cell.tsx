@@ -25,9 +25,5 @@ export const ModelGroupVersionStatusCell = ({ state }: { state: MODEL_STATE }) =
     return <>-</>;
   }
   const [color, text] = statusContent;
-  return (
-    <EuiHealth data-test-subj="model-group-version-status" color={color}>
-      {text}
-    </EuiHealth>
-  );
+  return <EuiHealth color={color}>{text}</EuiHealth>;
 };
