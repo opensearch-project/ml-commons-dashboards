@@ -144,7 +144,7 @@ describe('<RegisterModel /> Form', () => {
     expect(addSuccessMock).toHaveBeenCalled();
   });
 
-  it('should navigate to model group page when submit succeed', async () => {
+  it('should navigate to model page when submit succeed', async () => {
     const { user } = await setup();
     await user.click(screen.getByRole('button', { name: /register model/i }));
     expect(location.href).toContain(`model-registry/model/${MOCKED_MODEL_ID}`);

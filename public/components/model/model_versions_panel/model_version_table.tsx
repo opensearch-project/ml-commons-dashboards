@@ -13,8 +13,8 @@ import {
 
 import { VersionTableDataItem } from '../types';
 
-import { ModelGroupVersionCell } from './model_group_version_cell';
-import { ModelGroupVersionTableRowActions } from './model_group_version_table_row_actions';
+import { ModelVersionCell } from './model_version_cell';
+import { ModelVersionTableRowActions } from './model_version_table_row_actions';
 
 interface VersionTableProps extends Pick<EuiDataGridProps, 'pagination' | 'sorting'> {
   tags: string[];
@@ -22,7 +22,7 @@ interface VersionTableProps extends Pick<EuiDataGridProps, 'pagination' | 'sorti
   totalVersionCount?: number;
 }
 
-export const ModelGroupVersionTable = ({
+export const ModelVersionTable = ({
   tags,
   sorting,
   versions,
@@ -66,7 +66,7 @@ export const ModelGroupVersionTable = ({
         headerCellRender: () => null,
         rowCellRender: ({ rowIndex }: EuiDataGridCellValueElementProps) => {
           const version = versions[rowIndex];
-          return <ModelGroupVersionTableRowActions state={version.state} id={version.id} />;
+          return <ModelVersionTableRowActions state={version.state} id={version.id} />;
         },
       },
     ],
@@ -77,7 +77,7 @@ export const ModelGroupVersionTable = ({
 
   const renderCellValue = useCallback(
     ({ rowIndex, columnId, isDetails }) => (
-      <ModelGroupVersionCell data={versions[rowIndex]} columnId={columnId} isDetails={isDetails} />
+      <ModelVersionCell data={versions[rowIndex]} columnId={columnId} isDetails={isDetails} />
     ),
     [versions]
   );

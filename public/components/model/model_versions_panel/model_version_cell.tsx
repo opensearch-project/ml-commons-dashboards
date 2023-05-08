@@ -11,8 +11,8 @@ import { renderTime } from '../../../utils/table';
 import { MODEL_STATE } from '../../../../common';
 import { VersionTableDataItem } from '../types';
 
-import { ModelGroupVersionStatusCell } from './model_group_version_status_cell';
-import { ModelGroupVersionStatusDetail } from './model_group_version_status_detail';
+import { ModelVersionStatusCell } from './model_version_status_cell';
+import { ModelVersionStatusDetail } from './model_version_status_detail';
 
 interface ModelVersionCellProps {
   columnId: string;
@@ -20,10 +20,10 @@ interface ModelVersionCellProps {
   isDetails: boolean;
 }
 
-export const ModelGroupVersionCell = ({ data, columnId, isDetails }: ModelVersionCellProps) => {
+export const ModelVersionCell = ({ data, columnId, isDetails }: ModelVersionCellProps) => {
   if (columnId === 'status' && isDetails) {
     return (
-      <ModelGroupVersionStatusDetail
+      <ModelVersionStatusDetail
         id={data.id}
         name={data.name}
         version={data.version}
@@ -36,7 +36,7 @@ export const ModelGroupVersionCell = ({ data, columnId, isDetails }: ModelVersio
     case 'version':
       return <EuiText style={{ color: '#006BB4' }}>{data.version}</EuiText>;
     case 'status': {
-      return <ModelGroupVersionStatusCell state={data.state} />;
+      return <ModelVersionStatusCell state={data.state} />;
     }
     case 'state': {
       const deployed =

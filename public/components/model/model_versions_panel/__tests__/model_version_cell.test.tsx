@@ -6,12 +6,12 @@
 import React from 'react';
 
 import { render, screen } from '../../../../../test/test_utils';
-import { ModelGroupVersionCell } from '../model_group_version_cell';
+import { ModelVersionCell } from '../model_version_cell';
 import { MODEL_STATE } from '../../../../../common';
 
 const setup = (options: { columnId: string; isDetails?: boolean }) =>
   render(
-    <ModelGroupVersionCell
+    <ModelVersionCell
       data={{
         id: '1',
         name: 'model-1',
@@ -26,7 +26,7 @@ const setup = (options: { columnId: string; isDetails?: boolean }) =>
     />
   );
 
-describe('<ModelGroupVersionCell />', () => {
+describe('<ModelVersionCell />', () => {
   it('should render consistent version', () => {
     setup({
       columnId: 'version',
@@ -43,7 +43,7 @@ describe('<ModelGroupVersionCell />', () => {
     expect(screen.getByText('Not deployed')).toBeInTheDocument();
 
     rerender(
-      <ModelGroupVersionCell
+      <ModelVersionCell
         data={{
           id: '1',
           name: 'model-1',
@@ -60,7 +60,7 @@ describe('<ModelGroupVersionCell />', () => {
     expect(screen.getByText('Deployed')).toBeInTheDocument();
 
     rerender(
-      <ModelGroupVersionCell
+      <ModelVersionCell
         data={{
           id: '1',
           name: 'model-1',

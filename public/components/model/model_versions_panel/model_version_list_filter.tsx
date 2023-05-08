@@ -42,39 +42,39 @@ const removeDuplicateTag = (tagFilters: TagFilterValue[]) => {
   });
 };
 
-export interface ModelGroupVersionListFilterValue {
+export interface ModelVersionListFilterValue {
   status: Array<typeof statusOptions[number]['value']>;
   state: Array<typeof stateOptions[number]>;
   tag: TagFilterValue[];
 }
 
 interface ModelVersionListFilterProps {
-  value: ModelGroupVersionListFilterValue;
-  onChange: (value: ModelGroupVersionListFilterValue) => void;
+  value: ModelVersionListFilterValue;
+  onChange: (value: ModelVersionListFilterValue) => void;
 }
 
-export const ModelGroupVersionListFilter = ({ value, onChange }: ModelVersionListFilterProps) => {
+export const ModelVersionListFilter = ({ value, onChange }: ModelVersionListFilterProps) => {
   // TODO: Change to model tags API and pass model group id here
   const [tagKeysLoading, tagKeys] = useModelTagKeys();
   const valueRef = useRef(value);
   valueRef.current = value;
 
   const handleStateChange = useCallback(
-    (state: ModelGroupVersionListFilterValue['state']) => {
+    (state: ModelVersionListFilterValue['state']) => {
       onChange({ ...valueRef.current, state });
     },
     [onChange]
   );
 
   const handleStatusChange = useCallback(
-    (status: ModelGroupVersionListFilterValue['status']) => {
+    (status: ModelVersionListFilterValue['status']) => {
       onChange({ ...valueRef.current, status });
     },
     [onChange]
   );
 
   const handleTagChange = useCallback(
-    (tag: ModelGroupVersionListFilterValue['tag']) => {
+    (tag: ModelVersionListFilterValue['tag']) => {
       onChange({ ...valueRef.current, tag: removeDuplicateTag(tag) });
     },
     [onChange]

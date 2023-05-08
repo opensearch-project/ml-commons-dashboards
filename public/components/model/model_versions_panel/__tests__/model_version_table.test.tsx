@@ -7,7 +7,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
-import { ModelGroupVersionTable } from '../model_group_version_table';
+import { ModelVersionTable } from '../model_version_table';
 import { MODEL_STATE } from '../../../../../common';
 import { within } from '@testing-library/dom';
 
@@ -23,9 +23,9 @@ const versions = [
   },
 ];
 
-describe('<ModelGroupVersionTable />', () => {
+describe('<ModelVersionTable />', () => {
   it('should render consistent columns header ', async () => {
-    render(<ModelGroupVersionTable versions={[]} tags={['Accuracy: test', 'Accuracy: train']} />);
+    render(<ModelVersionTable versions={[]} tags={['Accuracy: test', 'Accuracy: train']} />);
 
     await waitFor(() => {
       expect(screen.getByTestId('dataGridHeaderCell-version')).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('<ModelGroupVersionTable />', () => {
       const user = userEvent.setup();
       const onSortMock = jest.fn();
       render(
-        <ModelGroupVersionTable
+        <ModelVersionTable
           versions={[]}
           tags={[]}
           sorting={{
@@ -72,7 +72,7 @@ describe('<ModelGroupVersionTable />', () => {
     'should NOT render sort button for state and status column',
     async () => {
       const user = userEvent.setup();
-      render(<ModelGroupVersionTable versions={[]} tags={[]} />);
+      render(<ModelVersionTable versions={[]} tags={[]} />);
 
       await user.click(screen.getByText('State'));
       expect(screen.queryByTitle('Sort A-Z')).toBeNull();
@@ -84,9 +84,7 @@ describe('<ModelGroupVersionTable />', () => {
   );
 
   it('should render consistent versions values', () => {
-    render(
-      <ModelGroupVersionTable versions={versions} tags={['Accuracy: test', 'Accuracy: train']} />
-    );
+    render(<ModelVersionTable versions={versions} tags={['Accuracy: test', 'Accuracy: train']} />);
 
     const gridCells = screen.getAllByRole('gridcell');
     expect(gridCells.length).toBe(7);
@@ -106,7 +104,7 @@ describe('<ModelGroupVersionTable />', () => {
       const onChangePageMock = jest.fn();
       const onChangeItemsPerPageMock = jest.fn();
       render(
-        <ModelGroupVersionTable
+        <ModelVersionTable
           versions={versions}
           tags={['Accuracy: test', 'Accuracy: train']}
           totalVersionCount={101}
@@ -141,7 +139,7 @@ describe('<ModelGroupVersionTable />', () => {
     'should show status details after status cell expand button clicked',
     async () => {
       const user = userEvent.setup();
-      render(<ModelGroupVersionTable versions={versions} tags={[]} />);
+      render(<ModelVersionTable versions={versions} tags={[]} />);
 
       await user.hover(screen.getByText('In progress...'));
       await user.click(

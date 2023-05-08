@@ -14,13 +14,7 @@ import {
 
 import { MODEL_STATE } from '../../../../common';
 
-export const ModelGroupVersionTableRowActions = ({
-  state,
-  id,
-}: {
-  state: MODEL_STATE;
-  id: string;
-}) => {
+export const ModelVersionTableRowActions = ({ state, id }: { state: MODEL_STATE; id: string }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleShowActionsClick = useCallback(() => {

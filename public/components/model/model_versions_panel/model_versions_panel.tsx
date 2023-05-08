@@ -18,17 +18,14 @@ import { useFetcher } from '../../../hooks';
 import { APIProvider } from '../../../apis/api_provider';
 import { MODEL_STATE } from '../../../../common';
 
-import { ModelGroupVersionTable } from './model_group_version_table';
-import {
-  ModelGroupVersionListFilter,
-  ModelGroupVersionListFilterValue,
-} from './model_group_version_list_filter';
+import { ModelVersionTable } from './model_version_table';
+import { ModelVersionListFilter, ModelVersionListFilterValue } from './model_version_list_filter';
 
 // TODO: Use tags from model group
 const tags = ['Tag1', 'Tag2'];
 
 const modelState2StatusMap: {
-  [key in MODEL_STATE]?: ModelGroupVersionListFilterValue['status'][number];
+  [key in MODEL_STATE]?: ModelVersionListFilterValue['status'][number];
 } = {
   [MODEL_STATE.loading]: 'InProgress',
   [MODEL_STATE.uploading]: 'InProgress',
@@ -43,7 +40,7 @@ const modelState2StatusMap: {
 const getStatesParam = ({
   status: statuses,
   state: states,
-}: Pick<ModelGroupVersionListFilterValue, 'status' | 'state'>) => {
+}: Pick<ModelVersionListFilterValue, 'status' | 'state'>) => {
   if (statuses.length === 0 && states.length === 0) {
     return undefined;
   }
@@ -67,16 +64,16 @@ const getStatesParam = ({
   });
 };
 
-interface ModelGroupVersionsPanelProps {
+interface ModelVersionsPanelProps {
   groupId: string;
 }
 
-export const ModelGroupVersionsPanel = ({ groupId }: ModelGroupVersionsPanelProps) => {
+export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
   const [params, setParams] = useState<{
     pageIndex: number;
     pageSize: number;
     sort: Array<{ id: string; direction: 'asc' | 'desc' }>;
-    filter: ModelGroupVersionListFilterValue;
+    filter: ModelVersionListFilterValue;
   }>({
     pageIndex: 0,
     pageSize: 25,
@@ -139,12 +136,12 @@ export const ModelGroupVersionsPanel = ({ groupId }: ModelGroupVersionsPanelProp
     [params]
   );
 
-  const handleFilterChange = useCallback((filter: ModelGroupVersionListFilterValue) => {
+  const handleFilterChange = useCallback((filter: ModelVersionListFilterValue) => {
     setParams((previousParams) => ({ ...previousParams, filter }));
   }, []);
 
   return (
-    <EuiPanel data-test-subj="modelGroupVersionsPanel" style={{ padding: 20 }}>
+    <EuiPanel style={{ padding: 20 }}>
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTitle size="s">
@@ -160,9 +157,9 @@ export const ModelGroupVersionsPanel = ({ groupId }: ModelGroupVersionsPanelProp
           <EuiButton onClick={reload}>Refresh</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <ModelGroupVersionListFilter value={params.filter} onChange={handleFilterChange} />
+      <ModelVersionListFilter value={params.filter} onChange={handleFilterChange} />
       <EuiSpacer />
-      <ModelGroupVersionTable
+      <ModelVersionTable
         versions={versions}
         tags={tags}
         pagination={pagination}

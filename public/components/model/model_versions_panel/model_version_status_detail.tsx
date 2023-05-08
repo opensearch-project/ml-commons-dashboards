@@ -18,7 +18,7 @@ import { MODEL_STATE, routerPaths } from '../../../../common';
 import { APIProvider } from '../../../apis/api_provider';
 import { renderTime } from '../../../utils';
 
-import { ModelGroupVersionErrorDetailModal } from './model_group_version_error_detail_modal';
+import { ModelVersionErrorDetailModal } from './model_version_error_detail_modal';
 
 const VERSION_LINK_SYMBOL = '<MODEL_VERSION_LINK>';
 
@@ -76,7 +76,7 @@ export const state2DetailContentMap: {
   ],
 };
 
-export const ModelGroupVersionStatusDetail = ({
+export const ModelVersionStatusDetail = ({
   id,
   name,
   state,
@@ -169,7 +169,7 @@ export const ModelGroupVersionStatusDetail = ({
         </div>
       </div>
       {isErrorDetailedModelShowed && errorDetail && (
-        <ModelGroupVersionErrorDetailModal
+        <ModelVersionErrorDetailModal
           closeModal={() => {
             setIsErrorDetailedModelShowed(false);
           }}

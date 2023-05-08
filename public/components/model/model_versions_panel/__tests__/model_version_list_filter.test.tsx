@@ -7,16 +7,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { act, render, screen, within } from '../../../../../test/test_utils';
-import { ModelGroupVersionListFilter } from '../model_group_version_list_filter';
+import { ModelVersionListFilter } from '../model_version_list_filter';
 import { TagFilterOperator } from '../../../common';
 
-describe('<ModelGroupVersionListFilter />', () => {
+describe('<ModelVersionListFilter />', () => {
   it('should render default search bar, state, status and Add tag filter', () => {
     render(
-      <ModelGroupVersionListFilter
-        value={{ tag: [], state: [], status: [] }}
-        onChange={jest.fn()}
-      />
+      <ModelVersionListFilter value={{ tag: [], state: [], status: [] }} onChange={jest.fn()} />
     );
     expect(screen.getByPlaceholderText('Search by version number, or keyword')).toBeInTheDocument();
 
@@ -27,7 +24,7 @@ describe('<ModelGroupVersionListFilter />', () => {
 
   it('should render activate filter count and tags after value provided', () => {
     render(
-      <ModelGroupVersionListFilter
+      <ModelVersionListFilter
         value={{
           tag: [{ name: 'tag1', operator: TagFilterOperator.IsNot, value: '123', type: 'string' }],
           state: ['Deployed'],
@@ -46,10 +43,7 @@ describe('<ModelGroupVersionListFilter />', () => {
     const onChangeMock = jest.fn();
     const user = userEvent.setup();
     render(
-      <ModelGroupVersionListFilter
-        value={{ tag: [], state: [], status: [] }}
-        onChange={onChangeMock}
-      />
+      <ModelVersionListFilter value={{ tag: [], state: [], status: [] }} onChange={onChangeMock} />
     );
 
     await user.click(screen.getByText('State'));
@@ -63,10 +57,7 @@ describe('<ModelGroupVersionListFilter />', () => {
     const onChangeMock = jest.fn();
     const user = userEvent.setup();
     render(
-      <ModelGroupVersionListFilter
-        value={{ tag: [], state: [], status: [] }}
-        onChange={onChangeMock}
-      />
+      <ModelVersionListFilter value={{ tag: [], state: [], status: [] }} onChange={onChangeMock} />
     );
 
     await user.click(screen.getByText('Status'));
@@ -83,7 +74,7 @@ describe('<ModelGroupVersionListFilter />', () => {
       const onChangeMock = jest.fn();
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
       render(
-        <ModelGroupVersionListFilter
+        <ModelVersionListFilter
           value={{
             tag: [
               {

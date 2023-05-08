@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export { ModelGroupVersionsPanel } from './model_group_versions_panel';
+export { ModelVersionsPanel } from './model_versions_panel';

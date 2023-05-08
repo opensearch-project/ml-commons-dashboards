@@ -22,7 +22,7 @@ import {
 
 import { routerPaths } from '../../../../common/router_paths';
 
-export const ModelGroupVersionErrorDetailModal = ({
+export const ModelVersionErrorDetailModal = ({
   id,
   name,
   version,

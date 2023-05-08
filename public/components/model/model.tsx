@@ -16,12 +16,12 @@ import React, { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
-import { ModelGroupOverviewCard } from './model_group_overview_card';
-import { ModelGroupVersionsPanel } from './model_group_versions_panel';
-import { ModelGroupDetailsPanel } from './model_group_details_panel';
-import { ModelGroupTagsPanel } from './model_group_tags_panel';
+import { ModelOverviewCard } from './model_overview_card';
+import { ModelVersionsPanel } from './model_versions_panel';
+import { ModelDetailsPanel } from './model_details_panel';
+import { ModelTagsPanel } from './model_tags_panel';
 
-export const ModelGroup = () => {
+export const Model = () => {
   const { id: modelId } = useParams<{ id: string }>();
   const { data, loading, error } = useFetcher(APIProvider.getAPI('model').getOne, modelId);
   const tabs = useMemo(
@@ -32,7 +32,7 @@ export const ModelGroup = () => {
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelGroupVersionsPanel groupId={modelId} />
+            <ModelVersionsPanel groupId={modelId} />
           </>
         ),
       },
@@ -42,7 +42,7 @@ export const ModelGroup = () => {
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelGroupDetailsPanel />
+            <ModelDetailsPanel />
           </>
         ),
       },
@@ -52,7 +52,7 @@ export const ModelGroup = () => {
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelGroupTagsPanel />
+            <ModelTagsPanel />
           </>
         ),
       },
@@ -84,7 +84,7 @@ export const ModelGroup = () => {
           <EuiButton color="danger">Delete</EuiButton>,
         ]}
       />
-      <ModelGroupOverviewCard
+      <ModelOverviewCard
         id={data.id}
         owner="TODO"
         isModelOwner={false}

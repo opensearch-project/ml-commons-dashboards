@@ -19,7 +19,7 @@ const state2StatusContentMap: { [key in MODEL_STATE]?: [string, string] } = {
   [MODEL_STATE.partiallyLoaded]: ['warning', 'Warning'],
 };
 
-export const ModelGroupVersionStatusCell = ({ state }: { state: MODEL_STATE }) => {
+export const ModelVersionStatusCell = ({ state }: { state: MODEL_STATE }) => {
   const statusContent = state2StatusContentMap[state];
   if (!statusContent) {
     return <>-</>;

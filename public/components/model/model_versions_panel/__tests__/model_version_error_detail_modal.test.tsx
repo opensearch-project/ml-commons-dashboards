@@ -7,12 +7,12 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen } from '../../../../../test/test_utils';
-import { ModelGroupVersionErrorDetailModal } from '../model_group_version_error_detail_modal';
+import { ModelVersionErrorDetailModal } from '../model_version_error_detail_modal';
 
-describe('<ModelGroupVersionErrorDetailModal />', () => {
+describe('<ModelVersionErrorDetailModal />', () => {
   it('should render model artifact upload failed screen', () => {
     render(
-      <ModelGroupVersionErrorDetailModal
+      <ModelVersionErrorDetailModal
         id="model-1-id"
         name="model-1-name"
         version="3"
@@ -32,7 +32,7 @@ describe('<ModelGroupVersionErrorDetailModal />', () => {
 
   it('should render deployment failed screen', () => {
     render(
-      <ModelGroupVersionErrorDetailModal
+      <ModelVersionErrorDetailModal
         id="model-1-id"
         name="model-1-name"
         version="3"
@@ -55,7 +55,7 @@ describe('<ModelGroupVersionErrorDetailModal />', () => {
   it('should call closeModal after Close button clicked', async () => {
     const closeModalMock = jest.fn();
     render(
-      <ModelGroupVersionErrorDetailModal
+      <ModelVersionErrorDetailModal
         id="model-1-id"
         name="model-1-name"
         version="3"

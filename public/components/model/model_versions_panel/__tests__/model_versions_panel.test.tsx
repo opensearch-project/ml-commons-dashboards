@@ -8,13 +8,13 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor, within } from '../../../../../test/test_utils';
 import { Model } from '../../../../apis/model';
-import { ModelGroupVersionsPanel } from '../model_group_versions_panel';
+import { ModelVersionsPanel } from '../model_versions_panel';
 
-describe('<ModelGroupVersionsPanel />', () => {
+describe('<ModelVersionsPanel />', () => {
   it(
     'should render version count, refresh button, filter and table by default',
     async () => {
-      render(<ModelGroupVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel groupId="1" />);
 
       expect(
         screen.getByPlaceholderText('Search by version number, or keyword')
@@ -49,7 +49,7 @@ describe('<ModelGroupVersionsPanel />', () => {
     async () => {
       const searchMock = jest.spyOn(Model.prototype, 'search');
 
-      render(<ModelGroupVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel groupId="1" />);
 
       expect(searchMock).toHaveBeenCalledTimes(1);
 
@@ -66,7 +66,7 @@ describe('<ModelGroupVersionsPanel />', () => {
     async () => {
       const searchMock = jest.spyOn(Model.prototype, 'search');
 
-      render(<ModelGroupVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel groupId="1" />);
 
       await userEvent.click(screen.getByTitle('State'));
       await userEvent.click(screen.getByRole('option', { name: 'Deployed' }));

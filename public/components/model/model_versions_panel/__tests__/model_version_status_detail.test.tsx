@@ -7,13 +7,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
-import { ModelGroupVersionStatusDetail } from '../model_group_version_status_detail';
+import { ModelVersionStatusDetail } from '../model_version_status_detail';
 import { MODEL_STATE } from '../../../../../common';
 
-describe('<ModelGroupVersionStatusDetail />', () => {
+describe('<ModelVersionStatusDetail />', () => {
   it('should render "In progress...", uploading tip and upload initialized time ', async () => {
     render(
-      <ModelGroupVersionStatusDetail
+      <ModelVersionStatusDetail
         id="1"
         name="model-1"
         version="1"
@@ -35,7 +35,7 @@ describe('<ModelGroupVersionStatusDetail />', () => {
 
   it('should render "-" if state not supported', async () => {
     render(
-      <ModelGroupVersionStatusDetail
+      <ModelVersionStatusDetail
         id="1"
         name="model-1"
         version="1"
@@ -49,7 +49,7 @@ describe('<ModelGroupVersionStatusDetail />', () => {
 
   it('should render "See full error" button for "loadFailed" state', async () => {
     render(
-      <ModelGroupVersionStatusDetail
+      <ModelVersionStatusDetail
         id="1"
         name="model-1"
         version="1.0.0"
@@ -67,7 +67,7 @@ describe('<ModelGroupVersionStatusDetail />', () => {
   it('should display error detail after "See full error" button clicked', async () => {
     const user = userEvent.setup();
     render(
-      <ModelGroupVersionStatusDetail
+      <ModelVersionStatusDetail
         id="1"
         name="model-1"
         version="1.0.0"

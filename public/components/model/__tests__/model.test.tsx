@@ -7,16 +7,16 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor, within } from '../../../../test/test_utils';
-import { ModelGroup } from '../model_group';
+import { Model } from '../model';
 import { routerPaths } from '../../../../common/router_paths';
 import { Route, generatePath } from 'react-router-dom';
 
 const setup = () => {
   const renderResult = render(
-    <Route path={routerPaths.modelGroup}>
-      <ModelGroup />
+    <Route path={routerPaths.model}>
+      <Model />
     </Route>,
-    { route: generatePath(routerPaths.modelGroup, { id: '1' }) }
+    { route: generatePath(routerPaths.model, { id: '1' }) }
   );
 
   return {
@@ -24,7 +24,7 @@ const setup = () => {
   };
 };
 
-describe('<ModelGroup />', () => {
+describe('<Model />', () => {
   it(
     'should display model name, action buttons, overview-card, tabs and tabpanel after data loaded',
     async () => {
