@@ -53,9 +53,16 @@ describe('<ModelVersionTable />', () => {
         />
       );
 
+      await waitFor(
+        async () => {
+          expect(screen.getByTestId('dataGridHeaderCellSortingIcon-version')).toBeInTheDocument();
+        },
+        {
+          timeout: 2000,
+        }
+      );
+      await user.click(screen.getByText('Version'));
       await waitFor(async () => {
-        expect(screen.getByTestId('dataGridHeaderCellSortingIcon-version')).toBeInTheDocument();
-        await user.click(screen.getByText('Version'));
         expect(screen.getByText('Sort A-Z').closest('li')).toHaveClass(
           'euiDataGridHeader__action--selected'
         );
