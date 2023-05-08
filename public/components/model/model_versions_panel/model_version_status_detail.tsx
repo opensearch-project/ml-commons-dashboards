@@ -18,62 +18,73 @@ import { MODEL_STATE, routerPaths } from '../../../../common';
 import { APIProvider } from '../../../apis/api_provider';
 import { renderTime } from '../../../utils';
 
-import { ModelVersionErrorDetailModal } from './model_version_error_detail_modal';
-
-const VERSION_LINK_SYMBOL = '<MODEL_VERSION_LINK>';
+import { ModelVersionErrorDetailsModal } from './model_version_error_details_modal';
 
 // TODO: Change to related time field after confirmed
 export const state2DetailContentMap: {
-  [key in MODEL_STATE]?: [string, string, string, 'createdTime'];
+  [key in MODEL_STATE]?: {
+    title: string;
+    description: (versionLink: React.ReactNode) => React.ReactNode;
+    timeTitle: string;
+    timeField: 'createdTime';
+  };
 } = {
-  [MODEL_STATE.uploading]: [
-    'In progress...',
-    `The model artifact for ${VERSION_LINK_SYMBOL} is uploading.`,
-    'Upload initiated on',
-    'createdTime',
-  ],
-  [MODEL_STATE.loading]: [
-    'In progress...',
-    `The model artifact for ${VERSION_LINK_SYMBOL} is deploying.`,
-    'Deployment initiated on',
-    'createdTime',
-  ],
-  [MODEL_STATE.uploaded]: [
-    'Success',
-    `The model artifact for ${VERSION_LINK_SYMBOL} uploaded.`,
-    'Uploaded on',
-    'createdTime',
-  ],
-  [MODEL_STATE.loaded]: [
-    'Success',
-    `${VERSION_LINK_SYMBOL} deployed.`,
-    'Deployed on',
-    'createdTime',
-  ],
-  [MODEL_STATE.unloaded]: [
-    'Success',
-    `${VERSION_LINK_SYMBOL} undeployed.`,
-    'Undeployed on',
-    'createdTime',
-  ],
-  [MODEL_STATE.loadFailed]: [
-    'Error',
-    `${VERSION_LINK_SYMBOL} deployment failed.`,
-    'Deployment failed on',
-    'createdTime',
-  ],
-  [MODEL_STATE.registerFailed]: [
-    'Error',
-    `${VERSION_LINK_SYMBOL} artifact upload failed.`,
-    'Upload failed on',
-    'createdTime',
-  ],
-  [MODEL_STATE.partiallyLoaded]: [
-    'Warning',
-    `${VERSION_LINK_SYMBOL} is deployed and partially responding.`,
-    'Last responded on',
-    'createdTime',
-  ],
+  [MODEL_STATE.uploading]: {
+    title: 'In progress...',
+    description: (versionLink: React.ReactNode) => (
+      <>The model artifact for {versionLink} is uploading.</>
+    ),
+    timeTitle: 'Upload initiated on',
+    timeField: 'createdTime',
+  },
+  [MODEL_STATE.loading]: {
+    title: 'In progress...',
+    description: (versionLink: React.ReactNode) => (
+      <>The model artifact for {versionLink} is deploying.</>
+    ),
+    timeTitle: 'Deployment initiated on',
+    timeField: 'createdTime',
+  },
+  [MODEL_STATE.uploaded]: {
+    title: 'Success',
+    description: (versionLink: React.ReactNode) => (
+      <>The model artifact for {versionLink} uploaded.</>
+    ),
+    timeTitle: 'Uploaded on',
+    timeField: 'createdTime',
+  },
+  [MODEL_STATE.loaded]: {
+    title: 'Success',
+    description: (versionLink: React.ReactNode) => <>{versionLink} deployed.</>,
+    timeTitle: 'Deployed on',
+    timeField: 'createdTime',
+  },
+  [MODEL_STATE.unloaded]: {
+    title: 'Success',
+    description: (versionLink: React.ReactNode) => <>{versionLink} undeployed.</>,
+    timeTitle: 'Undeployed on',
+    timeField: 'createdTime',
+  },
+  [MODEL_STATE.loadFailed]: {
+    title: 'Error',
+    description: (versionLink: React.ReactNode) => <>{versionLink} deployment failed.</>,
+    timeTitle: 'Deployment failed on',
+    timeField: 'createdTime',
+  },
+  [MODEL_STATE.registerFailed]: {
+    title: 'Error',
+    description: (versionLink: React.ReactNode) => <>{versionLink} artifact upload failed.</>,
+    timeTitle: 'Upload failed on',
+    timeField: 'createdTime',
+  },
+  [MODEL_STATE.partiallyLoaded]: {
+    title: 'Warning',
+    description: (versionLink: React.ReactNode) => (
+      <>{versionLink} is deployed and partially responding.</>
+    ),
+    timeTitle: 'Last responded on',
+    timeField: 'createdTime',
+  },
 };
 
 export const ModelVersionStatusDetail = ({
@@ -89,9 +100,9 @@ export const ModelVersionStatusDetail = ({
   version: string;
   createdTime: number;
 }) => {
-  const [isErrorDetailedModelShowed, setIsErrorDetailedModelShowed] = useState(false);
+  const [isErrorDetailsModalShowed, setIsErrorDetailsModalShowed] = useState(false);
   const [isLoadingErrorDetails, setIsLoadingErrorDetails] = useState(false);
-  const [errorDetail, setErrorDetail] = useState<string>();
+  const [errorDetails, setErrorDetails] = useState<string>();
 
   const handleSeeFullErrorClick = useCallback(async () => {
     const state2TaskTypeMap: { [key in MODEL_STATE]?: string } = {
@@ -101,8 +112,8 @@ export const ModelVersionStatusDetail = ({
     if (!(state in state2TaskTypeMap)) {
       return;
     }
-    if (errorDetail) {
-      setIsErrorDetailedModelShowed(true);
+    if (errorDetails) {
+      setIsErrorDetailsModalShowed(true);
       return;
     }
     setIsLoadingErrorDetails(true);
@@ -115,20 +126,23 @@ export const ModelVersionStatusDetail = ({
         sort: 'last_update_time-desc',
       });
       if (data[0]?.error) {
-        setErrorDetail(data[0].error);
-        setIsErrorDetailedModelShowed(true);
+        setErrorDetails(data[0].error);
+        setIsErrorDetailsModalShowed(true);
       }
     } finally {
       setIsLoadingErrorDetails(false);
     }
-  }, [state, id, errorDetail]);
+  }, [state, id, errorDetails]);
+
+  const handleCloseModal = useCallback(() => {
+    setIsErrorDetailsModalShowed(false);
+  }, []);
 
   const statusContent = state2DetailContentMap[state];
   if (!statusContent) {
     return <>-</>;
   }
-  const [title, description, timeTitle, timeField] = statusContent;
-  const [beforeVersionLink, afterVersionLink] = description.split(VERSION_LINK_SYMBOL);
+  const { title, description, timeTitle, timeField } = statusContent;
 
   return (
     <>
@@ -141,11 +155,11 @@ export const ModelVersionStatusDetail = ({
         </EuiPopoverTitle>
         <div style={{ padding: 8 }}>
           <EuiText>
-            {beforeVersionLink}
-            <Link component={EuiLink} to={generatePath(routerPaths.modelVersion, { id })}>
-              {name} version {version}
-            </Link>
-            {afterVersionLink}
+            {description(
+              <Link component={EuiLink} to={generatePath(routerPaths.modelVersion, { id })}>
+                {name} version {version}
+              </Link>
+            )}
           </EuiText>
           <EuiSpacer size="s" />
           <EuiText>
@@ -168,16 +182,14 @@ export const ModelVersionStatusDetail = ({
           )}
         </div>
       </div>
-      {isErrorDetailedModelShowed && errorDetail && (
-        <ModelVersionErrorDetailModal
-          closeModal={() => {
-            setIsErrorDetailedModelShowed(false);
-          }}
-          errorDetail={errorDetail}
+      {isErrorDetailsModalShowed && errorDetails && (
+        <ModelVersionErrorDetailsModal
           id={id}
           name={name}
           version={version}
+          errorDetails={errorDetails}
           isDeployFailed={state === MODEL_STATE.loadFailed}
+          closeModal={handleCloseModal}
         />
       )}
     </>

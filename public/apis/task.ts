@@ -6,6 +6,8 @@
 import { TASK_API_ENDPOINT } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
 
+type TaskSearchSortItem = 'last_update_time-desc' | 'last_update_time-asc';
+
 export interface TaskGetOneResponse {
   error?: string;
   last_update_time: number;
@@ -20,7 +22,7 @@ export interface TaskGetOneResponse {
 
 export interface TaskSearchResponse {
   data: TaskGetOneResponse[];
-  total_tasks: {};
+  total_tasks: number;
 }
 
 export class Task {
@@ -34,10 +36,7 @@ export class Task {
     modelId?: string;
     taskType?: string;
     state?: string;
-    sort?:
-      | 'last_update_time-desc'
-      | 'last_update_time-asc'
-      | Array<'last_update_time-desc' | 'last_update_time-asc'>;
+    sort?: TaskSearchSortItem | [TaskSearchSortItem];
   }) {
     const { modelId, taskType, ...restQuery } = query;
     return InnerHttpProvider.getHttp().get<TaskSearchResponse>(TASK_API_ENDPOINT, {

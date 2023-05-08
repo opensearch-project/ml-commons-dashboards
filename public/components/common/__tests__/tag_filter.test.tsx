@@ -18,7 +18,7 @@ describe('<TagFilter />', () => {
   it(
     'should call onChange when applying tag filter',
     async () => {
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      const user = userEvent.setup();
       const onChangeMock = jest.fn();
       render(
         <TagFilter
@@ -65,7 +65,7 @@ describe('<TagFilter />', () => {
   });
 
   it('should render loading screen when tags are loading', async () => {
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const user = userEvent.setup();
 
     const { rerender } = render(
       <TagFilter tagKeysLoading={true} tagKeys={[]} value={[]} onChange={jest.fn()} />
@@ -89,7 +89,7 @@ describe('<TagFilter />', () => {
   it(
     'should reset input after popover re-open',
     async () => {
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      const user = userEvent.setup();
       const onChangeMock = jest.fn();
       render(
         <TagFilter

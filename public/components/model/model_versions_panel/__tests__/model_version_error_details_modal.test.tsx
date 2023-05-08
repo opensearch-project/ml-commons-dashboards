@@ -7,16 +7,16 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen } from '../../../../../test/test_utils';
-import { ModelVersionErrorDetailModal } from '../model_version_error_detail_modal';
+import { ModelVersionErrorDetailsModal } from '../model_version_error_details_modal';
 
-describe('<ModelVersionErrorDetailModal />', () => {
+describe('<ModelVersionErrorDetailsModal />', () => {
   it('should render model artifact upload failed screen', () => {
     render(
-      <ModelVersionErrorDetailModal
+      <ModelVersionErrorDetailsModal
         id="model-1-id"
         name="model-1-name"
         version="3"
-        errorDetail="Error message"
+        errorDetails="Error message"
         closeModal={jest.fn()}
       />
     );
@@ -32,11 +32,11 @@ describe('<ModelVersionErrorDetailModal />', () => {
 
   it('should render deployment failed screen', () => {
     render(
-      <ModelVersionErrorDetailModal
+      <ModelVersionErrorDetailsModal
         id="model-1-id"
         name="model-1-name"
         version="3"
-        errorDetail={'{"foo": "bar"}'}
+        errorDetails={'{"foo": "bar"}'}
         closeModal={jest.fn()}
         isDeployFailed
       />
@@ -55,11 +55,11 @@ describe('<ModelVersionErrorDetailModal />', () => {
   it('should call closeModal after Close button clicked', async () => {
     const closeModalMock = jest.fn();
     render(
-      <ModelVersionErrorDetailModal
+      <ModelVersionErrorDetailsModal
         id="model-1-id"
         name="model-1-name"
         version="3"
-        errorDetail={'{"foo": "bar"}'}
+        errorDetails={'{"foo": "bar"}'}
         closeModal={closeModalMock}
         isDeployFailed
       />

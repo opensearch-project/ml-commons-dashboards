@@ -8,6 +8,11 @@ import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/co
 import { TaskService } from '../services';
 import { TASK_API_ENDPOINT } from './constants';
 
+const taskSearchSortItemSchema = schema.oneOf([
+  schema.literal('last_update_time-desc'),
+  schema.literal('last_update_time-asc'),
+]);
+
 export const taskRouter = (router: IRouter) => {
   router.get(
     {
@@ -39,16 +44,8 @@ export const taskRouter = (router: IRouter) => {
           size: schema.number(),
           sort: schema.maybe(
             schema.oneOf([
-              schema.oneOf([
-                schema.literal('last_update_time-desc'),
-                schema.literal('last_update_time-asc'),
-              ]),
-              schema.arrayOf(
-                schema.oneOf([
-                  schema.literal('last_update_time-desc'),
-                  schema.literal('last_update_time-asc'),
-                ])
-              ),
+              taskSearchSortItemSchema,
+              schema.arrayOf(taskSearchSortItemSchema, { maxSize: 1 }),
             ])
           ),
           model_id: schema.maybe(schema.string()),
@@ -64,7 +61,10 @@ export const taskRouter = (router: IRouter) => {
           client: context.core.opensearch.client,
           modelId,
           taskType,
-          sort: typeof sort === 'string' ? [sort] : sort,
+          sort:
+            typeof sort === 'string'
+              ? [sort]
+              : (sort as ['last_update_time-desc' | 'last_update_time-asc']),
           ...restQuery,
         });
         return opensearchDashboardsResponseFactory.ok({ body });

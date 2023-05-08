@@ -47,7 +47,7 @@ export class TaskService {
     size: number;
     modelId?: string;
     taskType?: string;
-    sort?: Array<'last_update_time-desc' | 'last_update_time-asc'>;
+    sort?: ['last_update_time-desc' | 'last_update_time-asc'];
     state?: string;
   }) {
     const {

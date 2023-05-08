@@ -22,19 +22,19 @@ import {
 
 import { routerPaths } from '../../../../common/router_paths';
 
-export const ModelVersionErrorDetailModal = ({
+export const ModelVersionErrorDetailsModal = ({
   id,
   name,
   version,
   closeModal,
-  errorDetail,
+  errorDetails,
   isDeployFailed,
 }: {
   name: string;
   id: string;
   version: string;
   closeModal: () => void;
-  errorDetail: string;
+  errorDetails: string;
   isDeployFailed?: boolean;
 }) => {
   return (
@@ -56,11 +56,11 @@ export const ModelVersionErrorDetailModal = ({
           <>
             <EuiText size="s">Error message:</EuiText>
             <EuiSpacer size="m" />
-            <EuiCodeBlock isCopyable={true}>{errorDetail}</EuiCodeBlock>
+            <EuiCodeBlock isCopyable={true}>{errorDetails}</EuiCodeBlock>
           </>
         ) : (
           <EuiText style={{ padding: '8px 0' }} size="s">
-            <p style={{ wordBreak: 'break-all' }}>{errorDetail}</p>
+            <p style={{ wordBreak: 'break-all' }}>{errorDetails}</p>
           </EuiText>
         )}
       </EuiModalBody>
