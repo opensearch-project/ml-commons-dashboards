@@ -4,14 +4,16 @@
  */
 
 import React from 'react';
-import { EuiPanel, EuiTitle } from '@elastic/eui';
+import { EuiHorizontalRule, EuiPanel, EuiSpacer, EuiTitle } from '@elastic/eui';
 
-export const ModelGroupVersionsPanel = () => {
+export const ModelTagsPanel = () => {
   return (
     <EuiPanel style={{ padding: 20 }}>
       <EuiTitle size="s">
-        <h3>Versions</h3>
+        <h3>Tags</h3>
       </EuiTitle>
+      <EuiSpacer size="m" />
+      <EuiHorizontalRule margin="none" />
     </EuiPanel>
   );
 };
