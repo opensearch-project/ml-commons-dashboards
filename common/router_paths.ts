@@ -8,6 +8,6 @@ export const routerPaths = {
   registerModel: '/model-registry/register-model/:id?',
   modelList: '/model-registry/model-list',
   overview: '/overview',
-  modelGroup: '/model-registry/model/:id',
+  model: '/model-registry/model/:id',
   modelVersion: '/model-registry/model-version/:id',
 };

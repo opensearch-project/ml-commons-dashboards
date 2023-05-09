@@ -2,22 +2,21 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-jest.mock('../../../apis/security');
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-import { ModelFilter } from '../model_filter';
-import { render, screen } from '../../../../test/test_utils';
+import { OptionsFilter } from '../options_filter';
+import { render, screen } from '../../../../../test/test_utils';
 
-describe('<ModelFilter />', () => {
+describe('<OptionsFilter />', () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
 
-  it('should render "Tags" with 0 active filter', () => {
+  it('should render "Tags" as filter name by default', () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={[]}
@@ -26,12 +25,11 @@ describe('<ModelFilter />', () => {
       />
     );
     expect(screen.getByText('Tags')).toBeInTheDocument();
-    expect(screen.getByText('0')).toBeInTheDocument();
   });
 
   it('should render Tags with 2 active filter', () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={[]}
@@ -45,7 +43,7 @@ describe('<ModelFilter />', () => {
 
   it('should render options filter after filter button clicked', async () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -64,7 +62,7 @@ describe('<ModelFilter />', () => {
 
   it('should render passed footer after filter button clicked', async () => {
     const { getByText, queryByText } = render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -81,7 +79,7 @@ describe('<ModelFilter />', () => {
 
   it('should only show "bar" after search', async () => {
     render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -101,7 +99,7 @@ describe('<ModelFilter />', () => {
   it('should call onChange with consistent value after option click', async () => {
     const onChangeMock = jest.fn();
     const { rerender } = render(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -118,7 +116,7 @@ describe('<ModelFilter />', () => {
     onChangeMock.mockClear();
 
     rerender(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -132,7 +130,7 @@ describe('<ModelFilter />', () => {
     onChangeMock.mockClear();
 
     rerender(
-      <ModelFilter
+      <OptionsFilter
         name="Tags"
         searchPlaceholder="Search Tags"
         options={['foo', 'bar']}
@@ -144,5 +142,27 @@ describe('<ModelFilter />', () => {
     await userEvent.click(screen.getByText('bar'));
     expect(onChangeMock).toHaveBeenCalledWith(['foo']);
     onChangeMock.mockClear();
+  });
+
+  it('should call obChange with option.value after option click', async () => {
+    const onChangeMock = jest.fn();
+    render(
+      <OptionsFilter
+        name="Tags"
+        searchPlaceholder="Search Tags"
+        options={[
+          { name: 'foo', value: 1 },
+          { name: 'bar', value: 2 },
+        ]}
+        value={[]}
+        onChange={onChangeMock}
+      />
+    );
+
+    expect(onChangeMock).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByText('Tags'));
+    await userEvent.click(screen.getByText('foo'));
+    expect(onChangeMock).toHaveBeenCalledWith([1]);
   });
 });

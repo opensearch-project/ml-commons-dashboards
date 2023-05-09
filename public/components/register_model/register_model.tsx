@@ -116,7 +116,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
       try {
         const onComplete = (modelId: string) => {
           // Navigate to model group page
-          history.push(generatePath(routerPaths.modelGroup, { id: modelId }));
+          history.push(generatePath(routerPaths.model, { id: modelId }));
 
           notifications?.toasts.addSuccess({
             title: mountReactNode(

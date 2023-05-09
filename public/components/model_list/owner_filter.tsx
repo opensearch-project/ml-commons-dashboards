@@ -5,13 +5,16 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { EuiButton } from '@elastic/eui';
-import { ModelFilter, ModelFilterProps } from './model_filter';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { APIProvider } from '../../apis/api_provider';
+import { OptionsFilter, OptionsFilterProps } from '../common';
 
 const ownerFetcher = () => Promise.resolve(['admin', 'owner-1', 'owner-2']);
 
-export const OwnerFilter = ({ value, onChange }: Pick<ModelFilterProps, 'value' | 'onChange'>) => {
+export const OwnerFilter = ({
+  value,
+  onChange,
+}: Pick<OptionsFilterProps, 'value' | 'onChange'>) => {
   const { data: accountData } = useFetcher(APIProvider.getAPI('security').getAccount);
   const { data: ownerData } = useFetcher(ownerFetcher);
   const currentAccountName = accountData?.user_name;
@@ -32,7 +35,7 @@ export const OwnerFilter = ({ value, onChange }: Pick<ModelFilterProps, 'value' 
   }, [currentAccountName, onChange]);
 
   return (
-    <ModelFilter
+    <OptionsFilter
       searchPlaceholder="Search"
       options={options}
       value={value}

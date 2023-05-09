@@ -13,6 +13,7 @@ export enum MODEL_STATE {
   loading = 'DEPLOYING',
   partiallyLoaded = 'PARTIALLY_DEPLOYED',
   loadFailed = 'DEPLOY_FAILED',
+  registerFailed = 'REGISTER_FAILED',
 }
 
 export interface OpenSearchModelBase {
