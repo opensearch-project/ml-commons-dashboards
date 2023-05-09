@@ -4,11 +4,14 @@
  */
 
 import { rest } from 'msw';
+
+import { MODEL_AGGREGATE_API_ENDPOINT } from '../../server/routes/constants';
+
 import { modelConfig } from './data/model_config';
 import { modelRepositoryResponse } from './data/model_repository';
 import { modelHandlers } from './model_handlers';
 import { modelAggregateResponse } from './data/model_aggregate';
-import { MODEL_AGGREGATE_API_ENDPOINT } from '../../server/routes/constants';
+import { taskHandlers } from './task_handlers';
 
 export const handlers = [
   rest.get('/api/ml-commons/model-repository', (req, res, ctx) => {
@@ -21,4 +24,5 @@ export const handlers = [
   rest.get(MODEL_AGGREGATE_API_ENDPOINT, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json(modelAggregateResponse));
   }),
+  ...taskHandlers,
 ];

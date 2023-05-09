@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ModelGroup } from '../public/components/model_group';
+import { Model } from '../public/components/model';
 import { ModelList } from '../public/components/model_list';
 import { Monitoring } from '../public/components/monitoring';
 import { RegisterModelForm } from '../public/components/register_model/register_model';
@@ -41,10 +41,10 @@ export const ROUTES: RouteConfig[] = [
     nav: true,
   },
   {
-    path: routerPaths.modelGroup,
+    path: routerPaths.model,
     // TODO: refactor label to be dynamic so that we can display group name in breadcrumb
-    label: 'Model Group',
-    Component: ModelGroup,
+    label: 'Model',
+    Component: Model,
     nav: false,
   },
   {

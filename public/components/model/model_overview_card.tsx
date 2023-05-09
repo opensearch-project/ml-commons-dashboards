@@ -8,7 +8,7 @@ import React from 'react';
 import { CopyableText } from '../common';
 import { renderTime } from '../../utils';
 
-interface ModelGroupOverviewCardProps {
+interface ModelOverviewCardProps {
   id: string;
   description?: string;
   owner: string;
@@ -17,14 +17,14 @@ interface ModelGroupOverviewCardProps {
   updatedTime: number;
 }
 
-export const ModelGroupOverviewCard = ({
+export const ModelOverviewCard = ({
   id,
   owner,
   createdTime,
   updatedTime,
   description,
   isModelOwner,
-}: ModelGroupOverviewCardProps) => {
+}: ModelOverviewCardProps) => {
   return (
     <EuiPanel data-test-subj="model-group-overview-card">
       <EuiSpacer size="m" />

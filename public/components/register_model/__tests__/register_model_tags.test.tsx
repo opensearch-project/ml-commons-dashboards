@@ -226,7 +226,7 @@ describe('<RegisterModel /> Tags', () => {
     );
   });
 
-  it('should allow adding one more tag when registering new version if model group has only two tags', async () => {
+  it('should allow adding one more tag when registering new version if model has only two tags', async () => {
     jest.spyOn(formHooks, 'useModelTags').mockReturnValue([
       false,
       [

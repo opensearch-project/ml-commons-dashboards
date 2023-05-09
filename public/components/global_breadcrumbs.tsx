@@ -54,7 +54,7 @@ const getModelRegisterBreadcrumbs = (basename: string, matchedParams: {}) => {
               [
                 {
                   text: model.name,
-                  href: joinUrl(basename, generatePath(routerPaths.modelGroup, { id: modelId })),
+                  href: joinUrl(basename, generatePath(routerPaths.model, { id: modelId })),
                 },
                 {
                   text: 'Register version',
@@ -73,7 +73,7 @@ const getModelRegisterBreadcrumbs = (basename: string, matchedParams: {}) => {
   };
 };
 
-const getModelGroupBreadcrumbs = (basename: string, matchedParams: {}) => {
+const getModelBreadcrumbs = (basename: string, matchedParams: {}) => {
   const baseModelRegistryBreadcrumbs = getBasicModelRegistryBreadcrumbs(basename);
   if ('id' in matchedParams && typeof matchedParams.id === 'string') {
     const modelId = matchedParams.id;
@@ -115,7 +115,7 @@ const getModelVersionBreadcrumbs = (basename: string, matchedParams: {}) => {
                 {
                   text: model.name,
                   // TODO: Change to use model group id
-                  href: joinUrl(basename, generatePath(routerPaths.modelGroup, { id: modelId })),
+                  href: joinUrl(basename, generatePath(routerPaths.model, { id: modelId })),
                 },
                 {
                   text: `Version ${model.model_version}`,
@@ -131,7 +131,7 @@ const getModelVersionBreadcrumbs = (basename: string, matchedParams: {}) => {
 
 const routerPathBreadcrumbsMap = {
   [routerPaths.registerModel]: getModelRegisterBreadcrumbs,
-  [routerPaths.modelGroup]: getModelGroupBreadcrumbs,
+  [routerPaths.model]: getModelBreadcrumbs,
   [routerPaths.modelVersion]: getModelVersionBreadcrumbs,
 };
 

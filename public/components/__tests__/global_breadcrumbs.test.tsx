@@ -56,7 +56,7 @@ describe('<GlobalBreadcrumbs />', () => {
     });
   });
 
-  it('should call onBreadcrumbsChange with model group breadcrumbs', async () => {
+  it('should call onBreadcrumbsChange with model breadcrumbs', async () => {
     const onBreadcrumbsChange = jest.fn();
     render(<GlobalBreadcrumbs onBreadcrumbsChange={onBreadcrumbsChange} basename="/" />, {
       route: '/model-registry/model/1',

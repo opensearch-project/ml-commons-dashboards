@@ -6,7 +6,7 @@
 import React from 'react';
 import { EuiHorizontalRule, EuiPanel, EuiSpacer, EuiTitle } from '@elastic/eui';
 
-export const ModelGroupDetailsPanel = () => {
+export const ModelDetailsPanel = () => {
   return (
     <EuiPanel style={{ padding: 20 }}>
       <EuiTitle size="s">

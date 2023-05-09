@@ -6,12 +6,12 @@
 import React from 'react';
 
 import { render, screen, within } from '../../../../test/test_utils';
-import { ModelGroupOverviewCard } from '../model_group_overview_card';
+import { ModelOverviewCard } from '../model_overview_card';
 
-describe('<ModelGroupOverviewCard />', () => {
-  it('should model group overview information according passed data', () => {
+describe('<ModelOverviewCard />', () => {
+  it('should model overview information according passed data', () => {
     render(
-      <ModelGroupOverviewCard
+      <ModelOverviewCard
         id="model-1-id"
         description="Model description of model 1"
         isModelOwner

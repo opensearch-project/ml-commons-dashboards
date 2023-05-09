@@ -12,9 +12,8 @@ import {
 } from '@elastic/eui';
 import React, { useCallback, useRef } from 'react';
 
-import { TagFilterValue, SelectedTagFiltersPanel, DebouncedSearchBar } from '../common';
+import { TagFilterValue, SelectedTagFiltersPanel, DebouncedSearchBar, TagFilter } from '../common';
 
-import { TagFilter } from './tag_filter';
 import { OwnerFilter } from './owner_filter';
 import { useModelTagKeys } from './model_list.hooks';
 

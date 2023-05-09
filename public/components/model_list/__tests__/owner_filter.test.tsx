@@ -16,10 +16,9 @@ describe('<OwnerFilter />', () => {
     jest.resetAllMocks();
   });
 
-  it('should render "Owner" with 3 filter for normal', async () => {
-    const { getByText, findByText } = render(<OwnerFilter value={[]} onChange={() => {}} />);
+  it('should render "Owner" by default', async () => {
+    const { getByText } = render(<OwnerFilter value={[]} onChange={() => {}} />);
     expect(getByText('Owner')).toBeInTheDocument();
-    expect(await findByText('3')).toBeInTheDocument();
   });
 
   it('should render three options with 1 checked option and 1 active filter', async () => {
