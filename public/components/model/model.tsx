@@ -39,10 +39,11 @@ export const Model = () => {
       {
         name: 'Details',
         id: 'details',
+        // TODO: Add description property here
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelDetailsPanel />
+            <ModelDetailsPanel name={data?.name} id={modelId} />
           </>
         ),
       },
@@ -57,7 +58,7 @@ export const Model = () => {
         ),
       },
     ],
-    [modelId]
+    [modelId, data]
   );
   const [selectedTabId, setSelectedTabId] = useState(tabs[0].id);
 
