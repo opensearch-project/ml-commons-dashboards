@@ -10,6 +10,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingSpinner,
+  EuiSpacer,
 } from '@elastic/eui';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 
@@ -17,6 +18,9 @@ import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionToggler } from './version_toggler';
+import { ModelVersionCallout } from './model_version_callout';
+import { MODEL_STATE } from '../../../common/model';
+import { ModelVersionDetails } from './model_version_details';
 
 export const ModelVersion = () => {
   const { id: modelId } = useParams<{ id: string }>();
@@ -74,10 +78,18 @@ export const ModelVersion = () => {
         }}
         rightSideItems={[
           <EuiButton fill>Register version</EuiButton>,
-          <EuiButton>Edit</EuiButton>,
           <EuiButton>Deploy</EuiButton>,
           <EuiButton color="danger">Delete</EuiButton>,
         ]}
+      />
+      <ModelVersionCallout modelVersionId="" modelState={MODEL_STATE.loading} />
+      <ModelVersionCallout modelVersionId="" modelState={MODEL_STATE.loadFailed} />
+      <EuiSpacer size="m" />
+      <ModelVersionDetails
+        description={model?.description}
+        modelId={model?.id}
+        createdTime={model?.created_time}
+        lastUpdatedTime={model?.last_updated_time}
       />
     </>
   );
