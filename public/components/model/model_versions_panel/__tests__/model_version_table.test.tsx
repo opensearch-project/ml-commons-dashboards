@@ -5,11 +5,11 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
+import { within } from '@testing-library/dom';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionTable } from '../model_version_table';
 import { MODEL_STATE } from '../../../../../common';
-import { within } from '@testing-library/dom';
 
 const versions = [
   {
@@ -156,5 +156,76 @@ describe('<ModelVersionTable />', () => {
       expect(screen.getByText(/The model artifact for.*is uploading./)).toBeInTheDocument();
     },
     10 * 1000
+  );
+
+  it(
+    'should show ID column after ID column checked',
+    async () => {
+      render(<ModelVersionTable versions={versions} tags={[]} />);
+
+      await userEvent.click(screen.getByTestId('dataGridColumnSelectorButton'));
+      await userEvent.click(
+        within(screen.getByRole('dialog')).getByRole('switch', { checked: false, name: 'ID' })
+      );
+
+      expect(screen.getByTestId('dataGridHeaderCell-id')).toBeInTheDocument();
+      expect(
+        within(screen.getAllByTestId('dataGridRowCell')[4]).getByText('1')
+      ).toBeInTheDocument();
+    },
+    10 * 1000
+  );
+
+  it(
+    'should call document.execCommand after ID column copy button clicked',
+    async () => {
+      const execCommandMock = jest.fn();
+      const execCommandOrigin = document.execCommand;
+      document.execCommand = execCommandMock;
+
+      render(<ModelVersionTable versions={versions} tags={[]} />);
+      const idCell = screen.getAllByTestId('dataGridRowCell')[4];
+
+      await userEvent.click(screen.getByTestId('dataGridColumnSelectorButton'));
+      await userEvent.click(screen.getByRole('switch', { checked: false, name: 'ID' }));
+      await userEvent.hover(idCell);
+
+      expect(execCommandMock).not.toHaveBeenCalled();
+      await userEvent.click(within(idCell).getByLabelText('Copy ID'));
+      expect(execCommandMock).toHaveBeenCalledWith('copy');
+
+      await userEvent.click(idCell);
+
+      document.execCommand = execCommandOrigin;
+    },
+    10 * 1000
+  );
+
+  it(
+    'should call document.execCommand after ID column expand copy button clicked',
+    async () => {
+      const execCommandMock = jest.fn();
+      const execCommandOrigin = document.execCommand;
+      document.execCommand = execCommandMock;
+
+      render(<ModelVersionTable versions={versions} tags={[]} />);
+      const idCell = screen.getAllByTestId('dataGridRowCell')[4];
+
+      await userEvent.click(screen.getByTestId('dataGridColumnSelectorButton'));
+      await userEvent.click(screen.getByRole('switch', { checked: false, name: 'ID' }));
+      await userEvent.hover(idCell);
+      await userEvent.click(
+        within(idCell).getByTitle('Click or hit enter to interact with cell content')
+      );
+      const copyButton = within(screen.getByRole('dialog')).getByText('Copy ID');
+
+      expect(execCommandMock).not.toHaveBeenCalled();
+      await userEvent.click(copyButton);
+      expect(execCommandMock).toHaveBeenCalledWith('copy');
+      expect(copyButton).toHaveTextContent('Copied');
+
+      document.execCommand = execCommandOrigin;
+    },
+    20 * 1000
   );
 });
