@@ -4,13 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import {
-  EuiPopover,
-  EuiButtonIcon,
-  EuiContextMenuPanel,
-  EuiContextMenuItem,
-  copyToClipboard,
-} from '@elastic/eui';
+import { EuiPopover, EuiButtonIcon, EuiContextMenuPanel, EuiContextMenuItem } from '@elastic/eui';
 
 import { MODEL_STATE } from '../../../../common';
 
@@ -45,16 +39,6 @@ export const ModelVersionTableRowActions = ({ state, id }: { state: MODEL_STATE;
         <EuiContextMenuPanel
           onClick={closePopover}
           items={[
-            <EuiContextMenuItem
-              key="copy-id"
-              icon="copy"
-              onClick={() => {
-                copyToClipboard(id);
-              }}
-              style={{ padding: 8 }}
-            >
-              Copy ID
-            </EuiContextMenuItem>,
             ...(state === MODEL_STATE.registerFailed
               ? [
                   <EuiContextMenuItem
