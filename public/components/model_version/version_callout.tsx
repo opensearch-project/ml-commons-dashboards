@@ -76,6 +76,8 @@ export const ModelVersionCallout = ({ modelState, modelVersionId }: ModelVersion
       title={calloutProps.title}
       color={calloutProps.color}
       iconType={'iconType' in calloutProps ? calloutProps.iconType : undefined}
-    />
+    >
+      Error details: TODO
+    </EuiCallOut>
   );
 };
