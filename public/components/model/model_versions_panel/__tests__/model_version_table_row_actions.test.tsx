@@ -5,28 +5,19 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import * as euiExports from '@elastic/eui';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionTableRowActions } from '../model_version_table_row_actions';
 import { MODEL_STATE } from '../../../../../common';
 
-jest.mock('@elastic/eui', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('@elastic/eui'),
-  };
-});
-
 describe('<ModelVersionTableRowActions />', () => {
-  it('should render actions icon and "Copy ID" and "Delete" button after clicked', async () => {
+  it('should render "actions icon" and "Delete" button after clicked', async () => {
     const user = userEvent.setup();
     render(<ModelVersionTableRowActions state={MODEL_STATE.uploading} id="1" />);
 
     expect(screen.getByLabelText('show actions')).toBeInTheDocument();
     await user.click(screen.getByLabelText('show actions'));
 
-    expect(screen.getByText('Copy ID')).toBeInTheDocument();
     expect(screen.getByText('Delete')).toBeInTheDocument();
   });
 
@@ -72,21 +63,5 @@ describe('<ModelVersionTableRowActions />', () => {
     await waitFor(() => {
       expect(screen.queryByText('Delete')).toBeNull();
     });
-  });
-
-  it('should call copyToClipboard with "1" after "Copy ID" button clicked', async () => {
-    const copyToClipboardMock = jest
-      .spyOn(euiExports, 'copyToClipboard')
-      .mockImplementation(jest.fn());
-    const user = userEvent.setup();
-    render(<ModelVersionTableRowActions state={MODEL_STATE.loaded} id="1" />);
-
-    await user.click(screen.getByLabelText('show actions'));
-
-    expect(copyToClipboardMock).not.toHaveBeenCalled();
-    await user.click(screen.getByText('Copy ID'));
-    expect(copyToClipboardMock).toHaveBeenCalledWith('1');
-
-    copyToClipboardMock.mockRestore();
   });
 });
