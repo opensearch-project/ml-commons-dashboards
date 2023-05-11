@@ -47,10 +47,20 @@ export interface ModelTableProps {
   loading: boolean;
   error: boolean;
   onResetClick: () => void;
+  onModelDeleteClick: (name: string, argsdeployedVersions: string[]) => void;
 }
 
 export function ModelTable(props: ModelTableProps) {
-  const { models, sort, onChange, onModelNameClick, loading, onResetClick, error } = props;
+  const {
+    models,
+    sort,
+    onChange,
+    onModelNameClick,
+    loading,
+    onResetClick,
+    error,
+    onModelDeleteClick,
+  } = props;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
@@ -145,15 +155,25 @@ export function ModelTable(props: ModelTableProps) {
             name: 'Prevew',
             description: 'Preview model group',
             type: 'icon',
-            icon: 'boxesHorizontal',
+            icon: 'plusInCircle',
             onClick: ({ name }) => {
               onModelNameClick(name);
+            },
+          },
+          // TODO: add a new task to update after design completed
+          {
+            name: 'Delete',
+            description: 'Delete this',
+            type: 'icon',
+            icon: 'trash',
+            onClick: ({ name, ...args }) => {
+              onModelDeleteClick(name, args.deployed_versions);
             },
           },
         ],
       },
     ],
-    [onModelNameClick]
+    [onModelNameClick, onModelDeleteClick]
   );
 
   const pagination = useMemo(

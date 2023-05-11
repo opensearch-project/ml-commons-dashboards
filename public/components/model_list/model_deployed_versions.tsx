@@ -4,15 +4,12 @@
  */
 
 import React from 'react';
-
 const DISPLAY_VERSION = 3;
-
 export const ModelDeployedVersions = ({ versions }: { versions: string[] }) => {
   if (versions.length === 0) {
     return <span>-</span>;
   }
   const appendMore = versions.length > DISPLAY_VERSION;
-
   return (
     <span style={{ color: '#343741', fontSize: 14 }}>
       <span style={{ fontWeight: 700 }}>

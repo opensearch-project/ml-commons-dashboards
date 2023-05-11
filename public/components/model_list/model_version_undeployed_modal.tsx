@@ -11,18 +11,19 @@ import {
   EuiModalFooter,
   EuiModalHeader,
   EuiModalHeaderTitle,
+  EuiLink,
 } from '@elastic/eui';
-import { bus } from './bus';
 export class NoIdProvideError {}
 export interface ModelConfirmDeleteModalInstance {
-  show: (modelId: string) => void;
+  show: (modelId: string, deployedVersions: string[], name: string) => void;
 }
-let deployedVersion: string[] = [];
+// let deployedVersion: string[] = [];
 export const ModelVersionUndeployedModal = React.forwardRef<
   ModelConfirmDeleteModalInstance,
   { onDeleted: () => void }
 >(({ onDeleted }, ref) => {
   const deleteIdRef = useRef<string>();
+  const deployedVersion = useRef<string[]>();
   const [visible, setVisible] = useState(false);
   const handleCancel = useCallback(() => {
     setVisible(false);
@@ -31,36 +32,33 @@ export const ModelVersionUndeployedModal = React.forwardRef<
   useImperativeHandle(
     ref,
     () => ({
-      show: (id: string) => {
+      show: (id: string, deployedVersions: string[]) => {
         deleteIdRef.current = id;
+        deployedVersion.current = deployedVersions;
         setVisible(true);
       },
     }),
     []
   );
-  function receiveVal() {
-    bus.on('sendVersions', (data) => {
-      deployedVersion = data;
-    });
-  }
-  receiveVal();
   if (!visible) {
     return null;
   }
   const curModel = (
-    <a href="xxx" style={{ color: 'blue' }}>
+    <EuiLink color="primary" href="#">
       {deleteIdRef.current}
-    </a>
+    </EuiLink>
   );
-  const willDeleteVersion = deployedVersion
-    .slice(0, -1)
+  const willDeleteVersion = deployedVersion.current
+    ?.slice(0, -1)
     .join(',')
-    .concat(' and ' + deployedVersion[deployedVersion.length - 1]);
+    .concat(' and ' + deployedVersion.current[deployedVersion.current?.length - 1]);
   return (
     <EuiModal onClose={handleCancel} style={{ width: '500px' }}>
       <EuiModalHeader>
         <EuiModalHeaderTitle>
-          <h1>{deployedVersion.length} Versions must be undeployed to delete this model.</h1>
+          <h1>
+            {deployedVersion.current?.length} Versions must be undeployed to delete this model.
+          </h1>
         </EuiModalHeaderTitle>
       </EuiModalHeader>
       <EuiModalBody style={{ lineHeight: '25px' }}>
