@@ -69,7 +69,7 @@ export const ModelVersion = () => {
         <>
           <EuiSpacer size="m" />
           <EuiPanel style={{ minHeight: 200 }}>
-            <EuiLoadingContent lines={2} />
+            <EuiLoadingContent data-test-subj="ml-versionDetailsLoading" lines={2} />
           </EuiPanel>
         </>
       ) : (
@@ -88,7 +88,7 @@ export const ModelVersion = () => {
         <>
           <EuiSpacer size="m" />
           <EuiPanel style={{ minHeight: 200 }}>
-            <EuiLoadingContent lines={2} />
+            <EuiLoadingContent data-test-subj="ml-versionDetailsLoading" lines={2} />
           </EuiPanel>
         </>
       ) : (
@@ -136,7 +136,7 @@ export const ModelVersion = () => {
       <EuiSpacer size="m" />
       {loading ? (
         <EuiPanel style={{ minHeight: 200 }}>
-          <EuiLoadingContent lines={2} />
+          <EuiLoadingContent data-test-subj="ml-versionDetailsLoading" lines={2} />
         </EuiPanel>
       ) : (
         <ModelVersionDetails
