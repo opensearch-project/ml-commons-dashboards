@@ -9,12 +9,34 @@ import {
   EuiDataGridProps,
   EuiTablePagination,
   EuiDataGridCellValueElementProps,
+  EuiIcon,
+  EuiDataGridColumn,
+  EuiCopy,
+  EuiButtonEmpty,
+  copyToClipboard,
 } from '@elastic/eui';
 
 import { VersionTableDataItem } from '../types';
 
 import { ModelVersionCell } from './model_version_cell';
 import { ModelVersionTableRowActions } from './model_version_table_row_actions';
+
+const ExpandCopyIDButton = ({ textToCopy }: { textToCopy: string }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  return (
+    <EuiButtonEmpty
+      onClick={() => {
+        copyToClipboard(textToCopy);
+        setIsCopied(true);
+      }}
+      iconType="copy"
+      style={{ width: 102 }}
+    >
+      {isCopied ? 'Copied' : 'Copy ID'}
+    </EuiButtonEmpty>
+  );
+};
 
 interface VersionTableProps extends Pick<EuiDataGridProps, 'pagination' | 'sorting'> {
   tags: string[];
@@ -29,7 +51,7 @@ export const ModelVersionTable = ({
   pagination,
   totalVersionCount,
 }: VersionTableProps) => {
-  const columns = useMemo(
+  const columns = useMemo<EuiDataGridColumn[]>(
     () => [
       {
         id: 'version',
@@ -51,12 +73,37 @@ export const ModelVersionTable = ({
         id: 'lastUpdated',
         displayAsText: 'Last updated',
       },
+      {
+        id: 'id',
+        displayAsText: 'ID',
+        cellActions: [
+          ({ rowIndex, isExpanded }) => {
+            const textToCopy = versions[rowIndex].id;
+            if (isExpanded) {
+              return <ExpandCopyIDButton textToCopy={textToCopy} />;
+            }
+            return (
+              <EuiCopy textToCopy={textToCopy} beforeMessage="Copy ID" afterMessage="Copied">
+                {(copy) => (
+                  <EuiIcon
+                    role="button"
+                    aria-label="Copy ID"
+                    style={{ cursor: 'pointer' }}
+                    onClick={copy}
+                    type="copy"
+                  />
+                )}
+              </EuiCopy>
+            );
+          },
+        ],
+      },
       ...tags.map((tag) => ({
         id: `tags.${tag}`,
         displayAsText: `Tag: ${tag}`,
       })),
     ],
-    [tags]
+    [tags, versions]
   );
   const trailingControlColumns = useMemo(
     () => [
@@ -72,7 +119,9 @@ export const ModelVersionTable = ({
     ],
     [versions]
   );
-  const [visibleColumns, setVisibleColumns] = useState(() => columns.map(({ id }) => id));
+  const [visibleColumns, setVisibleColumns] = useState(() =>
+    columns.map(({ id }) => id).filter((columnId) => columnId !== 'id')
+  );
   const columnVisibility = useMemo(() => ({ visibleColumns, setVisibleColumns }), [visibleColumns]);
 
   const renderCellValue = useCallback(
