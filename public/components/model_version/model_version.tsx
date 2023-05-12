@@ -10,6 +10,10 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingSpinner,
+  EuiSpacer,
+  EuiPanel,
+  EuiLoadingContent,
+  EuiTabbedContent,
 } from '@elastic/eui';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 
@@ -17,10 +21,16 @@ import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
 import { VersionToggler } from './version_toggler';
+import { ModelVersionCallout } from './version_callout';
+import { MODEL_STATE } from '../../../common/model';
+import { ModelVersionDetails } from './version_details';
+import { ModelVersionInformation } from './version_information';
+import { ModelVersionArtifact } from './version_artifact';
+import { ModelVersionTags } from './version_tags';
 
 export const ModelVersion = () => {
   const { id: modelId } = useParams<{ id: string }>();
-  const { data: model } = useFetcher(APIProvider.getAPI('model').getOne, modelId);
+  const { data: model, loading } = useFetcher(APIProvider.getAPI('model').getOne, modelId);
   const [modelInfo, setModelInfo] = useState<{ version: string; name: string }>();
   const history = useHistory();
   const modelName = model?.name;
@@ -51,34 +61,93 @@ export const ModelVersion = () => {
     });
   }, [modelName, modelVersion]);
 
-  if (!modelInfo) {
-    return <EuiLoadingSpinner data-test-subj="modelVersionLoadingSpinner" />;
-  }
+  const tabs = [
+    {
+      id: 'version-information',
+      name: 'Version information',
+      content: loading ? (
+        <>
+          <EuiSpacer size="m" />
+          <EuiPanel style={{ minHeight: 200 }}>
+            <EuiLoadingContent data-test-subj="ml-versionDetailsLoading" lines={2} />
+          </EuiPanel>
+        </>
+      ) : (
+        <>
+          <EuiSpacer size="m" />
+          <ModelVersionInformation />
+          <EuiSpacer size="m" />
+          <ModelVersionTags />
+        </>
+      ),
+    },
+    {
+      id: 'artifact-configuration',
+      name: 'Artifact and configuration',
+      content: loading ? (
+        <>
+          <EuiSpacer size="m" />
+          <EuiPanel style={{ minHeight: 200 }}>
+            <EuiLoadingContent data-test-subj="ml-versionDetailsLoading" lines={2} />
+          </EuiPanel>
+        </>
+      ) : (
+        <>
+          <EuiSpacer size="m" />
+          <ModelVersionArtifact />
+        </>
+      ),
+    },
+  ];
+
   return (
     <>
-      <EuiPageHeader
-        pageTitle={
-          <EuiFlexGroup gutterSize="m" responsive={false} alignItems="center">
-            <EuiFlexItem grow={false}>{modelInfo.name}</EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <VersionToggler
-                modelName={modelInfo.name}
-                currentVersion={modelInfo.version}
-                onVersionChange={onVersionChange}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        }
-        rightSideGroupProps={{
-          gutterSize: 'm',
-        }}
-        rightSideItems={[
-          <EuiButton fill>Register version</EuiButton>,
-          <EuiButton>Edit</EuiButton>,
-          <EuiButton>Deploy</EuiButton>,
-          <EuiButton color="danger">Delete</EuiButton>,
-        ]}
-      />
+      {!modelInfo ? (
+        <>
+          <EuiLoadingSpinner data-test-subj="modelVersionLoadingSpinner" />
+          <EuiSpacer size="m" />
+        </>
+      ) : (
+        <EuiPageHeader
+          pageTitle={
+            <EuiFlexGroup gutterSize="m" responsive={false} alignItems="center">
+              <EuiFlexItem grow={false}>{modelInfo.name}</EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <VersionToggler
+                  modelName={modelInfo.name}
+                  currentVersion={modelInfo.version}
+                  onVersionChange={onVersionChange}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          }
+          rightSideGroupProps={{
+            gutterSize: 'm',
+          }}
+          rightSideItems={[
+            <EuiButton fill>Register version</EuiButton>,
+            <EuiButton>Deploy</EuiButton>,
+            <EuiButton color="danger">Delete</EuiButton>,
+          ]}
+        />
+      )}
+      <ModelVersionCallout modelVersionId="" modelState={MODEL_STATE.loading} />
+      <ModelVersionCallout modelVersionId="" modelState={MODEL_STATE.loadFailed} />
+      <EuiSpacer size="m" />
+      {loading ? (
+        <EuiPanel style={{ minHeight: 200 }}>
+          <EuiLoadingContent data-test-subj="ml-versionDetailsLoading" lines={2} />
+        </EuiPanel>
+      ) : (
+        <ModelVersionDetails
+          description={model?.description}
+          modelId={model?.id}
+          createdTime={model?.created_time}
+          lastUpdatedTime={model?.last_updated_time}
+        />
+      )}
+      <EuiSpacer size="m" />
+      <EuiTabbedContent tabs={tabs} />
     </>
   );
 };
