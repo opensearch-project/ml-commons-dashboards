@@ -14,7 +14,7 @@ import {
 } from '@elastic/eui';
 
 import { Link, generatePath } from 'react-router-dom';
-import { MODEL_STATE, routerPaths } from '../../../../common';
+import { DATE_FORMAT, MODEL_STATE, routerPaths } from '../../../../common';
 import { APIProvider } from '../../../apis/api_provider';
 import { renderTime } from '../../../utils';
 
@@ -163,7 +163,7 @@ export const ModelVersionStatusDetail = ({
           </EuiText>
           <EuiSpacer size="s" />
           <EuiText>
-            <b>{timeTitle}:</b> {renderTime(restProps[timeField], 'MMM d, yyyy @ HH:mm:ss.SSS')}
+            <b>{timeTitle}:</b> {renderTime(restProps[timeField], DATE_FORMAT)}
           </EuiText>
           {(state === MODEL_STATE.loadFailed || state === MODEL_STATE.registerFailed) && (
             <>

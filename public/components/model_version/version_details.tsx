@@ -15,6 +15,7 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 import { renderTime } from '../../utils';
+import { DATE_FORMAT } from '../../../common/constant';
 
 interface Props {
   description?: string;
@@ -56,16 +57,14 @@ export const ModelVersionDetails = ({
           <EuiTitle size="xs">
             <h4>Created</h4>
           </EuiTitle>
-          <EuiText size="s">
-            {createdTime ? renderTime(createdTime, 'MMM d, yyyy @ HH:mm:ss.SSS') : '-'}
-          </EuiText>
+          <EuiText size="s">{createdTime ? renderTime(createdTime, DATE_FORMAT) : '-'}</EuiText>
         </EuiFlexItem>
         <EuiFlexItem style={{ maxWidth: 250 }}>
           <EuiTitle size="xs">
             <h4>Last updated</h4>
           </EuiTitle>
           <EuiText size="s">
-            {lastUpdatedTime ? renderTime(lastUpdatedTime, 'MMM d, yyyy @ HH:mm:ss.SSS') : '-'}
+            {lastUpdatedTime ? renderTime(lastUpdatedTime, DATE_FORMAT) : '-'}
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem style={{ maxWidth: 250 }}>
