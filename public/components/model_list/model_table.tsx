@@ -47,7 +47,7 @@ export interface ModelTableProps {
   loading: boolean;
   error: boolean;
   onResetClick: () => void;
-  onModelDeleteClick: (name: string, argsdeployedVersions: string[]) => void;
+  onModelDeleteClick: (name: string, deployedVersions: string[]) => void;
 }
 
 export function ModelTable(props: ModelTableProps) {
