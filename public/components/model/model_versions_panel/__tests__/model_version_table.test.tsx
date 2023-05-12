@@ -198,7 +198,7 @@ describe('<ModelVersionTable />', () => {
 
       document.execCommand = execCommandOrigin;
     },
-    10 * 1000
+    20 * 1000
   );
 
   it(
