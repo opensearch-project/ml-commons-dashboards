@@ -16,10 +16,12 @@ const DESCRIPTION_MAX_LENGTH = 200;
 
 interface ModelDescriptionFieldProps<TFieldValues extends ModeDescriptionFormData> {
   control: Control<TFieldValues>;
+  readOnly?: boolean;
 }
 
 export const ModelDescriptionField = <TFieldValues extends ModeDescriptionFormData>({
   control,
+  readOnly,
 }: ModelDescriptionFieldProps<TFieldValues>) => {
   const descriptionFieldController = useController({
     name: 'description' as FieldPathByValue<TFieldValues, string>,
@@ -37,16 +39,19 @@ export const ModelDescriptionField = <TFieldValues extends ModeDescriptionFormDa
       }
       isInvalid={Boolean(descriptionFieldController.fieldState.error)}
       error={descriptionFieldController.fieldState.error?.message}
-      helpText={`${Math.max(
-        DESCRIPTION_MAX_LENGTH - descriptionField.value.length,
-        0
-      )} characters ${descriptionField.value.length ? 'left' : 'allowed'}.`}
+      helpText={
+        !readOnly &&
+        `${Math.max(DESCRIPTION_MAX_LENGTH - descriptionField.value.length, 0)} characters ${
+          descriptionField.value.length ? 'left' : 'allowed'
+        }.`
+      }
     >
       <EuiTextArea
         inputRef={descriptionInputRef}
         isInvalid={Boolean(descriptionFieldController.fieldState.error)}
         maxLength={DESCRIPTION_MAX_LENGTH}
         {...descriptionField}
+        readOnly={readOnly}
       />
     </EuiFormRow>
   );

@@ -11,14 +11,14 @@ import { render, screen } from '../../../../../test/test_utils';
 
 import { ModelDescriptionField } from '../model_description_field';
 
-const setup = (description: string = '') => {
+const setup = (description: string = '', readOnly = false) => {
   const DescriptionForm = () => {
     const { control } = useForm({
       defaultValues: {
         description,
       },
     });
-    return <ModelDescriptionField control={control} />;
+    return <ModelDescriptionField control={control} readOnly={readOnly} />;
   };
 
   render(<DescriptionForm />);
@@ -47,5 +47,12 @@ describe('<ModelDescriptionField />', () => {
     expect(input.value).toHaveLength(200);
 
     expect(getHelpTextNode()).toHaveTextContent('0 characters left');
+  });
+
+  it('should set textarea to readOnly and hide help text', async () => {
+    const { input, getHelpTextNode } = setup('foo', true);
+
+    expect(input).toHaveAttribute('readonly');
+    expect(getHelpTextNode()).not.toBeInTheDocument();
   });
 });
