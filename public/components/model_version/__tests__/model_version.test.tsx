@@ -61,7 +61,7 @@ describe('<ModelVersion />', () => {
     await waitFor(() => {
       expect(screen.getByText('v1.0.1')).toBeInTheDocument();
     });
-    expect(location.pathname).toBe('/model-registry/model-version/2');
+    expect(location.pathname).toBe('/model-registry/model-version/4');
 
     mockReset();
   });

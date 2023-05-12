@@ -62,11 +62,40 @@ const models = [
     model_state: 'DEPLOYED',
     total_chunks: 34,
   },
+  {
+    id: '4',
+    name: 'model1',
+    model_version: '1.0.1',
+    description: 'model1 version 1.0.1 description',
+    created_time: 1683699469964,
+    last_registered_time: 1683699599632,
+    last_updated_time: 1683699599637,
+    model_config: {
+      all_config: '',
+      embedding_dimension: 768,
+      framework_type: 'SENTENCE_TRANSFORMERS',
+      model_type: 'roberta',
+    },
+    model_format: 'TORCH_SCRIPT',
+    model_state: 'DEPLOYED',
+    total_chunks: 34,
+  },
 ];
 
 export const modelHandlers = [
   rest.get(MODEL_API_ENDPOINT, (req, res, ctx) => {
-    const data = models.filter((model) => !req.params.name || model.name === req.params.name);
+    const { searchParams } = req.url;
+    const name = searchParams.get('name');
+    const ids = searchParams.getAll('ids');
+    const data = models.filter((model) => {
+      if (name) {
+        return model.name === name;
+      }
+      if (ids) {
+        return ids.includes(model.id);
+      }
+      return true;
+    });
     return res(
       ctx.status(200),
       ctx.json({
