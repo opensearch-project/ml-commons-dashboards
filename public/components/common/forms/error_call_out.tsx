@@ -5,24 +5,28 @@
 
 import { EuiCallOut, EuiText } from '@elastic/eui';
 import React, { useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { FORM_ERRORS } from './constants';
+import { FieldErrors } from 'react-hook-form';
 
-import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+interface ErrorCallOutProps {
+  formErrors: FieldErrors;
+  errorMessages: Array<{
+    field: string;
+    type: string;
+    message: string;
+  }>;
+}
 
-export const ErrorCallOut = () => {
-  const form = useFormContext<ModelFileFormData | ModelUrlFormData>();
-
+export const ErrorCallOut = ({ formErrors, errorMessages }: ErrorCallOutProps) => {
   const errors = useMemo(() => {
     const messages: string[] = [];
-    Object.keys(form.formState.errors).forEach((errorField) => {
-      const error = form.formState.errors[errorField as keyof typeof form.formState.errors];
+    Object.keys(formErrors).forEach((errorField) => {
+      const error = formErrors[errorField as keyof typeof formErrors];
       // If form have: criteriaMode: 'all', error.types will be set a value
       // error.types will contain all the errors of each field
       // In this case, we will display all the errors in the callout
       if (error?.types) {
         Object.keys(error.types).forEach((k) => {
-          const errorMessage = FORM_ERRORS.find((e) => e.field === errorField && e.type === k);
+          const errorMessage = errorMessages.find((e) => e.field === errorField && e.type === k);
           if (errorMessage) {
             messages.push(errorMessage.message);
           }
@@ -32,7 +36,7 @@ export const ErrorCallOut = () => {
         // to only produce the first error, even if a field has multiple errors.
         // In this case, error.types won't be set, and error.type and error.field represent the
         // first error
-        const errorMessage = FORM_ERRORS.find(
+        const errorMessage = errorMessages.find(
           (e) => e.field === errorField && e.type === error?.type
         );
         if (errorMessage) {
@@ -41,7 +45,7 @@ export const ErrorCallOut = () => {
       }
     });
     return messages;
-  }, [form]);
+  }, [formErrors, errorMessages]);
 
   if (errors.length === 0) {
     return null;
@@ -55,7 +59,7 @@ export const ErrorCallOut = () => {
       iconType="iInCircle"
     >
       <EuiText size="s">
-        <ul style={{ listStyle: 'none', margin: 0 }}>
+        <ul style={{ listStyle: 'inside', margin: 0, marginLeft: 6 }}>
           {errors.map((e) => (
             <li key={e}>- {e}</li>
           ))}
