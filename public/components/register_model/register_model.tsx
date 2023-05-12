@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { FieldErrors, useForm, FormProvider } from 'react-hook-form';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import {
@@ -24,25 +24,26 @@ import {
 import useObservable from 'react-use/lib/useObservable';
 import { from } from 'rxjs';
 
-import { ModelDetailsPanel } from './model_details';
-import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
-import { ArtifactPanel } from './artifact';
-import { ConfigurationPanel } from './model_configuration';
-import { ModelTagsPanel } from './model_tags';
-import { submitModelWithFile, submitModelWithURL } from './register_model_api';
 import { APIProvider } from '../../apis/api_provider';
 import { upgradeModelVersion } from '../../utils';
 import { useSearchParams } from '../../hooks/use_search_params';
 import { isValidModelRegisterFormType } from './utils';
 import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { mountReactNode } from '../../../../../src/core/public/utils';
-import { modelFileUploadManager } from './model_file_upload_manager';
-import { MAX_CHUNK_SIZE } from './constants';
 import { routerPaths } from '../../../common/router_paths';
+import { ErrorCallOut } from '../../components/common';
+import { modelRepositoryManager } from '../../utils/model_repository_manager';
+
 import { modelTaskManager } from './model_task_manager';
 import { ModelVersionNotesPanel } from './model_version_notes';
-import { modelRepositoryManager } from '../../utils/model_repository_manager';
-import { ErrorCallOut } from './error_call_out';
+import { modelFileUploadManager } from './model_file_upload_manager';
+import { MAX_CHUNK_SIZE, FORM_ERRORS } from './constants';
+import { ModelDetailsPanel } from './model_details';
+import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { ArtifactPanel } from './artifact';
+import { ConfigurationPanel } from './model_configuration';
+import { ModelTagsPanel } from './model_tags';
+import { submitModelWithFile, submitModelWithURL } from './register_model_api';
 
 const DEFAULT_VALUES = {
   name: '',
@@ -110,6 +111,9 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     defaultValues,
     criteriaMode: 'all',
   });
+
+  // formState.errors won't change after formState updated, need to update errors object manually
+  const formErrors = useMemo(() => ({ ...form.formState.errors }), [form.formState]);
 
   const onSubmit = useCallback(
     async (data: ModelFileFormData | ModelUrlFormData) => {
@@ -312,7 +316,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
             <EuiSpacer />
             {isSubmitted && !form.formState.isValid && (
               <>
-                <ErrorCallOut />
+                <ErrorCallOut formErrors={formErrors} errorMessages={FORM_ERRORS} />
                 <EuiSpacer />
               </>
             )}

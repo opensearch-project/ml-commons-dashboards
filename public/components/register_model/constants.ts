@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { ONE_GB } from '../../../common/constant';
+import { MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR } from '../../components/common';
 
 export const MAX_CHUNK_SIZE = 10 * 1000 * 1000;
 export const MAX_MODEL_FILE_SIZE = 4 * ONE_GB;
 
 export enum CUSTOM_FORM_ERROR_TYPES {
-  DUPLICATE_NAME = 'duplicateName',
+  DUPLICATE_NAME = MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR,
   FILE_SIZE_EXCEED_LIMIT = 'fileSizeExceedLimit',
   INVALID_CONFIGURATION = 'invalidConfiguration',
   CONFIGURATION_MISSING_MODEL_TYPE = 'configurationMissingModelType',
@@ -25,7 +26,7 @@ export const FORM_ERRORS = [
   },
   {
     field: 'name',
-    type: CUSTOM_FORM_ERROR_TYPES.DUPLICATE_NAME,
+    type: MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR,
     message: 'Name: Use a unique name.',
   },
   {

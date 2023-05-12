@@ -12,7 +12,7 @@ import {
   EuiTabbedContentTab,
   EuiText,
 } from '@elastic/eui';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
@@ -39,10 +39,11 @@ export const Model = () => {
       {
         name: 'Details',
         id: 'details',
+        // TODO: Add description property here
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelDetailsPanel />
+            <ModelDetailsPanel name={data?.name} id={modelId} />
           </>
         ),
       },
@@ -57,9 +58,13 @@ export const Model = () => {
         ),
       },
     ],
-    [modelId]
+    [modelId, data]
   );
-  const [selectedTab, setSelectedTab] = useState<EuiTabbedContentTab>(tabs[0]);
+  const [selectedTabId, setSelectedTabId] = useState(tabs[0].id);
+
+  const handleTabClick = useCallback((tab: EuiTabbedContentTab) => {
+    setSelectedTabId(tab.id);
+  }, []);
 
   if (loading) {
     // TODO: need to update per design
@@ -93,7 +98,11 @@ export const Model = () => {
         // TODO: Add description property here
       />
       <EuiSpacer size="l" />
-      <EuiTabbedContent tabs={tabs} onTabClick={setSelectedTab} selectedTab={selectedTab} />
+      <EuiTabbedContent
+        tabs={tabs}
+        onTabClick={handleTabClick}
+        selectedTab={tabs.find((tab) => tab.id === selectedTabId)}
+      />
     </>
   );
 };
