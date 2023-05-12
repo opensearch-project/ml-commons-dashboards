@@ -37,4 +37,19 @@ describe('<ModelOverviewCard />', () => {
       within(screen.getByText('model-1-id')).getByTestId('copy-id-button')
     ).toBeInTheDocument();
   });
+
+  it('should display "-" for empty description', () => {
+    render(
+      <ModelOverviewCard
+        id="model-1-id"
+        isModelOwner
+        owner="Foo"
+        createdTime={1682324310318}
+        updatedTime={1682342310318}
+      />
+    );
+    expect(
+      within(screen.getByText('Description').closest('dl')!).getByText('-')
+    ).toBeInTheDocument();
+  });
 });

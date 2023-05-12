@@ -33,7 +33,7 @@ export const ModelOverviewCard = ({
         listItems={[
           {
             title: 'Description',
-            description: description || '',
+            description: description || '-',
           },
         ]}
       />
