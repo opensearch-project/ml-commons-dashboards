@@ -61,7 +61,7 @@ export const ErrorCallOut = ({ formErrors, errorMessages }: ErrorCallOutProps) =
       <EuiText size="s">
         <ul style={{ listStyle: 'inside', margin: 0, marginLeft: 6 }}>
           {errors.map((e) => (
-            <li key={e}>- {e}</li>
+            <li key={e}>{e}</li>
           ))}
         </ul>
       </EuiText>
