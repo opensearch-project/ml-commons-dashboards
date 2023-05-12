@@ -37,13 +37,16 @@ describe('<ModelVersion />', () => {
     setup();
 
     expect(screen.getByTestId('modelVersionLoadingSpinner')).toBeInTheDocument();
+    expect(screen.queryAllByTestId('ml-versionDetailsLoading')).toBeTruthy();
+
     await waitFor(() => {
       expect(screen.queryByTestId('modelVersionLoadingSpinner')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('ml-versionDetailsLoading')).not.toBeInTheDocument();
     });
   });
 
   it('should display v1.0.1 and update location.pathname after version selected', async () => {
-    const mockRest = mockOffsetMethods();
+    const mockReset = mockOffsetMethods();
     const user = userEvent.setup();
 
     setup();
@@ -60,6 +63,6 @@ describe('<ModelVersion />', () => {
     });
     expect(location.pathname).toBe('/model-registry/model-version/2');
 
-    mockRest();
+    mockReset();
   });
 });
