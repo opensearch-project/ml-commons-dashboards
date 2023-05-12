@@ -20,6 +20,8 @@ interface ModelNameFormData {
 interface ModelNameFieldProps<TFieldValues extends ModelNameFormData> {
   control: Control<TFieldValues>;
   trigger: UseFormTrigger<TFieldValues>;
+  readOnly?: boolean;
+  originalModelName?: string;
 }
 
 const isDuplicateModelName = async (name: string) => {
@@ -34,6 +36,8 @@ const isDuplicateModelName = async (name: string) => {
 export const ModelNameField = <TFieldValues extends ModelNameFormData>({
   control,
   trigger,
+  readOnly,
+  originalModelName,
 }: ModelNameFieldProps<TFieldValues>) => {
   const modelNameFocusedRef = useRef(false);
   const nameFieldController = useController({
@@ -43,9 +47,18 @@ export const ModelNameField = <TFieldValues extends ModelNameFormData>({
       required: { value: true, message: 'Name can not be empty' },
       validate: {
         [MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR]: async (name) => {
-          return !modelNameFocusedRef.current && !!name && (await isDuplicateModelName(name))
-            ? 'This name is already in use. Use a unique name for the model.'
-            : undefined;
+          if (
+            modelNameFocusedRef.current ||
+            !name ||
+            (originalModelName !== undefined && originalModelName === name)
+          ) {
+            return undefined;
+          }
+          const result = await isDuplicateModelName(name);
+          if (result) {
+            return 'This name is already in use. Use a unique name for the model.';
+          }
+          return undefined;
         },
       },
     },
@@ -60,7 +73,7 @@ export const ModelNameField = <TFieldValues extends ModelNameFormData>({
   const handleModelNameBlur = useCallback(() => {
     nameField.onBlur();
     modelNameFocusedRef.current = false;
-    trigger('name' as FieldPathByValue<TFieldValues, string>);
+    trigger('name' as FieldPathByValue<TFieldValues, string>, {});
   }, [nameField, trigger]);
 
   return (
@@ -69,12 +82,14 @@ export const ModelNameField = <TFieldValues extends ModelNameFormData>({
       isInvalid={Boolean(nameFieldController.fieldState.error)}
       error={nameFieldController.fieldState.error?.message}
       helpText={
-        <EuiText color="subdued" size="xs">
-          {Math.max(NAME_MAX_LENGTH - nameField.value.length, 0)} characters{' '}
-          {nameField.value.length ? 'left' : 'allowed'}.
-          <br />
-          Use a unique for the model.
-        </EuiText>
+        !readOnly && (
+          <EuiText color="subdued" size="xs">
+            {Math.max(NAME_MAX_LENGTH - nameField.value.length, 0)} characters{' '}
+            {nameField.value.length ? 'left' : 'allowed'}.
+            <br />
+            Use a unique name for the model.
+          </EuiText>
+        )
       }
     >
       <EuiFieldText
@@ -84,6 +99,7 @@ export const ModelNameField = <TFieldValues extends ModelNameFormData>({
         {...nameField}
         onFocus={handleModelNameFocus}
         onBlur={handleModelNameBlur}
+        readOnly={readOnly}
       />
     </EuiFormRow>
   );
