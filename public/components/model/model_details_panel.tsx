@@ -6,34 +6,45 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import {
   EuiButton,
-  EuiCallOut,
   EuiDescribedFormGroup,
-  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiForm,
-  EuiFormRow,
   EuiHorizontalRule,
   EuiLink,
   EuiPanel,
   EuiSpacer,
   EuiText,
-  EuiTextArea,
   EuiTitle,
   htmlIdGenerator,
 } from '@elastic/eui';
-import { useController, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { generatePath, useHistory } from 'react-router-dom';
 
 import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { mountReactNode } from '../../../../../src/core/public/utils';
 import { routerPaths } from '../../../common';
+import {
+  ErrorCallOut,
+  MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR,
+  ModelDescriptionField,
+  ModelNameField,
+} from '../common';
 
 import { BottomFormActionBar } from './bottom_form_action_bar';
 
-const NAME_MAX_LENGTH = 80;
-
-const DESCRIPTION_MAX_LENGTH = 200;
+const formErrorMessages = [
+  {
+    field: 'name',
+    type: 'required',
+    message: 'Name: Enter a name.',
+  },
+  {
+    field: 'name',
+    type: MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR,
+    message: 'Name: Use a unique name.',
+  },
+];
 
 interface ModelDetailsProps {
   id: string;
@@ -50,7 +61,7 @@ export const ModelDetailsPanel = ({
 }: ModelDetailsProps) => {
   const formIdRef = useRef(htmlIdGenerator()());
   const history = useHistory();
-  const { control, resetField, formState, handleSubmit } = useForm({
+  const { control, resetField, formState, handleSubmit, trigger } = useForm({
     mode: 'onChange',
     defaultValues: {
       name: '',
@@ -62,28 +73,8 @@ export const ModelDetailsPanel = ({
     services: { notifications },
   } = useOpenSearchDashboards();
 
-  const nameController = useController({
-    control,
-    name: 'name',
-    rules: {
-      required: { value: true, message: 'Name can not be empty' },
-    },
-  });
-  const { ref: nameInputRef, ...restNameFieldProps } = nameController.field;
-
-  const descriptionController = useController({
-    control,
-    name: 'description',
-  });
-  const { ref: descriptionInputRef, ...restDescriptionFieldProps } = descriptionController.field;
-
-  const formErrorCalloutTexts = useMemo(() => {
-    const errors = [];
-    if (formState.errors.name && formState.errors.name.type === 'required') {
-      errors.push('Name: can not be empty');
-    }
-    return errors;
-  }, [formState]);
+  // formState.errors won't change after formState updated, need to update errors object manually
+  const formErrors = useMemo(() => ({ ...formState.errors }), [formState]);
 
   const handleFormSubmit = useMemo(
     () =>
@@ -99,7 +90,7 @@ export const ModelDetailsPanel = ({
               <EuiLink
                 onClick={() => {
                   history.push(
-                    generatePath(routerPaths.modelGroup, {
+                    generatePath(routerPaths.model, {
                       id,
                     })
                   );
@@ -154,51 +145,20 @@ export const ModelDetailsPanel = ({
       <EuiSpacer size="m" />
       <EuiHorizontalRule margin="none" />
       <EuiSpacer size="m" />
-      {formState.isSubmitted && formErrorCalloutTexts.length > 0 && (
+      {formState.isSubmitted && (
         <>
-          <EuiCallOut
-            iconType="alert"
-            color="danger"
-            title="Address the following error(s) in the form"
-          >
-            <EuiText size="s">
-              <ul style={{ listStyle: 'inside', marginLeft: 6 }}>
-                {formErrorCalloutTexts.map((text) => (
-                  <li key={text}>{text}</li>
-                ))}
-              </ul>
-            </EuiText>
-          </EuiCallOut>
+          <ErrorCallOut formErrors={formErrors} errorMessages={formErrorMessages} />
           <EuiSpacer size="l" />
         </>
       )}
       <EuiForm component="form" id={formIdRef.current} onSubmit={handleFormSubmit}>
         <EuiDescribedFormGroup title={<h4>Name</h4>}>
-          <EuiFormRow
-            helpText={
-              isEditMode && (
-                <>
-                  {`${Math.max(
-                    NAME_MAX_LENGTH - (restNameFieldProps.value?.length ?? 0),
-                    0
-                  )} characters ${restNameFieldProps.value?.length ? 'left' : 'allowed'}.`}
-                  <br />
-                  Use a unique name for the model.
-                </>
-              )
-            }
-            isInvalid={Boolean(nameController.fieldState.error)}
-            error={nameController.fieldState.error?.message}
-            label="Name"
-          >
-            <EuiFieldText
-              inputRef={nameInputRef}
-              aria-label="Name"
-              readOnly={!isEditMode}
-              maxLength={NAME_MAX_LENGTH}
-              {...restNameFieldProps}
-            />
-          </EuiFormRow>
+          <ModelNameField
+            control={control}
+            trigger={trigger}
+            readOnly={!isEditMode}
+            originalModelName={name}
+          />
         </EuiDescribedFormGroup>
         <EuiDescribedFormGroup
           title={
@@ -208,25 +168,7 @@ export const ModelDetailsPanel = ({
           }
           description="Describe the model."
         >
-          <EuiFormRow
-            helpText={
-              isEditMode &&
-              `${Math.max(
-                DESCRIPTION_MAX_LENGTH - (restDescriptionFieldProps.value?.length ?? 0),
-                0
-              )} characters ${restDescriptionFieldProps.value?.length ? 'left' : 'allowed'}.`
-            }
-            isInvalid={Boolean(descriptionController.fieldState.error)}
-            error={descriptionController.fieldState.error?.message}
-            label="Description"
-          >
-            <EuiTextArea
-              aria-label="Description"
-              readOnly={!isEditMode}
-              maxLength={DESCRIPTION_MAX_LENGTH}
-              {...restDescriptionFieldProps}
-            />
-          </EuiFormRow>
+          <ModelDescriptionField control={control} readOnly={!isEditMode} />
         </EuiDescribedFormGroup>
         {(formState.dirtyFields.name || formState.dirtyFields.description) && (
           <BottomFormActionBar

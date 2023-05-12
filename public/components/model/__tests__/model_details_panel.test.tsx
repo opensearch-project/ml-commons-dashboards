@@ -109,7 +109,7 @@ describe('<ModelDetailsPanel />', () => {
     await userEvent.click(screen.getByText('Save'));
 
     expect(screen.getByText('Address the following error(s) in the form')).toBeInTheDocument();
-    expect(screen.getByText('Name: can not be empty')).toBeInTheDocument();
+    expect(screen.getByText('Name: Enter a name.')).toBeInTheDocument();
   });
 
   it('should call addSuccessToast after form submit successfully', async () => {
