@@ -39,7 +39,7 @@ describe('<VersionToggler />', () => {
     await user.click(screen.getByText('1.0.1'));
     expect(onVersionChange).toHaveBeenCalledWith({
       newVersion: '1.0.1',
-      newId: '2',
+      newId: '4',
     });
   });
 });

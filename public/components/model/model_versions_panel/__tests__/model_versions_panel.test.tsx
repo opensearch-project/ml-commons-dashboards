@@ -30,7 +30,7 @@ describe('<ModelVersionsPanel />', () => {
       await waitFor(() => {
         expect(
           screen.getByText((text, node) => {
-            return text === 'Versions' && !!node?.childNodes[1]?.textContent?.includes('(3)');
+            return text === 'Versions' && !!node?.childNodes[1]?.textContent?.includes('(1)');
           })
         ).toBeInTheDocument();
       });

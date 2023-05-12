@@ -66,4 +66,19 @@ describe('<Model />', () => {
     },
     10 * 1000
   );
+
+  it(
+    'should display model name in details tab',
+    async () => {
+      setup();
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('model-group-loading-indicator')).toBeNull();
+      });
+      await userEvent.click(screen.getByRole('tab', { name: 'Details' }));
+
+      expect(within(screen.getByRole('tabpanel')).getByDisplayValue('model1')).toBeInTheDocument();
+    },
+    10 * 1000
+  );
 });
