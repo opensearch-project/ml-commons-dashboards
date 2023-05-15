@@ -17,6 +17,7 @@ import {
 } from '@elastic/eui';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 
+import { FormProvider, useForm } from 'react-hook-form';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 import { routerPaths } from '../../../common/router_paths';
@@ -27,6 +28,7 @@ import { ModelVersionDetails } from './version_details';
 import { ModelVersionInformation } from './version_information';
 import { ModelVersionArtifact } from './version_artifact';
 import { ModelVersionTags } from './version_tags';
+import { ModelFileFormData, ModelUrlFormData } from './types';
 
 export const ModelVersion = () => {
   const { id: modelId } = useParams<{ id: string }>();
@@ -35,6 +37,7 @@ export const ModelVersion = () => {
   const history = useHistory();
   const modelName = model?.name;
   const modelVersion = model?.model_version;
+  const form = useForm<ModelFileFormData | ModelUrlFormData>();
 
   const onVersionChange = useCallback(
     ({ newVersion, newId }: { newVersion: string; newId: string }) => {
@@ -60,6 +63,18 @@ export const ModelVersion = () => {
       };
     });
   }, [modelName, modelVersion]);
+
+  useEffect(() => {
+    if (model) {
+      form.reset({
+        versionNotes: 'TODO', // TODO: read from model.versionNotes
+        tags: [], // TODO: read from model.tags
+        configuration: JSON.stringify(model.model_config),
+        modelFileFormat: model.model_format,
+        // TODO: read model url or model filename
+      });
+    }
+  }, [model, form]);
 
   const tabs = [
     {
@@ -101,7 +116,7 @@ export const ModelVersion = () => {
   ];
 
   return (
-    <>
+    <FormProvider {...form}>
       {!modelInfo ? (
         <>
           <EuiLoadingSpinner data-test-subj="modelVersionLoadingSpinner" />
@@ -148,6 +163,6 @@ export const ModelVersion = () => {
       )}
       <EuiSpacer size="m" />
       <EuiTabbedContent tabs={tabs} />
-    </>
+    </FormProvider>
   );
 };

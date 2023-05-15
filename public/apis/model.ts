@@ -39,6 +39,7 @@ export interface ModelDetail extends ModelSearchItem {
   content: string;
   last_updated_time: number;
   created_time: number;
+  model_format: string;
 }
 
 export interface ModelSearchResponse {

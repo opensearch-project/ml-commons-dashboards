@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export interface Tag {
-  key: string;
-  value: string;
-  type: 'number' | 'string';
-}
+import type { Tag } from '../model/types';
 
 interface ModelFormBase {
   name: string;
