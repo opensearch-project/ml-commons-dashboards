@@ -59,7 +59,7 @@ describe('<ModelList />', () => {
     setup();
 
     await waitFor(() => {
-      // expect(within(screen.getByTestId('modelTotalCount')).getByText('(1)')).toBeInTheDocument();
+      expect(within(screen.getByTestId('modelTotalCount')).getByText('(1)')).toBeInTheDocument();
       expect(
         screen.getByText('traced_small_model').closest('.euiTableRowCell')
       ).toBeInTheDocument();
