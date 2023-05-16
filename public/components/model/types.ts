@@ -4,6 +4,7 @@
  */
 
 import { MODEL_STATE } from '../../../common';
+import { TagKey } from '../common';
 
 export interface VersionTableDataItem {
   id: string;
@@ -19,4 +20,8 @@ export interface Tag {
   key: string;
   value: string;
   type: 'number' | 'string';
+}
+
+export interface TagKeyFormData {
+  tagKeys: TagKey[];
 }
