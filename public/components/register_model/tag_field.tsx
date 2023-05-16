@@ -12,12 +12,13 @@ import {
   EuiContext,
   EuiButtonIcon,
   EuiFieldNumber,
-  EuiText,
-  EuiToken,
   EuiToolTip,
 } from '@elastic/eui';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useController, useWatch, useFormContext } from 'react-hook-form';
+
+import { tagKeyOptionRenderer } from '../common';
+
 import { FORM_ITEM_WIDTH } from './form_constants';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { TagTypePopover } from './tag_type_popover';
@@ -215,24 +216,6 @@ export const ModelTagField = ({
     [trigger]
   );
 
-  const renderOption = useCallback(
-    (option: EuiComboBoxOptionOption<TagGroup>, searchValue: string, contentClassName: string) => {
-      return (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <EuiToken
-            style={{ marginRight: 2 }}
-            iconType={option.value?.type === 'number' ? 'tokenNumber' : 'tokenString'}
-          />
-          <span className={contentClassName}>{option.label}</span>
-          <EuiText style={{ marginLeft: 'auto' }} color="subdued" size="s">
-            {option.value?.type}
-          </EuiText>
-        </div>
-      );
-    },
-    []
-  );
-
   const onRemove = useCallback(
     (idx: number) => {
       if (tags?.length && tags.length > 1) {
@@ -260,7 +243,7 @@ export const ModelTagField = ({
               isInvalid={Boolean(tagKeyController.fieldState.error)}
               singleSelection={{ asPlainText: true }}
               options={keyOptions}
-              renderOption={renderOption}
+              renderOption={tagKeyOptionRenderer}
               selectedOptions={
                 tagKeyController.field.value ? [{ label: tagKeyController.field.value }] : []
               }
