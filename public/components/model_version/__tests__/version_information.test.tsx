@@ -26,13 +26,13 @@ describe('<ModelVersionInformation />', () => {
   it('should display version notes as readonly by default', () => {
     render(<TestApp />);
     expect(screen.getByLabelText('edit version notes')).toBeEnabled();
-    expect(screen.getByDisplayValue('test_version_notes')).toBeDisabled();
+    expect(screen.getByDisplayValue('test_version_notes')).toHaveAttribute('readonly');
   });
 
   it('should allow to edit version notes after clicking edit button', async () => {
     const user = userEvent.setup();
     render(<TestApp />);
-    expect(screen.getByDisplayValue('test_version_notes')).toBeDisabled();
+    expect(screen.getByDisplayValue('test_version_notes')).toHaveAttribute('readonly');
 
     await user.click(screen.getByLabelText('edit version notes'));
     expect(screen.getByDisplayValue('test_version_notes')).toBeEnabled();
@@ -53,6 +53,6 @@ describe('<ModelVersionInformation />', () => {
 
     await user.click(screen.getByLabelText('cancel edit version notes'));
     // reset to default value after clicking cancel button
-    expect(screen.getByDisplayValue('test_version_notes')).toBeDisabled();
+    expect(screen.getByDisplayValue('test_version_notes')).toHaveAttribute('readonly');
   });
 });

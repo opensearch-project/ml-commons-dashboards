@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen } from '../../../../../test/test_utils';
@@ -16,7 +16,9 @@ const TestApp = ({ readOnly = false }: { readOnly?: boolean }) => {
   });
 
   return (
-    <ModelVersionNotesField control={form.control} label="Version notes" readOnly={readOnly} />
+    <FormProvider {...form}>
+      <ModelVersionNotesField label="Version notes" readOnly={readOnly} />
+    </FormProvider>
   );
 };
 
@@ -25,11 +27,12 @@ describe('<ModelVersionNotesField />', () => {
     render(<TestApp />);
     expect(screen.queryByRole('textbox')).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeEnabled();
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('readonly');
   });
 
   it('should render a readonly version notes input', () => {
     render(<TestApp readOnly />);
-    expect(screen.getByRole('textbox')).toBeDisabled();
+    expect(screen.getByRole('textbox')).toHaveAttribute('readonly');
   });
 
   it('should only allow maximum 200 characters', async () => {

@@ -8,7 +8,7 @@ import { generatePath, Route } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 
 import { ModelVersion } from '../model_version';
-import { render, screen, waitFor, mockOffsetMethods } from '../../../../test/test_utils';
+import { render, screen, waitFor, within, mockOffsetMethods } from '../../../../test/test_utils';
 import { routerPaths } from '../../../../common/router_paths';
 
 const setup = () =>
@@ -64,5 +64,54 @@ describe('<ModelVersion />', () => {
     expect(location.pathname).toBe('/model-registry/model-version/4');
 
     mockReset();
+  });
+
+  it('should NOT allow to edit tags if version notes is edited', async () => {
+    setup();
+
+    const user = userEvent.setup();
+
+    // wait for data loading finished
+    await waitFor(() => {
+      expect(screen.queryByTestId('modelVersionLoadingSpinner')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('ml-versionDetailsLoading')).not.toBeInTheDocument();
+    });
+
+    const editVersionNotesButton = within(
+      screen.getByTestId('ml-versionInformationPanel')
+    ).getByLabelText('edit version notes');
+
+    await user.click(editVersionNotesButton);
+    // version notes changed
+    await user.type(screen.getByLabelText('Version notes'), 'test notes');
+
+    // edit tags button should be disable as user can NOT edit notes and tags at the same time
+    expect(
+      within(screen.getByTestId('ml-versionTagPanel')).getByLabelText('edit tags')
+    ).toBeDisabled();
+  });
+
+  it('should NOT allow to edit version notes if tags is edited', async () => {
+    setup();
+
+    const user = userEvent.setup();
+
+    // wait for data loading finished
+    await waitFor(() => {
+      expect(screen.queryByTestId('modelVersionLoadingSpinner')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('ml-versionDetailsLoading')).not.toBeInTheDocument();
+    });
+
+    const editTagsButton = within(screen.getByTestId('ml-versionTagPanel')).getByLabelText(
+      'edit tags'
+    );
+    // enable editing
+    await user.click(editTagsButton);
+    // add a new tag
+    await user.click(screen.getByRole('button', { name: /add tag/i }));
+    // version information edit button should be disabled
+    expect(
+      within(screen.getByTestId('ml-versionInformationPanel')).getByLabelText('edit version notes')
+    ).toBeDisabled();
   });
 });
