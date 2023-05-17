@@ -26,7 +26,7 @@ export const state2DetailContentMap: {
     title: string;
     description: (versionLink: React.ReactNode) => React.ReactNode;
     timeTitle: string;
-    timeField: 'createdTime';
+    timeField: 'createdTime' | 'lastRegisteredTime' | 'lastDeployedTime' | 'lastUndeployedTime';
   };
 } = {
   [MODEL_STATE.uploading]: {
@@ -51,25 +51,25 @@ export const state2DetailContentMap: {
       <>The model artifact for {versionLink} uploaded.</>
     ),
     timeTitle: 'Uploaded on',
-    timeField: 'createdTime',
+    timeField: 'lastRegisteredTime',
   },
   [MODEL_STATE.loaded]: {
     title: 'Success',
     description: (versionLink: React.ReactNode) => <>{versionLink} deployed.</>,
     timeTitle: 'Deployed on',
-    timeField: 'createdTime',
+    timeField: 'lastDeployedTime',
   },
   [MODEL_STATE.unloaded]: {
     title: 'Success',
     description: (versionLink: React.ReactNode) => <>{versionLink} undeployed.</>,
     timeTitle: 'Undeployed on',
-    timeField: 'createdTime',
+    timeField: 'lastUndeployedTime',
   },
   [MODEL_STATE.loadFailed]: {
     title: 'Error',
     description: (versionLink: React.ReactNode) => <>{versionLink} deployment failed.</>,
     timeTitle: 'Deployment failed on',
-    timeField: 'createdTime',
+    timeField: 'lastDeployedTime',
   },
   [MODEL_STATE.registerFailed]: {
     title: 'Error',
@@ -99,6 +99,9 @@ export const ModelVersionStatusDetail = ({
   name: string;
   version: string;
   createdTime: number;
+  lastRegisteredTime?: number;
+  lastDeployedTime?: number;
+  lastUndeployedTime?: number;
 }) => {
   const [isErrorDetailsModalShowed, setIsErrorDetailsModalShowed] = useState(false);
   const [isLoadingErrorDetails, setIsLoadingErrorDetails] = useState(false);
@@ -143,6 +146,7 @@ export const ModelVersionStatusDetail = ({
     return <>-</>;
   }
   const { title, description, timeTitle, timeField } = statusContent;
+  const timeValue = restProps[timeField];
 
   return (
     <>
@@ -163,7 +167,7 @@ export const ModelVersionStatusDetail = ({
           </EuiText>
           <EuiSpacer size="s" />
           <EuiText>
-            <b>{timeTitle}:</b> {renderTime(restProps[timeField], DATE_FORMAT)}
+            <b>{timeTitle}:</b> {timeValue ? renderTime(timeValue, DATE_FORMAT) : '-'}
           </EuiText>
           {(state === MODEL_STATE.loadFailed || state === MODEL_STATE.registerFailed) && (
             <>

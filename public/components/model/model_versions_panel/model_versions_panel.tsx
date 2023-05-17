@@ -121,6 +121,9 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
       // TODO: Change to use tags in model version once structure finalized
       tags: {},
       createdTime: item.created_time,
+      lastRegisteredTime: item.last_registered_time,
+      lastDeployedTime: item.last_deployed_time,
+      lastUndeployedTime: item.last_undeployed_time,
     }));
   }, [versionsData]);
 

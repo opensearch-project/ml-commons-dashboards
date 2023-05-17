@@ -33,6 +33,9 @@ export interface ModelSearchItem {
   };
   last_updated_time: number;
   created_time: number;
+  last_registered_time?: number;
+  last_deployed_time?: number;
+  last_undeployed_time?: number;
 }
 
 export interface ModelDetail extends ModelSearchItem {

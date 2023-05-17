@@ -29,6 +29,9 @@ export const ModelVersionCell = ({ data, columnId, isDetails }: ModelVersionCell
         version={data.version}
         state={data.state}
         createdTime={data.createdTime}
+        lastRegisteredTime={data.lastRegisteredTime}
+        lastDeployedTime={data.lastDeployedTime}
+        lastUndeployedTime={data.lastUndeployedTime}
       />
     );
   }
