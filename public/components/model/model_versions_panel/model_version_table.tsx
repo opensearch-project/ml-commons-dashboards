@@ -70,7 +70,7 @@ export const ModelVersionTable = ({
         isSortable: false,
       },
       {
-        id: 'lastUpdated',
+        id: 'lastUpdatedTime',
         displayAsText: 'Last updated',
       },
       {

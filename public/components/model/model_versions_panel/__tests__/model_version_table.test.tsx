@@ -18,7 +18,7 @@ const versions = [
     version: '1.0.0',
     state: MODEL_STATE.uploading,
     tags: { 'Accuracy: test': 0.98, 'Accuracy: train': 0.99 },
-    lastUpdated: 1682676759143,
+    lastUpdatedTime: 1682676759143,
     createdTime: 1682676759143,
   },
 ];
@@ -31,7 +31,7 @@ describe('<ModelVersionTable />', () => {
       expect(screen.getByTestId('dataGridHeaderCell-version')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-state')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-status')).toBeInTheDocument();
-      expect(screen.getByTestId('dataGridHeaderCell-lastUpdated')).toBeInTheDocument();
+      expect(screen.getByTestId('dataGridHeaderCell-lastUpdatedTime')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-tags.Accuracy: test')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-tags.Accuracy: train')).toBeInTheDocument();
     });

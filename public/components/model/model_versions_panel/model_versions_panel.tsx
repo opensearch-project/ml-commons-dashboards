@@ -117,7 +117,7 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
       name: item.name,
       version: item.model_version,
       state: item.model_state,
-      lastUpdated: item.last_updated_time,
+      lastUpdatedTime: item.last_updated_time,
       // TODO: Change to use tags in model version once structure finalized
       tags: {},
       createdTime: item.created_time,

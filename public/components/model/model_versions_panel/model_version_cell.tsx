@@ -47,8 +47,8 @@ export const ModelVersionCell = ({ data, columnId, isDetails }: ModelVersionCell
         </EuiBadge>
       );
     }
-    case 'lastUpdated':
-      return renderTime(data.lastUpdated, 'MMM D, YYYY h:m A');
+    case 'lastUpdatedTime':
+      return renderTime(data.lastUpdatedTime, 'MMM D, YYYY h:m A');
     default:
       return get(data, columnId, '-');
   }

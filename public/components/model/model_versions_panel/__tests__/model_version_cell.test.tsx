@@ -18,7 +18,7 @@ const setup = (options: { columnId: string; isDetails?: boolean }) =>
         version: '1.0.0',
         state: MODEL_STATE.uploading,
         tags: {},
-        lastUpdated: 1682604957236,
+        lastUpdatedTime: 1682604957236,
         createdTime: 1682604957236,
       }}
       isDetails={false}
@@ -50,7 +50,7 @@ describe('<ModelVersionCell />', () => {
           version: '1.0.0',
           state: MODEL_STATE.loaded,
           tags: {},
-          lastUpdated: 1682604957236,
+          lastUpdatedTime: 1682604957236,
           createdTime: 1682604957236,
         }}
         isDetails={false}
@@ -67,7 +67,7 @@ describe('<ModelVersionCell />', () => {
           version: '1.0.0',
           state: MODEL_STATE.partiallyLoaded,
           tags: {},
-          lastUpdated: 1682604957236,
+          lastUpdatedTime: 1682604957236,
           createdTime: 1682604957236,
         }}
         isDetails={false}
@@ -97,7 +97,7 @@ describe('<ModelVersionCell />', () => {
 
   it('should render consistent last updated', () => {
     setup({
-      columnId: 'lastUpdated',
+      columnId: 'lastUpdatedTime',
     });
 
     expect(screen.getByText('Apr 27, 2023 2:15 PM')).toBeInTheDocument();
