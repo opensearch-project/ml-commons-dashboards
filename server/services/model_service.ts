@@ -25,7 +25,7 @@ import {
 } from '../../../../src/core/server';
 import { MODEL_STATE, ModelSearchSort } from '../../common';
 
-import { convertModelSource, generateModelSearchQuery } from './utils/model';
+import { generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
 import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
 
@@ -89,6 +89,7 @@ export class ModelService {
     name?: string;
     states?: MODEL_STATE[];
     nameOrId?: string;
+    versionOrKeyword?: string;
   }) {
     const {
       body: { hits },
