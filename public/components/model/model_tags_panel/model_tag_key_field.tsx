@@ -98,14 +98,14 @@ export const ModelTagKeyField = ({
     const savedTagKeyMap = savedTagKeys.reduce<{ [key: string]: boolean }>(
       (pValue, cValue) => ({
         ...pValue,
-        [`${cValue.name}${cValue.type}`]: true,
+        [cValue.name]: true,
       }),
       {}
     );
     return allTagKeys.map((item) => ({
       label: item.name,
       value: item,
-      disabled: savedTagKeyMap[`${item.name}${item.type}`],
+      disabled: savedTagKeyMap[item.name],
     }));
   }, [allTagKeys, savedTagKeys]);
 
