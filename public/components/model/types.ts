@@ -14,3 +14,9 @@ export interface VersionTableDataItem {
   tags: { [key: string]: string | number };
   createdTime: number;
 }
+
+export interface Tag {
+  key: string;
+  value: string;
+  type: 'number' | 'string';
+}
