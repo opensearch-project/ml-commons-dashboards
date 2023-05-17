@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -78,6 +78,7 @@ interface ModelVersionsPanelProps {
 }
 
 export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [params, setParams] = useState<{
     pageIndex: number;
     pageSize: number;
@@ -101,6 +102,7 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
       from: params.pageIndex * params.pageSize,
       size: params.pageSize,
       states: getStatesParam(params.filter),
+      versionOrKeyword: params.filter.search,
     }
   );
   const totalVersionCount = versionsData?.total_models;
@@ -156,11 +158,10 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
     if (error) {
       return 'error';
     }
+    const { tag, state, status, search } = params.filter;
     if (
       totalVersionCount === 0 &&
-      (params.filter.tag.length > 0 ||
-        params.filter.state.length > 0 ||
-        params.filter.status.length > 0)
+      (tag.length > 0 || state.length > 0 || status.length > 0 || !!search)
     ) {
       return 'no-result';
     }
@@ -179,6 +180,15 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
       ...previousParams,
       filter: { tag: [], state: [], status: [] },
     }));
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
+    }
+  }, []);
+
+  const bindSearchInputSearch = useCallback((input: HTMLInputElement | null) => {
+    if (searchInputRef) {
+      searchInputRef.current = input;
+    }
   }, []);
 
   useEffect(() => {
@@ -208,7 +218,11 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
         </EuiFlexItem>
       </EuiFlexGroup>
       {panelStatus !== 'empty' && (
-        <ModelVersionListFilter value={params.filter} onChange={handleFilterChange} />
+        <ModelVersionListFilter
+          value={params.filter}
+          onChange={handleFilterChange}
+          searchInputRef={bindSearchInputSearch}
+        />
       )}
       <EuiSpacer size="m" />
       {(panelStatus === 'normal' || panelStatus === 'no-result') && (
