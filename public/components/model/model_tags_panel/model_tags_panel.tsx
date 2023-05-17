@@ -47,7 +47,7 @@ export const ModelTagsPanel = ({ tagKeys, onTagKeysChange }: ModelTagsPanelProps
       tagKeys: [],
     },
   });
-  const unSavedChangeCount = Object.keys(formState.dirtyFields.tagKeys || {}).length;
+  const unSavedChangeCount = (formState.dirtyFields.tagKeys || []).length;
 
   const { fields, append, remove } = useFieldArray({
     name: 'tagKeys',
