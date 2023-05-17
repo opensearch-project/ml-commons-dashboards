@@ -177,7 +177,7 @@ export const ModelTagKeyField = ({
 
   return (
     <EuiFlexGroup gutterSize="m" tabIndex={-1}>
-      <EuiFlexItem style={{ width: FORM_ITEM_WIDTH }}>
+      <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
         <EuiContext i18n={KEY_COMBOBOX_I18N}>
           <EuiFormRow
             label={showLabel ? 'Key' : ''}
@@ -201,7 +201,7 @@ export const ModelTagKeyField = ({
           </EuiFormRow>
         </EuiContext>
       </EuiFlexItem>
-      <EuiFlexItem style={{ width: FORM_ITEM_WIDTH }}>
+      <EuiFlexItem grow={false} style={{ width: FORM_ITEM_WIDTH }}>
         <EuiFormRow
           label={showLabel ? 'Type' : ''}
           data-test-subj={`modelTagKeyType${index + 1}`}
