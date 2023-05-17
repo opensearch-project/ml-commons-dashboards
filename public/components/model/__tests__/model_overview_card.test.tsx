@@ -8,7 +8,33 @@ import React from 'react';
 import { render, screen, within } from '../../../../test/test_utils';
 import { ModelOverviewCard } from '../model_overview_card';
 
+import * as PluginContext from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+
+// Cannot spyOn(PluginContext, 'useOpenSearchDashboards') directly as it results in error:
+// TypeError: Cannot redefine property: useOpenSearchDashboards
+// So we have to mock the entire module first as a workaround
+jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('../../../../../../src/plugins/opensearch_dashboards_react/public'),
+  };
+});
+
 describe('<ModelOverviewCard />', () => {
+  beforeAll(() => {
+    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockReturnValue({
+      services: {
+        uiSettings: {
+          get: () => 'MMM D, YYYY @ HH:mm:ss.SSS',
+        },
+      },
+    });
+  });
+
+  afterAll(() => {
+    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockRestore();
+  });
+
   it('should model overview information according passed data', () => {
     render(
       <ModelOverviewCard
@@ -25,11 +51,13 @@ describe('<ModelOverviewCard />', () => {
     expect(screen.getByText('Foo (you)')).toBeInTheDocument();
     expect(screen.getByText('Created')).toBeInTheDocument();
     expect(
-      within(screen.getByText('Created').closest('dl')!).getByText('Apr 24, 2023 8:18 AM')
+      within(screen.getByText('Created').closest('dl')!).getByText('Apr 24, 2023 @ 08:18:30.318')
     ).toBeInTheDocument();
     expect(screen.getByText('Last updated')).toBeInTheDocument();
     expect(
-      within(screen.getByText('Last updated').closest('dl')!).getByText('Apr 24, 2023 1:18 PM')
+      within(screen.getByText('Last updated').closest('dl')!).getByText(
+        'Apr 24, 2023 @ 13:18:30.318'
+      )
     ).toBeInTheDocument();
 
     expect(screen.getByText('model-1-id')).toBeInTheDocument();

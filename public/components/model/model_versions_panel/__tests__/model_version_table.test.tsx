@@ -11,6 +11,18 @@ import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionTable } from '../model_version_table';
 import { MODEL_STATE } from '../../../../../common';
 
+import * as PluginContext from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
+
+// Cannot spyOn(PluginContext, 'useOpenSearchDashboards') directly as it results in error:
+// TypeError: Cannot redefine property: useOpenSearchDashboards
+// So we have to mock the entire module first as a workaround
+jest.mock('../../../../../../../src/plugins/opensearch_dashboards_react/public', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('../../../../../../../src/plugins/opensearch_dashboards_react/public'),
+  };
+});
+
 const versions = [
   {
     id: '1',
@@ -24,6 +36,19 @@ const versions = [
 ];
 
 describe('<ModelVersionTable />', () => {
+  beforeAll(() => {
+    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockReturnValue({
+      services: {
+        uiSettings: {
+          get: () => 'MMM D, yyyy @ HH:mm:ss.SSS',
+        },
+      },
+    });
+  });
+
+  afterAll(() => {
+    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockRestore();
+  });
   it('should render consistent columns header ', async () => {
     render(<ModelVersionTable versions={[]} tags={['Accuracy: test', 'Accuracy: train']} />);
 
@@ -98,7 +123,7 @@ describe('<ModelVersionTable />', () => {
     expect(within(gridCells[0]).getByText('1.0.0')).toBeInTheDocument();
     expect(within(gridCells[1]).getByText('Not deployed')).toBeInTheDocument();
     expect(within(gridCells[2]).getByText('In progress...')).toBeInTheDocument();
-    expect(within(gridCells[3]).getByText('Apr 28, 2023 10:12 AM')).toBeInTheDocument();
+    expect(within(gridCells[3]).getByText('Apr 28, 2023 @ 10:12:39.143')).toBeInTheDocument();
     expect(within(gridCells[4]).getByText('0.98')).toBeInTheDocument();
     expect(within(gridCells[5]).getByText('0.99')).toBeInTheDocument();
     expect(within(gridCells[6]).getByLabelText('show actions')).toBeInTheDocument();

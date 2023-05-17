@@ -14,9 +14,10 @@ import {
 } from '@elastic/eui';
 
 import { Link, generatePath } from 'react-router-dom';
-import { DATE_FORMAT, MODEL_STATE, routerPaths } from '../../../../common';
+import { MODEL_STATE, routerPaths } from '../../../../common';
 import { APIProvider } from '../../../apis/api_provider';
 import { renderTime } from '../../../utils';
+import { useOpenSearchDashboards } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 import { ModelVersionErrorDetailsModal } from './model_version_error_details_modal';
 
@@ -106,6 +107,10 @@ export const ModelVersionStatusDetail = ({
   const [isErrorDetailsModalShowed, setIsErrorDetailsModalShowed] = useState(false);
   const [isLoadingErrorDetails, setIsLoadingErrorDetails] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string>();
+  const {
+    services: { uiSettings },
+  } = useOpenSearchDashboards();
+  const dateFormat = uiSettings?.get('dateFormat');
 
   const handleSeeFullErrorClick = useCallback(async () => {
     const state2TaskTypeMap: { [key in MODEL_STATE]?: string } = {
@@ -167,7 +172,7 @@ export const ModelVersionStatusDetail = ({
           </EuiText>
           <EuiSpacer size="s" />
           <EuiText>
-            <b>{timeTitle}:</b> {timeValue ? renderTime(timeValue, DATE_FORMAT) : '-'}
+            <b>{timeTitle}:</b> {timeValue && dateFormat ? renderTime(timeValue, dateFormat) : '-'}
           </EuiText>
           {(state === MODEL_STATE.loadFailed || state === MODEL_STATE.registerFailed) && (
             <>
