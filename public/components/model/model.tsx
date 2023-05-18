@@ -50,10 +50,11 @@ export const Model = () => {
       {
         name: 'Tags',
         id: 'tags',
+        // TODO: Change tagKeys property from backend and update tagKeys after change
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelTagsPanel />
+            <ModelTagsPanel tagKeys={[{ name: 'F1', type: 'number' }]} onTagKeysChange={() => {}} />
           </>
         ),
       },

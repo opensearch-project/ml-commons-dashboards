@@ -11,19 +11,15 @@ import {
   EuiFormRow,
   EuiComboBox,
   EuiComboBoxOptionOption,
-  EuiToken,
-  EuiText,
   EuiSpacer,
   EuiButtonEmpty,
   EuiButton,
   EuiFieldNumber,
 } from '@elastic/eui';
-import { TagValueSelector } from './tag_value_selector';
 
-interface TagKey {
-  name: string;
-  type: 'string' | 'number';
-}
+import { tagKeyOptionRenderer, TagKey } from '../tag_key';
+
+import { TagValueSelector } from './tag_value_selector';
 
 export enum TagFilterOperator {
   Is = 'is',
@@ -136,24 +132,6 @@ export const TagFilterPopoverContent = ({
     }));
   }, [selectedTagType]);
   const operator = selectedOperatorOptions[0]?.label as TagFilterOperator;
-
-  const tagKeyOptionRenderer = useCallback(
-    (option: EuiComboBoxOptionOption<TagKey>, _searchValue: string, contentClassName: string) => {
-      return (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <EuiToken
-            style={{ marginRight: 2 }}
-            iconType={option.value?.type === 'number' ? 'tokenNumber' : 'tokenString'}
-          />
-          <span className={contentClassName}>{option.label}</span>
-          <EuiText style={{ marginLeft: 'auto' }} color="subdued" size="s">
-            {option.value?.type}
-          </EuiText>
-        </div>
-      );
-    },
-    []
-  );
 
   const handleSave = useCallback(() => {
     if (!selectedTag || !operator || !value) {
