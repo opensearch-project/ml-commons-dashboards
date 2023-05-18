@@ -11,3 +11,4 @@ export * from './debounced_search_bar';
 export * from './tag_filter';
 export * from './options_filter';
 export * from './forms';
+export * from './tag_key';
