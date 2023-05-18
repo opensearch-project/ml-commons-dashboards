@@ -104,7 +104,6 @@ describe('<ModelVersionCell />', () => {
     });
 
     expect(screen.getByText('In progress...')).toBeInTheDocument();
-    expect(screen.getByText('Upload initiated on:')).toBeInTheDocument();
   });
 
   it('should render consistent last updated', () => {

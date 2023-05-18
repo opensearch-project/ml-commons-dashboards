@@ -26,8 +26,8 @@ export const state2DetailContentMap: {
   [key in MODEL_STATE]?: {
     title: string;
     description: (versionLink: React.ReactNode) => React.ReactNode;
-    timeTitle: string;
-    timeField: 'createdTime' | 'lastRegisteredTime' | 'lastDeployedTime' | 'lastUndeployedTime';
+    timeTitle?: string;
+    timeField?: 'createdTime' | 'lastRegisteredTime' | 'lastDeployedTime' | 'lastUndeployedTime';
   };
 } = {
   [MODEL_STATE.uploading]: {
@@ -35,16 +35,12 @@ export const state2DetailContentMap: {
     description: (versionLink: React.ReactNode) => (
       <>The model artifact for {versionLink} is uploading.</>
     ),
-    timeTitle: 'Upload initiated on',
-    timeField: 'createdTime',
   },
   [MODEL_STATE.loading]: {
     title: 'In progress...',
     description: (versionLink: React.ReactNode) => (
       <>The model artifact for {versionLink} is deploying.</>
     ),
-    timeTitle: 'Deployment initiated on',
-    timeField: 'createdTime',
   },
   [MODEL_STATE.uploaded]: {
     title: 'Success',
@@ -151,7 +147,7 @@ export const ModelVersionStatusDetail = ({
     return <>-</>;
   }
   const { title, description, timeTitle, timeField } = statusContent;
-  const timeValue = restProps[timeField];
+  const timeValue = timeField ? restProps[timeField] : undefined;
 
   return (
     <>
@@ -170,10 +166,15 @@ export const ModelVersionStatusDetail = ({
               </Link>
             )}
           </EuiText>
-          <EuiSpacer size="s" />
-          <EuiText>
-            <b>{timeTitle}:</b> {timeValue && dateFormat ? renderTime(timeValue, dateFormat) : '-'}
-          </EuiText>
+          {timeTitle && (
+            <>
+              <EuiSpacer size="s" />
+              <EuiText>
+                <b>{timeTitle}:</b>{' '}
+                {timeValue && dateFormat ? renderTime(timeValue, dateFormat) : '-'}
+              </EuiText>
+            </>
+          )}
           {(state === MODEL_STATE.loadFailed || state === MODEL_STATE.registerFailed) && (
             <>
               <EuiSpacer size="s" />

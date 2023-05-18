@@ -37,7 +37,7 @@ describe('<ModelVersionStatusDetail />', () => {
     jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockRestore();
   });
 
-  it('should render "In progress...", uploading tip and upload initialized time ', async () => {
+  it('should render "In progress..." and uploading tip', async () => {
     render(
       <ModelVersionStatusDetail
         id="1"
@@ -54,8 +54,28 @@ describe('<ModelVersionStatusDetail />', () => {
       'href',
       '/model-registry/model-version/1'
     );
+  });
 
-    expect(screen.getByText('Upload initiated on:')).toBeInTheDocument();
+  it('should render "Success", deployment tip and deployed time ', async () => {
+    render(
+      <ModelVersionStatusDetail
+        id="1"
+        name="model-1"
+        version="1"
+        state={MODEL_STATE.loaded}
+        createdTime={1683276773541}
+        lastDeployedTime={1683276773541}
+      />
+    );
+
+    expect(screen.getByText('Success')).toBeInTheDocument();
+    expect(screen.getByText(/.*deployed./)).toBeInTheDocument();
+    expect(screen.getByText('model-1 version 1')).toHaveAttribute(
+      'href',
+      '/model-registry/model-version/1'
+    );
+
+    expect(screen.getByText('Deployed on:')).toBeInTheDocument();
     expect(screen.getByText('May 5, 2023 @ 08:52:53.541')).toBeInTheDocument();
   });
 
@@ -81,6 +101,7 @@ describe('<ModelVersionStatusDetail />', () => {
         version="1.0.0"
         state={MODEL_STATE.loadFailed}
         createdTime={1683276773541}
+        lastDeployedTime={1683276773541}
       />
     );
 
