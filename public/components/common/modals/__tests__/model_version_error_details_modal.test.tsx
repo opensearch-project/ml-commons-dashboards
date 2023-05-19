@@ -18,6 +18,7 @@ describe('<ModelVersionErrorDetailsModal />', () => {
         version="3"
         errorDetails="Error message"
         closeModal={jest.fn()}
+        mode="artifact-upload-failed"
       />
     );
 
@@ -38,7 +39,7 @@ describe('<ModelVersionErrorDetailsModal />', () => {
         version="3"
         errorDetails={'{"foo": "bar"}'}
         closeModal={jest.fn()}
-        isDeployFailed
+        mode="deployment-failed"
       />
     );
 
@@ -61,7 +62,7 @@ describe('<ModelVersionErrorDetailsModal />', () => {
         version="3"
         errorDetails={'{"foo": "bar"}'}
         closeModal={closeModalMock}
-        isDeployFailed
+        mode="deployment-failed"
       />
     );
 
