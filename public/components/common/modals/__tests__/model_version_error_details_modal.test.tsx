@@ -5,6 +5,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
+import { render as originRender } from '@testing-library/react';
 
 import { render, screen } from '../../../../../test/test_utils';
 import { ModelVersionErrorDetailsModal } from '../model_version_error_details_modal';
@@ -72,5 +73,46 @@ describe('<ModelVersionErrorDetailsModal />', () => {
 
     await userEvent.click(screen.getByLabelText('Closes this modal window'));
     expect(closeModalMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('should render undeployment failed screen', () => {
+    render(
+      <ModelVersionErrorDetailsModal
+        id="model-1-id"
+        name="model-1-name"
+        version="3"
+        errorDetails={'{"foo": "bar"}'}
+        closeModal={jest.fn()}
+        mode="undeployment-failed"
+      />
+    );
+
+    expect(screen.getByText('model-1-name version 3')).toBeInTheDocument();
+    expect(screen.getByText('undeployment failed')).toBeInTheDocument();
+    expect(screen.getByText('model-1-name version 3')).toHaveAttribute(
+      'href',
+      '/model-registry/model-version/model-1-id'
+    );
+    expect(screen.getByText('{"foo": "bar"}')).toBeInTheDocument();
+    expect(screen.getByLabelText('Copy')).toBeInTheDocument();
+  });
+
+  it('should render consistent plain model version link without react-router provider', () => {
+    originRender(
+      <ModelVersionErrorDetailsModal
+        id="model-1-id"
+        name="model-1-name"
+        version="3"
+        errorDetails={'{"foo": "bar"}'}
+        closeModal={jest.fn()}
+        mode="undeployment-failed"
+        plainVersionLink="/foo/model-registry/model-version/model-1-id"
+      />
+    );
+
+    expect(screen.getByText('model-1-name version 3')).toHaveAttribute(
+      'href',
+      '/foo/model-registry/model-version/model-1-id'
+    );
   });
 });
