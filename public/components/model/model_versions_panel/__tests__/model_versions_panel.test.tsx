@@ -226,4 +226,38 @@ describe('<ModelVersionsPanel />', () => {
     },
     10 * 1000
   );
+
+  it(
+    'should only sort by Last updated column after column sort button clicked',
+    async () => {
+      render(<ModelVersionsPanel groupId="1" />);
+      await waitFor(() => {
+        expect(screen.queryByText('Loading versions')).not.toBeInTheDocument();
+      });
+      const searchMock = jest.spyOn(Model.prototype, 'search');
+
+      await userEvent.click(
+        within(screen.getByTestId('dataGridHeaderCell-version')).getByText('Version')
+      );
+      await userEvent.click(screen.getByTitle('Sort A-Z'));
+      expect(searchMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          sort: ['version-asc'],
+        })
+      );
+
+      await userEvent.click(
+        within(screen.getByTestId('dataGridHeaderCell-lastUpdatedTime')).getByText('Last updated')
+      );
+      await userEvent.click(screen.getByTitle('Sort Z-A'));
+      expect(searchMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          sort: ['last_updated_time-desc'],
+        })
+      );
+
+      searchMock.mockRestore();
+    },
+    10 * 1000
+  );
 });

@@ -98,7 +98,7 @@ export class Model {
   public search(query: {
     algorithms?: string[];
     ids?: string[];
-    sort?: ModelSearchSort[];
+    sort?: string[];
     name?: string;
     from: number;
     size: number;

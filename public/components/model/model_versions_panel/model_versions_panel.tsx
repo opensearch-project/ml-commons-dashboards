@@ -7,6 +7,7 @@ import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiDataGridSorting,
   EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
@@ -73,6 +74,15 @@ const getStatesParam = ({
   });
 };
 
+const getSortParam = (sort: Array<{ id: string; direction: 'asc' | 'desc' }>) => {
+  const id2fieldMap: { [key: string]: string } = {
+    lastUpdatedTime: 'last_updated_time',
+  };
+  return sort.length > 0
+    ? sort.map(({ id, direction }) => `${id2fieldMap[id] || id}-${direction}`)
+    : undefined;
+};
+
 interface ModelVersionsPanelProps {
   groupId: string;
 }
@@ -103,6 +113,7 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
       size: params.pageSize,
       states: getStatesParam(params.filter),
       versionOrKeyword: params.filter.search,
+      sort: getSortParam(params.sort),
     }
   );
   const totalVersionCount = versionsData?.total_models;
@@ -144,11 +155,16 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
     };
   }, [params.pageIndex, params.pageSize, totalVersionCount]);
 
-  const versionsSorting = useMemo(
+  const versionsSorting = useMemo<EuiDataGridSorting>(
     () => ({
       columns: params.sort,
       onSort: (sort) => {
-        setParams((previousParams) => ({ ...previousParams, sort }));
+        setParams((previousParams) => ({
+          ...previousParams,
+          sort: sort.filter(
+            (item) => !previousParams.sort.find((previousItem) => previousItem.id === item.id)
+          ),
+        }));
       },
     }),
     [params]

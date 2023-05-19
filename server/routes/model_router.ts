@@ -15,16 +15,33 @@ import {
   MODEL_PROFILE_API_ENDPOINT,
 } from './constants';
 
-const modelSortQuerySchema = schema.oneOf([
-  schema.literal('version-desc'),
-  schema.literal('version-asc'),
-  schema.literal('name-asc'),
-  schema.literal('name-desc'),
-  schema.literal('model_state-asc'),
-  schema.literal('model_state-desc'),
-  schema.literal('id-asc'),
-  schema.literal('id-desc'),
-]);
+const validateSortItem = (sort: string) => {
+  const [key, direction] = sort.split('-');
+  if (typeof key !== 'string' || typeof direction !== 'string') {
+    return 'Invalidate sort';
+  }
+  if (direction !== 'asc' && direction !== 'desc') {
+    return 'Invalidate sort';
+  }
+  const availableSortKeys = ['id', 'version', 'last_updated_time', 'name', 'model_state'];
+
+  if (!availableSortKeys.includes(key) && !key.startsWith('tags.')) {
+    return 'Invalidate sort';
+  }
+  return undefined;
+};
+
+const validateUniqueSort = (sort: string[]) => {
+  const existsSortKeyMap: { [key: string]: boolean } = {};
+  for (let i = 0; i < sort.length; i++) {
+    const [key] = sort[i].split('-');
+    if (existsSortKeyMap[key]) {
+      return 'Invalidate sort';
+    }
+    existsSortKeyMap[key] = true;
+  }
+  return undefined;
+};
 
 const modelStateSchema = schema.oneOf([
   schema.literal(MODEL_STATE.loaded),
@@ -73,7 +90,12 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           from: schema.number({ min: 0 }),
           size: schema.number({ max: 50 }),
           sort: schema.maybe(
-            schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
+            schema.oneOf([
+              schema.string({ validate: validateSortItem }),
+              schema.arrayOf(schema.string({ validate: validateSortItem }), {
+                validate: validateUniqueSort,
+              }),
+            ])
           ),
           states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
           nameOrId: schema.maybe(schema.string()),
