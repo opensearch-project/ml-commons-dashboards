@@ -5,6 +5,10 @@
 
 import type { Tag } from '../model/types';
 
+interface ArtifactSourceFormData {
+  artifactSource: 'source_not_changed' | 'source_from_computer' | 'source_from_url';
+}
+
 interface FormDataBase {
   versionNotes?: string;
   tags?: Tag[];
@@ -12,10 +16,10 @@ interface FormDataBase {
   modelFileFormat: string;
 }
 
-export interface ModelFileFormData extends FormDataBase {
+export interface ModelFileFormData extends FormDataBase, ArtifactSourceFormData {
   modelFile: File;
 }
 
-export interface ModelUrlFormData extends FormDataBase {
+export interface ModelUrlFormData extends FormDataBase, ArtifactSourceFormData {
   modelURL: string;
 }

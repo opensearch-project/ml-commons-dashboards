@@ -19,8 +19,8 @@ import '../../ace-themes/sql_console.js';
 import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { HelpFlyout } from './help_flyout';
-import { CUSTOM_FORM_ERROR_TYPES } from './constants';
 import { ErrorMessage } from './error_message';
+import { CUSTOM_FORM_ERROR_TYPES } from '../common/forms/form_constants';
 
 function validateConfigurationObject(value: string) {
   try {

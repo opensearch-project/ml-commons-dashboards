@@ -29,16 +29,14 @@ export const ModelVersionTags = () => {
   formRef.current = form;
 
   const onCancel = useCallback(() => {
-    form.resetField('tags');
+    formRef.current.resetField('tags');
     setReadOnly(true);
-  }, [form]);
+  }, []);
 
   useEffect(() => {
     // reset form value to default when unmount
     return () => {
-      if (formRef.current.formState.dirtyFields.tags) {
-        formRef.current.resetField('tags');
-      }
+      formRef.current.resetField('tags');
     };
   }, []);
 

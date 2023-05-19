@@ -16,7 +16,7 @@ import {
 } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
-import { ModelFileUploader } from './artifact_file';
+import { ModelFileUploader } from '../common/forms/artifact_file';
 import { ArtifactUrl } from './artifact_url';
 import { ONE_GB } from '../../../common/constant';
 import { MAX_MODEL_FILE_SIZE } from './constants';

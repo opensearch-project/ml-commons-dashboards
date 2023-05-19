@@ -29,17 +29,15 @@ export const ModelVersionInformation = () => {
   formRef.current = form;
 
   const onCancel = useCallback(() => {
-    form.resetField('versionNotes');
+    formRef.current.resetField('versionNotes');
     setReadOnly(true);
-  }, [form]);
+  }, []);
 
   useEffect(() => {
     // reset form value to default when component unmounted, this makes sure
     // the unsaved changes are dropped when the component unmounted
     return () => {
-      if (formRef.current.formState.dirtyFields.versionNotes) {
-        formRef.current.resetField('versionNotes');
-      }
+      formRef.current.resetField('versionNotes');
     };
   }, []);
 

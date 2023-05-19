@@ -76,6 +76,9 @@ export const ModelVersion = () => {
         configuration: JSON.stringify(model.model_config),
         modelFileFormat: model.model_format,
         // TODO: read model url or model filename
+        artifactSource: 'source_not_changed',
+        // modelFile: new File([], 'artifact.zip'),
+        modelURL: 'http://url.to/artifact.zip',
       });
     }
   }, [model, form]);

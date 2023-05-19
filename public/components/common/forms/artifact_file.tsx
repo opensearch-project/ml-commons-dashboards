@@ -7,8 +7,7 @@ import React from 'react';
 import { EuiFormRow, EuiFilePicker } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
-import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
-import { CUSTOM_FORM_ERROR_TYPES, MAX_MODEL_FILE_SIZE } from './constants';
+import { CUSTOM_FORM_ERROR_TYPES, MAX_MODEL_FILE_SIZE } from './form_constants';
 
 function validateFileSize(file?: File) {
   if (file && file.size > MAX_MODEL_FILE_SIZE) {
@@ -18,7 +17,7 @@ function validateFileSize(file?: File) {
 }
 
 export const ModelFileUploader = () => {
-  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { control } = useFormContext<{ modelFile: File }>();
   const modelFileFieldController = useController({
     name: 'modelFile',
     control,
