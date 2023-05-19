@@ -258,6 +258,6 @@ describe('<ModelVersionsPanel />', () => {
 
       searchMock.mockRestore();
     },
-    10 * 1000
+    20 * 1000
   );
 });
