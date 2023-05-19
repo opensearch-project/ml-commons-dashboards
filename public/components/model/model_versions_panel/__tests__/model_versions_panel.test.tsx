@@ -232,7 +232,7 @@ describe('<ModelVersionsPanel />', () => {
     async () => {
       render(<ModelVersionsPanel groupId="1" />);
       await waitFor(() => {
-        expect(screen.queryByText('Loading versions')).not.toBeInTheDocument();
+        expect(screen.getByTestId('dataGridHeaderCell-version')).toBeInTheDocument();
       });
       const searchMock = jest.spyOn(Model.prototype, 'search');
 
