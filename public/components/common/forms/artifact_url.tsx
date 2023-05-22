@@ -9,7 +9,7 @@ import { useController, useFormContext } from 'react-hook-form';
 
 import { URL_REGEX } from '../../../utils/regex';
 
-export const ArtifactUrl = () => {
+export const ModelArtifactUrl = () => {
   const { control, unregister } = useFormContext<{ modelURL?: string }>();
   const modelUrlFieldController = useController({
     name: 'modelURL',

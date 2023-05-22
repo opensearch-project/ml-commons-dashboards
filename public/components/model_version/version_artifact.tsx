@@ -22,7 +22,7 @@ import {
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { ModelFileUploader, UploadHelpText } from '../common/forms/artifact_file';
-import { ArtifactUrl } from '../common/forms/artifact_url';
+import { ModelArtifactUrl } from '../common/forms/artifact_url';
 import { FILE_FORMAT_OPTIONS, ModelFileFormatSelect } from '../common/forms/model_file_format';
 import { ModelVersionFormData } from './types';
 import { VersionArtifactSource } from './version_artifact_source';
@@ -83,7 +83,7 @@ export const ModelVersionArtifact = () => {
       return <ModelFileUploader />;
     }
     if (artifactSource === 'source_from_url') {
-      return <ArtifactUrl />;
+      return <ModelArtifactUrl />;
     }
   };
 

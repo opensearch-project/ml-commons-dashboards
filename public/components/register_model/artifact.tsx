@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { htmlIdGenerator, EuiSpacer, EuiText, EuiRadio, EuiLink } from '@elastic/eui';
 
 import { ModelFileUploader, UploadHelpText } from '../common/forms/artifact_file';
-import { ArtifactUrl } from '../common/forms/artifact_url';
+import { ModelArtifactUrl } from '../common/forms/artifact_url';
 import { ModelFileFormatSelect } from '../common/forms/model_file_format';
 
 export const ArtifactPanel = () => {
@@ -48,7 +48,7 @@ export const ArtifactPanel = () => {
       />
       <EuiSpacer size="m" />
       {selectedSource === 'source_from_computer' && <ModelFileUploader />}
-      {selectedSource === 'source_from_url' && <ArtifactUrl />}
+      {selectedSource === 'source_from_url' && <ModelArtifactUrl />}
       <EuiSpacer size="xs" />
       <UploadHelpText />
       <EuiSpacer />
