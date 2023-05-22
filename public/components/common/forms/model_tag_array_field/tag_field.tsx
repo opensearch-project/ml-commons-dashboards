@@ -16,9 +16,9 @@ import {
   EuiFieldText,
 } from '@elastic/eui';
 import React, { useCallback, useMemo, useRef } from 'react';
+import { useController, useWatch, useFormContext, useFormState } from 'react-hook-form';
 
 import { tagKeyOptionRenderer } from '../../../common';
-import { useController, useWatch, useFormContext, useFormState } from 'react-hook-form';
 import { Tag } from '../../../model/types';
 import { TagTypePopover } from './tag_type_popover';
 
