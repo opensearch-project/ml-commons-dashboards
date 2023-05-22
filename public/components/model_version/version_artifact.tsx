@@ -23,6 +23,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { ModelFileUploader, UploadHelpText } from '../common/forms/artifact_file';
 import { ModelArtifactUrl } from '../common/forms/artifact_url';
+import { ModelConfiguration } from '../common/forms/model_configuration';
 import { FILE_FORMAT_OPTIONS, ModelFileFormatSelect } from '../common/forms/model_file_format';
 import { ModelVersionFormData } from './types';
 import { VersionArtifactSource } from './version_artifact_source';
@@ -167,7 +168,9 @@ export const ModelVersionArtifact = () => {
             </small>
           </EuiText>
         </EuiFlexItem>
-        <EuiFlexItem />
+        <EuiFlexItem>
+          <ModelConfiguration readOnly />
+        </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPanel>
   );

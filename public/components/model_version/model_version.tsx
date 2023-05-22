@@ -73,7 +73,7 @@ export const ModelVersion = () => {
           { key: 'Precision', value: '0.64', type: 'number' as const },
           { key: 'Task', value: 'Image classification', type: 'string' as const },
         ], // TODO: read from model.tags
-        configuration: JSON.stringify(model.model_config),
+        configuration: JSON.stringify(model.model_config, undefined, 2),
         modelFileFormat: model.model_format,
         // TODO: read model url or model filename
         artifactSource: 'source_not_changed',
