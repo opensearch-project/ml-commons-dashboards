@@ -20,6 +20,7 @@ import { ModelVersionUndeployedModal } from './model_version_undeployed_modal';
 
 export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
   const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
+  const modelVersionUndeployedRef = useRef<ModelConfirmDeleteModalInstance>(null);
   const [params, setParams] = useState<{
     sort: ModelTableSort;
     currentPage: number;
@@ -64,7 +65,11 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
   }, [reload, notifications.toasts]);
 
   const handleModelDelete = useCallback((modelId: string, deployedVersion: string[]) => {
-    confirmModelDeleteRef.current?.show(modelId, deployedVersion);
+    if (deployedVersion.length === 0) {
+      confirmModelDeleteRef.current?.show(modelId, deployedVersion);
+    } else {
+      modelVersionUndeployedRef.current?.show(modelId, deployedVersion);
+    }
   }, []);
 
   const handleViewModelDrawer = useCallback((name: string) => {
@@ -91,7 +96,6 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
       };
     });
   }, []);
-  const deployedVersion: string[] = [];
   const handleReset = useCallback(() => {
     setParams((prevParams) => ({
       ...prevParams,
@@ -141,14 +145,12 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
             onResetClick={handleReset}
             error={!!error}
           />
-          {deployedVersion.length === 0 ? (
-            <ModelVersionUndeployedModal
-              ref={confirmModelDeleteRef}
-              onDeleted={handleModelDeleted}
-            />
-          ) : (
-            <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
-          )}
+          <ModelVersionUndeployedModal
+            ref={modelVersionUndeployedRef}
+            onDeleted={handleModelDeleted}
+          />
+          <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
+
           {drawerModelName && (
             <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
           )}

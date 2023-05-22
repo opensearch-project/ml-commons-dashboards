@@ -23,10 +23,8 @@ export const ModelConfirmDeleteModal = React.forwardRef<
   const onChange = (e: any) => {
     setValue(e.target.value);
   };
-  let buttonColor: 'text' | 'danger' = 'text';
-  if (value === deleteIdRef.current) {
-    buttonColor = 'danger';
-  }
+  const buttonColor = value === deleteIdRef.current ? 'danger' : 'text';
+
   const { start: startPolling } = usePollingUntil({
     continueChecker: async () => {
       if (!deleteIdRef.current) {
@@ -81,35 +79,36 @@ export const ModelConfirmDeleteModal = React.forwardRef<
   if (!visible) {
     return null;
   }
-  const str = (
-    <span>
-      Delete{' '}
-      <EuiLink color="primary" href="#">
-        {deleteIdRef.current}?
-      </EuiLink>
-    </span>
-  );
-  const label = (
-    <span style={{ fontWeight: 400, fontSize: '16px' }}>
-      Type <span style={{ fontWeight: 600 }}>{deleteIdRef.current}</span> to confirm
-    </span>
-  );
   return (
     <EuiConfirmModal
       style={{ width: '480px' }}
-      title={str}
+      title={
+        <span>
+          Delete{' '}
+          <EuiLink color="primary" href="#">
+            {deleteIdRef.current}
+          </EuiLink>
+          ?
+        </span>
+      }
       onCancel={handleCancel}
       onConfirm={handleConfirm}
       isLoading={isDeleting}
       cancelButtonText="Cancel"
       confirmButtonText="Delete"
       buttonColor={buttonColor}
+      confirmButtonDisabled={value !== deleteIdRef.current}
     >
       <p style={{ fontSize: '16px' }}>
-        Deleting this model will delete {deployedVersion.current?.length} versions of this
-        model.This is irreversible.
+        This will delete all versions of this model. This action is irreversible.
       </p>
-      <EuiFormRow label={label}>
+      <EuiFormRow
+        label={
+          <span style={{ fontWeight: 400, fontSize: '16px' }}>
+            Type <span style={{ fontWeight: 600 }}>{deleteIdRef.current}</span> to confirm
+          </span>
+        }
+      >
         <EuiFieldText name="delete" value={value} onChange={(e) => onChange(e)} />
       </EuiFormRow>
     </EuiConfirmModal>

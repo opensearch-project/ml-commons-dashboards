@@ -17,7 +17,6 @@ export class NoIdProvideError {}
 export interface ModelConfirmDeleteModalInstance {
   show: (modelId: string, deployedVersions: string[], name: string) => void;
 }
-// let deployedVersion: string[] = [];
 export const ModelVersionUndeployedModal = React.forwardRef<
   ModelConfirmDeleteModalInstance,
   { onDeleted: () => void }
@@ -43,27 +42,32 @@ export const ModelVersionUndeployedModal = React.forwardRef<
   if (!visible) {
     return null;
   }
-  const curModel = (
-    <EuiLink color="primary" href="#">
-      {deleteIdRef.current}
-    </EuiLink>
-  );
-  const willDeleteVersion = deployedVersion.current
-    ?.slice(0, -1)
-    .join(',')
-    .concat(' and ' + deployedVersion.current[deployedVersion.current?.length - 1]);
+  const willDeleteVersion = deployedVersion.current?.map((item) => {
+    return <li>Version {item}</li>;
+  });
+
   return (
     <EuiModal onClose={handleCancel} style={{ width: '500px' }}>
       <EuiModalHeader>
         <EuiModalHeaderTitle>
           <h1>
-            {deployedVersion.current?.length} Versions must be undeployed to delete this model.
+            Unable to delete{' '}
+            {
+              <EuiLink color="primary" href="#">
+                {deleteIdRef.current}
+              </EuiLink>
+            }
           </h1>
         </EuiModalHeaderTitle>
       </EuiModalHeader>
       <EuiModalBody style={{ lineHeight: '25px' }}>
-        Versions {willDeleteVersion} of this model are deployed. They must be undeployed to delete
-        this model. See {curModel} to undeploy these versions.
+        Version of this model are currently deployed. To delete this model, undeployed following
+        versions from the{' '}
+        <EuiLink color="primary" href="#">
+          {deleteIdRef.current}
+        </EuiLink>{' '}
+        page.
+        {willDeleteVersion}
       </EuiModalBody>
       <EuiModalFooter>
         <EuiButton onClick={handleCancel}>Close</EuiButton>

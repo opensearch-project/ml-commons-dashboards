@@ -166,8 +166,8 @@ export function ModelTable(props: ModelTableProps) {
             description: 'Delete this',
             type: 'icon',
             icon: 'trash',
-            onClick: ({ name, ...args }) => {
-              onModelDeleteClick(name, args.deployed_versions);
+            onClick: ({ name, deployed_versions: deployedVersions }) => {
+              onModelDeleteClick(name, deployedVersions);
             },
           },
         ],
