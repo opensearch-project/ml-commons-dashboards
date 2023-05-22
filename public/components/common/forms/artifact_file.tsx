@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { EuiFormRow, EuiFilePicker, EuiText } from '@elastic/eui';
+import { EuiFormRow, EuiFilePicker, EuiText, EuiFieldText } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { CUSTOM_FORM_ERROR_TYPES, MAX_MODEL_FILE_SIZE } from './form_constants';
@@ -32,8 +32,13 @@ export const UploadHelpText = () => (
   </>
 );
 
-export const ModelFileUploader = () => {
-  const { control, unregister } = useFormContext<{ modelFile: File }>();
+interface Props {
+  label?: string;
+  readOnly?: boolean;
+}
+
+export const ModelFileUploader = ({ readOnly = false, label = 'File' }: Props) => {
+  const { control, unregister } = useFormContext<{ modelFile?: File }>();
   const modelFileFieldController = useController({
     name: 'modelFile',
     control,
@@ -51,9 +56,13 @@ export const ModelFileUploader = () => {
     };
   }, [unregister]);
 
-  return (
+  return readOnly ? (
+    <EuiFormRow label={label}>
+      <EuiFieldText icon="download" value={modelFileFieldController.field.value?.name} readOnly />
+    </EuiFormRow>
+  ) : (
     <EuiFormRow
-      label="File"
+      label={label}
       error={modelFileFieldController.fieldState.error?.message}
       isInvalid={Boolean(modelFileFieldController.fieldState.error)}
     >

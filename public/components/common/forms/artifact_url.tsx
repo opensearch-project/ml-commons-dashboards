@@ -4,12 +4,17 @@
  */
 
 import React, { useEffect } from 'react';
-import { EuiFormRow, htmlIdGenerator, EuiFieldText } from '@elastic/eui';
+import { EuiFormRow, htmlIdGenerator, EuiFieldText, EuiCopy, EuiIcon } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { URL_REGEX } from '../../../utils/regex';
 
-export const ModelArtifactUrl = () => {
+interface Props {
+  label?: string;
+  readOnly?: boolean;
+}
+
+export const ModelArtifactUrl = ({ label = 'URL', readOnly = false }: Props) => {
   const { control, unregister } = useFormContext<{ modelURL?: string }>();
   const modelUrlFieldController = useController({
     name: 'modelURL',
@@ -26,9 +31,24 @@ export const ModelArtifactUrl = () => {
     };
   }, [unregister]);
 
-  return (
+  return readOnly ? (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <EuiFormRow label={label} style={{ width: 400 }}>
+        <EuiFieldText value={modelUrlFieldController.field.value} readOnly />
+      </EuiFormRow>
+      <EuiCopy textToCopy={modelUrlFieldController.field.value ?? ''}>
+        {(copy) => (
+          <EuiIcon
+            style={{ marginLeft: 10, transform: 'translateY(10px)', cursor: 'pointer' }}
+            type="copy"
+            onClick={copy}
+          />
+        )}
+      </EuiCopy>
+    </div>
+  ) : (
     <EuiFormRow
-      label="URL"
+      label={label}
       isInvalid={Boolean(modelUrlFieldController.fieldState.error)}
       error={modelUrlFieldController.fieldState.error?.message}
     >

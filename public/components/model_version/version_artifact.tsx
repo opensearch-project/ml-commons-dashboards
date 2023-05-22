@@ -14,17 +14,13 @@ import {
   EuiText,
   EuiLink,
   EuiCode,
-  EuiFieldText,
-  EuiIcon,
-  EuiCopy,
-  EuiFormRow,
 } from '@elastic/eui';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { ModelFileUploader, UploadHelpText } from '../common/forms/artifact_file';
 import { ModelArtifactUrl } from '../common/forms/artifact_url';
 import { ModelConfiguration } from '../common/forms/model_configuration';
-import { FILE_FORMAT_OPTIONS, ModelFileFormatSelect } from '../common/forms/model_file_format';
+import { ModelFileFormatSelect } from '../common/forms/model_file_format';
 import { ModelVersionFormData } from './types';
 import { VersionArtifactSource } from './version_artifact_source';
 
@@ -59,25 +55,10 @@ export const ModelVersionArtifact = () => {
   const renderArtifactInput = () => {
     if (artifactSource === 'source_not_changed') {
       if (defaultValues && defaultValues.modelFile) {
-        return <EuiFieldText icon="download" value={defaultValues.modelFile.name} readOnly />;
+        return <ModelFileUploader label="Uploaded artifact details(file)" readOnly />;
       }
       if (defaultValues && defaultValues.modelURL) {
-        return (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <EuiFormRow label="Uploaded artifact details(URL)" style={{ width: 400 }}>
-              <EuiFieldText value={defaultValues.modelURL} readOnly />
-            </EuiFormRow>
-            <EuiCopy textToCopy={defaultValues.modelURL}>
-              {(copy) => (
-                <EuiIcon
-                  style={{ marginLeft: 10, transform: 'translateY(10px)', cursor: 'pointer' }}
-                  type="copy"
-                  onClick={copy}
-                />
-              )}
-            </EuiCopy>
-          </div>
-        );
+        return <ModelArtifactUrl readOnly label="Uploaded artifact details(URL)" />;
       }
     }
     if (artifactSource === 'source_from_computer') {
@@ -86,20 +67,6 @@ export const ModelVersionArtifact = () => {
     if (artifactSource === 'source_from_url') {
       return <ModelArtifactUrl />;
     }
-  };
-
-  const renderModelFileFormatInput = () => {
-    if (artifactSource === 'source_not_changed') {
-      const displayedFileFormat = FILE_FORMAT_OPTIONS.find(
-        (fmt) => fmt.value === defaultValues?.modelFileFormat
-      )?.label;
-      return (
-        <EuiFormRow label="Model file format" style={{ width: 400 }}>
-          <EuiFieldText value={displayedFileFormat} readOnly />
-        </EuiFormRow>
-      );
-    }
-    return <ModelFileFormatSelect />;
   };
 
   return (
@@ -153,7 +120,7 @@ export const ModelVersionArtifact = () => {
             </>
           )}
           <EuiSpacer size="m" />
-          {renderModelFileFormatInput()}
+          <ModelFileFormatSelect readOnly={artifactSource === 'source_not_changed'} />
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size="m" />

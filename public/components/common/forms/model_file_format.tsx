@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { EuiComboBox, EuiComboBoxOptionOption, EuiFormRow } from '@elastic/eui';
+import { EuiComboBox, EuiComboBoxOptionOption, EuiFieldText, EuiFormRow } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 import React, { useMemo, useCallback } from 'react';
 
@@ -18,7 +18,11 @@ export const FILE_FORMAT_OPTIONS = [
   },
 ];
 
-export const ModelFileFormatSelect = () => {
+interface Props {
+  readOnly?: boolean;
+}
+
+export const ModelFileFormatSelect = ({ readOnly = false }: Props) => {
   const { control } = useFormContext<{ modelFileFormat: string }>();
 
   const modelFileFormatController = useController({
@@ -54,14 +58,18 @@ export const ModelFileFormatSelect = () => {
       error={modelFileFormatController.fieldState.error?.message}
       isInvalid={Boolean(modelFileFormatController.fieldState.error)}
     >
-      <EuiComboBox
-        inputRef={fileFormatInputRef}
-        options={FILE_FORMAT_OPTIONS}
-        singleSelection={{ asPlainText: true }}
-        selectedOptions={selectedFileFormatOption ? [selectedFileFormatOption] : []}
-        placeholder="Select a format"
-        onChange={onFileFormatChange}
-      />
+      {readOnly ? (
+        <EuiFieldText value={selectedFileFormatOption?.label} readOnly />
+      ) : (
+        <EuiComboBox
+          inputRef={fileFormatInputRef}
+          options={FILE_FORMAT_OPTIONS}
+          singleSelection={{ asPlainText: true }}
+          selectedOptions={selectedFileFormatOption ? [selectedFileFormatOption] : []}
+          placeholder="Select a format"
+          onChange={onFileFormatChange}
+        />
+      )}
     </EuiFormRow>
   );
 };

@@ -95,7 +95,7 @@ export const ModelConfiguration = ({ readOnly = false }: Props) => {
     <>
       <EuiFormRow
         style={{ maxWidth: 800 }}
-        label="Configuration in JSON"
+        label="JSON configuration"
         isInvalid={Boolean(configurationFieldController.fieldState.error)}
         error={<ErrorMessage error={configurationFieldController.fieldState.error} />}
         labelAppend={
@@ -110,12 +110,16 @@ export const ModelConfiguration = ({ readOnly = false }: Props) => {
         }
       >
         {readOnly ? (
-          <EuiCodeBlock isCopyable language="json" overflowHeight={300}>
+          <EuiCodeBlock
+            aria-label="readonly configuration"
+            isCopyable
+            language="json"
+            overflowHeight={300}
+          >
             {configurationFieldController.field.value}
           </EuiCodeBlock>
         ) : (
           <EuiCodeEditor
-            readOnly={readOnly}
             tabSize={2}
             theme="sql_console"
             width="100%"
