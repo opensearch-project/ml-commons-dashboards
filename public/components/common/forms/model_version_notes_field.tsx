@@ -5,28 +5,19 @@
 
 import React from 'react';
 import { EuiFormRow, EuiTextArea } from '@elastic/eui';
-import { FieldPathByValue, useController } from 'react-hook-form';
-import type { Control } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 
-interface VersionNotesFormData {
-  versionNotes?: string;
-}
-
-interface Props<T extends VersionNotesFormData> {
+interface Props {
   label: React.ReactNode;
-  control: Control<T>;
   readOnly?: boolean;
 }
 
 const VERSION_NOTES_MAX_LENGTH = 200;
 
-export const ModelVersionNotesField = <T extends VersionNotesFormData>({
-  control,
-  label,
-  readOnly = false,
-}: Props<T>) => {
+export const ModelVersionNotesField = ({ label, readOnly = false }: Props) => {
+  const { control } = useFormContext<{ versionNotes?: string }>();
   const fieldController = useController({
-    name: 'versionNotes' as FieldPathByValue<T, string>,
+    name: 'versionNotes',
     control,
   });
   const { ref, ...versionNotesField } = fieldController.field;
@@ -42,7 +33,7 @@ export const ModelVersionNotesField = <T extends VersionNotesFormData>({
       label={label}
     >
       <EuiTextArea
-        disabled={readOnly}
+        readOnly={readOnly}
         inputRef={ref}
         isInvalid={Boolean(fieldController.fieldState.error)}
         maxLength={VERSION_NOTES_MAX_LENGTH}

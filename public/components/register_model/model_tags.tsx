@@ -3,31 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback } from 'react';
-import { EuiButton, EuiSpacer, EuiText, EuiLink } from '@elastic/eui';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import React from 'react';
+import { EuiSpacer, EuiText, EuiLink } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
 
-import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
-import { ModelTagField } from './tag_field';
 import { useModelTags } from './register_model.hooks';
+import { ModelTagArrayField } from '../common/forms/model_tag_array_field';
 
 const MAX_TAG_NUM = 10;
 
 export const ModelTagsPanel = () => {
-  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
   const { id: latestVersionId } = useParams<{ id: string | undefined }>();
   const [, tags] = useModelTags();
-  const { fields, append, remove } = useFieldArray({
-    name: 'tags',
-    control,
-  });
   const isRegisterNewVersion = !!latestVersionId;
   const maxTagNum = isRegisterNewVersion ? tags.length : MAX_TAG_NUM;
-
-  const addNewTag = useCallback(() => {
-    append({ key: '', value: '', type: 'string' });
-  }, [append]);
 
   return (
     <div>
@@ -57,25 +46,7 @@ export const ModelTagsPanel = () => {
         </small>
       </EuiText>
       <EuiSpacer size="m" />
-      {fields.map((field, index) => {
-        return (
-          <ModelTagField
-            key={field.id}
-            index={index}
-            tagGroups={tags}
-            onDelete={remove}
-            allowKeyCreate={!latestVersionId}
-          />
-        );
-      })}
-      <EuiSpacer />
-      <EuiButton disabled={fields.length >= maxTagNum} onClick={addNewTag}>
-        Add new tag
-      </EuiButton>
-      <EuiSpacer size="xs" />
-      <EuiText color="subdued">
-        <small>{`You can add up to ${maxTagNum - fields.length} more tags.`}</small>
-      </EuiText>
+      <ModelTagArrayField tags={tags} allowKeyCreate={!latestVersionId} maxTagNum={maxTagNum} />
     </div>
   );
 };

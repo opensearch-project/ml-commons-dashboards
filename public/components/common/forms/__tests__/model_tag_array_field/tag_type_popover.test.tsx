@@ -6,8 +6,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-import { render, screen } from '../../../../test/test_utils';
-import { TagTypePopover } from '../tag_type_popover';
+import { render, screen } from '../../../../../../test/test_utils';
+import { TagTypePopover } from '../../model_tag_array_field/tag_type_popover';
 
 describe('<TagTypePopover />', () => {
   it('should display tag type popover when clicking', async () => {

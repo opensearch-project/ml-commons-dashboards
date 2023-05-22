@@ -11,12 +11,41 @@ import {
   EuiSpacer,
   EuiTitle,
   EuiButton,
+  EuiText,
+  EuiLink,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useFormContext, useFormState } from 'react-hook-form';
+import { ModelTagArrayField } from '../common/forms/model_tag_array_field';
+import { useModelTags } from '../register_model/register_model.hooks';
+import { ModelFileFormData, ModelUrlFormData } from './types';
 
 export const ModelVersionTags = () => {
+  const [, tags] = useModelTags();
+  const form = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { isDirty, dirtyFields } = useFormState({ control: form.control });
+  const [readOnly, setReadOnly] = useState(true);
+  const formRef = useRef(form);
+  formRef.current = form;
+
+  const onCancel = useCallback(() => {
+    form.resetField('tags');
+    setReadOnly(true);
+  }, [form]);
+
+  useEffect(() => {
+    // reset form value to default when unmount
+    return () => {
+      if (formRef.current.formState.dirtyFields.tags) {
+        formRef.current.resetField('tags');
+      }
+    };
+  }, []);
+
+  const isEditDisabled = isDirty && !dirtyFields.tags;
+
   return (
-    <EuiPanel style={{ padding: 20 }}>
+    <EuiPanel data-test-subj="ml-versionTagPanel" style={{ padding: 20 }}>
       <EuiFlexGroup alignItems="center">
         <EuiFlexItem>
           <EuiTitle size="s">
@@ -24,11 +53,47 @@ export const ModelVersionTags = () => {
           </EuiTitle>
         </EuiFlexItem>
         <EuiFlexItem style={{ marginLeft: 'auto', flexGrow: 0 }}>
-          <EuiButton>Edit</EuiButton>
+          {readOnly || isEditDisabled ? (
+            <EuiButton
+              aria-label="edit tags"
+              disabled={isEditDisabled}
+              onClick={() => setReadOnly(false)}
+            >
+              Edit
+            </EuiButton>
+          ) : (
+            <EuiButton aria-label="cancel edit tags" onClick={onCancel}>
+              Cancel
+            </EuiButton>
+          )}
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size="m" />
       <EuiHorizontalRule margin="none" />
+      <EuiSpacer size="m" />
+      <EuiFlexGroup>
+        <EuiFlexItem style={{ minWidth: 372, flexGrow: 0 }}>
+          <EuiText>
+            <h4>
+              Tags - <i style={{ fontWeight: 'normal' }}>optional</i>
+            </h4>
+            <small>
+              Tags help your organization discover and compare models, and track information related
+              to model versions, such as evaluation metrics.{' '}
+              <EuiLink external href="http://todo">
+                Learn more
+              </EuiLink>
+            </small>
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <ModelTagArrayField
+            allowKeyCreate={false}
+            readOnly={readOnly || isEditDisabled}
+            tags={tags}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </EuiPanel>
   );
 };

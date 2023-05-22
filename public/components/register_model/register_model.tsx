@@ -302,7 +302,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
       verticalPosition="center"
       horizontalPosition="center"
       paddingSize="none"
-      style={{ maxWidth: 1000 }}
+      style={{ width: 1000 }}
     >
       <FormProvider {...form}>
         <EuiForm
