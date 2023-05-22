@@ -13,27 +13,42 @@ import {
   EuiButton,
   EuiText,
 } from '@elastic/eui';
-import React, { useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
 import { ModelVersionNotesField } from '../common/forms/model_version_notes_field';
 import { ModelFileFormData, ModelUrlFormData } from './types';
 
 export const ModelVersionInformation = () => {
   const form = useFormContext<ModelFileFormData | ModelUrlFormData>();
-  const formState = useFormState({ control: form.control });
+  // Returned formState is wrapped with Proxy to improve render performance and
+  // skip extra computation if specific state is not subscribed, so make sure you
+  // deconstruct or read it before render in order to enable the subscription.
+  const { isDirty, dirtyFields } = useFormState({ control: form.control });
   const [readOnly, setReadOnly] = useState(true);
+  const formRef = useRef(form);
+  formRef.current = form;
 
   const onCancel = useCallback(() => {
     form.resetField('versionNotes');
     setReadOnly(true);
   }, [form]);
 
+  useEffect(() => {
+    // reset form value to default when component unmounted, this makes sure
+    // the unsaved changes are dropped when the component unmounted
+    return () => {
+      if (formRef.current.formState.dirtyFields.versionNotes) {
+        formRef.current.resetField('versionNotes');
+      }
+    };
+  }, []);
+
   // Whether edit button is disabled or not
   // The edit button should be disabled if there were changes in other form fields
-  const isEditDisabled = formState.isDirty && !formState.dirtyFields.versionNotes;
+  const isEditDisabled = isDirty && !dirtyFields.versionNotes;
 
   return (
-    <EuiPanel style={{ padding: 20 }}>
+    <EuiPanel data-test-subj="ml-versionInformationPanel" style={{ padding: 20 }}>
       <EuiFlexGroup alignItems="center">
         <EuiFlexItem>
           <EuiTitle size="s">
@@ -41,7 +56,7 @@ export const ModelVersionInformation = () => {
           </EuiTitle>
         </EuiFlexItem>
         <EuiFlexItem style={{ marginLeft: 'auto', flexGrow: 0 }}>
-          {readOnly ? (
+          {readOnly || isEditDisabled ? (
             <EuiButton
               aria-label="edit version notes"
               disabled={isEditDisabled}
@@ -60,7 +75,7 @@ export const ModelVersionInformation = () => {
       <EuiHorizontalRule margin="none" />
       <EuiSpacer size="m" />
       <EuiFlexGroup>
-        <EuiFlexItem style={{ maxWidth: 372 }}>
+        <EuiFlexItem style={{ minWidth: 372, flexGrow: 0 }}>
           <EuiText>
             <h4>
               Version notes - <i style={{ fontWeight: 'normal' }}>optional</i>
@@ -69,11 +84,7 @@ export const ModelVersionInformation = () => {
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem>
-          <ModelVersionNotesField
-            readOnly={readOnly}
-            label="Version notes"
-            control={form.control}
-          />
+          <ModelVersionNotesField readOnly={readOnly || isEditDisabled} label="Version notes" />
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPanel>

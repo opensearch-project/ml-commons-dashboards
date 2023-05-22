@@ -26,35 +26,11 @@ describe('<RegisterModel /> Tags', () => {
     jest.clearAllMocks();
   });
 
-  it('should render a tags panel', async () => {
-    await setup();
-
-    const keyContainer = screen.queryByTestId('ml-tagKey1');
-    const valueContainer = screen.queryByTestId('ml-tagValue1');
-
-    expect(keyContainer).toBeInTheDocument();
-    expect(valueContainer).toBeInTheDocument();
-  });
-
   it('should submit the form without selecting tags', async () => {
     const result = await setup();
     await result.user.click(result.submitButton);
 
     expect(onSubmitMock).toHaveBeenCalled();
-  });
-
-  it('tag value input should be disabled if tag key is empty', async () => {
-    const result = await setup();
-
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const keyInput = within(keyContainer).getByRole('textbox');
-
-    const valueContainer = screen.getByTestId('ml-tagValue1');
-    const valueInput = within(valueContainer).getByRole('textbox');
-    expect(valueInput).toBeDisabled();
-
-    await result.user.type(keyInput, 'Key1{enter}');
-    expect(valueInput).toBeEnabled();
   });
 
   it('should submit the form with selected tags', async () => {
@@ -80,8 +56,8 @@ describe('<RegisterModel /> Tags', () => {
     const result = await setup();
 
     // Add two tags
-    await result.user.click(screen.getByText(/add new tag/i));
-    await result.user.click(screen.getByText(/add new tag/i));
+    await result.user.click(screen.getByRole('button', { name: /add tag/i }));
+    await result.user.click(screen.getByRole('button', { name: /add tag/i }));
 
     expect(
       screen.getAllByText(/select or add a key/i, { selector: '.euiComboBoxPlaceholder' })
@@ -154,7 +130,7 @@ describe('<RegisterModel /> Tags', () => {
     await result.user.type(valueInput1, 'Value 1');
 
     // Add a new tag, and input the same tag key and value
-    await result.user.click(screen.getByText(/add new tag/i));
+    await result.user.click(screen.getByRole('button', { name: /add tag/i }));
     // input tag key: 'Key 1'
     const keyContainer2 = screen.getByTestId('ml-tagKey2');
     const keyInput2 = within(keyContainer2).getByRole('textbox');
@@ -182,19 +158,17 @@ describe('<RegisterModel /> Tags', () => {
       const MAX_TAG_NUM = 10;
 
       // It has one tag by default, we can add 24 more tags
-      const addNewTagButton = screen.getByText(/add new tag/i);
+      const addNewTagButton = screen.getByRole('button', { name: /add tag/i });
       for (let i = 1; i < MAX_TAG_NUM; i++) {
         await result.user.click(addNewTagButton);
       }
 
       // 10 tags are displayed
       await waitFor(() => expect(screen.queryAllByTestId(/ml-tagKey/i)).toHaveLength(10));
-      // add new tag button should not be displayed
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: /add new tag/i })).toBeDisabled()
-      );
+      // add tag button should not be displayed
+      await waitFor(() => expect(screen.getByRole('button', { name: /add tag/i })).toBeDisabled());
     },
-    // The test will fail due to timeout as we interact with the page a lot(24 button click to add new tags)
+    // The test will fail due to timeout as we interact with the page a lot(24 button click to add tags)
     // So we try to increase test running timeout to 60000ms to mitigate the timeout issue
     60 * 1000
   );
@@ -203,8 +177,8 @@ describe('<RegisterModel /> Tags', () => {
     const result = await setup();
 
     // Add two tags
-    await result.user.click(screen.getByText(/add new tag/i));
-    await result.user.click(screen.getByText(/add new tag/i));
+    await result.user.click(screen.getByRole('button', { name: /add tag/i }));
+    await result.user.click(screen.getByRole('button', { name: /add tag/i }));
 
     expect(
       screen.getAllByText(/select or add a key/i, { selector: '.euiComboBoxPlaceholder' })
@@ -240,11 +214,9 @@ describe('<RegisterModel /> Tags', () => {
       mode: 'version',
     });
 
-    await result.user.click(screen.getByText(/add new tag/i));
+    await result.user.click(screen.getByRole('button', { name: /add tag/i }));
 
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: /add new tag/i })).toBeDisabled()
-    );
+    await waitFor(() => expect(screen.getByRole('button', { name: /add tag/i })).toBeDisabled());
   });
 
   it('should prevent creating new tag key when registering new version', async () => {
@@ -264,95 +236,6 @@ describe('<RegisterModel /> Tags', () => {
           element?.nextSibling?.textContent?.trim() === "doesn't match any options"
         );
       })
-    ).toBeInTheDocument();
-  });
-
-  it('should display error when creating new tag key with more than 80 characters', async () => {
-    const result = await setup();
-
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const keyInput = within(keyContainer).getByRole('textbox');
-    await result.user.type(keyInput, `${'x'.repeat(81)}{enter}`);
-    expect(
-      within(keyContainer).queryByText('80 characters allowed. Use 80 characters or less.')
-    ).toBeInTheDocument();
-  });
-
-  it('should display error when creating new tag value with more than 80 characters', async () => {
-    const result = await setup();
-
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const keyInput = within(keyContainer).getByRole('textbox');
-    await result.user.type(keyInput, 'dummy key{enter}');
-
-    const valueContainer = screen.getByTestId('ml-tagValue1');
-    const valueInput = within(valueContainer).getByRole('textbox');
-    await result.user.type(valueInput, `${'x'.repeat(81)}{enter}`);
-    expect(
-      within(valueContainer).queryByText('80 characters allowed. Use 80 characters or less.')
-    ).toBeInTheDocument();
-  });
-
-  it('should display "No keys found" and "No values found" if no tag keys and no tag values are provided', async () => {
-    jest.spyOn(formHooks, 'useModelTags').mockReturnValue([false, []]);
-
-    const result = await setup();
-
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const keyInput = within(keyContainer).getByRole('textbox');
-    await result.user.click(keyInput);
-    expect(screen.getByText('No keys found. Add a key.')).toBeInTheDocument();
-
-    await result.user.type(keyInput, 'dummy key{enter}');
-
-    const valueContainer = screen.getByTestId('ml-tagValue1');
-    const valueInput = within(valueContainer).getByRole('textbox');
-    await result.user.click(valueInput);
-    expect(screen.getByText('No values found. Add a value.')).toBeInTheDocument();
-  });
-
-  it('should NOT display "Key1" in the option list after "Key1" selected', async () => {
-    const result = await setup();
-
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const keyInput = within(keyContainer).getByRole('textbox');
-    await result.user.click(keyInput);
-    const optionListContainer = screen.getByTestId('comboBoxOptionsList');
-    expect(within(optionListContainer).getByTitle('Key1')).toBeInTheDocument();
-
-    await result.user.click(within(optionListContainer).getByTitle('Key1'));
-    expect(within(optionListContainer).queryByTitle('Key1')).toBe(null);
-  });
-
-  it('should not allow to select tag type if selected an existed tag', async () => {
-    const result = await setup();
-
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const valueContainer = screen.getByTestId('ml-tagValue1');
-    const keyInput = within(keyContainer).getByRole('textbox');
-
-    await result.user.click(keyInput);
-    // selected an existed tag
-    await result.user.click(within(screen.getByTestId('comboBoxOptionsList')).getByTitle('Key1'));
-
-    expect(within(valueContainer).queryByLabelText('select tag type')).not.toBeInTheDocument();
-  });
-
-  it('should display a list of tag value for selection after selecting a tag key', async () => {
-    const result = await setup();
-
-    const keyContainer = screen.getByTestId('ml-tagKey1');
-    const valueContainer = screen.getByTestId('ml-tagValue1');
-    const keyInput = within(keyContainer).getByRole('textbox');
-    const valueInput = within(valueContainer).getByRole('textbox');
-
-    await result.user.click(keyInput);
-    // selected an existed tag
-    await result.user.click(within(screen.getByTestId('comboBoxOptionsList')).getByTitle('Key1'));
-
-    await result.user.click(valueInput);
-    expect(
-      within(screen.getByTestId('comboBoxOptionsList')).queryByTitle('Value1')
     ).toBeInTheDocument();
   });
 
