@@ -169,7 +169,7 @@ export const ModelVersionArtifact = () => {
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem>
-          <ModelConfiguration readOnly />
+          <ModelConfiguration readOnly={readOnly} />
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPanel>
