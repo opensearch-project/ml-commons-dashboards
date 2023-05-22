@@ -21,16 +21,18 @@ import {
 } from '@elastic/eui';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
-import { ModelFileUploader } from '../common/forms/artifact_file';
-import { ModelFileFormData, ModelUrlFormData } from './types';
+import { ModelFileUploader, UploadHelpText } from '../common/forms/artifact_file';
+import { ArtifactUrl } from '../common/forms/artifact_url';
+import { FILE_FORMAT_OPTIONS, ModelFileFormatSelect } from '../common/forms/model_file_format';
+import { ModelVersionFormData } from './types';
 import { VersionArtifactSource } from './version_artifact_source';
 
 export const ModelVersionArtifact = () => {
-  const form = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const form = useFormContext<ModelVersionFormData>();
   // Returned formState is wrapped with Proxy to improve render performance and
   // skip extra computation if specific state is not subscribed, so make sure you
   // deconstruct or read it before render in order to enable the subscription.
-  const { isDirty, dirtyFields, defaultValues } = useFormState({ control: form.control });
+  const { defaultValues } = useFormState({ control: form.control });
   const [readOnly, setReadOnly] = useState(true);
   const formRef = useRef(form);
   formRef.current = form;
@@ -41,10 +43,7 @@ export const ModelVersionArtifact = () => {
   });
 
   const onCancel = useCallback(() => {
-    formRef.current.resetField('modelFile');
-    formRef.current.resetField('modelURL');
-    formRef.current.resetField('configuration');
-    formRef.current.resetField('modelFileFormat');
+    formRef.current.reset();
     setReadOnly(true);
   }, []);
 
@@ -52,19 +51,16 @@ export const ModelVersionArtifact = () => {
     // reset form value to default when component unmounted, this makes sure
     // the unsaved changes are dropped when the component unmounted
     return () => {
-      formRef.current.resetField('modelFile');
-      formRef.current.resetField('modelURL');
-      formRef.current.resetField('configuration');
-      formRef.current.resetField('modelFileFormat');
+      formRef.current.reset();
     };
   }, []);
 
   const renderArtifactInput = () => {
     if (artifactSource === 'source_not_changed') {
-      if (defaultValues && 'modelFile' in defaultValues && defaultValues.modelFile) {
+      if (defaultValues && defaultValues.modelFile) {
         return <EuiFieldText icon="download" value={defaultValues.modelFile.name} readOnly />;
       }
-      if (defaultValues && 'modelURL' in defaultValues && defaultValues.modelURL) {
+      if (defaultValues && defaultValues.modelURL) {
         return (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <EuiFormRow label="Uploaded artifact details(URL)" style={{ width: 400 }}>
@@ -83,17 +79,27 @@ export const ModelVersionArtifact = () => {
         );
       }
     }
+    if (artifactSource === 'source_from_computer') {
+      return <ModelFileUploader />;
+    }
+    if (artifactSource === 'source_from_url') {
+      return <ArtifactUrl />;
+    }
   };
 
-  // Whether edit button is disabled or not
-  // The edit button should be disabled if there were changes in other form fields
-  const currentFormNotChanged =
-    !dirtyFields.configuration &&
-    !dirtyFields.modelFileFormat &&
-    !dirtyFields.artifactSource &&
-    (!('modelURL' in dirtyFields) || !dirtyFields.modelURL) &&
-    (!('modelFile' in dirtyFields) || !dirtyFields.modelFile);
-  const isEditDisabled = isDirty && currentFormNotChanged;
+  const renderModelFileFormatInput = () => {
+    if (artifactSource === 'source_not_changed') {
+      const displayedFileFormat = FILE_FORMAT_OPTIONS.find(
+        (fmt) => fmt.value === defaultValues?.modelFileFormat
+      )?.label;
+      return (
+        <EuiFormRow label="Model file format" style={{ width: 400 }}>
+          <EuiFieldText value={displayedFileFormat} readOnly />
+        </EuiFormRow>
+      );
+    }
+    return <ModelFileFormatSelect />;
+  };
 
   return (
     <EuiPanel data-test-subj="ml-versionArtifactPanel" style={{ padding: 20 }}>
@@ -104,12 +110,8 @@ export const ModelVersionArtifact = () => {
           </EuiTitle>
         </EuiFlexItem>
         <EuiFlexItem style={{ marginLeft: 'auto', flexGrow: 0 }}>
-          {readOnly || isEditDisabled ? (
-            <EuiButton
-              aria-label="edit version artifact"
-              disabled={isEditDisabled}
-              onClick={() => setReadOnly(false)}
-            >
+          {readOnly ? (
+            <EuiButton aria-label="edit version artifact" onClick={() => setReadOnly(false)}>
               Edit
             </EuiButton>
           ) : (
@@ -136,13 +138,21 @@ export const ModelVersionArtifact = () => {
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem>
-          {!readOnly && !isEditDisabled && (
+          {!readOnly && (
             <>
               <VersionArtifactSource />
               <EuiSpacer size="m" />
             </>
           )}
           {renderArtifactInput()}
+          {!readOnly && artifactSource !== 'source_not_changed' && (
+            <>
+              <EuiSpacer size="m" />
+              <UploadHelpText />
+            </>
+          )}
+          <EuiSpacer size="m" />
+          {renderModelFileFormatInput()}
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size="m" />

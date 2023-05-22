@@ -18,11 +18,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
 import { ModelTagArrayField } from '../common/forms/model_tag_array_field';
 import { useModelTags } from '../register_model/register_model.hooks';
-import { ModelFileFormData, ModelUrlFormData } from './types';
+import { ModelVersionFormData } from './types';
 
 export const ModelVersionTags = () => {
   const [, tags] = useModelTags();
-  const form = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const form = useFormContext<ModelVersionFormData>();
   const { isDirty, dirtyFields } = useFormState({ control: form.control });
   const [readOnly, setReadOnly] = useState(true);
   const formRef = useRef(form);

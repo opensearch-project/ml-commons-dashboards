@@ -28,7 +28,7 @@ import { ModelVersionDetails } from './version_details';
 import { ModelVersionInformation } from './version_information';
 import { ModelVersionArtifact } from './version_artifact';
 import { ModelVersionTags } from './version_tags';
-import { ModelFileFormData, ModelUrlFormData } from './types';
+import { ModelVersionFormData } from './types';
 
 export const ModelVersion = () => {
   const { id: modelId } = useParams<{ id: string }>();
@@ -37,7 +37,7 @@ export const ModelVersion = () => {
   const history = useHistory();
   const modelName = model?.name;
   const modelVersion = model?.model_version;
-  const form = useForm<ModelFileFormData | ModelUrlFormData>();
+  const form = useForm<ModelVersionFormData>();
 
   const onVersionChange = useCallback(
     ({ newVersion, newId }: { newVersion: string; newId: string }) => {

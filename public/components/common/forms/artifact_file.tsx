@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { EuiFormRow, EuiFilePicker } from '@elastic/eui';
+import React, { useEffect } from 'react';
+import { EuiFormRow, EuiFilePicker, EuiText } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { CUSTOM_FORM_ERROR_TYPES, MAX_MODEL_FILE_SIZE } from './form_constants';
+import { ONE_GB } from '../../../../common/constant';
 
 function validateFileSize(file?: File) {
   if (file && file.size > MAX_MODEL_FILE_SIZE) {
@@ -16,8 +17,23 @@ function validateFileSize(file?: File) {
   return true;
 }
 
+export const UploadHelpText = () => (
+  <>
+    <EuiText size="xs" color="subdued">
+      Accepted file format: ZIP (.zip). Maximum size, {MAX_MODEL_FILE_SIZE / ONE_GB}GB.
+    </EuiText>
+    <EuiText size="xs" color="subdued">
+      The ZIP mush include the following contents:
+      <ul>
+        <li>Model File, accepted formats: Torchscript(.pt), ONNX(.onnx)</li>
+        <li>Tokenizer file, accepted format: JSON(.json)</li>
+      </ul>
+    </EuiText>
+  </>
+);
+
 export const ModelFileUploader = () => {
-  const { control } = useFormContext<{ modelFile: File }>();
+  const { control, unregister } = useFormContext<{ modelFile: File }>();
   const modelFileFieldController = useController({
     name: 'modelFile',
     control,
@@ -27,8 +43,13 @@ export const ModelFileUploader = () => {
         [CUSTOM_FORM_ERROR_TYPES.FILE_SIZE_EXCEED_LIMIT]: validateFileSize,
       },
     },
-    shouldUnregister: true,
   });
+
+  useEffect(() => {
+    return () => {
+      unregister('modelFile', { keepDefaultValue: true });
+    };
+  }, [unregister]);
 
   return (
     <EuiFormRow

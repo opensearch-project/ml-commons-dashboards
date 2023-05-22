@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { EuiFormRow, htmlIdGenerator, EuiFieldText } from '@elastic/eui';
 import { useController, useFormContext } from 'react-hook-form';
 
-import { FORM_ITEM_WIDTH } from './form_constants';
-import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
-import { URL_REGEX } from '../../utils/regex';
+import { URL_REGEX } from '../../../utils/regex';
 
 export const ArtifactUrl = () => {
-  const { control } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { control, unregister } = useFormContext<{ modelURL?: string }>();
   const modelUrlFieldController = useController({
     name: 'modelURL',
     control,
@@ -20,12 +18,16 @@ export const ArtifactUrl = () => {
       required: { value: true, message: 'URL is required. Enter a URL.' },
       pattern: { value: URL_REGEX, message: 'URL is invalid. Enter a valid URL.' },
     },
-    shouldUnregister: true,
   });
+
+  useEffect(() => {
+    return () => {
+      unregister('modelURL', { keepDefaultValue: true });
+    };
+  }, [unregister]);
 
   return (
     <EuiFormRow
-      style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
       label="URL"
       isInvalid={Boolean(modelUrlFieldController.fieldState.error)}
       error={modelUrlFieldController.fieldState.error?.message}

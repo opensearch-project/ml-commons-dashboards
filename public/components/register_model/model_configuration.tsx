@@ -16,7 +16,6 @@ import {
 import { useController, useFormContext } from 'react-hook-form';
 
 import '../../ace-themes/sql_console.js';
-import { FORM_ITEM_WIDTH } from './form_constants';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { HelpFlyout } from './help_flyout';
 import { ErrorMessage } from './error_message';
@@ -122,7 +121,7 @@ export const ConfigurationPanel = () => {
       </EuiText>
       <EuiSpacer size="m" />
       <EuiFormRow
-        style={{ maxWidth: FORM_ITEM_WIDTH * 2 }}
+        style={{ maxWidth: 800 }}
         label="Configuration in JSON"
         isInvalid={Boolean(configurationFieldController.fieldState.error)}
         error={<ErrorMessage error={configurationFieldController.fieldState.error} />}
