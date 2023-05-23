@@ -4,7 +4,7 @@
  */
 
 import { APIProvider } from '../../apis/api_provider';
-import { MAX_CHUNK_SIZE } from './constants';
+import { MAX_CHUNK_SIZE } from '../common/forms/form_constants';
 import { getModelContentHashValue } from './get_model_content_hash_value';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 

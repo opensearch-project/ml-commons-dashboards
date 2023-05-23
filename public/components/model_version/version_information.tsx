@@ -16,10 +16,10 @@ import {
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
 import { ModelVersionNotesField } from '../common/forms/model_version_notes_field';
-import { ModelFileFormData, ModelUrlFormData } from './types';
+import { ModelVersionFormData } from './types';
 
 export const ModelVersionInformation = () => {
-  const form = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const form = useFormContext<ModelVersionFormData>();
   // Returned formState is wrapped with Proxy to improve render performance and
   // skip extra computation if specific state is not subscribed, so make sure you
   // deconstruct or read it before render in order to enable the subscription.
@@ -29,17 +29,15 @@ export const ModelVersionInformation = () => {
   formRef.current = form;
 
   const onCancel = useCallback(() => {
-    form.resetField('versionNotes');
+    formRef.current.resetField('versionNotes');
     setReadOnly(true);
-  }, [form]);
+  }, []);
 
   useEffect(() => {
     // reset form value to default when component unmounted, this makes sure
     // the unsaved changes are dropped when the component unmounted
     return () => {
-      if (formRef.current.formState.dirtyFields.versionNotes) {
-        formRef.current.resetField('versionNotes');
-      }
+      formRef.current.resetField('versionNotes');
     };
   }, []);
 
