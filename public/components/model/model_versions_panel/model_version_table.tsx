@@ -125,7 +125,7 @@ export const ModelVersionTable = ({
       .map(({ id }) => id)
       .filter((columnId) => {
         if (columnId.startsWith('tags.')) {
-          const [_prefix, tag] = columnId;
+          const [_prefix, tag] = columnId.split('.');
           return !tagHiddenByDefaultColumns.includes(tag);
         }
         return columnId !== 'id';

@@ -17,7 +17,7 @@ import {
 
 const validateSortItem = (sort: string) => {
   const [key, direction] = sort.split('-');
-  if (typeof key !== 'string' || typeof direction !== 'string') {
+  if (key === undefined || direction === undefined) {
     return 'Invalidate sort';
   }
   if (direction !== 'asc' && direction !== 'desc') {
@@ -32,13 +32,8 @@ const validateSortItem = (sort: string) => {
 };
 
 const validateUniqueSort = (sort: string[]) => {
-  const existsSortKeyMap: { [key: string]: boolean } = {};
-  for (let i = 0; i < sort.length; i++) {
-    const [key] = sort[i].split('-');
-    if (existsSortKeyMap[key]) {
-      return 'Invalidate sort';
-    }
-    existsSortKeyMap[key] = true;
+  if (new Set(sort).size < sort.length) {
+    return 'Invalidate sort';
   }
   return undefined;
 };

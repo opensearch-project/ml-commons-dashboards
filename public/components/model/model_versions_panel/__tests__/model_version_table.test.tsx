@@ -49,8 +49,10 @@ describe('<ModelVersionTable />', () => {
   afterAll(() => {
     jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockRestore();
   });
-  it('should render consistent columns header ', async () => {
-    render(<ModelVersionTable versions={[]} tags={['Accuracy: test', 'Accuracy: train']} />);
+  it('should render consistent columns header and hide id, tags columns by default', async () => {
+    render(
+      <ModelVersionTable versions={[]} tags={['Accuracy: test', 'Accuracy: train', 'F1', 'F2']} />
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('dataGridHeaderCell-version')).toBeInTheDocument();
@@ -59,6 +61,9 @@ describe('<ModelVersionTable />', () => {
       expect(screen.getByTestId('dataGridHeaderCell-lastUpdatedTime')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-tags.Accuracy: test')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-tags.Accuracy: train')).toBeInTheDocument();
+      expect(screen.getByTestId('dataGridHeaderCell-tags.F1')).toBeInTheDocument();
+      expect(screen.queryByTestId('dataGridHeaderCell-id')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('dataGridHeaderCell-tags.F2')).not.toBeInTheDocument();
     });
   });
 
