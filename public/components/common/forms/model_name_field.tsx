@@ -8,8 +8,7 @@ import { EuiFieldText, EuiFormRow, EuiText } from '@elastic/eui';
 import { Control, FieldPathByValue, UseFormTrigger, useController } from 'react-hook-form';
 
 import { APIProvider } from '../../../apis/api_provider';
-
-export const MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR = 'duplicateName';
+import { MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR } from './form_constants';
 
 const NAME_MAX_LENGTH = 80;
 
