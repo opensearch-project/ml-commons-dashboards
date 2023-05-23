@@ -25,9 +25,9 @@ import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_d
 import { mountReactNode } from '../../../../../src/core/public/utils';
 import { routerPaths } from '../../../common';
 import { ErrorCallOut, ModelDescriptionField, ModelNameField } from '../common';
+import { MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR } from '../common/forms/form_constants';
 
 import { BottomFormActionBar } from './bottom_form_action_bar';
-import { MODEL_NAME_FIELD_DUPLICATE_NAME_ERROR } from '../common/forms/form_constants';
 
 const formErrorMessages = [
   {

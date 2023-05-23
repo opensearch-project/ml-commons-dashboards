@@ -7,8 +7,8 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, within } from '../../../../../../test/test_utils';
-import { ModelConfiguration } from '../../model_configuration';
+import { render, screen } from '../../../../../../test/test_utils';
+import { ModelConfiguration } from '../model_configuration';
 
 const TestApp = ({
   configuration = '{}',
