@@ -44,6 +44,13 @@ export const ModelVersionArtifact = () => {
     setReadOnly(true);
   }, []);
 
+  const onSourceChange = useCallback((source: string) => {
+    if (source === 'source_not_changed') {
+      formRef.current.resetField('modelFile');
+      formRef.current.resetField('modelURL');
+    }
+  }, []);
+
   useEffect(() => {
     // reset form value to default when component unmounted, this makes sure
     // the unsaved changes are dropped when the component unmounted
@@ -108,7 +115,7 @@ export const ModelVersionArtifact = () => {
         <EuiFlexItem>
           {!readOnly && (
             <>
-              <VersionArtifactSource />
+              <VersionArtifactSource onChange={onSourceChange} />
               <EuiSpacer size="m" />
             </>
           )}
@@ -120,7 +127,7 @@ export const ModelVersionArtifact = () => {
             </>
           )}
           <EuiSpacer size="m" />
-          <ModelFileFormatSelect readOnly={artifactSource === 'source_not_changed'} />
+          <ModelFileFormatSelect readOnly={readOnly} />
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size="m" />

@@ -6,7 +6,8 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { render, screen } from '../../../../test/test_utils';
+
+import { render, screen, within } from '../../../../test/test_utils';
 import { ModelVersionFormData } from '../types';
 import { ModelVersionArtifact } from '../version_artifact';
 
@@ -68,9 +69,10 @@ describe('<ModelVersionArtifact />', () => {
 
     await user.click(screen.getByLabelText('edit version artifact'));
     expect(screen.getByLabelText('Keep existing')).toBeChecked();
-    // model url and model file format are readonly
-    expect(screen.getByDisplayValue('http://url.to/artifact.zip')).toHaveAttribute('readonly');
-    expect(screen.getByDisplayValue('Torchscript(.pt)')).toHaveAttribute('readonly');
+    // model url is readonly
+    expect(screen.getByLabelText('Uploaded artifact details(URL)')).toHaveAttribute('readonly');
+    // model file format is editable
+    expect(screen.getByLabelText('Model file format')).not.toHaveAttribute('readonly');
 
     // configuration json input is editable
     expect(screen.getByLabelText('JSON configuration')).toBeEnabled();
@@ -111,5 +113,88 @@ describe('<ModelVersionArtifact />', () => {
 
     await user.click(screen.getByLabelText('Upload new from URL'));
     expect(screen.getByLabelText('Model file format')).not.toHaveAttribute('readonly');
+  });
+
+  it('should reset form changes after clicking "Cancel" button', async () => {
+    const user = userEvent.setup();
+    render(<TestApp />);
+
+    // model url field should display the default url
+    expect(screen.getByLabelText('Uploaded artifact details(URL)')).toHaveDisplayValue(
+      'http://url.to/artifact.zip'
+    );
+    // model file format should display the default file format
+    expect(screen.getByLabelText('Model file format')).toHaveDisplayValue('Torchscript(.pt)');
+
+    await user.click(screen.getByLabelText('edit version artifact'));
+    await user.click(screen.getByLabelText('Upload new from URL'));
+
+    // update model url
+    const urlInput = screen.getByLabelText<HTMLInputElement>(/url/i, {
+      selector: 'input[type="text"]',
+    });
+    await user.clear(urlInput);
+    await user.type(urlInput, 'http://ur.new/artifact.zip');
+
+    // select another model file format
+    const input = screen.getByLabelText<HTMLInputElement>(/model file format/i);
+    await user.click(input);
+    const listBox = screen.getByRole('listBox');
+    await user.click(within(listBox).getByText('ONNX(.onnx)'));
+
+    await user.click(screen.getByLabelText('cancel edit version artifact'));
+    expect(screen.getByLabelText('Uploaded artifact details(URL)')).toHaveDisplayValue(
+      'http://url.to/artifact.zip'
+    );
+    expect(screen.getByLabelText('Model file format')).toHaveDisplayValue('Torchscript(.pt)');
+  });
+
+  it('should NOT change artifact(via URL) after selecting "Keep existing"', async () => {
+    const user = userEvent.setup();
+    render(<TestApp />);
+
+    await user.click(screen.getByLabelText('edit version artifact'));
+
+    // model url field should display the default url
+    expect(screen.getByLabelText('Uploaded artifact details(URL)')).toHaveDisplayValue(
+      'http://url.to/artifact.zip'
+    );
+
+    // starts to edit url
+    await user.click(screen.getByLabelText('Upload new from URL'));
+    // update model url
+    const urlInput = screen.getByLabelText<HTMLInputElement>(/url/i, {
+      selector: 'input[type="text"]',
+    });
+    await user.clear(urlInput);
+    await user.type(urlInput, 'http://ur.new/artifact.zip');
+
+    await user.click(screen.getByLabelText('Keep existing'));
+    expect(screen.getByLabelText('Uploaded artifact details(URL)')).toHaveDisplayValue(
+      'http://url.to/artifact.zip'
+    );
+  });
+
+  it('should NOT change artifact(via file upload) after selecting "Keep existing"', async () => {
+    const user = userEvent.setup();
+    render(<TestApp />);
+
+    await user.click(screen.getByLabelText('edit version artifact'));
+
+    // model url field should display the default url
+    expect(screen.getByLabelText('Uploaded artifact details(URL)')).toHaveDisplayValue(
+      'http://url.to/artifact.zip'
+    );
+
+    // starts to upload model file
+    await user.click(screen.getByLabelText('Upload new from local file'));
+    const modelFileInput = screen.getByLabelText<HTMLInputElement>(/^file$/i);
+    const file = new File(['test model file'], 'model.zip', { type: 'application/zip' });
+    await user.upload(modelFileInput, file);
+
+    await user.click(screen.getByLabelText('Keep existing'));
+    expect(screen.getByLabelText('Uploaded artifact details(URL)')).toHaveDisplayValue(
+      'http://url.to/artifact.zip'
+    );
   });
 });

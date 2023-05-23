@@ -4,8 +4,10 @@
  */
 
 import { EuiRadioGroup, EuiText } from '@elastic/eui';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
+
+type Source = 'source_not_changed' | 'source_from_computer' | 'source_from_url';
 
 const OPTIONS = [
   {
@@ -22,9 +24,13 @@ const OPTIONS = [
   },
 ];
 
-export const VersionArtifactSource = () => {
+interface Props {
+  onChange?: (source: Source) => void;
+}
+
+export const VersionArtifactSource = ({ onChange }: Props) => {
   const { control } = useFormContext<{
-    artifactSource: 'source_not_changed' | 'source_from_computer' | 'source_from_url';
+    artifactSource: Source;
   }>();
 
   const sourceArtifactControl = useController({
@@ -32,11 +38,21 @@ export const VersionArtifactSource = () => {
     control,
   });
 
+  const onSourceChange = useCallback(
+    (id: string) => {
+      sourceArtifactControl.field.onChange(id);
+      if (onChange) {
+        onChange(id as Source);
+      }
+    },
+    [sourceArtifactControl.field, onChange]
+  );
+
   return (
     <EuiRadioGroup
       options={OPTIONS}
       idSelected={sourceArtifactControl.field.value}
-      onChange={(id) => sourceArtifactControl.field.onChange(id)}
+      onChange={onSourceChange}
       legend={{
         children: (
           <EuiText size="xs">
