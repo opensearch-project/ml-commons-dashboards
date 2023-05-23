@@ -28,7 +28,7 @@ import { ModelVersionDetails } from './version_details';
 import { ModelVersionInformation } from './version_information';
 import { ModelVersionArtifact } from './version_artifact';
 import { ModelVersionTags } from './version_tags';
-import { ModelFileFormData, ModelUrlFormData } from './types';
+import { ModelVersionFormData } from './types';
 
 export const ModelVersion = () => {
   const { id: modelId } = useParams<{ id: string }>();
@@ -37,7 +37,7 @@ export const ModelVersion = () => {
   const history = useHistory();
   const modelName = model?.name;
   const modelVersion = model?.model_version;
-  const form = useForm<ModelFileFormData | ModelUrlFormData>();
+  const form = useForm<ModelVersionFormData>();
 
   const onVersionChange = useCallback(
     ({ newVersion, newId }: { newVersion: string; newId: string }) => {
@@ -73,9 +73,12 @@ export const ModelVersion = () => {
           { key: 'Precision', value: '0.64', type: 'number' as const },
           { key: 'Task', value: 'Image classification', type: 'string' as const },
         ], // TODO: read from model.tags
-        configuration: JSON.stringify(model.model_config),
+        configuration: JSON.stringify(model.model_config, undefined, 2),
         modelFileFormat: model.model_format,
         // TODO: read model url or model filename
+        artifactSource: 'source_not_changed',
+        // modelFile: new File([], 'artifact.zip'),
+        modelURL: 'http://url.to/artifact.zip',
       });
     }
   }, [model, form]);

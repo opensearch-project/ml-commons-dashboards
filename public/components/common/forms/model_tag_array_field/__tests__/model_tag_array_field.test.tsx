@@ -8,9 +8,9 @@ import { FormProvider, useForm } from 'react-hook-form';
 import userEvent from '@testing-library/user-event';
 
 import { Tag } from '../../../../../components/model/types';
-import { ModelTagArrayField } from '../../model_tag_array_field';
-import { TagGroup } from '../../model_tag_array_field/tag_field';
 import { render, screen } from '../../../../../../test/test_utils';
+import { ModelTagArrayField } from '../model_tag_array_field';
+import { TagGroup } from '../tag_field';
 
 const TEST_TAG_GROUPS = [
   { name: 'Key1', type: 'string' as const, values: ['Value1'] },

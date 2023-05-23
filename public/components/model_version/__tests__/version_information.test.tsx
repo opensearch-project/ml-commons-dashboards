@@ -7,11 +7,11 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { render, screen } from '../../../../test/test_utils';
-import { ModelFileFormData, ModelUrlFormData } from '../types';
+import { ModelVersionFormData } from '../types';
 import { ModelVersionInformation } from '../version_information';
 
 const TestApp = () => {
-  const form = useForm<ModelFileFormData | ModelUrlFormData>({
+  const form = useForm<ModelVersionFormData>({
     defaultValues: { versionNotes: 'test_version_notes' },
   });
 

@@ -37,7 +37,7 @@ import { modelRepositoryManager } from '../../utils/model_repository_manager';
 import { modelTaskManager } from './model_task_manager';
 import { ModelVersionNotesPanel } from './model_version_notes';
 import { modelFileUploadManager } from './model_file_upload_manager';
-import { MAX_CHUNK_SIZE, FORM_ERRORS } from './constants';
+import { MAX_CHUNK_SIZE, FORM_ERRORS } from '../common/forms/form_constants';
 import { ModelDetailsPanel } from './model_details';
 import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';

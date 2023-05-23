@@ -23,14 +23,6 @@ describe('<RegisterModel /> Configuration', () => {
     jest.clearAllMocks();
   });
 
-  it('should render a help flyout when click help button', async () => {
-    const { user } = await setup();
-
-    expect(screen.getByLabelText('Configuration in JSON')).toBeInTheDocument();
-    await user.click(screen.getByTestId('model-configuration-help-button'));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-  });
-
   it('should not allow to submit form if model_type is missing', async () => {
     // Missing model_type
     const invalidConfiguration = `{}`;

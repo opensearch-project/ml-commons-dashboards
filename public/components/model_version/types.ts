@@ -5,17 +5,12 @@
 
 import type { Tag } from '../model/types';
 
-interface FormDataBase {
+export interface ModelVersionFormData {
+  artifactSource?: 'source_not_changed' | 'source_from_computer' | 'source_from_url';
   versionNotes?: string;
   tags?: Tag[];
-  configuration: string;
-  modelFileFormat: string;
-}
-
-export interface ModelFileFormData extends FormDataBase {
-  modelFile: File;
-}
-
-export interface ModelUrlFormData extends FormDataBase {
-  modelURL: string;
+  configuration?: string;
+  modelFileFormat?: string;
+  modelFile?: File;
+  modelURL?: string;
 }
