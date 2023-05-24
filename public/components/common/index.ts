@@ -12,3 +12,4 @@ export * from './tag_filter';
 export * from './options_filter';
 export * from './forms';
 export * from './tag_key';
+export * from './ui_setting_date_format_time';
