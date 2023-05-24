@@ -16,16 +16,29 @@ import {
 } from './constants';
 import { getOpenSearchClientTransport } from './utils';
 
-const modelSortQuerySchema = schema.oneOf([
-  schema.literal('version-desc'),
-  schema.literal('version-asc'),
-  schema.literal('name-asc'),
-  schema.literal('name-desc'),
-  schema.literal('model_state-asc'),
-  schema.literal('model_state-desc'),
-  schema.literal('id-asc'),
-  schema.literal('id-desc'),
-]);
+const validateSortItem = (sort: string) => {
+  const [key, direction] = sort.split('-');
+  if (key === undefined || direction === undefined) {
+    return 'Invalidate sort';
+  }
+  if (direction !== 'asc' && direction !== 'desc') {
+    return 'Invalidate sort';
+  }
+  const availableSortKeys = ['id', 'version', 'last_updated_time', 'name', 'model_state'];
+
+  if (!availableSortKeys.includes(key) && !key.startsWith('tags.')) {
+    return 'Invalidate sort';
+  }
+  return undefined;
+};
+
+const validateUniqueSort = (sort: string[]) => {
+  const uniqueSortKeys = new Set(sort.map((item) => item.split('-')[0]));
+  if (uniqueSortKeys.size < sort.length) {
+    return 'Invalidate sort';
+  }
+  return undefined;
+};
 
 const modelStateSchema = schema.oneOf([
   schema.literal(MODEL_STATE.loaded),
@@ -66,13 +79,20 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
       path: MODEL_API_ENDPOINT,
       validate: {
         query: schema.object({
+          name: schema.maybe(schema.string()),
           from: schema.number({ min: 0 }),
           size: schema.number({ max: 50 }),
           sort: schema.maybe(
-            schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
+            schema.oneOf([
+              schema.string({ validate: validateSortItem }),
+              schema.arrayOf(schema.string({ validate: validateSortItem }), {
+                validate: validateUniqueSort,
+              }),
+            ])
           ),
           states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
           nameOrId: schema.maybe(schema.string()),
+          versionOrKeyword: schema.maybe(schema.string()),
           extra_query: schema.maybe(schema.recordOf(schema.string(), schema.any())),
           data_source_id: schema.maybe(schema.string()),
         }),
@@ -83,10 +103,12 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
         from,
         size,
         sort,
+        name,
         states,
         nameOrId,
         extra_query: extraQuery,
         data_source_id: dataSourceId,
+        versionOrKeyword,
       } = request.query;
       try {
         const payload = await ModelService.search({
@@ -97,9 +119,11 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           from,
           size,
           sort: typeof sort === 'string' ? [sort] : sort,
+          name,
           states: typeof states === 'string' ? [states] : states,
           nameOrId,
           extraQuery,
+          versionOrKeyword,
         });
         return response.ok({ body: payload });
       } catch (err) {

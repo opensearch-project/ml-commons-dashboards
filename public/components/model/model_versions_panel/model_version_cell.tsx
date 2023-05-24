@@ -7,9 +7,9 @@ import React from 'react';
 import { get } from 'lodash';
 import { EuiBadge, EuiText } from '@elastic/eui';
 
-import { renderTime } from '../../../utils/table';
 import { MODEL_STATE } from '../../../../common';
 import { VersionTableDataItem } from '../types';
+import { UiSettingDateFormatTime } from '../../common';
 
 import { ModelVersionStatusCell } from './model_version_status_cell';
 import { ModelVersionStatusDetail } from './model_version_status_detail';
@@ -29,6 +29,9 @@ export const ModelVersionCell = ({ data, columnId, isDetails }: ModelVersionCell
         version={data.version}
         state={data.state}
         createdTime={data.createdTime}
+        lastRegisteredTime={data.lastRegisteredTime}
+        lastDeployedTime={data.lastDeployedTime}
+        lastUndeployedTime={data.lastUndeployedTime}
       />
     );
   }
@@ -47,8 +50,8 @@ export const ModelVersionCell = ({ data, columnId, isDetails }: ModelVersionCell
         </EuiBadge>
       );
     }
-    case 'lastUpdated':
-      return renderTime(data.lastUpdated, 'MMM D, YYYY h:m A');
+    case 'lastUpdatedTime':
+      return <UiSettingDateFormatTime time={data.lastUpdatedTime} />;
     default:
       return get(data, columnId, '-');
   }

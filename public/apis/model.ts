@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE, ModelSearchSort } from '../../common';
+import { MODEL_STATE } from '../../common';
 import {
   MODEL_API_ENDPOINT,
   MODEL_LOAD_API_ENDPOINT,
@@ -38,6 +38,9 @@ export interface ModelSearchItem {
   };
   last_updated_time: number;
   created_time: number;
+  last_registered_time?: number;
+  last_deployed_time?: number;
+  last_undeployed_time?: number;
 }
 
 export interface ModelDetail extends ModelSearchItem {
@@ -100,13 +103,15 @@ export class Model {
   public search(query: {
     algorithms?: string[];
     ids?: string[];
-    sort?: ModelSearchSort[];
+    sort?: string[];
+    name?: string;
     from: number;
     size: number;
     states?: MODEL_STATE[];
     nameOrId?: string;
     extraQuery?: Record<string, any>;
     dataSourceId?: string;
+    versionOrKeyword?: string;
   }) {
     const { extraQuery, dataSourceId, ...restQuery } = query;
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
