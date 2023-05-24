@@ -192,7 +192,9 @@ export const ModelVersionStatusDetail = ({
           name={name}
           version={version}
           errorDetails={errorDetails}
-          mode={state === MODEL_STATE.loadFailed ? 'deployment-failed' : 'artifact-upload-failed'}
+          errorType={
+            state === MODEL_STATE.loadFailed ? 'deployment-failed' : 'artifact-upload-failed'
+          }
           closeModal={handleCloseModal}
         />
       )}

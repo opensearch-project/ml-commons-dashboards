@@ -92,7 +92,7 @@ export const ModelVersionDeploymentConfirmModal = ({
                           name={name}
                           version={version}
                           plainVersionLink={modelVersionUrl}
-                          mode={errorType}
+                          errorType={errorType}
                           closeModal={() => {
                             overlayRef?.close();
                           }}

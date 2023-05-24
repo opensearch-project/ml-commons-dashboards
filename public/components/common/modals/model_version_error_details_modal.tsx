@@ -22,7 +22,7 @@ import {
 
 import { routerPaths } from '../../../../common/router_paths';
 
-const mode2ErrorTitleMap = {
+const errorType2ErrorTitleMap = {
   'deployment-failed': 'deployment failed',
   'artifact-upload-failed': 'artifact upload failed',
   'undeployment-failed': 'undeployment failed',
@@ -30,22 +30,22 @@ const mode2ErrorTitleMap = {
 
 export const ModelVersionErrorDetailsModal = ({
   id,
-  mode,
   name,
   version,
+  errorType,
   closeModal,
   errorDetails,
   plainVersionLink,
 }: {
   id: string;
-  mode: 'deployment-failed' | 'artifact-upload-failed' | 'undeployment-failed';
   name: string;
   version: string;
+  errorType: 'deployment-failed' | 'artifact-upload-failed' | 'undeployment-failed';
   closeModal: () => void;
   errorDetails: string;
   plainVersionLink?: string;
 }) => {
-  const errorTitle = mode2ErrorTitleMap[mode];
+  const errorTitle = errorType2ErrorTitleMap[errorType];
   const linkText = `${name} version ${version}`;
 
   return (
@@ -67,7 +67,7 @@ export const ModelVersionErrorDetailsModal = ({
         </EuiModalHeaderTitle>
       </EuiModalHeader>
       <EuiModalBody>
-        {mode === 'deployment-failed' || mode === 'undeployment-failed' ? (
+        {errorType === 'deployment-failed' || errorType === 'undeployment-failed' ? (
           <>
             <EuiText size="s">Error message:</EuiText>
             <EuiSpacer size="m" />
