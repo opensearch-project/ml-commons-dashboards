@@ -32,7 +32,8 @@ const validateSortItem = (sort: string) => {
 };
 
 const validateUniqueSort = (sort: string[]) => {
-  if (new Set(sort).size < sort.length) {
+  const uniqueSortKeys = new Set(sort.map((item) => item.split('-')[0]));
+  if (uniqueSortKeys.size < sort.length) {
     return 'Invalidate sort';
   }
   return undefined;
