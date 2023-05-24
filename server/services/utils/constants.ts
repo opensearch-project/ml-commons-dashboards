@@ -26,6 +26,10 @@ export const MODEL_UPLOAD_API = `${MODEL_BASE_API}/_upload`;
 export const MODEL_META_API = `${MODEL_BASE_API}/meta`;
 export const MODEL_PROFILE_API = `${PROFILE_BASE_API}/models`;
 export const PREDICT_BASE_API = `${ML_COMMONS_API_PREFIX}/_predict`;
+export const MODEL_GROUP_BASE_API = `${ML_COMMONS_API_PREFIX}/model_groups`;
+export const MODEL_GROUP_REGISTER_API = `${MODEL_GROUP_BASE_API}/_register`;
+export const MODEL_GROUP_UPDATE_API = `${MODEL_GROUP_BASE_API}/<model_group_id>/_update`;
+export const MODEL_GROUP_SEARCH_API = `${MODEL_GROUP_BASE_API}/_search`;
 
 export const SECURITY_API_PREFIX = '/_plugins/_security/api';
 export const SECURITY_ACCOUNT_API = `${SECURITY_API_PREFIX}/account`;
