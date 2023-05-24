@@ -8,44 +8,63 @@ import { MAX_CHUNK_SIZE } from '../common/forms/form_constants';
 import { getModelContentHashValue } from './get_model_content_hash_value';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
-export async function submitModelWithFile(model: ModelFileFormData) {
-  const modelUploadBase = {
-    name: model.name,
-    version: model.version,
-    description: model.description,
-    // TODO: Need to confirm if we have the model format input
-    modelFormat: 'TORCH_SCRIPT',
-    modelConfig: JSON.parse(model.configuration),
+const getModelUploadBase = async ({
+  name,
+  description,
+  versionNotes,
+  modelFileFormat,
+  configuration,
+}: ModelFileFormData | ModelUrlFormData) => {
+  const { model_group_id: modelGroupId } = await APIProvider.getAPI('modelGroup').register({
+    name,
+    description,
+  });
+  return {
+    name,
+    description: versionNotes,
+    modelFormat: modelFileFormat,
+    modelGroupId,
+    modelConfig: JSON.parse(configuration),
   };
+};
+
+export async function submitModelWithFile(model: ModelFileFormData) {
   const { modelFile } = model;
   const totalChunks = Math.ceil(modelFile.size / MAX_CHUNK_SIZE);
   const modelContentHashValue = await getModelContentHashValue(modelFile);
+  const modelUploadBase = await getModelUploadBase(model);
 
-  const modelId = (
-    await APIProvider.getAPI('model').upload({
-      ...modelUploadBase,
-      totalChunks,
-      modelContentHashValue,
-    })
-  ).model_id;
-
+  let modelId;
+  try {
+    modelId = (
+      await APIProvider.getAPI('model').upload({
+        ...modelUploadBase,
+        totalChunks,
+        modelContentHashValue,
+      })
+    ).model_id;
+  } catch (error) {
+    APIProvider.getAPI('modelGroup').delete(modelUploadBase.modelGroupId);
+    throw error;
+  }
   return modelId;
 }
 
 export async function submitModelWithURL(model: ModelUrlFormData) {
-  const modelUploadBase = {
-    name: model.name,
-    version: model.version,
-    description: model.description,
-    // TODO: Need to confirm if we have the model format input
-    modelFormat: 'TORCH_SCRIPT',
-    modelConfig: JSON.parse(model.configuration),
-  };
+  const modelUploadBase = await getModelUploadBase(model);
 
-  const { task_id: taskId } = await APIProvider.getAPI('model').upload({
-    ...modelUploadBase,
-    url: model.modelURL,
-  });
+  let taskId;
+  try {
+    taskId = (
+      await APIProvider.getAPI('model').upload({
+        ...modelUploadBase,
+        url: model.modelURL,
+      })
+    ).task_id;
+  } catch (error) {
+    APIProvider.getAPI('modelGroup').delete(modelUploadBase.modelGroupId);
+    throw error;
+  }
 
   return taskId;
 }

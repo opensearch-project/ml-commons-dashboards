@@ -7,8 +7,7 @@ import type { Tag } from '../model/types';
 
 interface ModelFormBase {
   name: string;
-  version: string;
-  description: string;
+  description?: string;
   configuration: string;
   modelFileFormat: string;
   tags?: Tag[];
