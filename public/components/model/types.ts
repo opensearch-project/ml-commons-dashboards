@@ -11,9 +11,12 @@ export interface VersionTableDataItem {
   name: string;
   version: string;
   state: MODEL_STATE;
-  lastUpdated: number;
+  lastUpdatedTime: number;
   tags: { [key: string]: string | number };
   createdTime: number;
+  lastRegisteredTime?: number;
+  lastDeployedTime?: number;
+  lastUndeployedTime?: number;
 }
 
 export interface Tag {

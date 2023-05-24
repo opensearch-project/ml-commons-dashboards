@@ -25,11 +25,13 @@ describe('<ModelOverviewCard />', () => {
     expect(screen.getByText('Foo (you)')).toBeInTheDocument();
     expect(screen.getByText('Created')).toBeInTheDocument();
     expect(
-      within(screen.getByText('Created').closest('dl')!).getByText('Apr 24, 2023 8:18 AM')
+      within(screen.getByText('Created').closest('dl')!).getByText('Apr 24, 2023 @ 08:18:30.318')
     ).toBeInTheDocument();
     expect(screen.getByText('Last updated')).toBeInTheDocument();
     expect(
-      within(screen.getByText('Last updated').closest('dl')!).getByText('Apr 24, 2023 1:18 PM')
+      within(screen.getByText('Last updated').closest('dl')!).getByText(
+        'Apr 24, 2023 @ 13:18:30.318'
+      )
     ).toBeInTheDocument();
 
     expect(screen.getByText('model-1-id')).toBeInTheDocument();

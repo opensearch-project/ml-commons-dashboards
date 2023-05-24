@@ -12,11 +12,11 @@ import {
   EuiPopoverTitle,
   EuiLink,
 } from '@elastic/eui';
-
 import { Link, generatePath } from 'react-router-dom';
-import { DATE_FORMAT, MODEL_STATE, routerPaths } from '../../../../common';
+
+import { MODEL_STATE, routerPaths } from '../../../../common';
+import { UiSettingDateFormatTime } from '../../common';
 import { APIProvider } from '../../../apis/api_provider';
-import { renderTime } from '../../../utils';
 
 import { ModelVersionErrorDetailsModal } from './model_version_error_details_modal';
 
@@ -25,8 +25,8 @@ export const state2DetailContentMap: {
   [key in MODEL_STATE]?: {
     title: string;
     description: (versionLink: React.ReactNode) => React.ReactNode;
-    timeTitle: string;
-    timeField: 'createdTime';
+    timeTitle?: string;
+    timeField?: 'createdTime' | 'lastRegisteredTime' | 'lastDeployedTime' | 'lastUndeployedTime';
   };
 } = {
   [MODEL_STATE.uploading]: {
@@ -34,16 +34,12 @@ export const state2DetailContentMap: {
     description: (versionLink: React.ReactNode) => (
       <>The model artifact for {versionLink} is uploading.</>
     ),
-    timeTitle: 'Upload initiated on',
-    timeField: 'createdTime',
   },
   [MODEL_STATE.loading]: {
     title: 'In progress...',
     description: (versionLink: React.ReactNode) => (
       <>The model artifact for {versionLink} is deploying.</>
     ),
-    timeTitle: 'Deployment initiated on',
-    timeField: 'createdTime',
   },
   [MODEL_STATE.uploaded]: {
     title: 'Success',
@@ -51,25 +47,25 @@ export const state2DetailContentMap: {
       <>The model artifact for {versionLink} uploaded.</>
     ),
     timeTitle: 'Uploaded on',
-    timeField: 'createdTime',
+    timeField: 'lastRegisteredTime',
   },
   [MODEL_STATE.loaded]: {
     title: 'Success',
     description: (versionLink: React.ReactNode) => <>{versionLink} deployed.</>,
     timeTitle: 'Deployed on',
-    timeField: 'createdTime',
+    timeField: 'lastDeployedTime',
   },
   [MODEL_STATE.unloaded]: {
     title: 'Success',
     description: (versionLink: React.ReactNode) => <>{versionLink} undeployed.</>,
     timeTitle: 'Undeployed on',
-    timeField: 'createdTime',
+    timeField: 'lastUndeployedTime',
   },
   [MODEL_STATE.loadFailed]: {
     title: 'Error',
     description: (versionLink: React.ReactNode) => <>{versionLink} deployment failed.</>,
     timeTitle: 'Deployment failed on',
-    timeField: 'createdTime',
+    timeField: 'lastDeployedTime',
   },
   [MODEL_STATE.registerFailed]: {
     title: 'Error',
@@ -99,6 +95,9 @@ export const ModelVersionStatusDetail = ({
   name: string;
   version: string;
   createdTime: number;
+  lastRegisteredTime?: number;
+  lastDeployedTime?: number;
+  lastUndeployedTime?: number;
 }) => {
   const [isErrorDetailsModalShowed, setIsErrorDetailsModalShowed] = useState(false);
   const [isLoadingErrorDetails, setIsLoadingErrorDetails] = useState(false);
@@ -143,6 +142,7 @@ export const ModelVersionStatusDetail = ({
     return <>-</>;
   }
   const { title, description, timeTitle, timeField } = statusContent;
+  const timeValue = timeField ? restProps[timeField] : undefined;
 
   return (
     <>
@@ -161,10 +161,14 @@ export const ModelVersionStatusDetail = ({
               </Link>
             )}
           </EuiText>
-          <EuiSpacer size="s" />
-          <EuiText>
-            <b>{timeTitle}:</b> {renderTime(restProps[timeField], DATE_FORMAT)}
-          </EuiText>
+          {timeTitle && (
+            <>
+              <EuiSpacer size="s" />
+              <EuiText>
+                <b>{timeTitle}:</b> <UiSettingDateFormatTime time={timeValue} />
+              </EuiText>
+            </>
+          )}
           {(state === MODEL_STATE.loadFailed || state === MODEL_STATE.registerFailed) && (
             <>
               <EuiSpacer size="s" />

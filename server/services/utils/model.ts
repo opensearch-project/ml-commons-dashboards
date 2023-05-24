@@ -27,6 +27,7 @@ export const generateModelSearchQuery = ({
   states,
   nameOrId,
   extraQuery,
+  versionOrKeyword,
 }: {
   ids?: string[];
   algorithms?: string[];
@@ -34,6 +35,7 @@ export const generateModelSearchQuery = ({
   states?: MODEL_STATE[];
   nameOrId?: string;
   extraQuery?: Record<string, any>;
+  versionOrKeyword?: string;
 }) => ({
   bool: {
     must: [
@@ -66,6 +68,24 @@ export const generateModelSearchQuery = ({
           ]
         : []),
       ...(extraQuery ? [extraQuery] : []),
+      ...(versionOrKeyword
+        ? [
+            {
+              bool: {
+                should: [
+                  {
+                    wildcard: {
+                      model_version: {
+                        value: `*${versionOrKeyword}*`,
+                        case_insensitive: true,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          ]
+        : []),
     ],
     must_not: {
       exists: {

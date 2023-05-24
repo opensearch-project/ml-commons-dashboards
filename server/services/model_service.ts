@@ -24,11 +24,11 @@ import {
   ScopeableRequest,
   ILegacyClusterClient,
 } from '../../../../src/core/server';
-import { MODEL_STATE, ModelSearchSort } from '../../common';
+import { MODEL_STATE } from '../../common';
 
-import { convertModelSource, generateModelSearchQuery } from './utils/model';
-import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
+import { generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
+import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
 
 const modelSortFieldMapping: { [key: string]: string } = {
   version: 'model_version',
@@ -84,11 +84,12 @@ export class ModelService {
     transport: OpenSearchClient['transport'];
     from: number;
     size: number;
-    sort?: ModelSearchSort[];
+    sort?: string[];
     name?: string;
     states?: MODEL_STATE[];
     extraQuery?: Record<string, any>;
     nameOrId?: string;
+    versionOrKeyword?: string;
   }) {
     const {
       body: { hits },

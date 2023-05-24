@@ -13,7 +13,13 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 
-import { TagFilterValue, TagFilter, OptionsFilter, SelectedTagFiltersPanel } from '../../common';
+import {
+  TagFilterValue,
+  TagFilter,
+  OptionsFilter,
+  SelectedTagFiltersPanel,
+  DebouncedSearchBar,
+} from '../../common';
 import { useModelTagKeys } from '../../model_list/model_list.hooks';
 
 const statusOptions = [
@@ -46,14 +52,20 @@ export interface ModelVersionListFilterValue {
   status: Array<typeof statusOptions[number]['value']>;
   state: Array<typeof stateOptions[number]>;
   tag: TagFilterValue[];
+  search?: string;
 }
 
 interface ModelVersionListFilterProps {
-  value: ModelVersionListFilterValue;
+  searchInputRef?: (input: HTMLInputElement | null) => void;
+  value: Omit<ModelVersionListFilterValue, 'search'>;
   onChange: (value: ModelVersionListFilterValue) => void;
 }
 
-export const ModelVersionListFilter = ({ value, onChange }: ModelVersionListFilterProps) => {
+export const ModelVersionListFilter = ({
+  searchInputRef,
+  value,
+  onChange,
+}: ModelVersionListFilterProps) => {
   // TODO: Change to model tags API and pass model group id here
   const [tagKeysLoading, tagKeys] = useModelTagKeys();
   const valueRef = useRef(value);
@@ -80,11 +92,22 @@ export const ModelVersionListFilter = ({ value, onChange }: ModelVersionListFilt
     [onChange]
   );
 
+  const handleSearch = useCallback(
+    (search: string) => {
+      onChange({ ...valueRef.current, search });
+    },
+    [onChange]
+  );
+
   return (
     <>
       <EuiFlexGroup gutterSize="m">
         <EuiFlexItem>
-          <EuiFieldSearch placeholder="Search by version number, or keyword" fullWidth />
+          <DebouncedSearchBar
+            placeholder="Search by version number, or keyword"
+            onSearch={handleSearch}
+            inputRef={searchInputRef}
+          />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiFilterGroup>

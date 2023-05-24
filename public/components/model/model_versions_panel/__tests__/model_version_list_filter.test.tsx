@@ -124,4 +124,64 @@ describe('<ModelVersionListFilter />', () => {
     },
     10 * 1000
   );
+
+  it('should call onChangeMock with search text after search text typed', async () => {
+    jest.useFakeTimers();
+    const onChangeMock = jest.fn();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    render(
+      <ModelVersionListFilter
+        value={{
+          tag: [],
+          state: [],
+          status: [],
+        }}
+        onChange={onChangeMock}
+      />
+    );
+
+    expect(onChangeMock).not.toHaveBeenCalled();
+
+    await user.type(
+      screen.getByPlaceholderText('Search by version number, or keyword'),
+      'search text'
+    );
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+    expect(onChangeMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        search: 'search text',
+      })
+    );
+
+    jest.useRealTimers();
+  });
+
+  it('should bind searchInput and able to clear search text by searchInputRef', async () => {
+    const onChangeMock = jest.fn();
+    let searchInput: HTMLInputElement | null = null;
+
+    render(
+      <ModelVersionListFilter
+        value={{
+          tag: [],
+          state: [],
+          status: [],
+        }}
+        onChange={onChangeMock}
+        searchInputRef={(input: HTMLInputElement | null) => {
+          searchInput = input;
+        }}
+      />
+    );
+    expect(searchInput).not.toBeNull();
+
+    const searchTextInput = screen.getByPlaceholderText('Search by version number, or keyword');
+    await userEvent.type(searchTextInput, 'search text');
+
+    expect(searchTextInput).toHaveValue('search text');
+    searchInput!.value = '';
+    expect(searchTextInput).toHaveValue('');
+  });
 });

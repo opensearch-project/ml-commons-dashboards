@@ -8,4 +8,4 @@ export const ONE_GB = 1000 * ONE_MB;
 
 export const MAX_MODEL_CHUNK_SIZE = 10 * ONE_MB;
 
-export const DATE_FORMAT = 'MMM d, yyyy @ HH:mm:ss.SSS';
+export const DATE_FORMAT = 'MMM D, yyyy @ HH:mm:ss.SSS';
