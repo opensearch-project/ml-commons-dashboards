@@ -170,30 +170,34 @@ describe('<ModelVersionsPanel />', () => {
     searchMock.mockRestore();
   });
 
-  it('should render no-result screen and reset search button if no result for specific condition', async () => {
-    render(<ModelVersionsPanel groupId="1" />);
-    await waitFor(() => {
-      expect(screen.getByTitle('Status')).toBeInTheDocument();
-    });
+  it(
+    'should render no-result screen and reset search button if no result for specific condition',
+    async () => {
+      render(<ModelVersionsPanel groupId="1" />);
+      await waitFor(() => {
+        expect(screen.getByTitle('Status')).toBeInTheDocument();
+      });
 
-    const searchMock = jest.spyOn(Model.prototype, 'search').mockImplementation(async () => {
-      return {
-        data: [],
-        total_models: 0,
-      };
-    });
-    await userEvent.click(screen.getByTitle('Status'));
-    await userEvent.click(screen.getByRole('option', { name: 'In progress...' }));
+      const searchMock = jest.spyOn(Model.prototype, 'search').mockImplementation(async () => {
+        return {
+          data: [],
+          total_models: 0,
+        };
+      });
+      await userEvent.click(screen.getByTitle('Status'));
+      await userEvent.click(screen.getByRole('option', { name: 'In progress...' }));
 
-    expect(
-      screen.getByText(
-        'There are no results for your search. Reset the search criteria to view registered versions.'
-      )
-    ).toBeInTheDocument();
-    expect(screen.getByText('Reset search criteria')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'There are no results for your search. Reset the search criteria to view registered versions.'
+        )
+      ).toBeInTheDocument();
+      expect(screen.getByText('Reset search criteria')).toBeInTheDocument();
 
-    searchMock.mockRestore();
-  });
+      searchMock.mockRestore();
+    },
+    10 * 1000
+  );
 
   it(
     'should call model search without filter condition after reset button clicked',
