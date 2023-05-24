@@ -18,7 +18,7 @@ import { MODEL_STATE, routerPaths } from '../../../../common';
 import { UiSettingDateFormatTime } from '../../common';
 import { APIProvider } from '../../../apis/api_provider';
 
-import { ModelVersionErrorDetailsModal } from './model_version_error_details_modal';
+import { ModelVersionErrorDetailsModal } from '../../common';
 
 // TODO: Change to related time field after confirmed
 export const state2DetailContentMap: {
@@ -192,7 +192,9 @@ export const ModelVersionStatusDetail = ({
           name={name}
           version={version}
           errorDetails={errorDetails}
-          isDeployFailed={state === MODEL_STATE.loadFailed}
+          errorType={
+            state === MODEL_STATE.loadFailed ? 'deployment-failed' : 'artifact-upload-failed'
+          }
           closeModal={handleCloseModal}
         />
       )}

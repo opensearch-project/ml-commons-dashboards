@@ -112,8 +112,10 @@ export const ModelVersionTable = ({
         width: 40,
         headerCellRender: () => null,
         rowCellRender: ({ rowIndex }: EuiDataGridCellValueElementProps) => {
-          const version = versions[rowIndex];
-          return <ModelVersionTableRowActions state={version.state} id={version.id} />;
+          const { id, name, version, state } = versions[rowIndex];
+          return (
+            <ModelVersionTableRowActions id={id} name={name} state={state} version={version} />
+          );
         },
       },
     ],
