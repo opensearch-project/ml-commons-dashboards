@@ -70,7 +70,7 @@ export const ModelVersionTable = ({
         isSortable: false,
       },
       {
-        id: 'lastUpdated',
+        id: 'lastUpdatedTime',
         displayAsText: 'Last updated',
       },
       {
@@ -119,9 +119,18 @@ export const ModelVersionTable = ({
     ],
     [versions]
   );
-  const [visibleColumns, setVisibleColumns] = useState(() =>
-    columns.map(({ id }) => id).filter((columnId) => columnId !== 'id')
-  );
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const tagHiddenByDefaultColumns = tags.slice(3);
+    return columns
+      .map(({ id }) => id)
+      .filter((columnId) => {
+        if (columnId.startsWith('tags.')) {
+          const [_prefix, tag] = columnId.split('.');
+          return !tagHiddenByDefaultColumns.includes(tag);
+        }
+        return columnId !== 'id';
+      });
+  });
   const columnVisibility = useMemo(() => ({ visibleColumns, setVisibleColumns }), [visibleColumns]);
 
   const renderCellValue = useCallback(

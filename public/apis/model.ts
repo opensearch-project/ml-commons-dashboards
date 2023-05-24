@@ -33,6 +33,9 @@ export interface ModelSearchItem {
   };
   last_updated_time: number;
   created_time: number;
+  last_registered_time?: number;
+  last_deployed_time?: number;
+  last_undeployed_time?: number;
 }
 
 export interface ModelDetail extends ModelSearchItem {
@@ -95,12 +98,13 @@ export class Model {
   public search(query: {
     algorithms?: string[];
     ids?: string[];
-    sort?: ModelSearchSort[];
+    sort?: string[];
     name?: string;
     from: number;
     size: number;
     states?: MODEL_STATE[];
     nameOrId?: string;
+    versionOrKeyword?: string;
   }) {
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
       query,

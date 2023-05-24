@@ -23,9 +23,9 @@ import {
   IScopedClusterClient,
   ScopeableRequest,
 } from '../../../../src/core/server';
-import { MODEL_STATE, ModelSearchSort } from '../../common';
+import { MODEL_STATE } from '../../common';
 
-import { convertModelSource, generateModelSearchQuery } from './utils/model';
+import { generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
 import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
 
@@ -85,10 +85,11 @@ export class ModelService {
     ids?: string[];
     from: number;
     size: number;
-    sort?: ModelSearchSort[];
+    sort?: string[];
     name?: string;
     states?: MODEL_STATE[];
     nameOrId?: string;
+    versionOrKeyword?: string;
   }) {
     const {
       body: { hits },

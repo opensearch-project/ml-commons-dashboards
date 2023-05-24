@@ -12,12 +12,14 @@ export const generateModelSearchQuery = ({
   name,
   states,
   nameOrId,
+  versionOrKeyword,
 }: {
   ids?: string[];
   algorithms?: string[];
   name?: string;
   states?: MODEL_STATE[];
   nameOrId?: string;
+  versionOrKeyword?: string;
 }) => ({
   bool: {
     must: [
@@ -44,6 +46,24 @@ export const generateModelSearchQuery = ({
                     },
                   },
                   generateTermQuery('_id', nameOrId),
+                ],
+              },
+            },
+          ]
+        : []),
+      ...(versionOrKeyword
+        ? [
+            {
+              bool: {
+                should: [
+                  {
+                    wildcard: {
+                      model_version: {
+                        value: `*${versionOrKeyword}*`,
+                        case_insensitive: true,
+                      },
+                    },
+                  },
                 ],
               },
             },

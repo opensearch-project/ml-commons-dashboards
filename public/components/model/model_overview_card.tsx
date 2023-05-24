@@ -5,8 +5,7 @@
 
 import { EuiDescriptionList, EuiFlexGroup, EuiFlexItem, EuiPanel, EuiSpacer } from '@elastic/eui';
 import React from 'react';
-import { CopyableText } from '../common';
-import { renderTime } from '../../utils';
+import { CopyableText, UiSettingDateFormatTime } from '../common';
 
 interface ModelOverviewCardProps {
   id: string;
@@ -54,7 +53,7 @@ export const ModelOverviewCard = ({
             listItems={[
               {
                 title: 'Created',
-                description: renderTime(createdTime, 'MMM D, YYYY h:m A'),
+                description: <UiSettingDateFormatTime time={createdTime} />,
               },
             ]}
           />
@@ -64,7 +63,7 @@ export const ModelOverviewCard = ({
             listItems={[
               {
                 title: 'Last updated',
-                description: renderTime(updatedTime, 'MMM D, YYYY h:m A'),
+                description: <UiSettingDateFormatTime time={updatedTime} />,
               },
             ]}
           />

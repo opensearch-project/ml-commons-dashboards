@@ -18,22 +18,27 @@ const versions = [
     version: '1.0.0',
     state: MODEL_STATE.uploading,
     tags: { 'Accuracy: test': 0.98, 'Accuracy: train': 0.99 },
-    lastUpdated: 1682676759143,
+    lastUpdatedTime: 1682676759143,
     createdTime: 1682676759143,
   },
 ];
 
 describe('<ModelVersionTable />', () => {
-  it('should render consistent columns header ', async () => {
-    render(<ModelVersionTable versions={[]} tags={['Accuracy: test', 'Accuracy: train']} />);
+  it('should render consistent columns header and hide id, tags columns by default', async () => {
+    render(
+      <ModelVersionTable versions={[]} tags={['Accuracy: test', 'Accuracy: train', 'F1', 'F2']} />
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('dataGridHeaderCell-version')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-state')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-status')).toBeInTheDocument();
-      expect(screen.getByTestId('dataGridHeaderCell-lastUpdated')).toBeInTheDocument();
+      expect(screen.getByTestId('dataGridHeaderCell-lastUpdatedTime')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-tags.Accuracy: test')).toBeInTheDocument();
       expect(screen.getByTestId('dataGridHeaderCell-tags.Accuracy: train')).toBeInTheDocument();
+      expect(screen.getByTestId('dataGridHeaderCell-tags.F1')).toBeInTheDocument();
+      expect(screen.queryByTestId('dataGridHeaderCell-id')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('dataGridHeaderCell-tags.F2')).not.toBeInTheDocument();
     });
   });
 
@@ -98,7 +103,7 @@ describe('<ModelVersionTable />', () => {
     expect(within(gridCells[0]).getByText('1.0.0')).toBeInTheDocument();
     expect(within(gridCells[1]).getByText('Not deployed')).toBeInTheDocument();
     expect(within(gridCells[2]).getByText('In progress...')).toBeInTheDocument();
-    expect(within(gridCells[3]).getByText('Apr 28, 2023 10:12 AM')).toBeInTheDocument();
+    expect(within(gridCells[3]).getByText('Apr 28, 2023 @ 10:12:39.143')).toBeInTheDocument();
     expect(within(gridCells[4]).getByText('0.98')).toBeInTheDocument();
     expect(within(gridCells[5]).getByText('0.99')).toBeInTheDocument();
     expect(within(gridCells[6]).getByLabelText('show actions')).toBeInTheDocument();
