@@ -37,6 +37,27 @@ describe('register model api', () => {
     expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
   });
 
+  it('should not call delete model group API if modelId provided and model upload failed', async () => {
+    const uploadError = new Error();
+    const uploadMock = jest.spyOn(Model.prototype, 'upload').mockRejectedValue(uploadError);
+
+    try {
+      await submitModelWithFile({
+        name: 'foo',
+        description: 'bar',
+        configuration: '{}',
+        modelFileFormat: '',
+        modelId: 'a-exists-model-id',
+        modelFile: new File([], 'artifact.zip'),
+      });
+    } catch (error) {
+      expect(error).toBe(uploadError);
+    }
+    expect(ModelGroup.prototype.delete).not.toHaveBeenCalled();
+
+    uploadMock.mockRestore();
+  });
+
   describe('submitModelWithFile', () => {
     it('should call register model group API with name and description', async () => {
       expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
