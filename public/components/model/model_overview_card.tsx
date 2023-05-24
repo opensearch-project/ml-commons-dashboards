@@ -5,9 +5,7 @@
 
 import { EuiDescriptionList, EuiFlexGroup, EuiFlexItem, EuiPanel, EuiSpacer } from '@elastic/eui';
 import React from 'react';
-import { CopyableText } from '../common';
-import { renderTime } from '../../utils';
-import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { CopyableText, UiSettingDateFormatTime } from '../common';
 
 interface ModelOverviewCardProps {
   id: string;
@@ -26,11 +24,6 @@ export const ModelOverviewCard = ({
   description,
   isModelOwner,
 }: ModelOverviewCardProps) => {
-  const {
-    services: { uiSettings },
-  } = useOpenSearchDashboards();
-  const dateFormat = uiSettings?.get('dateFormat');
-
   return (
     <EuiPanel data-test-subj="model-group-overview-card">
       <EuiSpacer size="m" />
@@ -60,7 +53,7 @@ export const ModelOverviewCard = ({
             listItems={[
               {
                 title: 'Created',
-                description: dateFormat ? renderTime(createdTime, dateFormat) : '-',
+                description: <UiSettingDateFormatTime time={createdTime} />,
               },
             ]}
           />
@@ -70,7 +63,7 @@ export const ModelOverviewCard = ({
             listItems={[
               {
                 title: 'Last updated',
-                description: dateFormat ? renderTime(updatedTime, dateFormat) : '-',
+                description: <UiSettingDateFormatTime time={updatedTime} />,
               },
             ]}
           />

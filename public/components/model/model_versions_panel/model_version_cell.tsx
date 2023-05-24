@@ -7,22 +7,12 @@ import React from 'react';
 import { get } from 'lodash';
 import { EuiBadge, EuiText } from '@elastic/eui';
 
-import { renderTime } from '../../../utils/table';
 import { MODEL_STATE } from '../../../../common';
 import { VersionTableDataItem } from '../types';
-import { useOpenSearchDashboards } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { UiSettingDateFormatTime } from '../../common';
 
 import { ModelVersionStatusCell } from './model_version_status_cell';
 import { ModelVersionStatusDetail } from './model_version_status_detail';
-
-const ModelVersionLastUpdatedCell = ({ lastUpdatedTime }: { lastUpdatedTime: number }) => {
-  const {
-    services: { uiSettings },
-  } = useOpenSearchDashboards();
-  const dateFormat = uiSettings?.get('dateFormat');
-
-  return <>{dateFormat ? renderTime(lastUpdatedTime, dateFormat) : '-'}</>;
-};
 
 interface ModelVersionCellProps {
   columnId: string;
@@ -61,7 +51,7 @@ export const ModelVersionCell = ({ data, columnId, isDetails }: ModelVersionCell
       );
     }
     case 'lastUpdatedTime':
-      return <ModelVersionLastUpdatedCell lastUpdatedTime={data.lastUpdatedTime} />;
+      return <UiSettingDateFormatTime time={data.lastUpdatedTime} />;
     default:
       return get(data, columnId, '-');
   }

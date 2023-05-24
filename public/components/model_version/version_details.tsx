@@ -14,8 +14,7 @@ import {
   EuiCopy,
   EuiIcon,
 } from '@elastic/eui';
-import { renderTime } from '../../utils';
-import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { UiSettingDateFormatTime } from '../common';
 
 interface Props {
   description?: string;
@@ -30,11 +29,6 @@ export const ModelVersionDetails = ({
   lastUpdatedTime,
   modelId,
 }: Props) => {
-  const {
-    services: { uiSettings },
-  } = useOpenSearchDashboards();
-  const dateFormat = uiSettings?.get('dateFormat');
-
   return (
     <EuiPanel>
       <EuiTitle size="xs">
@@ -63,7 +57,7 @@ export const ModelVersionDetails = ({
             <h4>Created</h4>
           </EuiTitle>
           <EuiText size="s">
-            {createdTime && dateFormat ? renderTime(createdTime, dateFormat) : '-'}
+            <UiSettingDateFormatTime time={createdTime} />
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem style={{ maxWidth: 250 }}>
@@ -71,7 +65,7 @@ export const ModelVersionDetails = ({
             <h4>Last updated</h4>
           </EuiTitle>
           <EuiText size="s">
-            {lastUpdatedTime && dateFormat ? renderTime(lastUpdatedTime, dateFormat) : '-'}
+            <UiSettingDateFormatTime time={lastUpdatedTime} />
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem style={{ maxWidth: 250 }}>

@@ -10,33 +10,7 @@ import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionStatusDetail } from '../model_version_status_detail';
 import { MODEL_STATE } from '../../../../../common';
 
-import * as PluginContext from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
-
-// Cannot spyOn(PluginContext, 'useOpenSearchDashboards') directly as it results in error:
-// TypeError: Cannot redefine property: useOpenSearchDashboards
-// So we have to mock the entire module first as a workaround
-jest.mock('../../../../../../../src/plugins/opensearch_dashboards_react/public', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('../../../../../../../src/plugins/opensearch_dashboards_react/public'),
-  };
-});
-
 describe('<ModelVersionStatusDetail />', () => {
-  beforeAll(() => {
-    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockReturnValue({
-      services: {
-        uiSettings: {
-          get: () => 'MMM D, yyyy @ HH:mm:ss.SSS',
-        },
-      },
-    });
-  });
-
-  afterAll(() => {
-    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockRestore();
-  });
-
   it('should render "In progress..." and uploading tip', async () => {
     render(
       <ModelVersionStatusDetail

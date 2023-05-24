@@ -8,33 +8,7 @@ import React from 'react';
 import { render, screen, within } from '../../../../test/test_utils';
 import { ModelOverviewCard } from '../model_overview_card';
 
-import * as PluginContext from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-
-// Cannot spyOn(PluginContext, 'useOpenSearchDashboards') directly as it results in error:
-// TypeError: Cannot redefine property: useOpenSearchDashboards
-// So we have to mock the entire module first as a workaround
-jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('../../../../../../src/plugins/opensearch_dashboards_react/public'),
-  };
-});
-
 describe('<ModelOverviewCard />', () => {
-  beforeAll(() => {
-    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockReturnValue({
-      services: {
-        uiSettings: {
-          get: () => 'MMM D, YYYY @ HH:mm:ss.SSS',
-        },
-      },
-    });
-  });
-
-  afterAll(() => {
-    jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockRestore();
-  });
-
   it('should model overview information according passed data', () => {
     render(
       <ModelOverviewCard

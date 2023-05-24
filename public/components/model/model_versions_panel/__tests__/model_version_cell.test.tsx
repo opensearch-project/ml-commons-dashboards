@@ -9,18 +9,6 @@ import { render, screen } from '../../../../../test/test_utils';
 import { ModelVersionCell } from '../model_version_cell';
 import { MODEL_STATE } from '../../../../../common';
 
-import * as PluginContext from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
-
-// Cannot spyOn(PluginContext, 'useOpenSearchDashboards') directly as it results in error:
-// TypeError: Cannot redefine property: useOpenSearchDashboards
-// So we have to mock the entire module first as a workaround
-jest.mock('../../../../../../../src/plugins/opensearch_dashboards_react/public', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('../../../../../../../src/plugins/opensearch_dashboards_react/public'),
-  };
-});
-
 const setup = (options: { columnId: string; isDetails?: boolean }) =>
   render(
     <ModelVersionCell
@@ -107,21 +95,11 @@ describe('<ModelVersionCell />', () => {
   });
 
   it('should render consistent last updated', () => {
-    const useOpenSearchDashboardsMock = jest
-      .spyOn(PluginContext, 'useOpenSearchDashboards')
-      .mockReturnValue({
-        services: {
-          uiSettings: {
-            get: () => 'MMM D, yyyy @ HH:mm:ss.SSS',
-          },
-        },
-      });
     setup({
       columnId: 'lastUpdatedTime',
     });
 
     expect(screen.getByText('Apr 27, 2023 @ 14:15:57.236')).toBeInTheDocument();
-    useOpenSearchDashboardsMock.mockRestore();
   });
 
   it('should render "model-1" for name column', () => {
