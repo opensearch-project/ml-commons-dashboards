@@ -7,6 +7,7 @@ import { MODEL_GROUP_API_ENDPOINT } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
 
 interface ModelGroupSearchItem {
+  id: string;
   owner: {
     backend_roles: string[];
     roles: string[];
@@ -56,4 +57,8 @@ export class ModelGroup {
       query,
     });
   }
+
+  public getOne = async (id: string) => {
+    return (await this.search({ id, from: 0, size: 1 })).data[0];
+  };
 }

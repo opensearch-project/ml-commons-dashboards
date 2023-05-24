@@ -14,11 +14,16 @@ const getModelUploadBase = async ({
   versionNotes,
   modelFileFormat,
   configuration,
+  modelId,
 }: ModelFileFormData | ModelUrlFormData) => {
-  const { model_group_id: modelGroupId } = await APIProvider.getAPI('modelGroup').register({
-    name,
-    description,
-  });
+  const modelGroupId =
+    modelId ||
+    (
+      await APIProvider.getAPI('modelGroup').register({
+        name,
+        description,
+      })
+    ).model_group_id;
   return {
     name,
     description: versionNotes,

@@ -22,6 +22,21 @@ describe('register model api', () => {
     jest.spyOn(Model.prototype, 'upload').mockRestore();
   });
 
+  it('should not call register model group API if modelId provided', async () => {
+    expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
+
+    await submitModelWithFile({
+      name: 'foo',
+      description: 'bar',
+      configuration: '{}',
+      modelFileFormat: '',
+      modelId: 'a-exists-model-id',
+      modelFile: new File([], 'artifact.zip'),
+    });
+
+    expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
+  });
+
   describe('submitModelWithFile', () => {
     it('should call register model group API with name and description', async () => {
       expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
