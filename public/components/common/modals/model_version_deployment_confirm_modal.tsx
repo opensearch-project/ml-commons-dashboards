@@ -39,19 +39,32 @@ export const ModelVersionDeploymentConfirmModal = ({
   const {
     services: { notifications, overlays },
   } = useOpenSearchDashboards();
-  const isDeployMode = mode === 'deploy';
   const history = useHistory();
+  const mapping = {
+    deploy: {
+      title: 'Deploy',
+      description: 'This version will begin deploying.',
+      errorMessage: 'deployment failed.',
+      errorType: 'deployment-failed' as const,
+      action: APIProvider.getAPI('model').load,
+    },
+    undeploy: {
+      title: 'Undeploy',
+      description: 'This version will be undeployed. You can deploy it again later.',
+      errorMessage: 'undeployment failed.',
+      errorType: 'undeployment-failed' as const,
+      action: APIProvider.getAPI('model').unload,
+    },
+  };
+  const { title, description, errorMessage, errorType, action } = mapping[mode];
 
   const handleConfirm = useCallback(async () => {
     setIsSubmitting(true);
-    let result;
     const modelVersionUrl = history.createHref({
       pathname: generatePath(routerPaths.modelVersion, { id }),
     });
     try {
-      result = await (isDeployMode
-        ? APIProvider.getAPI('model').load
-        : APIProvider.getAPI('model').unload)(id);
+      await action(id);
     } catch (e) {
       notifications?.toasts.addDanger({
         title: mountReactNode(
@@ -64,7 +77,7 @@ export const ModelVersionDeploymentConfirmModal = ({
         ),
         text: mountReactNode(
           <>
-            <EuiText>{isDeployMode ? 'deployment failed.' : 'undeployment failed.'}</EuiText>
+            <EuiText>{errorMessage}</EuiText>
             <EuiSpacer size="xs" />
             <EuiSpacer size="s" />
             <EuiFlexGroup justifyContent="flexEnd">
@@ -79,7 +92,7 @@ export const ModelVersionDeploymentConfirmModal = ({
                           name={name}
                           version={version}
                           plainVersionLink={modelVersionUrl}
-                          mode={isDeployMode ? 'deployment-failed' : 'undeployment-failed'}
+                          mode={errorType}
                           closeModal={() => {
                             overlayRef?.close();
                           }}
@@ -102,7 +115,7 @@ export const ModelVersionDeploymentConfirmModal = ({
       closeModal();
     }
     // The undeploy API call is sync, we can show error message after immediately
-    if (!isDeployMode) {
+    if (mode === 'undeploy') {
       notifications?.toasts.addSuccess({
         title: mountReactNode(
           <>
@@ -114,21 +127,34 @@ export const ModelVersionDeploymentConfirmModal = ({
           </>
         ),
       });
+      return;
     }
     // TODO: Implement model version table status updated after integrate model version table automatic refresh status column
-  }, [id, notifications, isDeployMode, closeModal, overlays, history, name, version]);
+  }, [
+    id,
+    notifications,
+    action,
+    closeModal,
+    overlays,
+    history,
+    name,
+    version,
+    errorType,
+    errorMessage,
+    mode,
+  ]);
 
   return (
     <EuiConfirmModal
       title={
         <>
-          {isDeployMode ? 'Deploy' : 'Undeploy'}{' '}
+          {title}{' '}
           <Link to={generatePath(routerPaths.modelVersion, { id })} component={EuiLink}>
             {name} version {version}
           </Link>
         </>
       }
-      confirmButtonText={isDeployMode ? 'Deploy' : 'Undeploy'}
+      confirmButtonText={title}
       cancelButtonText="Cancel"
       onCancel={closeModal}
       onConfirm={handleConfirm}
@@ -136,9 +162,7 @@ export const ModelVersionDeploymentConfirmModal = ({
       isLoading={isSubmitting}
       maxWidth={500}
     >
-      {isDeployMode
-        ? 'This version will begin deploying.'
-        : 'This version will be undeployed. You can deploy it again later.'}
+      {description}
     </EuiConfirmModal>
   );
 };
