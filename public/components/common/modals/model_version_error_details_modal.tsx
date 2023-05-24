@@ -22,37 +22,52 @@ import {
 
 import { routerPaths } from '../../../../common/router_paths';
 
+const errorType2ErrorTitleMap = {
+  'deployment-failed': 'deployment failed',
+  'artifact-upload-failed': 'artifact upload failed',
+  'undeployment-failed': 'undeployment failed',
+};
+
 export const ModelVersionErrorDetailsModal = ({
   id,
   name,
   version,
+  errorType,
   closeModal,
   errorDetails,
-  isDeployFailed,
+  plainVersionLink,
 }: {
-  name: string;
   id: string;
+  name: string;
   version: string;
+  errorType: 'deployment-failed' | 'artifact-upload-failed' | 'undeployment-failed';
   closeModal: () => void;
   errorDetails: string;
-  isDeployFailed?: boolean;
+  plainVersionLink?: string;
 }) => {
+  const errorTitle = errorType2ErrorTitleMap[errorType];
+  const linkText = `${name} version ${version}`;
+
   return (
     <EuiModal style={{ width: 520 }} onClose={closeModal}>
       <EuiModalHeader>
         <EuiModalHeaderTitle>
           <EuiTitle>
             <h2>
-              <Link component={EuiLink} to={generatePath(routerPaths.modelVersion, { id })}>
-                {name} version {version}
-              </Link>{' '}
-              {isDeployFailed ? 'deployment failed' : 'artifact upload failed'}
+              {plainVersionLink ? (
+                <EuiLink href={plainVersionLink}>{linkText}</EuiLink>
+              ) : (
+                <Link component={EuiLink} to={generatePath(routerPaths.modelVersion, { id })}>
+                  {linkText}
+                </Link>
+              )}{' '}
+              {errorTitle}
             </h2>
           </EuiTitle>
         </EuiModalHeaderTitle>
       </EuiModalHeader>
       <EuiModalBody>
-        {isDeployFailed ? (
+        {errorType === 'deployment-failed' || errorType === 'undeployment-failed' ? (
           <>
             <EuiText size="s">Error message:</EuiText>
             <EuiSpacer size="m" />
