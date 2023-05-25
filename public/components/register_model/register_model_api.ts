@@ -38,6 +38,8 @@ const createModelIfNeedAndUploadVersion = async <T>({
     await APIProvider.getAPI('modelGroup').register({
       name,
       description,
+      // TODO: This value should follow form data, need to be updated after UI design confirmed
+      modelAccessMode: 'public',
     })
   ).model_group_id;
 

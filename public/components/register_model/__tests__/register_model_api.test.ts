@@ -70,10 +70,12 @@ describe('register model api', () => {
         modelFile: new File([], 'artifact.zip'),
       });
 
-      expect(ModelGroup.prototype.register).toHaveBeenCalledWith({
-        name: 'foo',
-        description: 'bar',
-      });
+      expect(ModelGroup.prototype.register).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'foo',
+          description: 'bar',
+        })
+      );
     });
 
     it('should delete created model group API upload failed', async () => {
@@ -110,10 +112,12 @@ describe('register model api', () => {
         modelURL: 'https://address.to/artifact.zip',
       });
 
-      expect(ModelGroup.prototype.register).toHaveBeenCalledWith({
-        name: 'foo',
-        description: 'bar',
-      });
+      expect(ModelGroup.prototype.register).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'foo',
+          description: 'bar',
+        })
+      );
     });
 
     it('should delete created model group API upload failed', async () => {

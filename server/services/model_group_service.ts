@@ -28,15 +28,16 @@ import {
 } from './utils/constants';
 import { generateMustQueries, generateTermQuery } from './utils/query';
 
-type Status = 'success';
-
 export class ModelGroupService {
   public static async register(params: {
     client: IScopedClusterClient;
     name: string;
     description?: string;
+    modelAccessMode: 'public' | 'restricted' | 'private';
+    backendRoles?: string[];
+    addAllBackendRoles?: boolean;
   }) {
-    const { client, name, description } = params;
+    const { client, name, description, modelAccessMode, backendRoles, addAllBackendRoles } = params;
     const result = (
       await client.asCurrentUser.transport.request({
         method: 'POST',
@@ -44,11 +45,14 @@ export class ModelGroupService {
         body: {
           name,
           description,
+          model_access_mode: modelAccessMode,
+          backend_roles: backendRoles,
+          add_all_backend_roles: addAllBackendRoles,
         },
       })
     ).body as {
       model_group_id: string;
-      status: Status;
+      status: 'CREATED';
     };
     return result;
   }
@@ -74,7 +78,7 @@ export class ModelGroupService {
         },
       })
     ).body as {
-      status: Status;
+      status: 'UPDATED';
     };
     return result;
   }
@@ -85,9 +89,7 @@ export class ModelGroupService {
         method: 'DELETE',
         path: `${MODEL_GROUP_BASE_API}/${id}`,
       })
-    ).body as {
-      status: Status;
-    };
+    ).body;
     return result;
   }
 

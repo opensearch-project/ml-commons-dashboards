@@ -25,8 +25,14 @@ export interface ModelGroupSearchResponse {
 }
 
 export class ModelGroup {
-  public register(body: { name: string; description?: string }) {
-    return InnerHttpProvider.getHttp().post<{ model_group_id: string; status: 'success' }>(
+  public register(body: {
+    name: string;
+    description?: string;
+    modelAccessMode: 'public' | 'restricted' | 'private';
+    backendRoles?: string[];
+    addAllBackendRoles?: boolean;
+  }) {
+    return InnerHttpProvider.getHttp().post<{ model_group_id: string; status: 'CREATED' }>(
       MODEL_GROUP_API_ENDPOINT,
       {
         body: JSON.stringify(body),

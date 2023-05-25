@@ -18,16 +18,26 @@ export const modelGroupRouter = (router: IRouter) => {
         body: schema.object({
           name: schema.string(),
           description: schema.maybe(schema.string()),
+          modelAccessMode: schema.oneOf([
+            schema.literal('public'),
+            schema.literal('private'),
+            schema.literal('restricted'),
+          ]),
+          backendRoles: schema.maybe(schema.arrayOf(schema.string())),
+          addAllBackendRoles: schema.maybe(schema.boolean()),
         }),
       },
     },
     async (context, request) => {
-      const { name, description } = request.body;
+      const { name, description, modelAccessMode, backendRoles, addAllBackendRoles } = request.body;
       try {
         const payload = await ModelGroupService.register({
           client: context.core.opensearch.client,
           name,
           description,
+          modelAccessMode,
+          backendRoles,
+          addAllBackendRoles,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (error) {
