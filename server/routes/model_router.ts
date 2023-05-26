@@ -97,6 +97,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
           nameOrId: schema.maybe(schema.string()),
           versionOrKeyword: schema.maybe(schema.string()),
+          modelGroupId: schema.maybe(schema.string()),
         }),
       },
     },
@@ -110,6 +111,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
         name,
         states,
         nameOrId,
+        modelGroupId,
         versionOrKeyword,
       } = request.query;
       try {
@@ -123,6 +125,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           name,
           states: typeof states === 'string' ? [states] : states,
           nameOrId,
+          modelGroupId,
           versionOrKeyword,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });

@@ -11,7 +11,7 @@ describe('register model api', () => {
   beforeEach(() => {
     jest
       .spyOn(ModelGroup.prototype, 'register')
-      .mockResolvedValue({ model_group_id: 'foo', status: 'success' });
+      .mockResolvedValue({ model_group_id: '1', status: 'CREATED' });
     jest.spyOn(ModelGroup.prototype, 'delete').mockResolvedValue({ status: 'success' });
     jest.spyOn(Model.prototype, 'upload').mockResolvedValue({ task_id: 'foo', model_id: 'bar' });
   });
@@ -94,9 +94,24 @@ describe('register model api', () => {
       } catch (error) {
         expect(uploadError).toBe(error);
       }
-      expect(ModelGroup.prototype.delete).toHaveBeenCalledWith('foo');
+      expect(ModelGroup.prototype.delete).toHaveBeenCalledWith('1');
 
       uploadMock.mockRestore();
+    });
+
+    it('should return task id and model id after submit successful', async () => {
+      const result = await submitModelWithFile({
+        name: 'foo',
+        description: 'bar',
+        configuration: '{}',
+        modelFileFormat: '',
+        modelFile: new File([], 'artifact.zip'),
+      });
+
+      expect(result).toEqual({
+        modelId: '1',
+        modelVersionId: 'bar',
+      });
     });
   });
 
@@ -136,9 +151,24 @@ describe('register model api', () => {
       } catch (error) {
         expect(uploadError).toBe(error);
       }
-      expect(ModelGroup.prototype.delete).toHaveBeenCalledWith('foo');
+      expect(ModelGroup.prototype.delete).toHaveBeenCalledWith('1');
 
       uploadMock.mockRestore();
+    });
+
+    it('should return model id and model version id after submit successful', async () => {
+      const result = await submitModelWithURL({
+        name: 'foo',
+        description: 'bar',
+        configuration: '{}',
+        modelFileFormat: '',
+        modelURL: 'https://address.to/artifact.zip',
+      });
+
+      expect(result).toEqual({
+        modelId: '1',
+        taskId: 'foo',
+      });
     });
   });
 });
