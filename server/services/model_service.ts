@@ -37,10 +37,11 @@ const modelSortFieldMapping: { [key: string]: string } = {
 
 interface UploadModelBase {
   name: string;
-  version: string;
-  description: string;
+  version?: string;
+  description?: string;
   modelFormat: string;
   modelConfig: Record<string, unknown>;
+  modelGroupId: string;
 }
 
 interface UploadModelByURL extends UploadModelBase {
@@ -178,13 +179,14 @@ export class ModelService {
     client: IScopedClusterClient;
     model: T;
   }): UploadResult<T> {
-    const { name, version, description, modelFormat, modelConfig } = model;
+    const { name, version, description, modelFormat, modelConfig, modelGroupId } = model;
     const uploadModelBase = {
       name,
       version,
       description,
       model_format: modelFormat,
       model_config: modelConfig,
+      model_group_id: modelGroupId,
     };
     if (isUploadModelByURL(model)) {
       const { task_id: taskId, status } = (

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE, ModelSearchSort } from '../../common';
+import { MODEL_STATE } from '../../common';
 import {
   MODEL_API_ENDPOINT,
   MODEL_LOAD_API_ENDPOINT,
@@ -79,10 +79,11 @@ export interface ModelProfileResponse {
 
 interface UploadModelBase {
   name: string;
-  version: string;
-  description: string;
+  version?: string;
+  description?: string;
   modelFormat: string;
   modelConfig: Record<string, unknown>;
+  modelGroupId: string;
 }
 
 export interface UploadModelByURL extends UploadModelBase {

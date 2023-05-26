@@ -9,7 +9,6 @@ import { Route } from 'react-router-dom';
 import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 
 import { RegisterModelForm } from '../register_model';
-import { Model } from '../../../apis/model';
 import { render, RenderWithRouteProps, screen, waitFor } from '../../../../test/test_utils';
 import { ModelFileFormData, ModelUrlFormData } from '../register_model.types';
 
@@ -106,8 +105,6 @@ export async function setup(
     throw new Error('Description input not found');
   }
 
-  // Mock model name unique
-  jest.spyOn(Model.prototype, 'search').mockResolvedValue({ data: [], total_models: 0 });
   // fill model name
   if (mode === 'model') {
     await user.type(nameInput, 'test model name');
