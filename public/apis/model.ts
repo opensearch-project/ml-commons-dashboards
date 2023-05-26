@@ -106,6 +106,7 @@ export class Model {
     states?: MODEL_STATE[];
     nameOrId?: string;
     versionOrKeyword?: string;
+    modelGroupId?: string;
   }) {
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
       query,
