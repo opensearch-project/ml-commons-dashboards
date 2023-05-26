@@ -84,10 +84,11 @@ export interface ModelProfileResponse {
 
 interface UploadModelBase {
   name: string;
-  version: string;
-  description: string;
+  version?: string;
+  description?: string;
   modelFormat: string;
   modelConfig: Record<string, unknown>;
+  modelGroupId: string;
 }
 
 export interface UploadModelByURL extends UploadModelBase {

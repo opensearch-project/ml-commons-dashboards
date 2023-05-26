@@ -25,7 +25,6 @@ import useObservable from 'react-use/lib/useObservable';
 import { from } from 'rxjs';
 
 import { APIProvider } from '../../apis/api_provider';
-import { upgradeModelVersion } from '../../utils';
 import { useSearchParams } from '../../hooks/use_search_params';
 import { isValidModelRegisterFormType } from './utils';
 import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -79,7 +78,7 @@ const FileAndVersionTitle = () => {
 export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterModelFormProps) => {
   const history = useHistory();
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const { id: latestVersionId } = useParams<{ id: string | undefined }>();
+  const { id: registerToModelId } = useParams<{ id: string | undefined }>();
   const [modelGroupName, setModelGroupName] = useState<string>();
   const searchParams = useSearchParams();
   const typeParams = searchParams.get('type');
@@ -96,13 +95,13 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     formType === 'import'
       ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
       : [
-          ...(latestVersionId ? [] : [ModelOverviewTitle]),
-          ...(latestVersionId ? [] : [ModelDetailsPanel]),
-          ...(latestVersionId ? [] : [ModelTagsPanel]),
-          ...(latestVersionId ? [] : [FileAndVersionTitle]),
+          ...(registerToModelId ? [] : [ModelOverviewTitle]),
+          ...(registerToModelId ? [] : [ModelDetailsPanel]),
+          ...(registerToModelId ? [] : [ModelTagsPanel]),
+          ...(registerToModelId ? [] : [FileAndVersionTitle]),
           ArtifactPanel,
           ConfigurationPanel,
-          ...(latestVersionId ? [ModelTagsPanel] : []),
+          ...(registerToModelId ? [ModelTagsPanel] : []),
           ModelVersionNotesPanel,
         ];
 
@@ -162,7 +161,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
         // Navigate to model list if form submit successfully
         history.push(routerPaths.modelList);
 
-        if (latestVersionId) {
+        if (data.modelId) {
           notifications?.toasts.addSuccess({
             title: mountReactNode(
               <EuiText>
@@ -198,27 +197,25 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
         }
       }
     },
-    [notifications, form, latestVersionId, history]
+    [notifications, form, history]
   );
 
   useEffect(() => {
-    if (!latestVersionId) return;
+    if (!registerToModelId) return;
     const initializeForm = async () => {
+      form.setValue('modelId', registerToModelId);
       try {
-        const data = await APIProvider.getAPI('model').getOne(latestVersionId);
+        const data = await APIProvider.getAPI('modelGroup').getOne(registerToModelId);
         // TODO:  clarify which fields to pre-populate
-        const { model_version: modelVersion, name, model_config: modelConfig } = data;
-        const newVersion = upgradeModelVersion(modelVersion);
+        const { name } = data;
         form.setValue('name', name);
-        form.setValue('version', newVersion);
-        form.setValue('configuration', modelConfig?.all_config ?? '');
         setModelGroupName(name);
       } catch (e) {
         // TODO: handle error here
       }
     };
     initializeForm();
-  }, [latestVersionId, form]);
+  }, [registerToModelId, form]);
 
   useEffect(() => {
     if (!nameParams) {
@@ -262,10 +259,10 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
   const errorCount = Object.keys(form.formState.errors).length;
   const formHeader = (
     <>
-      <EuiPageHeader pageTitle={latestVersionId ? 'Register version' : 'Register model'} />
+      <EuiPageHeader pageTitle={registerToModelId ? 'Register version' : 'Register model'} />
       <EuiText style={{ maxWidth: 725 }}>
         <small>
-          {latestVersionId && (
+          {registerToModelId && (
             <>
               Register a new version of <b>{modelGroupName}</b>. The version number will be
               automatically incremented.&nbsp;
@@ -275,8 +272,8 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
               .
             </>
           )}
-          {formType === 'import' && !latestVersionId && <>Register a pre-trained model.</>}
-          {formType === 'upload' && !latestVersionId && (
+          {formType === 'import' && !registerToModelId && <>Register a pre-trained model.</>}
+          {formType === 'upload' && !registerToModelId && (
             <>
               Register your model to manage its life cycle, and facilitate model discovery across
               your organization.
@@ -357,7 +354,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
                   onClick={() => setIsSubmitted(true)}
                   fill
                 >
-                  {latestVersionId ? 'Register version' : 'Register model'}
+                  {registerToModelId ? 'Register version' : 'Register model'}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>

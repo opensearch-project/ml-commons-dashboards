@@ -47,7 +47,7 @@ const getModelRegisterBreadcrumbs = (basename: string, matchedParams: {}) => {
       staticBreadcrumbs: baseModelRegistryBreadcrumbs,
       // TODO: Change to model group API
       asyncBreadcrumbsLoader: () =>
-        APIProvider.getAPI('model')
+        APIProvider.getAPI('modelGroup')
           .getOne(modelId)
           .then(
             (model) =>

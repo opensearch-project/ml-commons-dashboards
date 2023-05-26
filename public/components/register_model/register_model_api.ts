@@ -8,44 +8,78 @@ import { MAX_CHUNK_SIZE } from '../common/forms/form_constants';
 import { getModelContentHashValue } from './get_model_content_hash_value';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
+const getModelUploadBase = ({
+  name,
+  versionNotes,
+  modelFileFormat,
+  configuration,
+}: ModelFileFormData | ModelUrlFormData) => ({
+  name,
+  description: versionNotes,
+  modelFormat: modelFileFormat,
+  modelConfig: JSON.parse(configuration),
+});
+
+const createModelIfNeedAndUploadVersion = async <T>({
+  name,
+  modelId,
+  description,
+  uploader,
+}: {
+  name: string;
+  modelId?: string;
+  description?: string;
+  uploader: (modelId: string) => Promise<T>;
+}) => {
+  if (modelId) {
+    return await uploader(modelId);
+  }
+  modelId = (
+    await APIProvider.getAPI('modelGroup').register({
+      name,
+      description,
+      // TODO: This value should follow form data, need to be updated after UI design confirmed
+      modelAccessMode: 'public',
+    })
+  ).model_group_id;
+
+  try {
+    return await uploader(modelId);
+  } catch (error) {
+    APIProvider.getAPI('modelGroup').delete(modelId);
+    throw error;
+  }
+};
+
 export async function submitModelWithFile(model: ModelFileFormData) {
-  const modelUploadBase = {
-    name: model.name,
-    version: model.version,
-    description: model.description,
-    // TODO: Need to confirm if we have the model format input
-    modelFormat: 'TORCH_SCRIPT',
-    modelConfig: JSON.parse(model.configuration),
-  };
   const { modelFile } = model;
   const totalChunks = Math.ceil(modelFile.size / MAX_CHUNK_SIZE);
   const modelContentHashValue = await getModelContentHashValue(modelFile);
 
-  const modelId = (
-    await APIProvider.getAPI('model').upload({
-      ...modelUploadBase,
-      totalChunks,
-      modelContentHashValue,
+  return (
+    await createModelIfNeedAndUploadVersion({
+      ...model,
+      uploader: (modelId: string) =>
+        APIProvider.getAPI('model').upload({
+          ...getModelUploadBase(model),
+          modelGroupId: modelId,
+          totalChunks,
+          modelContentHashValue,
+        }),
     })
   ).model_id;
-
-  return modelId;
 }
 
 export async function submitModelWithURL(model: ModelUrlFormData) {
-  const modelUploadBase = {
-    name: model.name,
-    version: model.version,
-    description: model.description,
-    // TODO: Need to confirm if we have the model format input
-    modelFormat: 'TORCH_SCRIPT',
-    modelConfig: JSON.parse(model.configuration),
-  };
-
-  const { task_id: taskId } = await APIProvider.getAPI('model').upload({
-    ...modelUploadBase,
-    url: model.modelURL,
-  });
-
-  return taskId;
+  return (
+    await createModelIfNeedAndUploadVersion({
+      ...model,
+      uploader: (modelId: string) =>
+        APIProvider.getAPI('model').upload({
+          ...getModelUploadBase(model),
+          modelGroupId: modelId,
+          url: model.modelURL,
+        }),
+    })
+  ).task_id;
 }
