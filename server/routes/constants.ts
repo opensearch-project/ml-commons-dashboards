@@ -15,6 +15,7 @@ export const PROFILE_API_ENDPOINT = `${API_PREFIX}/profile`;
 export const DEPLOYED_MODEL_PROFILE_API_ENDPOINT = `${PROFILE_API_ENDPOINT}/deployed-model`;
 export const CONNECTOR_API_ENDPOINT = `${API_PREFIX}/connector`;
 export const INTERNAL_CONNECTOR_API_ENDPOINT = `${API_PREFIX}/internal-connector`;
+export const MODEL_GROUP_API_ENDPOINT = `${API_PREFIX}/model-group`;
 
 export const SECURITY_API_ENDPOINT = `${API_PREFIX}/security`;
 export const SECURITY_ACCOUNT_API_ENDPOINT = `${SECURITY_API_ENDPOINT}/account`;

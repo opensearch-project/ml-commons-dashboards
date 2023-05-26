@@ -21,6 +21,7 @@ import {
   securityRouter,
   taskRouter,
   modelRepositoryRouter,
+  modelGroupRouter,
 } from './routes';
 import { ModelService } from './services';
 
@@ -50,6 +51,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     securityRouter(router);
     taskRouter(router);
     modelRepositoryRouter(router);
+    modelGroupRouter(router);
 
     return {};
   }

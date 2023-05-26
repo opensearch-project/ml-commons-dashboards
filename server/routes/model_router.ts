@@ -54,10 +54,11 @@ const modelStateSchema = schema.oneOf([
 
 const modelUploadBaseSchema = {
   name: schema.string(),
-  version: schema.string(),
-  description: schema.string(),
+  version: schema.maybe(schema.string()),
+  description: schema.maybe(schema.string()),
   modelFormat: schema.string(),
   modelConfig: schema.object({}, { unknowns: 'allow' }),
+  modelGroupId: schema.string(),
 };
 
 const modelUploadByURLSchema = schema.object({

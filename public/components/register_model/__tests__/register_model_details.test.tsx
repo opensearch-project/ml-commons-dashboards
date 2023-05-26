@@ -5,7 +5,6 @@
 
 import { setup } from './setup';
 import * as formAPI from '../register_model_api';
-import { Model } from '../../../apis/model';
 
 describe('<RegisterModel /> Details', () => {
   const onSubmitMock = jest.fn().mockResolvedValue('model_id');
@@ -53,13 +52,9 @@ describe('<RegisterModel /> Details', () => {
 
   it('should NOT submit the register model form if model name is duplicated', async () => {
     const result = await setup();
-    jest.spyOn(Model.prototype, 'search').mockResolvedValue({
-      data: [],
-      total_models: 1,
-    });
 
     await result.user.clear(result.nameInput);
-    await result.user.type(result.nameInput, 'a-duplicated-model-name');
+    await result.user.type(result.nameInput, 'model1');
     await result.user.click(result.submitButton);
 
     expect(result.nameInput).toBeInvalid();
