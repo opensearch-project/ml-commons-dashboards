@@ -91,6 +91,7 @@ export class ModelService {
     extraQuery?: Record<string, any>;
     nameOrId?: string;
     versionOrKeyword?: string;
+    modelGroupId?: string;
   }) {
     const {
       body: { hits },

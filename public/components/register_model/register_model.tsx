@@ -117,10 +117,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
   const onSubmit = useCallback(
     async (data: ModelFileFormData | ModelUrlFormData) => {
       try {
-        const onComplete = (modelId: string) => {
-          // Navigate to model group page
-          history.push(generatePath(routerPaths.model, { id: modelId }));
-
+        const onComplete = () => {
           notifications?.toasts.addSuccess({
             title: mountReactNode(
               <EuiText>
@@ -143,23 +140,29 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
             text: 'The new version was not created.',
           });
         };
-
+        let modelId;
         if ('modelFile' in data) {
-          const modelId = await submitModelWithFile(data);
+          const result = await submitModelWithFile(data);
           modelFileUploadManager.upload({
             file: data.modelFile,
-            modelId,
+            modelId: result.modelVersionId,
             chunkSize: MAX_CHUNK_SIZE,
             onComplete,
             onError,
           });
+          modelId = result.modelId;
         } else {
-          const taskId = await submitModelWithURL(data);
-          modelTaskManager.query({ taskId, onComplete, onError });
+          const result = await submitModelWithURL(data);
+          modelTaskManager.query({
+            taskId: result.taskId,
+            onComplete,
+            onError,
+          });
+          modelId = result.modelId;
         }
 
         // Navigate to model list if form submit successfully
-        history.push(routerPaths.modelList);
+        history.push(generatePath(routerPaths.model, { id: modelId }));
 
         if (data.modelId) {
           notifications?.toasts.addSuccess({
