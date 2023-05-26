@@ -113,6 +113,7 @@ export class Model {
     extraQuery?: Record<string, any>;
     dataSourceId?: string;
     versionOrKeyword?: string;
+    modelGroupId?: string;
   }) {
     const { extraQuery, dataSourceId, ...restQuery } = query;
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {

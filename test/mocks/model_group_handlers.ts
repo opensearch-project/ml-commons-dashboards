@@ -13,6 +13,13 @@ const modelGroups = [
     id: '1',
     latest_version: 1,
     description: 'foo bar',
+    owner: {
+      backend_roles: ['admin'],
+      name: 'admin',
+      roles: ['admin'],
+    },
+    created_time: 1683699499637,
+    last_updated_time: 1685073391256,
   },
 ];
 
@@ -39,6 +46,15 @@ export const modelGroupHandlers = [
       ctx.json({
         data: filteredData.slice(from, end),
         total_model_groups: filteredData.length,
+      })
+    );
+  }),
+
+  rest.post(MODEL_GROUP_API_ENDPOINT, (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        model_group_id: '1',
       })
     );
   }),

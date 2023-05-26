@@ -27,6 +27,7 @@ export const generateModelSearchQuery = ({
   states,
   nameOrId,
   extraQuery,
+  modelGroupId,
   versionOrKeyword,
 }: {
   ids?: string[];
@@ -36,6 +37,7 @@ export const generateModelSearchQuery = ({
   nameOrId?: string;
   extraQuery?: Record<string, any>;
   versionOrKeyword?: string;
+  modelGroupId?: string;
 }) => ({
   bool: {
     must: [
@@ -86,6 +88,7 @@ export const generateModelSearchQuery = ({
             },
           ]
         : []),
+      ...(modelGroupId ? [generateTermQuery('model_group_id.keyword', modelGroupId)] : []),
     ],
     must_not: {
       exists: {

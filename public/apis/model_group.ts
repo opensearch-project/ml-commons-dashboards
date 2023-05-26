@@ -14,9 +14,11 @@ interface ModelGroupSearchItem {
     name: string;
   };
   latest_version: number;
+  created_time: number;
   last_updated_time: number;
   name: string;
   description?: string;
+  access: 'public' | 'restricted' | 'private';
 }
 
 export interface ModelGroupSearchResponse {

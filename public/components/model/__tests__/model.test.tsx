@@ -5,6 +5,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
+import * as euiExports from '@elastic/eui';
 
 import { render, screen, waitFor, within } from '../../../../test/test_utils';
 import { Model } from '../model';
@@ -24,10 +25,19 @@ const setup = () => {
   };
 };
 
+jest.mock('@elastic/eui', () => ({
+  __esModule: true,
+  ...jest.requireActual('@elastic/eui'),
+}));
+
+const mockEuiDataGrid = () =>
+  jest.spyOn(euiExports, 'EuiDataGrid').mockImplementation(() => <div>EuiDataGrid</div>);
+
 describe('<Model />', () => {
   it(
     'should display model name, action buttons, overview-card, tabs and tabpanel after data loaded',
     async () => {
+      const euiDataGridMock = mockEuiDataGrid();
       setup();
 
       await waitFor(() => {
@@ -41,6 +51,8 @@ describe('<Model />', () => {
       expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: 'Versions' })).toHaveClass('euiTab-isSelected');
       expect(within(screen.getByRole('tabpanel')).getByText('Versions')).toBeInTheDocument();
+
+      euiDataGridMock.mockRestore();
     },
     10 * 1000
   );
@@ -48,6 +60,7 @@ describe('<Model />', () => {
   it(
     'should display consistent tabs content after tab clicked',
     async () => {
+      const euiDataGridMock = mockEuiDataGrid();
       setup();
 
       await waitFor(() => {
@@ -63,6 +76,8 @@ describe('<Model />', () => {
       await userEvent.click(screen.getByRole('tab', { name: 'Tags' }));
       expect(screen.getByRole('tab', { name: 'Tags' })).toHaveClass('euiTab-isSelected');
       expect(within(screen.getByRole('tabpanel')).getByText('Tags')).toBeInTheDocument();
+
+      euiDataGridMock.mockRestore();
     },
     10 * 1000
   );
@@ -70,6 +85,7 @@ describe('<Model />', () => {
   it(
     'should display model name in details tab',
     async () => {
+      const euiDataGridMock = mockEuiDataGrid();
       setup();
 
       await waitFor(() => {
@@ -78,6 +94,8 @@ describe('<Model />', () => {
       await userEvent.click(screen.getByRole('tab', { name: 'Details' }));
 
       expect(within(screen.getByRole('tabpanel')).getByDisplayValue('model1')).toBeInTheDocument();
+
+      euiDataGridMock.mockRestore();
     },
     10 * 1000
   );

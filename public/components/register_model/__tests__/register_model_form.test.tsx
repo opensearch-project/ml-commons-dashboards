@@ -25,7 +25,9 @@ describe('<RegisterModel /> Form', () => {
   const MOCKED_MODEL_ID = 'model_id';
   const addDangerMock = jest.fn();
   const addSuccessMock = jest.fn();
-  const onSubmitMock = jest.fn().mockResolvedValue(MOCKED_MODEL_ID);
+  const onSubmitMock = jest
+    .fn()
+    .mockResolvedValue({ modelId: MOCKED_MODEL_ID, modelVersionId: 'model_version_id' });
 
   beforeEach(() => {
     jest.spyOn(PluginContext, 'useOpenSearchDashboards').mockReturnValue({

@@ -96,6 +96,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           versionOrKeyword: schema.maybe(schema.string()),
           extra_query: schema.maybe(schema.recordOf(schema.string(), schema.any())),
           data_source_id: schema.maybe(schema.string()),
+          modelGroupId: schema.maybe(schema.string()),
         }),
       },
     },
@@ -109,6 +110,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
         nameOrId,
         extra_query: extraQuery,
         data_source_id: dataSourceId,
+        modelGroupId,
         versionOrKeyword,
       } = request.query;
       try {
@@ -124,6 +126,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           states: typeof states === 'string' ? [states] : states,
           nameOrId,
           extraQuery,
+          modelGroupId,
           versionOrKeyword,
         });
         return response.ok({ body: payload });
