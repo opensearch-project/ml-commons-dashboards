@@ -31,7 +31,7 @@ describe('<ModelVersionsPanel />', () => {
   it(
     'should render version count, refresh button, filter and table by default',
     async () => {
-      render(<ModelVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel modelId="1" />);
 
       expect(
         screen.getByPlaceholderText('Search by version number, or keyword')
@@ -47,7 +47,7 @@ describe('<ModelVersionsPanel />', () => {
       await waitFor(() => {
         expect(
           screen.getByText((text, node) => {
-            return text === 'Versions' && !!node?.childNodes[1]?.textContent?.includes('(1)');
+            return text === 'Versions' && !!node?.childNodes[1]?.textContent?.includes('(2)');
           })
         ).toBeInTheDocument();
       });
@@ -72,7 +72,7 @@ describe('<ModelVersionsPanel />', () => {
         };
       });
 
-      render(<ModelVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel modelId="1" />);
 
       expect(searchMock).toHaveBeenCalledTimes(1);
 
@@ -91,7 +91,7 @@ describe('<ModelVersionsPanel />', () => {
       const euiDataGridMock = mockEuiDataGrid();
       const searchMock = jest.spyOn(Model.prototype, 'search');
 
-      render(<ModelVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel modelId="1" />);
 
       await userEvent.click(screen.getByTitle('State'));
       await userEvent.click(screen.getByRole('option', { name: 'Deployed' }));
@@ -127,7 +127,7 @@ describe('<ModelVersionsPanel />', () => {
     const searchMock = jest
       .spyOn(Model.prototype, 'search')
       .mockImplementation(() => new Promise(() => {}));
-    render(<ModelVersionsPanel groupId="1" />);
+    render(<ModelVersionsPanel modelId="1" />);
 
     expect(screen.getByText('Loading versions')).toBeInTheDocument();
 
@@ -148,7 +148,7 @@ describe('<ModelVersionsPanel />', () => {
         },
       },
     });
-    render(<ModelVersionsPanel groupId="1" />);
+    render(<ModelVersionsPanel modelId="1" />);
 
     await waitFor(() => {
       expect(screen.getByText('Failed to load versions')).toBeInTheDocument();
@@ -173,7 +173,7 @@ describe('<ModelVersionsPanel />', () => {
       };
     });
 
-    render(<ModelVersionsPanel groupId="1" />);
+    render(<ModelVersionsPanel modelId="1" />);
 
     await waitFor(() => {
       expect(screen.getByText('Registered versions will appear here.')).toBeInTheDocument();
@@ -193,7 +193,7 @@ describe('<ModelVersionsPanel />', () => {
     'should render no-result screen and reset search button if no result for specific condition',
     async () => {
       const euiDataGridMock = mockEuiDataGrid();
-      render(<ModelVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel modelId="1" />);
       await waitFor(() => {
         expect(screen.getByTitle('Status')).toBeInTheDocument();
       });
@@ -224,7 +224,7 @@ describe('<ModelVersionsPanel />', () => {
     'should call model search without filter condition after reset button clicked',
     async () => {
       const euiDataGridMock = mockEuiDataGrid();
-      render(<ModelVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel modelId="1" />);
       await waitFor(() => {
         expect(screen.getByTitle('Status')).toBeInTheDocument();
       });
@@ -244,8 +244,7 @@ describe('<ModelVersionsPanel />', () => {
       expect(searchMock).toHaveBeenCalledWith({
         from: 0,
         size: 25,
-        // TODO: Change to model group id once parameter added
-        ids: expect.any(Array),
+        modelGroupId: '1',
       });
 
       searchMock.mockRestore();
@@ -257,7 +256,7 @@ describe('<ModelVersionsPanel />', () => {
   it(
     'should only sort by Last updated column after column sort button clicked',
     async () => {
-      render(<ModelVersionsPanel groupId="1" />);
+      render(<ModelVersionsPanel modelId="1" />);
       await waitFor(() => {
         expect(screen.getByTestId('dataGridHeaderCell-version')).toBeInTheDocument();
       });

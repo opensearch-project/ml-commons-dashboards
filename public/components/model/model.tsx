@@ -13,9 +13,12 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useState, useMemo, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, generatePath, useParams } from 'react-router-dom';
+
+import { routerPaths } from '../../../common';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
+
 import { ModelOverviewCard } from './model_overview_card';
 import { ModelVersionsPanel } from './model_versions_panel';
 import { ModelDetailsPanel } from './model_details_panel';
@@ -23,7 +26,7 @@ import { ModelTagsPanel } from './model_tags_panel';
 
 export const Model = () => {
   const { id: modelId } = useParams<{ id: string }>();
-  const { data, loading, error } = useFetcher(APIProvider.getAPI('model').getOne, modelId);
+  const { data, loading, error } = useFetcher(APIProvider.getAPI('modelGroup').getOne, modelId);
   const tabs = useMemo(
     () => [
       {
@@ -32,7 +35,7 @@ export const Model = () => {
         content: (
           <>
             <EuiSpacer size="m" />
-            <ModelVersionsPanel groupId={modelId} />
+            <ModelVersionsPanel modelId={modelId} />
           </>
         ),
       },
@@ -86,17 +89,20 @@ export const Model = () => {
           </EuiText>
         }
         rightSideItems={[
-          <EuiButton fill>Register version</EuiButton>,
+          <Link to={generatePath(routerPaths.registerModel, { id: modelId })}>
+            <EuiButton fill>Register version</EuiButton>
+          </Link>,
           <EuiButton color="danger">Delete</EuiButton>,
         ]}
       />
       <ModelOverviewCard
         id={data.id}
-        owner="TODO"
+        owner={data.owner.name}
         isModelOwner={false}
-        createdTime={data.created_time}
+        // TODO: update to create time
+        createdTime={data.last_updated_time}
         updatedTime={data.last_updated_time}
-        // TODO: Add description property here
+        description={data.description}
       />
       <EuiSpacer size="l" />
       <EuiTabbedContent

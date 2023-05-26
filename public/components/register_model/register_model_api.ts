@@ -30,9 +30,12 @@ const createModelIfNeedAndUploadVersion = async <T>({
   modelId?: string;
   description?: string;
   uploader: (modelId: string) => Promise<T>;
-}) => {
+}): Promise<{ uploadResult: T; modelId: string }> => {
   if (modelId) {
-    return await uploader(modelId);
+    return {
+      uploadResult: await uploader(modelId),
+      modelId,
+    };
   }
   modelId = (
     await APIProvider.getAPI('modelGroup').register({
@@ -44,7 +47,10 @@ const createModelIfNeedAndUploadVersion = async <T>({
   ).model_group_id;
 
   try {
-    return await uploader(modelId);
+    return {
+      uploadResult: await uploader(modelId),
+      modelId,
+    };
   } catch (error) {
     APIProvider.getAPI('modelGroup').delete(modelId);
     throw error;
@@ -55,31 +61,36 @@ export async function submitModelWithFile(model: ModelFileFormData) {
   const { modelFile } = model;
   const totalChunks = Math.ceil(modelFile.size / MAX_CHUNK_SIZE);
   const modelContentHashValue = await getModelContentHashValue(modelFile);
+  const result = await createModelIfNeedAndUploadVersion({
+    ...model,
+    uploader: (modelId: string) =>
+      APIProvider.getAPI('model').upload({
+        ...getModelUploadBase(model),
+        modelGroupId: modelId,
+        totalChunks,
+        modelContentHashValue,
+      }),
+  });
 
-  return (
-    await createModelIfNeedAndUploadVersion({
-      ...model,
-      uploader: (modelId: string) =>
-        APIProvider.getAPI('model').upload({
-          ...getModelUploadBase(model),
-          modelGroupId: modelId,
-          totalChunks,
-          modelContentHashValue,
-        }),
-    })
-  ).model_id;
+  return {
+    modelId: result.modelId,
+    modelVersionId: result.uploadResult.model_id,
+  };
 }
 
 export async function submitModelWithURL(model: ModelUrlFormData) {
-  return (
-    await createModelIfNeedAndUploadVersion({
-      ...model,
-      uploader: (modelId: string) =>
-        APIProvider.getAPI('model').upload({
-          ...getModelUploadBase(model),
-          modelGroupId: modelId,
-          url: model.modelURL,
-        }),
-    })
-  ).task_id;
+  const result = await createModelIfNeedAndUploadVersion({
+    ...model,
+    uploader: (modelId: string) =>
+      APIProvider.getAPI('model').upload({
+        ...getModelUploadBase(model),
+        modelGroupId: modelId,
+        url: model.modelURL,
+      }),
+  });
+
+  return {
+    modelId: result.modelId,
+    taskId: result.uploadResult.task_id,
+  };
 }

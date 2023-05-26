@@ -84,10 +84,10 @@ const getSortParam = (sort: Array<{ id: string; direction: 'asc' | 'desc' }>) =>
 };
 
 interface ModelVersionsPanelProps {
-  groupId: string;
+  modelId: string;
 }
 
-export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
+export const ModelVersionsPanel = ({ modelId }: ModelVersionsPanelProps) => {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [params, setParams] = useState<{
     pageIndex: number;
@@ -107,8 +107,7 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
   const { data: versionsData, reload, loading, error } = useFetcher(
     APIProvider.getAPI('model').search,
     {
-      // TODO: Change to model group id
-      ids: [groupId],
+      modelGroupId: modelId,
       from: params.pageIndex * params.pageSize,
       size: params.pageSize,
       states: getStatesParam(params.filter),
@@ -314,7 +313,7 @@ export const ModelVersionsPanel = ({ groupId }: ModelVersionsPanelProps) => {
               <EuiSpacer size="xxl" />
               <EuiText color="subdued">Registered versions will appear here.</EuiText>
               <EuiSpacer size="xl" />
-              <EuiLink href={generatePath(routerPaths.registerModel, { id: groupId })}>
+              <EuiLink href={generatePath(routerPaths.registerModel, { id: modelId })}>
                 <EuiButton iconType="plusInCircle">Register new version</EuiButton>
               </EuiLink>
               <EuiSpacer size="m" />
