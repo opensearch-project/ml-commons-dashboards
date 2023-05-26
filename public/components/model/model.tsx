@@ -99,8 +99,7 @@ export const Model = () => {
         id={data.id}
         owner={data.owner.name}
         isModelOwner={false}
-        // TODO: update to create time
-        createdTime={data.last_updated_time}
+        createdTime={data.created_time}
         updatedTime={data.last_updated_time}
         description={data.description}
       />
