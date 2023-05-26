@@ -25,6 +25,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'REGISTERED',
     total_chunks: 34,
+    model_group_id: '1',
   },
   {
     id: '2',
@@ -43,6 +44,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'REGISTERED',
     total_chunks: 34,
+    model_group_id: '2',
   },
   {
     id: '3',
@@ -61,6 +63,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'DEPLOYED',
     total_chunks: 34,
+    model_group_id: '3',
   },
   {
     id: '4',
@@ -79,6 +82,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'DEPLOYED',
     total_chunks: 34,
+    model_group_id: '1',
   },
 ];
 
@@ -87,12 +91,16 @@ export const modelHandlers = [
     const { searchParams } = req.url;
     const name = searchParams.get('name');
     const ids = searchParams.getAll('ids');
+    const modelGroupId = searchParams.get('modelGroupId');
     const data = models.filter((model) => {
       if (name) {
         return model.name === name;
       }
-      if (ids) {
+      if (ids && ids.length > 0) {
         return ids.includes(model.id);
+      }
+      if (modelGroupId) {
+        return model.model_group_id === modelGroupId;
       }
       return true;
     });
