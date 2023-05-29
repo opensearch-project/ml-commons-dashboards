@@ -72,4 +72,49 @@ describe('<ModelList />', () => {
 
     modelAggregateSearchMock.mockRestore();
   });
+
+  it('should call model aggregate with extraQuery after search text typed', async () => {
+    setup();
+    const modelAggregateSearchMock = jest.spyOn(ModelAggregate.prototype, 'search');
+
+    await userEvent.type(screen.getByPlaceholderText('Search by name, person, or keyword'), 'foo');
+
+    await waitFor(() => {
+      expect(modelAggregateSearchMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: JSON.stringify({
+            bool: {
+              should: [
+                {
+                  match_phrase: {
+                    name: 'foo',
+                  },
+                },
+                {
+                  match_phrase: {
+                    description: 'foo',
+                  },
+                },
+                {
+                  nested: {
+                    path: 'owner',
+                    query: {
+                      term: {
+                        'owner.name.keyword': {
+                          value: 'foo',
+                          boost: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          }),
+        })
+      );
+    });
+
+    modelAggregateSearchMock.mockRestore();
+  });
 });

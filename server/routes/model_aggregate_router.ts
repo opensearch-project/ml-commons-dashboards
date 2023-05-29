@@ -33,17 +33,17 @@ export const modelAggregateRouter = (router: IRouter) => {
           ),
           name: schema.maybe(schema.string()),
           states: schema.maybe(schema.oneOf([modelStateSchema, schema.arrayOf(modelStateSchema)])),
-          queryString: schema.maybe(schema.string()),
+          extraQuery: schema.maybe(schema.recordOf(schema.string(), schema.any())),
         }),
       },
     },
     async (context, request) => {
-      const { states, queryString, ...restQuery } = request.query;
+      const { states, extraQuery, ...restQuery } = request.query;
       try {
         const payload = await ModelAggregateService.search({
           client: context.core.opensearch.client,
           states: typeof states === 'string' ? [states] : states,
-          queryString,
+          extraQuery,
           ...restQuery,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });

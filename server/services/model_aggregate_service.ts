@@ -55,7 +55,7 @@ interface ModelAggregateSearchParams extends GetAggregateModelsParams {
   from: number;
   size: number;
   sort?: ModelAggregateSort;
-  queryString?: string;
+  extraQuery?: Record<string, any>;
 }
 
 export class ModelAggregateService {
@@ -90,7 +90,7 @@ export class ModelAggregateService {
     size,
     sort,
     states,
-    queryString,
+    extraQuery,
   }: ModelAggregateSearchParams) {
     const sourceModelIds = states
       ? await ModelAggregateService.getModelIdsByVersion({ client, states })
@@ -101,7 +101,7 @@ export class ModelAggregateService {
       size,
       sort: sort ? getModelSort(sort) : sort,
       ids: sourceModelIds,
-      queryString,
+      extraQuery,
     });
     const modelIds = models.map(({ id }) => id);
     const { data: deployedModels } = await ModelVersionService.search({

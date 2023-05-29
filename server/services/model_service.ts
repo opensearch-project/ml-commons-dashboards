@@ -111,7 +111,7 @@ export class ModelService {
     from,
     size,
     sort,
-    queryString,
+    extraQuery,
   }: {
     client: IScopedClusterClient;
     ids?: string[];
@@ -119,7 +119,7 @@ export class ModelService {
     from: number;
     size: number;
     sort?: ModelSort;
-    queryString?: string;
+    extraQuery?: Record<string, any>;
   }) {
     const {
       body: { hits },
@@ -132,15 +132,7 @@ export class ModelService {
             must: [
               ...(ids ? [generateTermQuery('_id', ids)] : []),
               ...(name ? [generateTermQuery('name', name)] : []),
-              ...(queryString
-                ? [
-                    {
-                      query_string: {
-                        query: queryString,
-                      },
-                    },
-                  ]
-                : []),
+              ...(extraQuery ? [extraQuery] : []),
             ],
           },
         },

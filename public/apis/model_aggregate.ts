@@ -19,7 +19,7 @@ export class ModelAggregate {
     size: number;
     sort?: ModelAggregateSort;
     states?: MODEL_VERSION_STATE[];
-    queryString?: string;
+    extraQuery?: string;
   }) {
     return InnerHttpProvider.getHttp().get<ModelAggregateSearchResponse>(
       MODEL_AGGREGATE_API_ENDPOINT,

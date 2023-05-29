@@ -115,12 +115,12 @@ export const modelRouter = (router: IRouter) => {
           name: schema.maybe(schema.string()),
           from: schema.number({ min: 0 }),
           size: schema.number({ max: 100 }),
-          queryString: schema.maybe(schema.string()),
+          extraQuery: schema.maybe(schema.recordOf(schema.string(), schema.any())),
         }),
       },
     },
     async (context, request) => {
-      const { ids, name, from, size, queryString } = request.query;
+      const { ids, name, from, size, extraQuery } = request.query;
       try {
         const payload = await ModelService.search({
           client: context.core.opensearch.client,
@@ -128,7 +128,7 @@ export const modelRouter = (router: IRouter) => {
           name,
           from,
           size,
-          queryString,
+          extraQuery,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (error) {

@@ -7,7 +7,7 @@ import { EuiPageHeader, EuiSpacer, EuiPanel, EuiTextColor } from '@elastic/eui';
 
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { MODEL_VERSION_STATE } from '../../../common';
+import { MODEL_VERSION_STATE, ModelAggregateSort } from '../../../common';
 
 import { ModelTable, ModelTableCriteria, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
@@ -32,13 +32,57 @@ const getStatesParam = (deployed?: boolean) => {
   return undefined;
 };
 
+interface Params {
+  sort: ModelTableSort;
+  currentPage: number;
+  pageSize: number;
+  filterValue: ModelListFilterFilterValue;
+}
+
+const getModelAggregateSearchParams = (params: Params) => {
+  return {
+    from: (params.currentPage - 1) * params.pageSize,
+    size: params.pageSize,
+    sort: params.sort
+      ? (`${params.sort.field}-${params.sort.direction}` as ModelAggregateSort)
+      : undefined,
+    states: getStatesParam(params.filterValue.deployed),
+    extraQuery: params.filterValue.search
+      ? JSON.stringify({
+          bool: {
+            should: [
+              {
+                match_phrase: {
+                  name: params.filterValue.search,
+                },
+              },
+              {
+                match_phrase: {
+                  description: params.filterValue.search,
+                },
+              },
+              {
+                nested: {
+                  path: 'owner',
+                  query: {
+                    term: {
+                      'owner.name.keyword': {
+                        value: params.filterValue.search,
+                        boost: 1,
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        })
+      : undefined,
+  };
+};
+
 export const ModelList = () => {
-  const [params, setParams] = useState<{
-    sort: ModelTableSort;
-    currentPage: number;
-    pageSize: number;
-    filterValue: ModelListFilterFilterValue;
-  }>({
+  const [params, setParams] = useState<Params>({
     currentPage: 1,
     pageSize: 15,
     filterValue: { tag: [], owner: [] },
@@ -50,15 +94,10 @@ export const ModelList = () => {
     searchInputRef.current = node;
   }, []);
 
-  const { data, loading, error } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
-    from: (params.currentPage - 1) * params.pageSize,
-    size: params.pageSize,
-    sort: params.sort ? `${params.sort.field}-${params.sort.direction}` : undefined,
-    states: getStatesParam(params.filterValue.deployed),
-    queryString: params.filterValue.search
-      ? `name:*${params.filterValue.search}* OR *${params.filterValue.search}* OR owner.name.keyword:*${params.filterValue.search}*`
-      : undefined,
-  });
+  const { data, loading, error } = useFetcher(
+    APIProvider.getAPI('modelAggregate').search,
+    getModelAggregateSearchParams(params)
+  );
   const models = useMemo(() => data?.data || [], [data]);
   const totalModelCounts = data?.total_models;
 

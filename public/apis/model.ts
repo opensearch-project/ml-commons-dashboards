@@ -46,7 +46,7 @@ export class Model {
     name?: string;
     from: number;
     size: number;
-    queryString?: string;
+    extraQuery?: string;
   }) {
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
       query,
