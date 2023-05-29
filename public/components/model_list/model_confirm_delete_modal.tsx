@@ -33,7 +33,7 @@ export const ModelConfirmDeleteModal = React.forwardRef<
             from: 0,
             size: 1,
           })
-        ).total_models === 1
+        ).total_model_versions === 1
       );
     },
     onGiveUp: () => {

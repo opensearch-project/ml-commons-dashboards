@@ -42,7 +42,7 @@ interface UploadModelBase {
   description?: string;
   modelFormat: string;
   modelConfig: Record<string, unknown>;
-  modelGroupId: string;
+  modelId: string;
 }
 
 interface UploadModelByURL extends UploadModelBase {
@@ -57,7 +57,7 @@ interface UploadModelByChunk extends UploadModelBase {
 type UploadResultInner<
   T extends UploadModelByURL | UploadModelByChunk
 > = T extends UploadModelByChunk
-  ? { model_id: string; status: string }
+  ? { model_version_id: string; status: string }
   : T extends UploadModelByURL
   ? { task_id: string; status: string }
   : never;
@@ -88,7 +88,7 @@ export class ModelVersionService {
     states?: MODEL_VERSION_STATE[];
     nameOrId?: string;
     versionOrKeyword?: string;
-    modelGroupIds?: string[];
+    modelIds?: string[];
   }) {
     const {
       body: { hits },
@@ -113,11 +113,12 @@ export class ModelVersionService {
     });
 
     return {
-      data: hits.hits.map(({ _id, _source }) => ({
+      data: hits.hits.map(({ _id, _source: source }) => ({
         id: _id,
-        ..._source,
+        model_id: source.model_group_id,
+        ...source,
       })),
-      total_models: hits.total.value,
+      total_model_versions: hits.total.value,
     };
   }
 
@@ -205,14 +206,14 @@ export class ModelVersionService {
     client: IScopedClusterClient;
     model: T;
   }): UploadResult<T> {
-    const { name, version, description, modelFormat, modelConfig, modelGroupId } = model;
+    const { name, version, description, modelFormat, modelConfig, modelId } = model;
     const uploadModelBase = {
       name,
       version,
       description,
       model_format: modelFormat,
       model_config: modelConfig,
-      model_group_id: modelGroupId,
+      model_group_id: modelId,
     };
     if (isUploadModelByURL(model)) {
       const { task_id: taskId, status } = (
@@ -228,7 +229,7 @@ export class ModelVersionService {
       return { task_id: taskId, status } as UploadResultInner<T>;
     }
 
-    const { model_id: modelId, status } = (
+    const { model_id: modelVersionId, status } = (
       await client.asCurrentUser.transport.request({
         method: 'POST',
         path: MODEL_META_API,
@@ -239,7 +240,7 @@ export class ModelVersionService {
         },
       })
     ).body;
-    return { model_id: modelId, status } as UploadResultInner<T>;
+    return { model_version_id: modelVersionId, status } as UploadResultInner<T>;
   }
 
   public static async uploadModelChunk({

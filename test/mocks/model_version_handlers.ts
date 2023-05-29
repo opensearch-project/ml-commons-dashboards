@@ -7,7 +7,7 @@ import { rest } from 'msw';
 
 import { MODEL_VERSION_API_ENDPOINT } from '../../server/routes/constants';
 
-const models = [
+const modelVersions = [
   {
     id: '1',
     name: 'model1',
@@ -25,7 +25,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'PARTIALLY_DEPLOYED',
     total_chunks: 34,
-    model_group_id: '1',
+    model_id: '1',
     current_worker_node_count: 1,
     planning_worker_node_count: 3,
     planning_worker_nodes: ['node1', 'node2', 'node3'],
@@ -47,7 +47,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'REGISTERED',
     total_chunks: 34,
-    model_group_id: '2',
+    model_id: '2',
   },
   {
     id: '3',
@@ -66,7 +66,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'DEPLOYED',
     total_chunks: 34,
-    model_group_id: '3',
+    model_id: '3',
   },
   {
     id: '4',
@@ -85,7 +85,7 @@ const models = [
     model_format: 'TORCH_SCRIPT',
     model_state: 'DEPLOYED',
     total_chunks: 34,
-    model_group_id: '1',
+    model_id: '1',
   },
 ];
 
@@ -94,16 +94,16 @@ export const modelVersionHandlers = [
     const { searchParams } = req.url;
     const name = searchParams.get('name');
     const ids = searchParams.getAll('ids');
-    const modelGroupIds = searchParams.getAll('modelGroupIds');
-    const data = models.filter((model) => {
+    const modelIds = searchParams.getAll('modelIds');
+    const data = modelVersions.filter((model) => {
       if (name) {
         return model.name === name;
       }
       if (ids.length > 0) {
         return ids.includes(model.id);
       }
-      if (modelGroupIds.length > 0) {
-        return modelGroupIds.includes(model.model_group_id);
+      if (modelIds.length > 0) {
+        return modelIds.includes(model.model_id);
       }
       return true;
     });
@@ -111,13 +111,13 @@ export const modelVersionHandlers = [
       ctx.status(200),
       ctx.json({
         data,
-        total_models: data.length,
+        total_model_versions: data.length,
       })
     );
   }),
 
   rest.get(`${MODEL_VERSION_API_ENDPOINT}/:modelId`, (req, res, ctx) => {
     const [modelId, ..._restParts] = req.url.pathname.split('/').reverse();
-    return res(ctx.status(200), ctx.json(models.find((model) => model.id === modelId)));
+    return res(ctx.status(200), ctx.json(modelVersions.find((model) => model.id === modelId)));
   }),
 ];

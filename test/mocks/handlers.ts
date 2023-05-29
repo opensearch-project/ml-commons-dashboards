@@ -12,7 +12,7 @@ import { modelRepositoryResponse } from './data/model_repository';
 import { modelVersionHandlers } from './model_version_handlers';
 import { modelAggregateResponse } from './data/model_aggregate';
 import { taskHandlers } from './task_handlers';
-import { modelGroupHandlers } from './model_group_handlers';
+import { modelHandlers } from './model_handlers';
 
 export const handlers = [
   rest.get('/api/ml-commons/model-repository', (req, res, ctx) => {
@@ -26,5 +26,5 @@ export const handlers = [
     return res(ctx.status(200), ctx.json(modelAggregateResponse));
   }),
   ...taskHandlers,
-  ...modelGroupHandlers,
+  ...modelHandlers,
 ];

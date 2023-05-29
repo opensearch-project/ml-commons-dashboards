@@ -70,7 +70,7 @@ describe('<ModelVersionsPanel />', () => {
         .mockImplementation(async () => {
           return {
             data: [],
-            total_models: 0,
+            total_model_versions: 0,
           };
         });
 
@@ -171,7 +171,7 @@ describe('<ModelVersionsPanel />', () => {
     const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockImplementation(async () => {
       return {
         data: [],
-        total_models: 0,
+        total_model_versions: 0,
       };
     });
 
@@ -205,7 +205,7 @@ describe('<ModelVersionsPanel />', () => {
         .mockImplementation(async () => {
           return {
             data: [],
-            total_models: 0,
+            total_model_versions: 0,
           };
         });
       await userEvent.click(screen.getByTitle('Status'));
@@ -238,7 +238,7 @@ describe('<ModelVersionsPanel />', () => {
         .mockImplementation(async () => {
           return {
             data: [],
-            total_models: 0,
+            total_model_versions: 0,
           };
         });
       await userEvent.click(screen.getByTitle('Status'));
@@ -250,7 +250,7 @@ describe('<ModelVersionsPanel />', () => {
       expect(searchMock).toHaveBeenCalledWith({
         from: 0,
         size: 25,
-        modelGroupIds: ['1'],
+        modelIds: ['1'],
       });
 
       searchMock.mockRestore();

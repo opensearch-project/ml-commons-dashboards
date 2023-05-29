@@ -110,7 +110,7 @@ export const ModelVersionsPanel = ({ modelId }: ModelVersionsPanelProps) => {
   const { data: versionsData, reload, loading, error } = useFetcher(
     APIProvider.getAPI('modelVersion').search,
     {
-      modelGroupIds: [modelId],
+      modelIds: [modelId],
       from: params.pageIndex * params.pageSize,
       size: params.pageSize,
       states: getStatesParam(params.filter),
@@ -118,7 +118,7 @@ export const ModelVersionsPanel = ({ modelId }: ModelVersionsPanelProps) => {
       sort: getSortParam(params.sort),
     }
   );
-  const totalVersionCount = versionsData?.total_models;
+  const totalVersionCount = versionsData?.total_model_versions;
   const { notifications } = useOpenSearchDashboards();
 
   const versions = useMemo(() => {

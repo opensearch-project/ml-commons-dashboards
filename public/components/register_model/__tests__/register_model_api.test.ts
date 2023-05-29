@@ -3,29 +3,27 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ModelGroup } from '../../../apis/model_group';
+import { Model } from '../../../apis/model';
 import { ModelVersion } from '../../../apis/model_version';
 import { submitModelWithFile, submitModelWithURL } from '../register_model_api';
 
 describe('register model api', () => {
   beforeEach(() => {
-    jest
-      .spyOn(ModelGroup.prototype, 'register')
-      .mockResolvedValue({ model_group_id: '1', status: 'CREATED' });
-    jest.spyOn(ModelGroup.prototype, 'delete').mockResolvedValue({ status: 'success' });
+    jest.spyOn(Model.prototype, 'register').mockResolvedValue({ model_id: '1', status: 'CREATED' });
+    jest.spyOn(Model.prototype, 'delete').mockResolvedValue({ status: 'success' });
     jest
       .spyOn(ModelVersion.prototype, 'upload')
-      .mockResolvedValue({ task_id: 'foo', model_id: 'bar' });
+      .mockResolvedValue({ task_id: 'foo', model_version_id: 'bar' });
   });
 
   afterEach(() => {
-    jest.spyOn(ModelGroup.prototype, 'register').mockRestore();
-    jest.spyOn(ModelGroup.prototype, 'delete').mockRestore();
+    jest.spyOn(Model.prototype, 'register').mockRestore();
+    jest.spyOn(Model.prototype, 'delete').mockRestore();
     jest.spyOn(ModelVersion.prototype, 'upload').mockRestore();
   });
 
   it('should not call register model group API if modelId provided', async () => {
-    expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
+    expect(Model.prototype.register).not.toHaveBeenCalled();
 
     await submitModelWithFile({
       name: 'foo',
@@ -36,7 +34,7 @@ describe('register model api', () => {
       modelFile: new File([], 'artifact.zip'),
     });
 
-    expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
+    expect(Model.prototype.register).not.toHaveBeenCalled();
   });
 
   it('should not call delete model group API if modelId provided and model upload failed', async () => {
@@ -55,14 +53,14 @@ describe('register model api', () => {
     } catch (error) {
       expect(error).toBe(uploadError);
     }
-    expect(ModelGroup.prototype.delete).not.toHaveBeenCalled();
+    expect(Model.prototype.delete).not.toHaveBeenCalled();
 
     uploadMock.mockRestore();
   });
 
   describe('submitModelWithFile', () => {
     it('should call register model group API with name and description', async () => {
-      expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
+      expect(Model.prototype.register).not.toHaveBeenCalled();
 
       await submitModelWithFile({
         name: 'foo',
@@ -72,7 +70,7 @@ describe('register model api', () => {
         modelFile: new File([], 'artifact.zip'),
       });
 
-      expect(ModelGroup.prototype.register).toHaveBeenCalledWith(
+      expect(Model.prototype.register).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'foo',
           description: 'bar',
@@ -86,7 +84,7 @@ describe('register model api', () => {
         .spyOn(ModelVersion.prototype, 'upload')
         .mockRejectedValue(uploadError);
 
-      expect(ModelGroup.prototype.delete).not.toHaveBeenCalled();
+      expect(Model.prototype.delete).not.toHaveBeenCalled();
       try {
         await submitModelWithFile({
           name: 'foo',
@@ -98,7 +96,7 @@ describe('register model api', () => {
       } catch (error) {
         expect(uploadError).toBe(error);
       }
-      expect(ModelGroup.prototype.delete).toHaveBeenCalledWith('1');
+      expect(Model.prototype.delete).toHaveBeenCalledWith('1');
 
       uploadMock.mockRestore();
     });
@@ -121,7 +119,7 @@ describe('register model api', () => {
 
   describe('submitModelWithURL', () => {
     it('should call register model group API with name and description', async () => {
-      expect(ModelGroup.prototype.register).not.toHaveBeenCalled();
+      expect(Model.prototype.register).not.toHaveBeenCalled();
 
       await submitModelWithURL({
         name: 'foo',
@@ -131,7 +129,7 @@ describe('register model api', () => {
         modelURL: 'https://address.to/artifact.zip',
       });
 
-      expect(ModelGroup.prototype.register).toHaveBeenCalledWith(
+      expect(Model.prototype.register).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'foo',
           description: 'bar',
@@ -145,7 +143,7 @@ describe('register model api', () => {
         .spyOn(ModelVersion.prototype, 'upload')
         .mockRejectedValue(uploadError);
 
-      expect(ModelGroup.prototype.delete).not.toHaveBeenCalled();
+      expect(Model.prototype.delete).not.toHaveBeenCalled();
       try {
         await submitModelWithURL({
           name: 'foo',
@@ -157,7 +155,7 @@ describe('register model api', () => {
       } catch (error) {
         expect(uploadError).toBe(error);
       }
-      expect(ModelGroup.prototype.delete).toHaveBeenCalledWith('1');
+      expect(Model.prototype.delete).toHaveBeenCalledWith('1');
 
       uploadMock.mockRestore();
     });

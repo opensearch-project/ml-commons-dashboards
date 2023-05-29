@@ -47,7 +47,7 @@ export interface ModelVersionDetail extends ModelVersionSearchItem {
 
 export interface ModelVersionSearchResponse {
   data: ModelVersionSearchItem[];
-  total_models: number;
+  total_model_versions: number;
 }
 
 export interface ModelVersionLoadResponse {
@@ -83,7 +83,7 @@ interface UploadModelBase {
   description?: string;
   modelFormat: string;
   modelConfig: Record<string, unknown>;
-  modelGroupId: string;
+  modelId: string;
 }
 
 export interface UploadModelByURL extends UploadModelBase {
@@ -106,7 +106,7 @@ export class ModelVersion {
     states?: MODEL_VERSION_STATE[];
     nameOrId?: string;
     versionOrKeyword?: string;
-    modelGroupIds?: string[];
+    modelIds?: string[];
   }) {
     return InnerHttpProvider.getHttp().get<ModelVersionSearchResponse>(MODEL_VERSION_API_ENDPOINT, {
       query,
@@ -147,7 +147,7 @@ export class ModelVersion {
     T extends UploadModelByURL
       ? { task_id: string }
       : T extends UploadModelByChunk
-      ? { model_id: string }
+      ? { model_version_id: string }
       : never
   > {
     return InnerHttpProvider.getHttp().post(MODEL_VERSION_UPLOAD_API_ENDPOINT, {

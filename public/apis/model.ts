@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OpenSearchModelGroup } from '../../common';
-import { MODEL_GROUP_API_ENDPOINT } from '../../server/routes/constants';
+import { OpenSearchModel } from '../../common';
+import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
 
-export interface ModelGroupSearchResponse {
-  data: OpenSearchModelGroup[];
-  total_model_groups: number;
+export interface ModelSearchResponse {
+  data: OpenSearchModel[];
+  total_models: number;
 }
 
-export class ModelGroup {
+export class Model {
   public register(body: {
     name: string;
     description?: string;
@@ -20,8 +20,8 @@ export class ModelGroup {
     backendRoles?: string[];
     addAllBackendRoles?: boolean;
   }) {
-    return InnerHttpProvider.getHttp().post<{ model_group_id: string; status: 'CREATED' }>(
-      MODEL_GROUP_API_ENDPOINT,
+    return InnerHttpProvider.getHttp().post<{ model_id: string; status: string }>(
+      MODEL_API_ENDPOINT,
       {
         body: JSON.stringify(body),
       }
@@ -29,21 +29,16 @@ export class ModelGroup {
   }
 
   public update({ id, name, description }: { id: string; name?: string; description?: string }) {
-    return InnerHttpProvider.getHttp().put<{ status: 'success' }>(
-      `${MODEL_GROUP_API_ENDPOINT}/${id}`,
-      {
-        body: JSON.stringify({
-          name,
-          description,
-        }),
-      }
-    );
+    return InnerHttpProvider.getHttp().put<{ status: 'success' }>(`${MODEL_API_ENDPOINT}/${id}`, {
+      body: JSON.stringify({
+        name,
+        description,
+      }),
+    });
   }
 
   public delete(id: string) {
-    return InnerHttpProvider.getHttp().delete<{ status: 'success' }>(
-      `${MODEL_GROUP_API_ENDPOINT}/${id}`
-    );
+    return InnerHttpProvider.getHttp().delete<{ status: 'success' }>(`${MODEL_API_ENDPOINT}/${id}`);
   }
 
   public search(query: {
@@ -53,7 +48,7 @@ export class ModelGroup {
     size: number;
     queryString?: string;
   }) {
-    return InnerHttpProvider.getHttp().get<ModelGroupSearchResponse>(MODEL_GROUP_API_ENDPOINT, {
+    return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
       query,
     });
   }

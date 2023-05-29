@@ -5,7 +5,7 @@
 
 import { ModelVersion } from './model_version';
 import { ModelAggregate } from './model_aggregate';
-import { ModelGroup } from './model_group';
+import { Model } from './model';
 import { ModelRepository } from './model_repository';
 import { Profile } from './profile';
 import { Security } from './security';
@@ -18,7 +18,7 @@ const apiInstanceStore: {
   security: Security | undefined;
   task: Task | undefined;
   modelRepository: ModelRepository | undefined;
-  modelGroup: ModelGroup | undefined;
+  model: Model | undefined;
 } = {
   modelVersion: undefined,
   modelAggregate: undefined,
@@ -26,7 +26,7 @@ const apiInstanceStore: {
   security: undefined,
   task: undefined,
   modelRepository: undefined,
-  modelGroup: undefined,
+  model: undefined,
 };
 
 export class APIProvider {
@@ -36,7 +36,7 @@ export class APIProvider {
   public static getAPI(type: 'profile'): Profile;
   public static getAPI(type: 'security'): Security;
   public static getAPI(type: 'modelRepository'): ModelRepository;
-  public static getAPI(type: 'modelGroup'): ModelGroup;
+  public static getAPI(type: 'model'): Model;
   public static getAPI(type: keyof typeof apiInstanceStore) {
     if (apiInstanceStore[type]) {
       return apiInstanceStore[type]!;
@@ -72,9 +72,9 @@ export class APIProvider {
         apiInstanceStore.modelRepository = newInstance;
         return newInstance;
       }
-      case 'modelGroup': {
-        const newInstance = new ModelGroup();
-        apiInstanceStore.modelGroup = newInstance;
+      case 'model': {
+        const newInstance = new Model();
+        apiInstanceStore.model = newInstance;
         return newInstance;
       }
     }

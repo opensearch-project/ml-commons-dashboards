@@ -25,16 +25,16 @@ import {
   MODEL_VERSION_STATE,
   ModelAggregateSort,
   ModelAggregateItem,
-  ModelGroupSort,
+  ModelSort,
 } from '../../common';
 
-import { ModelGroupService } from './model_group_service';
+import { ModelService } from './model_service';
 import { ModelVersionService } from './model_version_service';
 import { MODEL_SEARCH_API } from './utils/constants';
 import { generateModelSearchQuery } from './utils/model';
 
 const MAX_MODEL_BUCKET_NUM = 10000;
-const getModelGroupSort = (sort: ModelAggregateSort): ModelGroupSort => {
+const getModelSort = (sort: ModelAggregateSort): ModelSort => {
   switch (sort) {
     case 'owner_name-asc':
       return 'owner.name-asc';
@@ -59,7 +59,7 @@ interface ModelAggregateSearchParams extends GetAggregateModelsParams {
 }
 
 export class ModelAggregateService {
-  public static async getModelGroupIdsByModel({ client, states }: GetAggregateModelsParams) {
+  public static async getModelIdsByVersion({ client, states }: GetAggregateModelsParams) {
     const aggregateResult = await client.asCurrentUser.transport.request({
       method: 'GET',
       path: MODEL_SEARCH_API,
@@ -92,40 +92,37 @@ export class ModelAggregateService {
     states,
     queryString,
   }: ModelAggregateSearchParams) {
-    const sourceModelGroupIds = states
-      ? await ModelAggregateService.getModelGroupIdsByModel({ client, states })
+    const sourceModelIds = states
+      ? await ModelAggregateService.getModelIdsByVersion({ client, states })
       : undefined;
-    const {
-      data: modelGroups,
-      total_model_groups: totalModelGroups,
-    } = await ModelGroupService.search({
+    const { data: models, total_models: totalModels } = await ModelService.search({
       client,
       from,
       size,
-      sort: sort ? getModelGroupSort(sort) : sort,
-      ids: sourceModelGroupIds,
+      sort: sort ? getModelSort(sort) : sort,
+      ids: sourceModelIds,
       queryString,
     });
-    const modelGroupIds = modelGroups.map(({ id }) => id);
+    const modelIds = models.map(({ id }) => id);
     const { data: deployedModels } = await ModelVersionService.search({
       client,
       from: 0,
       size: MAX_MODEL_BUCKET_NUM,
-      modelGroupIds,
+      modelIds,
       states: [MODEL_VERSION_STATE.deployed],
     });
 
-    const modelGroupId2Model = groupBy(deployedModels, 'model_group_id');
+    const modelId2Version = groupBy(deployedModels, 'model_id');
 
     return {
-      data: modelGroups.map((modelGroup) => ({
-        ...modelGroup,
-        owner_name: modelGroup.owner.name,
-        deployed_versions: (modelGroupId2Model[modelGroup.id] || []).map(
-          (model) => model.model_version
+      data: models.map((model) => ({
+        ...model,
+        owner_name: model.owner.name,
+        deployed_versions: (modelId2Version[model.id] || []).map(
+          (deployedVersion) => deployedVersion.model_version
         ),
       })) as ModelAggregateItem[],
-      total_models: totalModelGroups,
+      total_models: totalModels,
     };
   }
 }

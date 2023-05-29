@@ -38,13 +38,13 @@ const createModelIfNeedAndUploadVersion = async <T>({
     };
   }
   modelId = (
-    await APIProvider.getAPI('modelGroup').register({
+    await APIProvider.getAPI('model').register({
       name,
       description,
       // TODO: This value should follow form data, need to be updated after UI design confirmed
       modelAccessMode: 'public',
     })
-  ).model_group_id;
+  ).model_id;
 
   try {
     return {
@@ -52,7 +52,7 @@ const createModelIfNeedAndUploadVersion = async <T>({
       modelId,
     };
   } catch (error) {
-    APIProvider.getAPI('modelGroup').delete(modelId);
+    APIProvider.getAPI('model').delete(modelId);
     throw error;
   }
 };
@@ -66,7 +66,7 @@ export async function submitModelWithFile(model: ModelFileFormData) {
     uploader: (modelId: string) =>
       APIProvider.getAPI('modelVersion').upload({
         ...getModelUploadBase(model),
-        modelGroupId: modelId,
+        modelId,
         totalChunks,
         modelContentHashValue,
       }),
@@ -74,7 +74,7 @@ export async function submitModelWithFile(model: ModelFileFormData) {
 
   return {
     modelId: result.modelId,
-    modelVersionId: result.uploadResult.model_id,
+    modelVersionId: result.uploadResult.model_version_id,
   };
 }
 
@@ -84,7 +84,7 @@ export async function submitModelWithURL(model: ModelUrlFormData) {
     uploader: (modelId: string) =>
       APIProvider.getAPI('modelVersion').upload({
         ...getModelUploadBase(model),
-        modelGroupId: modelId,
+        modelId,
         url: model.modelURL,
       }),
   });

@@ -208,7 +208,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     const initializeForm = async () => {
       form.setValue('modelId', registerToModelId);
       try {
-        const data = await APIProvider.getAPI('modelGroup').getOne(registerToModelId);
+        const data = await APIProvider.getAPI('model').getOne(registerToModelId);
         // TODO:  clarify which fields to pre-populate
         const { name } = data;
         form.setValue('name', name);

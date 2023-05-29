@@ -11,5 +11,5 @@ export * from './constant';
 export * from './status';
 export * from './model_version';
 export * from './router_paths';
-export * from './model_group';
+export * from './model';
 export * from './model_aggregate';

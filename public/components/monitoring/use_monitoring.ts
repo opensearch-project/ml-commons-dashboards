@@ -52,12 +52,12 @@ const fetchDeployedModels = async (params: Params) => {
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
   });
-  const totalPages = Math.ceil(result.total_models / params.pageSize);
+  const totalPages = Math.ceil(result.total_model_versions / params.pageSize);
   return {
     pagination: {
       currentPage: params.currentPage,
       pageSize: params.pageSize,
-      totalRecords: result.total_models,
+      totalRecords: result.total_model_versions,
       totalPages,
     },
     data: result.data.map(

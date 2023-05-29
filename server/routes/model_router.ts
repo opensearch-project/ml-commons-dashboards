@@ -6,14 +6,14 @@
 import { schema } from '@osd/config-schema';
 
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
-import { ModelGroupService } from '../services/model_group_service';
+import { ModelService } from '../services';
 
-import { MODEL_GROUP_API_ENDPOINT } from './constants';
+import { MODEL_API_ENDPOINT } from './constants';
 
-export const modelGroupRouter = (router: IRouter) => {
+export const modelRouter = (router: IRouter) => {
   router.post(
     {
-      path: MODEL_GROUP_API_ENDPOINT,
+      path: MODEL_API_ENDPOINT,
       validate: {
         body: schema.object({
           name: schema.string(),
@@ -31,7 +31,7 @@ export const modelGroupRouter = (router: IRouter) => {
     async (context, request) => {
       const { name, description, modelAccessMode, backendRoles, addAllBackendRoles } = request.body;
       try {
-        const payload = await ModelGroupService.register({
+        const payload = await ModelService.register({
           client: context.core.opensearch.client,
           name,
           description,
@@ -50,10 +50,10 @@ export const modelGroupRouter = (router: IRouter) => {
 
   router.put(
     {
-      path: `${MODEL_GROUP_API_ENDPOINT}/{groupId}`,
+      path: `${MODEL_API_ENDPOINT}/{id}`,
       validate: {
         params: schema.object({
-          groupId: schema.string(),
+          id: schema.string(),
         }),
         body: schema.object({
           name: schema.maybe(schema.string()),
@@ -63,13 +63,13 @@ export const modelGroupRouter = (router: IRouter) => {
     },
     async (context, request) => {
       const {
-        params: { groupId },
+        params: { id },
         body: { name, description },
       } = request;
       try {
-        const payload = await ModelGroupService.update({
+        const payload = await ModelService.update({
           client: context.core.opensearch.client,
-          id: groupId,
+          id,
           name,
           description,
         });
@@ -84,18 +84,18 @@ export const modelGroupRouter = (router: IRouter) => {
 
   router.delete(
     {
-      path: `${MODEL_GROUP_API_ENDPOINT}/{groupId}`,
+      path: `${MODEL_API_ENDPOINT}/{id}`,
       validate: {
         params: schema.object({
-          groupId: schema.string(),
+          id: schema.string(),
         }),
       },
     },
     async (context, request) => {
       try {
-        const payload = await ModelGroupService.delete({
+        const payload = await ModelService.delete({
           client: context.core.opensearch.client,
-          id: request.params.groupId,
+          id: request.params.id,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (error) {
@@ -108,7 +108,7 @@ export const modelGroupRouter = (router: IRouter) => {
 
   router.get(
     {
-      path: MODEL_GROUP_API_ENDPOINT,
+      path: MODEL_API_ENDPOINT,
       validate: {
         query: schema.object({
           ids: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
@@ -122,7 +122,7 @@ export const modelGroupRouter = (router: IRouter) => {
     async (context, request) => {
       const { ids, name, from, size, queryString } = request.query;
       try {
-        const payload = await ModelGroupService.search({
+        const payload = await ModelService.search({
           client: context.core.opensearch.client,
           ids: typeof ids === 'string' ? [ids] : ids,
           name,

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export interface OpenSearchModelGroup {
+export interface OpenSearchModel {
   id: string;
   owner: {
     backend_roles: string[];
@@ -18,7 +18,7 @@ export interface OpenSearchModelGroup {
   access: 'public' | 'restricted' | 'private';
 }
 
-export type ModelGroupSort =
+export type ModelSort =
   | 'name-asc'
   | 'name-desc'
   | 'latest_version-asc'

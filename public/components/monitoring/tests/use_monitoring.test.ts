@@ -11,7 +11,7 @@ import { useMonitoring } from '../use_monitoring';
 const mockEmptyRecords = () =>
   jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValueOnce({
     data: [],
-    total_models: 0,
+    total_model_versions: 0,
   });
 
 describe('useMonitoring', () => {
@@ -128,7 +128,7 @@ describe('useMonitoring.pageStatus', () => {
               planning_worker_nodes: ['node1', 'node2', 'node3'],
             },
           ],
-          total_models: 1,
+          total_model_versions: 1,
         });
       };
     });

@@ -57,7 +57,7 @@ const modelUploadBaseSchema = {
   description: schema.maybe(schema.string()),
   modelFormat: schema.string(),
   modelConfig: schema.object({}, { unknowns: 'allow' }),
-  modelGroupId: schema.string(),
+  modelId: schema.string(),
 };
 
 const modelUploadByURLSchema = schema.object({
@@ -95,9 +95,7 @@ export const modelVersionRouter = (router: IRouter) => {
           states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
           nameOrId: schema.maybe(schema.string()),
           versionOrKeyword: schema.maybe(schema.string()),
-          modelGroupIds: schema.maybe(
-            schema.oneOf([schema.string(), schema.arrayOf(schema.string())])
-          ),
+          modelIds: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
         }),
       },
     },
@@ -111,7 +109,7 @@ export const modelVersionRouter = (router: IRouter) => {
         name,
         states,
         nameOrId,
-        modelGroupIds,
+        modelIds,
         versionOrKeyword,
       } = request.query;
       try {
@@ -125,7 +123,7 @@ export const modelVersionRouter = (router: IRouter) => {
           name,
           states: typeof states === 'string' ? [states] : states,
           nameOrId,
-          modelGroupIds: typeof modelGroupIds === 'string' ? [modelGroupIds] : modelGroupIds,
+          modelIds: typeof modelIds === 'string' ? [modelIds] : modelIds,
           versionOrKeyword,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });

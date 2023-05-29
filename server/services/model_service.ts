@@ -18,7 +18,7 @@
  *   permissions and limitations under the License.
  */
 
-import { ModelGroupSort, OpenSearchModelGroup } from '../../common';
+import { ModelSort, OpenSearchModel } from '../../common';
 import { IScopedClusterClient } from '../../../../src/core/server';
 
 import {
@@ -29,7 +29,7 @@ import {
 } from './utils/constants';
 import { generateTermQuery } from './utils/query';
 
-const getSortItem = (sort: ModelGroupSort) => {
+const getSortItem = (sort: ModelSort) => {
   const [key, direction] = sort.split('-');
   const keyMapping: { [key: string]: string } = {
     'owner.name': 'owner.name.keyword',
@@ -39,7 +39,7 @@ const getSortItem = (sort: ModelGroupSort) => {
   return { [keyMapping[key] || key]: direction };
 };
 
-export class ModelGroupService {
+export class ModelService {
   public static async register(params: {
     client: IScopedClusterClient;
     name: string;
@@ -118,7 +118,7 @@ export class ModelGroupService {
     name?: string;
     from: number;
     size: number;
-    sort?: ModelGroupSort;
+    sort?: ModelSort;
     queryString?: string;
   }) {
     const {
@@ -158,8 +158,8 @@ export class ModelGroupService {
       data: hits.hits.map(({ _id, _source }) => ({
         id: _id,
         ..._source,
-      })) as OpenSearchModelGroup[],
-      total_model_groups: hits.total.value,
+      })) as OpenSearchModel[],
+      total_models: hits.total.value,
     };
   }
 }

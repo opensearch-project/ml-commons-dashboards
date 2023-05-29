@@ -19,7 +19,7 @@ import {
   securityRouter,
   taskRouter,
   modelRepositoryRouter,
-  modelGroupRouter,
+  modelRouter,
 } from './routes';
 
 export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPluginStart> {
@@ -39,7 +39,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     securityRouter(router);
     taskRouter(router);
     modelRepositoryRouter(router);
-    modelGroupRouter(router);
+    modelRouter(router);
 
     return {};
   }

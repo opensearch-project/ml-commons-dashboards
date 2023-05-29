@@ -5,9 +5,9 @@
 
 import { rest } from 'msw';
 
-import { MODEL_GROUP_API_ENDPOINT } from '../../server/routes/constants';
+import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
 
-const modelGroups = [
+const models = [
   {
     name: 'model1',
     id: '1',
@@ -23,18 +23,18 @@ const modelGroups = [
   },
 ];
 
-export const modelGroupHandlers = [
-  rest.get(MODEL_GROUP_API_ENDPOINT, (req, res, ctx) => {
+export const modelHandlers = [
+  rest.get(MODEL_API_ENDPOINT, (req, res, ctx) => {
     const { searchParams } = req.url;
     const name = searchParams.get('name');
     const ids = searchParams.getAll('ids');
     const from = parseInt(searchParams.get('from') || '0', 10);
-    const size = parseInt(searchParams.get('size') || `${modelGroups.length}`, 10);
-    const filteredData = modelGroups.filter((modelGroup) => {
+    const size = parseInt(searchParams.get('size') || `${models.length}`, 10);
+    const filteredData = models.filter((model) => {
       if (ids.length > 0) {
-        return ids.includes(modelGroup.id);
+        return ids.includes(model.id);
       }
-      if (name && name !== modelGroup.name) {
+      if (name && name !== model.name) {
         return false;
       }
       return true;
@@ -45,16 +45,16 @@ export const modelGroupHandlers = [
       ctx.status(200),
       ctx.json({
         data: filteredData.slice(from, end),
-        total_model_groups: filteredData.length,
+        total_models: filteredData.length,
       })
     );
   }),
 
-  rest.post(MODEL_GROUP_API_ENDPOINT, (req, res, ctx) => {
+  rest.post(MODEL_API_ENDPOINT, (req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
-        model_group_id: '1',
+        model_id: '1',
       })
     );
   }),
