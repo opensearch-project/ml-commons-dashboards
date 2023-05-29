@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE, ModelAggregateItem, ModelAggregateSort } from '../../common';
+import { MODEL_VERSION_STATE, ModelAggregateItem, ModelAggregateSort } from '../../common';
 import { MODEL_AGGREGATE_API_ENDPOINT } from '../../server/routes/constants';
 
 import { InnerHttpProvider } from './inner_http_provider';
@@ -18,7 +18,7 @@ export class ModelAggregate {
     from: number;
     size: number;
     sort?: ModelAggregateSort;
-    states?: MODEL_STATE[];
+    states?: MODEL_VERSION_STATE[];
     queryString?: string;
   }) {
     return InnerHttpProvider.getHttp().get<ModelAggregateSearchResponse>(

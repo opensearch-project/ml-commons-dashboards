@@ -24,7 +24,7 @@ import { generatePath } from 'react-router-dom';
 
 import { useFetcher } from '../../../hooks';
 import { APIProvider } from '../../../apis/api_provider';
-import { MODEL_STATE, routerPaths } from '../../../../common';
+import { MODEL_VERSION_STATE, routerPaths } from '../../../../common';
 import { useOpenSearchDashboards } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 import { ModelVersionTable } from './model_version_table';
@@ -35,16 +35,16 @@ const tags = ['Tag1', 'Tag2'];
 const emptyPromptStyle = { maxWidth: 528 };
 
 const modelState2StatusMap: {
-  [key in MODEL_STATE]?: ModelVersionListFilterValue['status'][number];
+  [key in MODEL_VERSION_STATE]?: ModelVersionListFilterValue['status'][number];
 } = {
-  [MODEL_STATE.loading]: 'InProgress',
-  [MODEL_STATE.uploading]: 'InProgress',
-  [MODEL_STATE.uploaded]: 'Success',
-  [MODEL_STATE.loaded]: 'Success',
-  [MODEL_STATE.unloaded]: 'Success',
-  [MODEL_STATE.partiallyLoaded]: 'Warning',
-  [MODEL_STATE.loadFailed]: 'Error',
-  [MODEL_STATE.registerFailed]: 'Error',
+  [MODEL_VERSION_STATE.deploying]: 'InProgress',
+  [MODEL_VERSION_STATE.registering]: 'InProgress',
+  [MODEL_VERSION_STATE.registered]: 'Success',
+  [MODEL_VERSION_STATE.deployed]: 'Success',
+  [MODEL_VERSION_STATE.undeployed]: 'Success',
+  [MODEL_VERSION_STATE.partiallyDeployed]: 'Warning',
+  [MODEL_VERSION_STATE.deployFailed]: 'Error',
+  [MODEL_VERSION_STATE.registerFailed]: 'Error',
 };
 
 const getStatesParam = ({
@@ -55,19 +55,22 @@ const getStatesParam = ({
     return undefined;
   }
   return [
-    MODEL_STATE.loading,
-    MODEL_STATE.uploading,
-    MODEL_STATE.uploaded,
-    MODEL_STATE.loaded,
-    MODEL_STATE.partiallyLoaded,
-    MODEL_STATE.loadFailed,
-    MODEL_STATE.registerFailed,
+    MODEL_VERSION_STATE.deploying,
+    MODEL_VERSION_STATE.registering,
+    MODEL_VERSION_STATE.registered,
+    MODEL_VERSION_STATE.deployed,
+    MODEL_VERSION_STATE.partiallyDeployed,
+    MODEL_VERSION_STATE.deployFailed,
+    MODEL_VERSION_STATE.registerFailed,
   ].filter((modelState) => {
     const stateRelatedStatus = modelState2StatusMap[modelState];
     if (stateRelatedStatus && statuses.includes(stateRelatedStatus)) {
       return true;
     }
-    if (modelState === MODEL_STATE.loaded || modelState === MODEL_STATE.partiallyLoaded) {
+    if (
+      modelState === MODEL_VERSION_STATE.deployed ||
+      modelState === MODEL_VERSION_STATE.partiallyDeployed
+    ) {
       return states.includes('Deployed');
     }
     return states.includes('Not deployed');

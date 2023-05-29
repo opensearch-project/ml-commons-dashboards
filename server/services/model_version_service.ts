@@ -19,7 +19,7 @@
  */
 
 import { IScopedClusterClient } from '../../../../src/core/server';
-import { MODEL_STATE } from '../../common';
+import { MODEL_VERSION_STATE } from '../../common';
 
 import { generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
@@ -85,7 +85,7 @@ export class ModelVersionService {
     size: number;
     sort?: string[];
     name?: string;
-    states?: MODEL_STATE[];
+    states?: MODEL_VERSION_STATE[];
     nameOrId?: string;
     versionOrKeyword?: string;
     modelGroupIds?: string[];

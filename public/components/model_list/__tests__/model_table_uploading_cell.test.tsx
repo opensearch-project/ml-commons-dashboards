@@ -7,7 +7,7 @@ import React from 'react';
 
 import { ModelTableUploadingCell } from '../model_table_uploading_cell';
 import { render, screen } from '../../../../test/test_utils';
-import { MODEL_STATE } from '../../../../common';
+import { MODEL_VERSION_STATE } from '../../../../common';
 
 describe('<ModelTableUploadingCell />', () => {
   it('should render "updating" if column is deployedVersions or createdAt', () => {
@@ -15,7 +15,7 @@ describe('<ModelTableUploadingCell />', () => {
       <ModelTableUploadingCell
         column="deployedVersions"
         fallback={<></>}
-        latestVersionState={MODEL_STATE.uploading}
+        latestVersionState={MODEL_VERSION_STATE.registering}
       />
     );
     expect(screen.getByText('updating')).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe('<ModelTableUploadingCell />', () => {
       <ModelTableUploadingCell
         column="createdAt"
         fallback={<></>}
-        latestVersionState={MODEL_STATE.uploading}
+        latestVersionState={MODEL_VERSION_STATE.registering}
       />
     );
     expect(screen.getByText('updating')).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('<ModelTableUploadingCell />', () => {
       <ModelTableUploadingCell
         column="latestVersion"
         fallback={<></>}
-        latestVersionState={MODEL_STATE.uploading}
+        latestVersionState={MODEL_VERSION_STATE.registering}
       />
     );
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe('<ModelTableUploadingCell />', () => {
       <ModelTableUploadingCell
         column="owner"
         fallback={<></>}
-        latestVersionState={MODEL_STATE.uploading}
+        latestVersionState={MODEL_VERSION_STATE.registering}
       />
     );
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('<ModelTableUploadingCell />', () => {
       <ModelTableUploadingCell
         column="name"
         fallback={<></>}
-        latestVersionState={MODEL_STATE.uploading}
+        latestVersionState={MODEL_VERSION_STATE.registering}
       />
     );
     expect(screen.getByText('New model')).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe('<ModelTableUploadingCell />', () => {
       <ModelTableUploadingCell
         column="description"
         fallback={<></>}
-        latestVersionState={MODEL_STATE.uploading}
+        latestVersionState={MODEL_VERSION_STATE.registering}
       />
     );
     expect(screen.getByText('...')).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('<ModelTableUploadingCell />', () => {
       <ModelTableUploadingCell
         column="description"
         fallback={<>Foo Bar</>}
-        latestVersionState={MODEL_STATE.loaded}
+        latestVersionState={MODEL_VERSION_STATE.deployed}
       />
     );
     expect(screen.getByText('Foo Bar')).toBeInTheDocument();

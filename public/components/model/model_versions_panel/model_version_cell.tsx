@@ -8,7 +8,7 @@ import { get } from 'lodash';
 import { EuiBadge, EuiLink, EuiText } from '@elastic/eui';
 import { Link, generatePath } from 'react-router-dom';
 
-import { MODEL_STATE, routerPaths } from '../../../../common';
+import { MODEL_VERSION_STATE, routerPaths } from '../../../../common';
 import { VersionTableDataItem } from '../types';
 import { UiSettingDateFormatTime } from '../../common';
 
@@ -48,7 +48,8 @@ export const ModelVersionCell = ({ data, columnId, isDetails }: ModelVersionCell
     }
     case 'state': {
       const deployed =
-        data.state === MODEL_STATE.loaded || data.state === MODEL_STATE.partiallyLoaded;
+        data.state === MODEL_VERSION_STATE.deployed ||
+        data.state === MODEL_VERSION_STATE.partiallyDeployed;
       return (
         <EuiBadge color={deployed ? '#E0E5EE' : 'hollow'}>
           {deployed ? 'Deployed' : 'Not deployed'}

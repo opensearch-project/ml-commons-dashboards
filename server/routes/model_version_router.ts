@@ -4,7 +4,7 @@
  */
 
 import { schema } from '@osd/config-schema';
-import { MAX_MODEL_CHUNK_SIZE, MODEL_STATE } from '../../common';
+import { MAX_MODEL_CHUNK_SIZE, MODEL_VERSION_STATE } from '../../common';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
 import { ModelVersionService, RecordNotFoundError } from '../services';
 import {
@@ -40,15 +40,15 @@ const validateUniqueSort = (sort: string[]) => {
 };
 
 export const modelStateSchema = schema.oneOf([
-  schema.literal(MODEL_STATE.loaded),
-  schema.literal(MODEL_STATE.trained),
-  schema.literal(MODEL_STATE.unloaded),
-  schema.literal(MODEL_STATE.uploaded),
-  schema.literal(MODEL_STATE.uploading),
-  schema.literal(MODEL_STATE.loading),
-  schema.literal(MODEL_STATE.partiallyLoaded),
-  schema.literal(MODEL_STATE.loadFailed),
-  schema.literal(MODEL_STATE.registerFailed),
+  schema.literal(MODEL_VERSION_STATE.deployed),
+  schema.literal(MODEL_VERSION_STATE.trained),
+  schema.literal(MODEL_VERSION_STATE.undeployed),
+  schema.literal(MODEL_VERSION_STATE.registered),
+  schema.literal(MODEL_VERSION_STATE.registering),
+  schema.literal(MODEL_VERSION_STATE.deploying),
+  schema.literal(MODEL_VERSION_STATE.partiallyDeployed),
+  schema.literal(MODEL_VERSION_STATE.deployFailed),
+  schema.literal(MODEL_VERSION_STATE.registerFailed),
 ]);
 
 const modelUploadBaseSchema = {

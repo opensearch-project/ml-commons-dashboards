@@ -21,7 +21,7 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 
-import { MODEL_STATE } from '../../../common';
+import { MODEL_VERSION_STATE } from '../../../common';
 
 export interface ModelDeploymentTableSort {
   field: 'name' | 'model_state' | 'id';
@@ -36,7 +36,7 @@ export interface ModelDeploymentTableCriteria {
 export interface ModelDeploymentItem {
   id: string;
   name: string;
-  model_state?: MODEL_STATE;
+  model_state?: MODEL_VERSION_STATE;
   respondingNodesCount: number | undefined;
   planningNodesCount: number | undefined;
   notRespondingNodesCount: number | undefined;

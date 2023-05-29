@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE } from '../../common';
+import { MODEL_VERSION_STATE } from '../../common';
 import {
   MODEL_VERSION_API_ENDPOINT,
   MODEL_VERSION_LOAD_API_ENDPOINT,
@@ -20,7 +20,7 @@ export interface ModelVersionSearchItem {
   // we should fix this when integrating the new API changes
   description: string;
   algorithm: string;
-  model_state: MODEL_STATE;
+  model_state: MODEL_VERSION_STATE;
   model_version: string;
   current_worker_node_count: number;
   planning_worker_node_count: number;
@@ -103,7 +103,7 @@ export class ModelVersion {
     name?: string;
     from: number;
     size: number;
-    states?: MODEL_STATE[];
+    states?: MODEL_VERSION_STATE[];
     nameOrId?: string;
     versionOrKeyword?: string;
     modelGroupIds?: string[];

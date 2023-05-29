@@ -7,7 +7,7 @@ import { EuiPageHeader, EuiSpacer, EuiPanel, EuiTextColor } from '@elastic/eui';
 
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { MODEL_STATE } from '../../../common';
+import { MODEL_VERSION_STATE } from '../../../common';
 
 import { ModelTable, ModelTableCriteria, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
@@ -16,17 +16,17 @@ import { ModelListEmpty } from './model_list_empty';
 
 const getStatesParam = (deployed?: boolean) => {
   if (deployed) {
-    return [MODEL_STATE.loaded];
+    return [MODEL_VERSION_STATE.deployed];
   }
   if (deployed === false) {
     return [
-      MODEL_STATE.loadFailed,
-      MODEL_STATE.loading,
-      MODEL_STATE.partiallyLoaded,
-      MODEL_STATE.registerFailed,
-      MODEL_STATE.unloaded,
-      MODEL_STATE.uploaded,
-      MODEL_STATE.uploading,
+      MODEL_VERSION_STATE.deployFailed,
+      MODEL_VERSION_STATE.deploying,
+      MODEL_VERSION_STATE.partiallyDeployed,
+      MODEL_VERSION_STATE.registerFailed,
+      MODEL_VERSION_STATE.undeployed,
+      MODEL_VERSION_STATE.registered,
+      MODEL_VERSION_STATE.registering,
     ];
   }
   return undefined;

@@ -21,7 +21,12 @@
 import { groupBy } from 'lodash';
 
 import { IScopedClusterClient } from '../../../../src/core/server';
-import { MODEL_STATE, ModelAggregateSort, ModelAggregateItem, ModelGroupSort } from '../../common';
+import {
+  MODEL_VERSION_STATE,
+  ModelAggregateSort,
+  ModelAggregateItem,
+  ModelGroupSort,
+} from '../../common';
 
 import { ModelGroupService } from './model_group_service';
 import { ModelVersionService } from './model_version_service';
@@ -42,7 +47,7 @@ const getModelGroupSort = (sort: ModelAggregateSort): ModelGroupSort => {
 
 interface GetAggregateModelsParams {
   client: IScopedClusterClient;
-  states?: MODEL_STATE[];
+  states?: MODEL_VERSION_STATE[];
 }
 
 interface ModelAggregateSearchParams extends GetAggregateModelsParams {
@@ -107,7 +112,7 @@ export class ModelAggregateService {
       from: 0,
       size: MAX_MODEL_BUCKET_NUM,
       modelGroupIds,
-      states: [MODEL_STATE.loaded],
+      states: [MODEL_VERSION_STATE.deployed],
     });
 
     const modelGroupId2Model = groupBy(deployedModels, 'model_group_id');

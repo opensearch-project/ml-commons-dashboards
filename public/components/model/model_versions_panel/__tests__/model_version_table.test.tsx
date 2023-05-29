@@ -9,14 +9,14 @@ import { within } from '@testing-library/dom';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionTable } from '../model_version_table';
-import { MODEL_STATE } from '../../../../../common';
+import { MODEL_VERSION_STATE } from '../../../../../common';
 
 const versions = [
   {
     id: '1',
     name: 'model-1',
     version: '1.0.0',
-    state: MODEL_STATE.uploading,
+    state: MODEL_VERSION_STATE.registering,
     tags: { 'Accuracy: test': 0.98, 'Accuracy: train': 0.99 },
     lastUpdatedTime: 1682676759143,
     createdTime: 1682676759143,

@@ -18,7 +18,7 @@ import {
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { MODEL_STATE, routerPaths } from '../../../common';
+import { MODEL_VERSION_STATE, routerPaths } from '../../../common';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 
@@ -153,8 +153,8 @@ export const ModelVersion = () => {
           ]}
         />
       )}
-      <ModelVersionCallout modelVersionId="" modelState={MODEL_STATE.loading} />
-      <ModelVersionCallout modelVersionId="" modelState={MODEL_STATE.loadFailed} />
+      <ModelVersionCallout modelVersionId="" modelState={MODEL_VERSION_STATE.deploying} />
+      <ModelVersionCallout modelVersionId="" modelState={MODEL_VERSION_STATE.deployFailed} />
       <EuiSpacer size="m" />
       {loading ? (
         <EuiPanel style={{ minHeight: 200 }}>

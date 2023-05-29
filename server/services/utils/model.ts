@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE } from '../../../common';
+import { MODEL_VERSION_STATE } from '../../../common';
 import { generateTermQuery } from './query';
 
 export const generateModelSearchQuery = ({
@@ -18,7 +18,7 @@ export const generateModelSearchQuery = ({
   ids?: string[];
   algorithms?: string[];
   name?: string;
-  states?: MODEL_STATE[];
+  states?: MODEL_VERSION_STATE[];
   nameOrId?: string;
   versionOrKeyword?: string;
   modelGroupIds?: string[];
