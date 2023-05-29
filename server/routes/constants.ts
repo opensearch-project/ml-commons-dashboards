@@ -5,7 +5,7 @@
 
 export const API_PREFIX = '/api/ml-commons';
 
-export const MODEL_VERSION_API_ENDPOINT = `${API_PREFIX}/model`;
+export const MODEL_VERSION_API_ENDPOINT = `${API_PREFIX}/model-version`;
 export const MODEL_VERSION_LOAD_API_ENDPOINT = `${MODEL_VERSION_API_ENDPOINT}/load`;
 export const MODEL_VERSION_UNLOAD_API_ENDPOINT = `${MODEL_VERSION_API_ENDPOINT}/unload`;
 export const MODEL_VERSION_PROFILE_API_ENDPOINT = `${MODEL_VERSION_API_ENDPOINT}/profile`;
