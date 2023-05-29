@@ -65,7 +65,10 @@ export class ModelService {
       model_group_id: string;
       status: 'CREATED';
     };
-    return result;
+    return {
+      model_id: result.model_group_id,
+      status: result.status,
+    };
   }
 
   public static async update({
