@@ -11,10 +11,9 @@ import {
   Logger,
 } from '../../../src/core/server';
 
-import { createModelCluster } from './clusters/create_model_cluster';
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
 import {
-  modelRouter,
+  modelVersionRouter,
   modelAggregateRouter,
   profileRouter,
   securityRouter,
@@ -22,7 +21,6 @@ import {
   modelRepositoryRouter,
   modelGroupRouter,
 } from './routes';
-import { ModelService } from './services';
 
 export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPluginStart> {
   private readonly logger: Logger;
@@ -35,15 +33,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     this.logger.debug('mlCommons: Setup');
     const router = core.http.createRouter();
 
-    const modelOSClient = createModelCluster(core);
-
-    const modelService = new ModelService(modelOSClient);
-
-    const services = {
-      modelService,
-    };
-
-    modelRouter(services, router);
+    modelVersionRouter(router);
     modelAggregateRouter(router);
     profileRouter(router);
     securityRouter(router);

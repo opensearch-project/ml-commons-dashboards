@@ -105,7 +105,7 @@ export const ModelVersionsPanel = ({ modelId }: ModelVersionsPanelProps) => {
     },
   });
   const { data: versionsData, reload, loading, error } = useFetcher(
-    APIProvider.getAPI('model').search,
+    APIProvider.getAPI('modelVersion').search,
     {
       modelGroupIds: [modelId],
       from: params.pageIndex * params.pageSize,

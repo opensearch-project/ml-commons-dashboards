@@ -24,7 +24,7 @@ import { IScopedClusterClient } from '../../../../src/core/server';
 import { MODEL_STATE, ModelAggregateSort, ModelAggregateItem, ModelGroupSort } from '../../common';
 
 import { ModelGroupService } from './model_group_service';
-import { ModelService } from './model_service';
+import { ModelVersionService } from './model_version_service';
 import { MODEL_SEARCH_API } from './utils/constants';
 import { generateModelSearchQuery } from './utils/model';
 
@@ -102,7 +102,7 @@ export class ModelAggregateService {
       queryString,
     });
     const modelGroupIds = modelGroups.map(({ id }) => id);
-    const { data: deployedModels } = await ModelService.search({
+    const { data: deployedModels } = await ModelVersionService.search({
       client,
       from: 0,
       size: MAX_MODEL_BUCKET_NUM,

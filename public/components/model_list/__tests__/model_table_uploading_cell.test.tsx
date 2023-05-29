@@ -7,7 +7,7 @@ import React from 'react';
 
 import { ModelTableUploadingCell } from '../model_table_uploading_cell';
 import { render, screen } from '../../../../test/test_utils';
-import { MODEL_STATE } from '../../../../common/model';
+import { MODEL_STATE } from '../../../../common';
 
 describe('<ModelTableUploadingCell />', () => {
   it('should render "updating" if column is deployedVersions or createdAt', () => {

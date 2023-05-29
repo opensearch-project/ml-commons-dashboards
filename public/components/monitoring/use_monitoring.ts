@@ -38,7 +38,7 @@ const fetchDeployedModels = async (params: Params) => {
         return MODEL_STATE.partiallyLoaded;
     }
   });
-  const result = await APIProvider.getAPI('model').search({
+  const result = await APIProvider.getAPI('modelVersion').search({
     from: (params.currentPage - 1) * params.pageSize,
     size: params.pageSize,
     nameOrId: params.nameOrId,

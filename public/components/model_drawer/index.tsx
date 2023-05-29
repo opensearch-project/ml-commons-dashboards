@@ -32,7 +32,7 @@ interface Props {
 
 export const ModelDrawer = ({ onClose, name }: Props) => {
   const [sort, setSort] = useState<VersionTableSort>('version-desc');
-  const { data: model } = useFetcher(APIProvider.getAPI('model').search, {
+  const { data: model } = useFetcher(APIProvider.getAPI('modelVersion').search, {
     name,
     from: 0,
     size: 50,

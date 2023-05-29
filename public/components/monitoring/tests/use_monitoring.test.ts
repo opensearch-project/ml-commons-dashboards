@@ -5,34 +5,18 @@
 
 import { act, renderHook } from '@testing-library/react-hooks';
 
-import { Model, ModelSearchResponse } from '../../../apis/model';
+import { ModelVersion, ModelVersionSearchResponse } from '../../../apis/model_version';
 import { useMonitoring } from '../use_monitoring';
 
-jest.mock('../../../apis/model');
-
 const mockEmptyRecords = () =>
-  jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
+  jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValueOnce({
     data: [],
     total_models: 0,
   });
 
 describe('useMonitoring', () => {
   beforeEach(() => {
-    jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
-      data: [
-        {
-          id: 'model-1-id',
-          name: 'model-1-name',
-          current_worker_node_count: 1,
-          planning_worker_node_count: 3,
-          algorithm: '',
-          model_state: '',
-          model_version: '',
-          planning_worker_nodes: ['node1', 'node2', 'node3'],
-        },
-      ],
-      total_models: 1,
-    });
+    jest.spyOn(ModelVersion.prototype, 'search');
   });
 
   afterEach(() => {
@@ -48,7 +32,7 @@ describe('useMonitoring', () => {
       result.current.searchByNameOrId('foo');
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
           states: ['DEPLOY_FAILED', 'DEPLOYED', 'PARTIALLY_DEPLOYED'],
@@ -60,7 +44,7 @@ describe('useMonitoring', () => {
       result.current.searchByStatus(['responding']);
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
           states: ['DEPLOYED'],
@@ -76,7 +60,7 @@ describe('useMonitoring', () => {
       result.current.searchByStatus(['partial-responding']);
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           states: ['PARTIALLY_DEPLOYED'],
         })
@@ -88,7 +72,7 @@ describe('useMonitoring', () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: ['model_state-asc'],
           from: 0,
@@ -104,7 +88,7 @@ describe('useMonitoring', () => {
       });
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: ['name-desc'],
           from: 10,
@@ -117,19 +101,19 @@ describe('useMonitoring', () => {
   it('should call search API twice after reload called', async () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
-    await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(1));
 
     act(() => {
       result.current.reload();
     });
-    await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(2));
   });
 });
 
 describe('useMonitoring.pageStatus', () => {
   it("should return 'loading' if data loading and will back to 'normal' after data loaded", async () => {
     let resolveFn: Function;
-    const promise = new Promise<ModelSearchResponse>((resolve) => {
+    const promise = new Promise<ModelVersionSearchResponse>((resolve) => {
       resolveFn = () => {
         resolve({
           data: [
@@ -148,7 +132,7 @@ describe('useMonitoring.pageStatus', () => {
         });
       };
     });
-    jest.spyOn(Model.prototype, 'search').mockReturnValueOnce(promise);
+    jest.spyOn(ModelVersion.prototype, 'search').mockReturnValueOnce(promise);
     const { result } = renderHook(() => useMonitoring());
 
     expect(result.current.pageStatus).toBe('loading');
@@ -200,16 +184,14 @@ describe('useMonitoring.pageStatus', () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
     await waitFor(() =>
-      expect(result.current.deployedModels).toEqual([
-        {
-          id: 'model-1-id',
-          name: 'model-1-name',
-          respondingNodesCount: 1,
-          notRespondingNodesCount: 2,
-          planningNodesCount: 3,
-          planningWorkerNodes: ['node1', 'node2', 'node3'],
-        },
-      ])
+      expect(result.current.deployedModels[0]).toEqual({
+        id: '1',
+        name: 'model1',
+        respondingNodesCount: 1,
+        planningNodesCount: 3,
+        notRespondingNodesCount: 2,
+        planningWorkerNodes: ['node1', 'node2', 'node3'],
+      })
     );
   });
 });

@@ -4,7 +4,7 @@
  */
 
 import { ModelGroup } from '../../../apis/model_group';
-import { Model } from '../../../apis/model';
+import { ModelVersion } from '../../../apis/model_version';
 import { submitModelWithFile, submitModelWithURL } from '../register_model_api';
 
 describe('register model api', () => {
@@ -13,13 +13,15 @@ describe('register model api', () => {
       .spyOn(ModelGroup.prototype, 'register')
       .mockResolvedValue({ model_group_id: '1', status: 'CREATED' });
     jest.spyOn(ModelGroup.prototype, 'delete').mockResolvedValue({ status: 'success' });
-    jest.spyOn(Model.prototype, 'upload').mockResolvedValue({ task_id: 'foo', model_id: 'bar' });
+    jest
+      .spyOn(ModelVersion.prototype, 'upload')
+      .mockResolvedValue({ task_id: 'foo', model_id: 'bar' });
   });
 
   afterEach(() => {
     jest.spyOn(ModelGroup.prototype, 'register').mockRestore();
     jest.spyOn(ModelGroup.prototype, 'delete').mockRestore();
-    jest.spyOn(Model.prototype, 'upload').mockRestore();
+    jest.spyOn(ModelVersion.prototype, 'upload').mockRestore();
   });
 
   it('should not call register model group API if modelId provided', async () => {
@@ -39,7 +41,7 @@ describe('register model api', () => {
 
   it('should not call delete model group API if modelId provided and model upload failed', async () => {
     const uploadError = new Error();
-    const uploadMock = jest.spyOn(Model.prototype, 'upload').mockRejectedValue(uploadError);
+    const uploadMock = jest.spyOn(ModelVersion.prototype, 'upload').mockRejectedValue(uploadError);
 
     try {
       await submitModelWithFile({
@@ -80,7 +82,9 @@ describe('register model api', () => {
 
     it('should delete created model group API upload failed', async () => {
       const uploadError = new Error();
-      const uploadMock = jest.spyOn(Model.prototype, 'upload').mockRejectedValue(uploadError);
+      const uploadMock = jest
+        .spyOn(ModelVersion.prototype, 'upload')
+        .mockRejectedValue(uploadError);
 
       expect(ModelGroup.prototype.delete).not.toHaveBeenCalled();
       try {
@@ -137,7 +141,9 @@ describe('register model api', () => {
 
     it('should delete created model group API upload failed', async () => {
       const uploadError = new Error();
-      const uploadMock = jest.spyOn(Model.prototype, 'upload').mockRejectedValue(uploadError);
+      const uploadMock = jest
+        .spyOn(ModelVersion.prototype, 'upload')
+        .mockRejectedValue(uploadError);
 
       expect(ModelGroup.prototype.delete).not.toHaveBeenCalled();
       try {

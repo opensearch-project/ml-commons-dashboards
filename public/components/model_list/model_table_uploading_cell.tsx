@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { EuiLoadingSpinner, EuiText } from '@elastic/eui';
-import { MODEL_STATE } from '../../../common/model';
+import { MODEL_STATE } from '../../../common';
 
 type ColumnType =
   | 'name'

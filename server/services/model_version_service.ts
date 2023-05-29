@@ -18,16 +18,17 @@
  *   permissions and limitations under the License.
  */
 
-import {
-  ILegacyClusterClient,
-  IScopedClusterClient,
-  ScopeableRequest,
-} from '../../../../src/core/server';
+import { IScopedClusterClient } from '../../../../src/core/server';
 import { MODEL_STATE } from '../../common';
 
 import { generateModelSearchQuery } from './utils/model';
 import { RecordNotFoundError } from './errors';
-import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
+import {
+  MODEL_BASE_API,
+  MODEL_META_API,
+  MODEL_PROFILE_API,
+  MODEL_UPLOAD_API,
+} from './utils/constants';
 
 const modelSortFieldMapping: { [key: string]: string } = {
   version: 'model_version',
@@ -67,12 +68,8 @@ const isUploadModelByURL = (
   test: UploadModelByURL | UploadModelByChunk
 ): test is UploadModelByURL => (test as UploadModelByURL).url !== undefined;
 
-export class ModelService {
-  private osClient: ILegacyClusterClient;
-
-  constructor(osClient: ILegacyClusterClient) {
-    this.osClient = osClient;
-  }
+export class ModelVersionService {
+  constructor() {}
 
   public static async search({
     from,
@@ -124,53 +121,81 @@ export class ModelService {
     };
   }
 
-  public async getOne({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const modelSource = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.getOne', {
-        modelId,
-      });
+  public static async getOne({
+    modelId,
+    client,
+  }: {
+    modelId: string;
+    client: IScopedClusterClient;
+  }) {
+    const modelSource = (
+      await client.asCurrentUser.transport.request({
+        method: 'GET',
+        path: `${MODEL_BASE_API}/${modelId}`,
+      })
+    ).body;
     return {
       id: modelId,
       ...modelSource,
     };
   }
 
-  public async delete({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const { result } = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.delete', {
-        modelId,
-      });
+  public static async delete({
+    modelId,
+    client,
+  }: {
+    modelId: string;
+    client: IScopedClusterClient;
+  }) {
+    const { result } = (
+      await client.asCurrentUser.transport.request({
+        method: 'DELETE',
+        path: `${MODEL_BASE_API}/${modelId}`,
+      })
+    ).body;
     if (result === 'not_found') {
       throw new RecordNotFoundError();
     }
     return true;
   }
 
-  public async load({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const result = await this.osClient.asScoped(request).callAsCurrentUser('mlCommonsModel.load', {
-      modelId,
-    });
-    return result;
+  public static async load({ modelId, client }: { modelId: string; client: IScopedClusterClient }) {
+    return (
+      await client.asCurrentUser.transport.request({
+        method: 'POST',
+        path: `${MODEL_BASE_API}/${modelId}/_load`,
+      })
+    ).body;
   }
 
-  public async unload({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const result = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.unload', {
-        modelId,
-      });
-    return result;
+  public static async unload({
+    modelId,
+    client,
+  }: {
+    modelId: string;
+    client: IScopedClusterClient;
+  }) {
+    return (
+      await client.asCurrentUser.transport.request({
+        method: 'POST',
+        path: `${MODEL_BASE_API}/${modelId}/_unload`,
+      })
+    ).body;
   }
 
-  public async profile({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const result = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.profile', {
-        modelId,
-      });
-    return result;
+  public static async profile({
+    client,
+    modelId,
+  }: {
+    client: IScopedClusterClient;
+    modelId: string;
+  }) {
+    return (
+      await client.asCurrentUser.transport.request({
+        method: 'GET',
+        path: `${MODEL_PROFILE_API}/${modelId}`,
+      })
+    ).body;
   }
 
   public static async upload<T extends UploadModelByChunk | UploadModelByURL>({

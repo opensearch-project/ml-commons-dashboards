@@ -6,13 +6,13 @@
 import { schema } from '@osd/config-schema';
 import { MAX_MODEL_CHUNK_SIZE, MODEL_STATE } from '../../common';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
-import { ModelService, RecordNotFoundError } from '../services';
+import { ModelVersionService, RecordNotFoundError } from '../services';
 import {
-  MODEL_API_ENDPOINT,
-  MODEL_LOAD_API_ENDPOINT,
-  MODEL_UNLOAD_API_ENDPOINT,
-  MODEL_UPLOAD_API_ENDPOINT,
-  MODEL_PROFILE_API_ENDPOINT,
+  MODEL_VERSION_API_ENDPOINT,
+  MODEL_VERSION_LOAD_API_ENDPOINT,
+  MODEL_VERSION_UNLOAD_API_ENDPOINT,
+  MODEL_VERSION_UPLOAD_API_ENDPOINT,
+  MODEL_VERSION_PROFILE_API_ENDPOINT,
 } from './constants';
 
 const validateSortItem = (sort: string) => {
@@ -71,12 +71,10 @@ const modelUploadByChunkSchema = schema.object({
   totalChunks: schema.number(),
 });
 
-export const modelRouter = (services: { modelService: ModelService }, router: IRouter) => {
-  const { modelService } = services;
-
+export const modelVersionRouter = (router: IRouter) => {
   router.get(
     {
-      path: MODEL_API_ENDPOINT,
+      path: MODEL_VERSION_API_ENDPOINT,
       validate: {
         query: schema.object({
           name: schema.maybe(schema.string()),
@@ -117,7 +115,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
         versionOrKeyword,
       } = request.query;
       try {
-        const payload = await ModelService.search({
+        const payload = await ModelVersionService.search({
           client: context.core.opensearch.client,
           algorithms: typeof algorithms === 'string' ? [algorithms] : algorithms,
           ids: typeof ids === 'string' ? [ids] : ids,
@@ -139,17 +137,17 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
 
   router.get(
     {
-      path: `${MODEL_API_ENDPOINT}/{modelId}`,
+      path: `${MODEL_VERSION_API_ENDPOINT}/{modelId}`,
       validate: {
         params: schema.object({
           modelId: schema.string(),
         }),
       },
     },
-    async (_context, request) => {
+    async (context, request) => {
       try {
-        const model = await modelService.getOne({
-          request,
+        const model = await ModelVersionService.getOne({
+          client: context.core.opensearch.client,
           modelId: request.params.modelId,
         });
         return opensearchDashboardsResponseFactory.ok({ body: model });
@@ -161,17 +159,17 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
 
   router.delete(
     {
-      path: `${MODEL_API_ENDPOINT}/{modelId}`,
+      path: `${MODEL_VERSION_API_ENDPOINT}/{modelId}`,
       validate: {
         params: schema.object({
           modelId: schema.string(),
         }),
       },
     },
-    async (_context, request) => {
+    async (context, request) => {
       try {
-        await modelService.delete({
-          request,
+        await ModelVersionService.delete({
+          client: context.core.opensearch.client,
           modelId: request.params.modelId,
         });
         return opensearchDashboardsResponseFactory.ok();
@@ -186,17 +184,17 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
 
   router.post(
     {
-      path: `${MODEL_LOAD_API_ENDPOINT}/{modelId}`,
+      path: `${MODEL_VERSION_LOAD_API_ENDPOINT}/{modelId}`,
       validate: {
         params: schema.object({
           modelId: schema.string(),
         }),
       },
     },
-    async (_context, request) => {
+    async (context, request) => {
       try {
-        const result = await modelService.load({
-          request,
+        const result = await ModelVersionService.load({
+          client: context.core.opensearch.client,
           modelId: request.params.modelId,
         });
         return opensearchDashboardsResponseFactory.ok({ body: result });
@@ -208,17 +206,17 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
 
   router.post(
     {
-      path: `${MODEL_UNLOAD_API_ENDPOINT}/{modelId}`,
+      path: `${MODEL_VERSION_UNLOAD_API_ENDPOINT}/{modelId}`,
       validate: {
         params: schema.object({
           modelId: schema.string(),
         }),
       },
     },
-    async (_context, request) => {
+    async (context, request) => {
       try {
-        const result = await modelService.unload({
-          request,
+        const result = await ModelVersionService.unload({
+          client: context.core.opensearch.client,
           modelId: request.params.modelId,
         });
         return opensearchDashboardsResponseFactory.ok({ body: result });
@@ -230,17 +228,17 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
 
   router.get(
     {
-      path: `${MODEL_PROFILE_API_ENDPOINT}/{modelId}`,
+      path: `${MODEL_VERSION_PROFILE_API_ENDPOINT}/{modelId}`,
       validate: {
         params: schema.object({
           modelId: schema.string(),
         }),
       },
     },
-    async (_context, request) => {
+    async (context, request) => {
       try {
-        const result = await modelService.profile({
-          request,
+        const result = await ModelVersionService.profile({
+          client: context.core.opensearch.client,
           modelId: request.params.modelId,
         });
         return opensearchDashboardsResponseFactory.ok({ body: result });
@@ -252,14 +250,14 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
 
   router.post(
     {
-      path: MODEL_UPLOAD_API_ENDPOINT,
+      path: MODEL_VERSION_UPLOAD_API_ENDPOINT,
       validate: {
         body: schema.oneOf([modelUploadByURLSchema, modelUploadByChunkSchema]),
       },
     },
     async (context, request) => {
       try {
-        const body = await ModelService.upload({
+        const body = await ModelVersionService.upload({
           client: context.core.opensearch.client,
           model: request.body,
         });
@@ -275,7 +273,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
 
   router.post(
     {
-      path: `${MODEL_API_ENDPOINT}/{modelId}/chunk/{chunkId}`,
+      path: `${MODEL_VERSION_API_ENDPOINT}/{modelId}/chunk/{chunkId}`,
       validate: {
         params: schema.object({
           modelId: schema.string(),
@@ -291,7 +289,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
     },
     async (context, request) => {
       try {
-        await ModelService.uploadModelChunk({
+        await ModelVersionService.uploadModelChunk({
           client: context.core.opensearch.client,
           modelId: request.params.modelId,
           chunkId: request.params.chunkId,

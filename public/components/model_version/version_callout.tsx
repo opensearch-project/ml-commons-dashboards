@@ -5,7 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { EuiCallOut, EuiLoadingSpinner } from '@elastic/eui';
-import { MODEL_STATE } from '../../../common/model';
+import { MODEL_STATE } from '../../../common';
 
 interface ModelVersionCalloutProps {
   modelVersionId: string;

@@ -64,7 +64,7 @@ export async function submitModelWithFile(model: ModelFileFormData) {
   const result = await createModelIfNeedAndUploadVersion({
     ...model,
     uploader: (modelId: string) =>
-      APIProvider.getAPI('model').upload({
+      APIProvider.getAPI('modelVersion').upload({
         ...getModelUploadBase(model),
         modelGroupId: modelId,
         totalChunks,
@@ -82,7 +82,7 @@ export async function submitModelWithURL(model: ModelUrlFormData) {
   const result = await createModelIfNeedAndUploadVersion({
     ...model,
     uploader: (modelId: string) =>
-      APIProvider.getAPI('model').upload({
+      APIProvider.getAPI('modelVersion').upload({
         ...getModelUploadBase(model),
         modelGroupId: modelId,
         url: model.modelURL,

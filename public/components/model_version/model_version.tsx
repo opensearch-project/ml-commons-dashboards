@@ -16,14 +16,14 @@ import {
   EuiTabbedContent,
 } from '@elastic/eui';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
-
 import { FormProvider, useForm } from 'react-hook-form';
+
+import { MODEL_STATE, routerPaths } from '../../../common';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
-import { routerPaths } from '../../../common/router_paths';
+
 import { VersionToggler } from './version_toggler';
 import { ModelVersionCallout } from './version_callout';
-import { MODEL_STATE } from '../../../common/model';
 import { ModelVersionDetails } from './version_details';
 import { ModelVersionInformation } from './version_information';
 import { ModelVersionArtifact } from './version_artifact';
@@ -32,7 +32,7 @@ import { ModelVersionFormData } from './types';
 
 export const ModelVersion = () => {
   const { id: modelId } = useParams<{ id: string }>();
-  const { data: model, loading } = useFetcher(APIProvider.getAPI('model').getOne, modelId);
+  const { data: model, loading } = useFetcher(APIProvider.getAPI('modelVersion').getOne, modelId);
   const [modelInfo, setModelInfo] = useState<{ version: string; name: string }>();
   const history = useHistory();
   const modelName = model?.name;

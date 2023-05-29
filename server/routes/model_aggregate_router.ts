@@ -7,7 +7,7 @@ import { schema } from '@osd/config-schema';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
 import { ModelAggregateService } from '../services/model_aggregate_service';
 import { MODEL_AGGREGATE_API_ENDPOINT } from './constants';
-import { modelStateSchema } from './model_router';
+import { modelStateSchema } from './model_version_router';
 
 export const modelAggregateRouter = (router: IRouter) => {
   router.get(

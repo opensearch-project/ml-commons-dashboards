@@ -39,7 +39,7 @@ export class ModelFileUploadManager {
           chunkSize * (i - 1),
           Math.min(chunkSize * i, options.file.size)
         );
-        await APIProvider.getAPI('model').uploadChunk(options.modelId, `${i - 1}`, chunk);
+        await APIProvider.getAPI('modelVersion').uploadChunk(options.modelId, `${i - 1}`, chunk);
         return { total: totalChunks, current: i };
       })
     );

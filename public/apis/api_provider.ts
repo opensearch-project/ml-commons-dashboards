@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Model } from './model';
+import { ModelVersion } from './model_version';
 import { ModelAggregate } from './model_aggregate';
 import { ModelGroup } from './model_group';
 import { ModelRepository } from './model_repository';
@@ -12,7 +12,7 @@ import { Security } from './security';
 import { Task } from './task';
 
 const apiInstanceStore: {
-  model: Model | undefined;
+  modelVersion: ModelVersion | undefined;
   modelAggregate: ModelAggregate | undefined;
   profile: Profile | undefined;
   security: Security | undefined;
@@ -20,7 +20,7 @@ const apiInstanceStore: {
   modelRepository: ModelRepository | undefined;
   modelGroup: ModelGroup | undefined;
 } = {
-  model: undefined,
+  modelVersion: undefined,
   modelAggregate: undefined,
   profile: undefined,
   security: undefined,
@@ -31,7 +31,7 @@ const apiInstanceStore: {
 
 export class APIProvider {
   public static getAPI(type: 'task'): Task;
-  public static getAPI(type: 'model'): Model;
+  public static getAPI(type: 'modelVersion'): ModelVersion;
   public static getAPI(type: 'modelAggregate'): ModelAggregate;
   public static getAPI(type: 'profile'): Profile;
   public static getAPI(type: 'security'): Security;
@@ -42,9 +42,9 @@ export class APIProvider {
       return apiInstanceStore[type]!;
     }
     switch (type) {
-      case 'model': {
-        const newInstance = new Model();
-        apiInstanceStore.model = newInstance;
+      case 'modelVersion': {
+        const newInstance = new ModelVersion();
+        apiInstanceStore.modelVersion = newInstance;
         return newInstance;
       }
       case 'modelAggregate': {
@@ -80,6 +80,8 @@ export class APIProvider {
     }
   }
   public static clear() {
-    apiInstanceStore.model = undefined;
+    Object.keys(apiInstanceStore).forEach((key) => {
+      apiInstanceStore[key as keyof typeof apiInstanceStore] = undefined;
+    });
   }
 }

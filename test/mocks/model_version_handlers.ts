@@ -5,7 +5,7 @@
 
 import { rest } from 'msw';
 
-import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
+import { MODEL_VERSION_API_ENDPOINT } from '../../server/routes/constants';
 
 const models = [
   {
@@ -23,9 +23,12 @@ const models = [
       model_type: 'roberta',
     },
     model_format: 'TORCH_SCRIPT',
-    model_state: 'REGISTERED',
+    model_state: 'PARTIALLY_DEPLOYED',
     total_chunks: 34,
     model_group_id: '1',
+    current_worker_node_count: 1,
+    planning_worker_node_count: 3,
+    planning_worker_nodes: ['node1', 'node2', 'node3'],
   },
   {
     id: '2',
@@ -86,8 +89,8 @@ const models = [
   },
 ];
 
-export const modelHandlers = [
-  rest.get(MODEL_API_ENDPOINT, (req, res, ctx) => {
+export const modelVersionHandlers = [
+  rest.get(MODEL_VERSION_API_ENDPOINT, (req, res, ctx) => {
     const { searchParams } = req.url;
     const name = searchParams.get('name');
     const ids = searchParams.getAll('ids');
@@ -113,7 +116,7 @@ export const modelHandlers = [
     );
   }),
 
-  rest.get(`${MODEL_API_ENDPOINT}/:modelId`, (req, res, ctx) => {
+  rest.get(`${MODEL_VERSION_API_ENDPOINT}/:modelId`, (req, res, ctx) => {
     const [modelId, ..._restParts] = req.url.pathname.split('/').reverse();
     return res(ctx.status(200), ctx.json(models.find((model) => model.id === modelId)));
   }),

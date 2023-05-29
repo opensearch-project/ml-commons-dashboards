@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import * as euiExports from '@elastic/eui';
 
 import { render, screen, waitFor, within } from '../../../../../test/test_utils';
-import { Model } from '../../../../apis/model';
+import { ModelVersion } from '../../../../apis/model_version';
 import { ModelVersionsPanel } from '../model_versions_panel';
 import * as PluginContext from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -65,12 +65,14 @@ describe('<ModelVersionsPanel />', () => {
     'should call model search API again after refresh button clicked',
     async () => {
       const euiDataGridMock = mockEuiDataGrid();
-      const searchMock = jest.spyOn(Model.prototype, 'search').mockImplementation(async () => {
-        return {
-          data: [],
-          total_models: 0,
-        };
-      });
+      const searchMock = jest
+        .spyOn(ModelVersion.prototype, 'search')
+        .mockImplementation(async () => {
+          return {
+            data: [],
+            total_models: 0,
+          };
+        });
 
       render(<ModelVersionsPanel modelId="1" />);
 
@@ -89,7 +91,7 @@ describe('<ModelVersionsPanel />', () => {
     'should call model search with consistent state parameters after deployed state filter applied',
     async () => {
       const euiDataGridMock = mockEuiDataGrid();
-      const searchMock = jest.spyOn(Model.prototype, 'search');
+      const searchMock = jest.spyOn(ModelVersion.prototype, 'search');
 
       render(<ModelVersionsPanel modelId="1" />);
 
@@ -125,7 +127,7 @@ describe('<ModelVersionsPanel />', () => {
   it('should render loading screen when calling model search API', async () => {
     const euiDataGridMock = mockEuiDataGrid();
     const searchMock = jest
-      .spyOn(Model.prototype, 'search')
+      .spyOn(ModelVersion.prototype, 'search')
       .mockImplementation(() => new Promise(() => {}));
     render(<ModelVersionsPanel modelId="1" />);
 
@@ -137,7 +139,7 @@ describe('<ModelVersionsPanel />', () => {
 
   it('should render error screen and show error toast after call model search failed', async () => {
     const euiDataGridMock = mockEuiDataGrid();
-    const searchMock = jest.spyOn(Model.prototype, 'search').mockImplementation(async () => {
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockImplementation(async () => {
       throw new Error();
     });
     const dangerMock = jest.fn();
@@ -166,7 +168,7 @@ describe('<ModelVersionsPanel />', () => {
 
   it('should render empty screen if model no versions', async () => {
     const euiDataGridMock = mockEuiDataGrid();
-    const searchMock = jest.spyOn(Model.prototype, 'search').mockImplementation(async () => {
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockImplementation(async () => {
       return {
         data: [],
         total_models: 0,
@@ -198,12 +200,14 @@ describe('<ModelVersionsPanel />', () => {
         expect(screen.getByTitle('Status')).toBeInTheDocument();
       });
 
-      const searchMock = jest.spyOn(Model.prototype, 'search').mockImplementation(async () => {
-        return {
-          data: [],
-          total_models: 0,
-        };
-      });
+      const searchMock = jest
+        .spyOn(ModelVersion.prototype, 'search')
+        .mockImplementation(async () => {
+          return {
+            data: [],
+            total_models: 0,
+          };
+        });
       await userEvent.click(screen.getByTitle('Status'));
       await userEvent.click(screen.getByRole('option', { name: 'In progress...' }));
 
@@ -229,12 +233,14 @@ describe('<ModelVersionsPanel />', () => {
         expect(screen.getByTitle('Status')).toBeInTheDocument();
       });
 
-      const searchMock = jest.spyOn(Model.prototype, 'search').mockImplementation(async () => {
-        return {
-          data: [],
-          total_models: 0,
-        };
-      });
+      const searchMock = jest
+        .spyOn(ModelVersion.prototype, 'search')
+        .mockImplementation(async () => {
+          return {
+            data: [],
+            total_models: 0,
+          };
+        });
       await userEvent.click(screen.getByTitle('Status'));
       await userEvent.click(screen.getByRole('option', { name: 'In progress...' }));
 
@@ -260,7 +266,7 @@ describe('<ModelVersionsPanel />', () => {
       await waitFor(() => {
         expect(screen.getByTestId('dataGridHeaderCell-version')).toBeInTheDocument();
       });
-      const searchMock = jest.spyOn(Model.prototype, 'search');
+      const searchMock = jest.spyOn(ModelVersion.prototype, 'search');
 
       await userEvent.click(
         within(screen.getByTestId('dataGridHeaderCell-version')).getByText('Version')

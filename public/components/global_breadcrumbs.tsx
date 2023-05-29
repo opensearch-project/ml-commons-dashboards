@@ -106,7 +106,7 @@ const getModelVersionBreadcrumbs = (basename: string, matchedParams: {}) => {
       staticBreadcrumbs: baseModelRegistryBreadcrumbs,
       // TODO: Change to model group API
       asyncBreadcrumbsLoader: () =>
-        APIProvider.getAPI('model')
+        APIProvider.getAPI('modelVersion')
           .getOne(modelId)
           .then(
             (model) =>

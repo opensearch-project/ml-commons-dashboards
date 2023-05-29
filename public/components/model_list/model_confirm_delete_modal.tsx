@@ -28,7 +28,7 @@ export const ModelConfirmDeleteModal = React.forwardRef<
       }
       return (
         (
-          await APIProvider.getAPI('model').search({
+          await APIProvider.getAPI('modelVersion').search({
             ids: [deleteIdRef.current],
             from: 0,
             size: 1,
@@ -54,7 +54,7 @@ export const ModelConfirmDeleteModal = React.forwardRef<
       }
       e.stopPropagation();
       setIsDeleting(true);
-      await APIProvider.getAPI('model').delete(deleteIdRef.current);
+      await APIProvider.getAPI('modelVersion').delete(deleteIdRef.current);
       startPolling();
     },
     [startPolling]
