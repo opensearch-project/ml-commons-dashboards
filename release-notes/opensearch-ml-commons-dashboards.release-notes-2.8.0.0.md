@@ -3,6 +3,10 @@
 Compatible with OpenSearch 2.8.0
 
 
+### Features
+
+* Remove experiment warning banner. ([#194](https://github.com/opensearch-project/ml-commons-dashboards/pull/194))
+
 ### Infrastructure
 
 * Update husky to 8.0.3 to remove execa as development dependency. ([#160](https://github.com/opensearch-project/ml-commons-dashboards/pull/160))
