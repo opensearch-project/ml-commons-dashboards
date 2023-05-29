@@ -16,7 +16,6 @@ import React, { useState, useRef, useCallback } from 'react';
 
 import { RefreshInterval } from '../common/refresh_interval';
 import { PreviewPanel } from '../preview_panel';
-import { ExperimentalWarning } from '../experiment_warning';
 import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
 import { ModelStatusFilter } from './model_status_filter';
@@ -69,7 +68,6 @@ export const Monitoring = () => {
 
   return (
     <div>
-      <ExperimentalWarning />
       <EuiSpacer size="s" />
       <EuiSpacer size="xs" />
       <EuiPageHeader
