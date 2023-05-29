@@ -122,36 +122,24 @@ export class ModelVersionService {
     };
   }
 
-  public static async getOne({
-    modelId,
-    client,
-  }: {
-    modelId: string;
-    client: IScopedClusterClient;
-  }) {
+  public static async getOne({ id, client }: { id: string; client: IScopedClusterClient }) {
     const modelSource = (
       await client.asCurrentUser.transport.request({
         method: 'GET',
-        path: `${MODEL_BASE_API}/${modelId}`,
+        path: `${MODEL_BASE_API}/${id}`,
       })
     ).body;
     return {
-      id: modelId,
+      id,
       ...modelSource,
     };
   }
 
-  public static async delete({
-    modelId,
-    client,
-  }: {
-    modelId: string;
-    client: IScopedClusterClient;
-  }) {
+  public static async delete({ id, client }: { id: string; client: IScopedClusterClient }) {
     const { result } = (
       await client.asCurrentUser.transport.request({
         method: 'DELETE',
-        path: `${MODEL_BASE_API}/${modelId}`,
+        path: `${MODEL_BASE_API}/${id}`,
       })
     ).body;
     if (result === 'not_found') {
@@ -160,41 +148,29 @@ export class ModelVersionService {
     return true;
   }
 
-  public static async load({ modelId, client }: { modelId: string; client: IScopedClusterClient }) {
+  public static async load({ id, client }: { id: string; client: IScopedClusterClient }) {
     return (
       await client.asCurrentUser.transport.request({
         method: 'POST',
-        path: `${MODEL_BASE_API}/${modelId}/_load`,
+        path: `${MODEL_BASE_API}/${id}/_load`,
       })
     ).body;
   }
 
-  public static async unload({
-    modelId,
-    client,
-  }: {
-    modelId: string;
-    client: IScopedClusterClient;
-  }) {
+  public static async unload({ id, client }: { id: string; client: IScopedClusterClient }) {
     return (
       await client.asCurrentUser.transport.request({
         method: 'POST',
-        path: `${MODEL_BASE_API}/${modelId}/_unload`,
+        path: `${MODEL_BASE_API}/${id}/_unload`,
       })
     ).body;
   }
 
-  public static async profile({
-    client,
-    modelId,
-  }: {
-    client: IScopedClusterClient;
-    modelId: string;
-  }) {
+  public static async profile({ client, id }: { client: IScopedClusterClient; id: string }) {
     return (
       await client.asCurrentUser.transport.request({
         method: 'GET',
-        path: `${MODEL_PROFILE_API}/${modelId}`,
+        path: `${MODEL_PROFILE_API}/${id}`,
       })
     ).body;
   }
@@ -245,18 +221,18 @@ export class ModelVersionService {
 
   public static async uploadModelChunk({
     client,
-    modelId,
+    id,
     chunkId,
     chunk,
   }: {
     client: IScopedClusterClient;
-    modelId: string;
+    id: string;
     chunkId: string;
     chunk: Buffer;
   }) {
     return client.asCurrentUser.transport.request({
       method: 'POST',
-      path: `${MODEL_BASE_API}/${modelId}/chunk/${chunkId}`,
+      path: `${MODEL_BASE_API}/${id}/chunk/${chunkId}`,
       body: chunk,
     });
   }

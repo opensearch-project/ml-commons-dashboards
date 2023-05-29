@@ -58,7 +58,7 @@ export interface ModelVersionLoadResponse {
 export interface ModelVersionUnloadResponse {
   [nodeId: string]: {
     stats: {
-      [modelId: string]: string;
+      [id: string]: string;
     };
   };
 }
@@ -67,7 +67,7 @@ export interface ModelVersionProfileResponse {
   nodes: {
     [nodeId: string]: {
       models: {
-        [modelId: string]: {
+        [id: string]: {
           model_state: string;
           predictor: string;
           worker_nodes: string[];
@@ -83,7 +83,7 @@ interface UploadModelBase {
   description?: string;
   modelFormat: string;
   modelConfig: Record<string, unknown>;
-  modelId: string;
+  id: string;
 }
 
 export interface UploadModelByURL extends UploadModelBase {
@@ -113,31 +113,31 @@ export class ModelVersion {
     });
   }
 
-  public delete(modelId: string) {
-    return InnerHttpProvider.getHttp().delete(`${MODEL_VERSION_API_ENDPOINT}/${modelId}`);
+  public delete(id: string) {
+    return InnerHttpProvider.getHttp().delete(`${MODEL_VERSION_API_ENDPOINT}/${id}`);
   }
 
-  public getOne(modelId: string) {
+  public getOne(id: string) {
     return InnerHttpProvider.getHttp().get<ModelVersionDetail>(
-      `${MODEL_VERSION_API_ENDPOINT}/${modelId}`
+      `${MODEL_VERSION_API_ENDPOINT}/${id}`
     );
   }
 
-  public load(modelId: string) {
+  public load(id: string) {
     return InnerHttpProvider.getHttp().post<ModelVersionLoadResponse>(
-      `${MODEL_VERSION_LOAD_API_ENDPOINT}/${modelId}`
+      `${MODEL_VERSION_LOAD_API_ENDPOINT}/${id}`
     );
   }
 
-  public unload(modelId: string) {
+  public unload(id: string) {
     return InnerHttpProvider.getHttp().post<ModelVersionUnloadResponse>(
-      `${MODEL_VERSION_UNLOAD_API_ENDPOINT}/${modelId}`
+      `${MODEL_VERSION_UNLOAD_API_ENDPOINT}/${id}`
     );
   }
 
-  public profile(modelId: string) {
+  public profile(id: string) {
     return InnerHttpProvider.getHttp().get<ModelVersionProfileResponse>(
-      `${MODEL_VERSION_PROFILE_API_ENDPOINT}/${modelId}`
+      `${MODEL_VERSION_PROFILE_API_ENDPOINT}/${id}`
     );
   }
 
@@ -155,9 +155,9 @@ export class ModelVersion {
     });
   }
 
-  public uploadChunk(modelId: string, chunkId: string, chunkContent: Blob) {
+  public uploadChunk(id: string, chunkId: string, chunkContent: Blob) {
     return InnerHttpProvider.getHttp().post(
-      `${MODEL_VERSION_API_ENDPOINT}/${modelId}/chunk/${chunkId}`,
+      `${MODEL_VERSION_API_ENDPOINT}/${id}/chunk/${chunkId}`,
       {
         body: chunkContent,
         headers: {
