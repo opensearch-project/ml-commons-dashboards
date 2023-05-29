@@ -27,12 +27,12 @@ export const modelGroupHandlers = [
   rest.get(MODEL_GROUP_API_ENDPOINT, (req, res, ctx) => {
     const { searchParams } = req.url;
     const name = searchParams.get('name');
-    const id = searchParams.get('id');
+    const ids = searchParams.getAll('ids');
     const from = parseInt(searchParams.get('from') || '0', 10);
     const size = parseInt(searchParams.get('size') || `${modelGroups.length}`, 10);
     const filteredData = modelGroups.filter((modelGroup) => {
-      if (id && id !== modelGroup.id) {
-        return false;
+      if (ids.length > 0) {
+        return ids.includes(modelGroup.id);
       }
       if (name && name !== modelGroup.name) {
         return false;

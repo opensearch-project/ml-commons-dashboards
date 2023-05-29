@@ -3,26 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { OpenSearchModelGroup } from '../../common';
 import { MODEL_GROUP_API_ENDPOINT } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
 
-interface ModelGroupSearchItem {
-  id: string;
-  owner: {
-    backend_roles: string[];
-    roles: string[];
-    name: string;
-  };
-  latest_version: number;
-  created_time: number;
-  last_updated_time: number;
-  name: string;
-  description?: string;
-  access: 'public' | 'restricted' | 'private';
-}
-
 export interface ModelGroupSearchResponse {
-  data: ModelGroupSearchItem[];
+  data: OpenSearchModelGroup[];
   total_model_groups: number;
 }
 
@@ -60,13 +46,25 @@ export class ModelGroup {
     );
   }
 
-  public search(query: { id?: string; name?: string; from: number; size: number }) {
+  public search(query: {
+    ids?: string[];
+    name?: string;
+    from: number;
+    size: number;
+    queryString?: string;
+  }) {
     return InnerHttpProvider.getHttp().get<ModelGroupSearchResponse>(MODEL_GROUP_API_ENDPOINT, {
       query,
     });
   }
 
   public getOne = async (id: string) => {
-    return (await this.search({ id, from: 0, size: 1 })).data[0];
+    return (
+      await this.search({
+        ids: [id],
+        from: 0,
+        size: 1,
+      })
+    ).data[0];
   };
 }

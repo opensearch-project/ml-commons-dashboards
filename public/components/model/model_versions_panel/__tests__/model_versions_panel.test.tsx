@@ -244,7 +244,7 @@ describe('<ModelVersionsPanel />', () => {
       expect(searchMock).toHaveBeenCalledWith({
         from: 0,
         size: 25,
-        modelGroupId: '1',
+        modelGroupIds: ['1'],
       });
 
       searchMock.mockRestore();

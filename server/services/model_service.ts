@@ -91,7 +91,7 @@ export class ModelService {
     states?: MODEL_STATE[];
     nameOrId?: string;
     versionOrKeyword?: string;
-    modelGroupId?: string;
+    modelGroupIds?: string[];
   }) {
     const {
       body: { hits },

@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 import { ModelAggregate } from '../../../apis/model_aggregate';
 import { render, screen, waitFor, within } from '../../../../test/test_utils';
@@ -11,23 +12,7 @@ import { render, screen, waitFor, within } from '../../../../test/test_utils';
 import { ModelList } from '../index';
 
 const setup = () => {
-  const notificationsMock = {
-    toasts: {
-      get$: jest.fn(),
-      add: jest.fn(),
-      remove: jest.fn(),
-      addSuccess: jest.fn(),
-      addWarning: jest.fn(),
-      addDanger: jest.fn(),
-      addError: jest.fn(),
-      addInfo: jest.fn(),
-    },
-  };
-  const renderResult = render(<ModelList notifications={notificationsMock} />);
-  return {
-    renderResult,
-    notificationsMock,
-  };
+  render(<ModelList />);
 };
 
 describe('<ModelList />', () => {
@@ -37,12 +22,7 @@ describe('<ModelList />', () => {
       .mockImplementation(() =>
         Promise.resolve({
           data: [],
-          pagination: {
-            currentPage: 1,
-            pageSize: 15,
-            totalPages: 0,
-            totalRecords: 0,
-          },
+          total_models: 0,
         })
       );
 
@@ -63,7 +43,7 @@ describe('<ModelList />', () => {
       expect(
         screen.getByText('traced_small_model').closest('.euiTableRowCell')
       ).toBeInTheDocument();
-      expect(screen.getByText('1.0.5').closest('.euiTableRowCell')).toBeInTheDocument();
+      expect(screen.getByText('5').closest('.euiTableRowCell')).toBeInTheDocument();
     });
   });
 
@@ -76,5 +56,20 @@ describe('<ModelList />', () => {
         (text, node) => text === 'Owner' && !!node?.className.includes('euiFilterButton__textShift')
       )
     ).toBeInTheDocument();
+  });
+
+  it('should call model aggregate with filter parameters after filter applied', async () => {
+    setup();
+    const modelAggregateSearchMock = jest.spyOn(ModelAggregate.prototype, 'search');
+
+    await userEvent.click(screen.getByText('Deployed'));
+
+    expect(modelAggregateSearchMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        states: ['DEPLOYED'],
+      })
+    );
+
+    modelAggregateSearchMock.mockRestore();
   });
 });

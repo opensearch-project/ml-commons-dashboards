@@ -39,7 +39,7 @@ const validateUniqueSort = (sort: string[]) => {
   return undefined;
 };
 
-const modelStateSchema = schema.oneOf([
+export const modelStateSchema = schema.oneOf([
   schema.literal(MODEL_STATE.loaded),
   schema.literal(MODEL_STATE.trained),
   schema.literal(MODEL_STATE.unloaded),
@@ -97,7 +97,9 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
           nameOrId: schema.maybe(schema.string()),
           versionOrKeyword: schema.maybe(schema.string()),
-          modelGroupId: schema.maybe(schema.string()),
+          modelGroupIds: schema.maybe(
+            schema.oneOf([schema.string(), schema.arrayOf(schema.string())])
+          ),
         }),
       },
     },
@@ -111,7 +113,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
         name,
         states,
         nameOrId,
-        modelGroupId,
+        modelGroupIds,
         versionOrKeyword,
       } = request.query;
       try {
@@ -125,7 +127,7 @@ export const modelRouter = (services: { modelService: ModelService }, router: IR
           name,
           states: typeof states === 'string' ? [states] : states,
           nameOrId,
-          modelGroupId,
+          modelGroupIds: typeof modelGroupIds === 'string' ? [modelGroupIds] : modelGroupIds,
           versionOrKeyword,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });

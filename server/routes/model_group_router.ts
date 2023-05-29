@@ -111,22 +111,24 @@ export const modelGroupRouter = (router: IRouter) => {
       path: MODEL_GROUP_API_ENDPOINT,
       validate: {
         query: schema.object({
-          id: schema.maybe(schema.string()),
+          ids: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
           name: schema.maybe(schema.string()),
           from: schema.number({ min: 0 }),
           size: schema.number({ max: 100 }),
+          queryString: schema.maybe(schema.string()),
         }),
       },
     },
     async (context, request) => {
-      const { id, name, from, size } = request.query;
+      const { ids, name, from, size, queryString } = request.query;
       try {
         const payload = await ModelGroupService.search({
           client: context.core.opensearch.client,
-          id,
+          ids: typeof ids === 'string' ? [ids] : ids,
           name,
           from,
           size,
+          queryString,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (error) {

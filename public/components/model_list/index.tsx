@@ -4,21 +4,35 @@
  */
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiSpacer, EuiPanel, EuiTextColor } from '@elastic/eui';
-import { CoreStart } from '../../../../../src/core/public';
+
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { ModelDrawer } from '../model_drawer';
+import { MODEL_STATE } from '../../../common';
+
 import { ModelTable, ModelTableCriteria, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
 import { RegisterNewModelButton } from './register_new_model_button';
-import {
-  ModelConfirmDeleteModal,
-  ModelConfirmDeleteModalInstance,
-} from './model_confirm_delete_modal';
 import { ModelListEmpty } from './model_list_empty';
 
-export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
-  const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
+const getStatesParam = (deployed?: boolean) => {
+  if (deployed) {
+    return [MODEL_STATE.loaded];
+  }
+  if (deployed === false) {
+    return [
+      MODEL_STATE.loadFailed,
+      MODEL_STATE.loading,
+      MODEL_STATE.partiallyLoaded,
+      MODEL_STATE.registerFailed,
+      MODEL_STATE.unloaded,
+      MODEL_STATE.uploaded,
+      MODEL_STATE.uploading,
+    ];
+  }
+  return undefined;
+};
+
+export const ModelList = () => {
   const [params, setParams] = useState<{
     sort: ModelTableSort;
     currentPage: number;
@@ -28,24 +42,25 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     currentPage: 1,
     pageSize: 15,
     filterValue: { tag: [], owner: [] },
-    sort: { field: 'created_time', direction: 'desc' },
+    sort: { field: 'last_updated_time', direction: 'desc' },
   });
-  const [drawerModelName, setDrawerModelName] = useState('');
   const searchInputRef = useRef<HTMLInputElement | null>();
 
   const setSearchInputRef = useCallback((node: HTMLInputElement | null) => {
     searchInputRef.current = node;
   }, []);
 
-  const { data, reload, loading, error } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
-    currentPage: params.currentPage,
-    pageSize: params.pageSize,
-    sort: params.sort?.field,
-    order: params.sort?.direction,
-    name: params.filterValue.search,
+  const { data, loading, error } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
+    from: (params.currentPage - 1) * params.pageSize,
+    size: params.pageSize,
+    sort: params.sort ? `${params.sort.field}-${params.sort.direction}` : undefined,
+    states: getStatesParam(params.filterValue.deployed),
+    queryString: params.filterValue.search
+      ? `name:*${params.filterValue.search}* OR *${params.filterValue.search}* OR owner.name.keyword:*${params.filterValue.search}*`
+      : undefined,
   });
   const models = useMemo(() => data?.data || [], [data]);
-  const totalModelCounts = data?.pagination.totalRecords;
+  const totalModelCounts = data?.total_models;
 
   const pagination = useMemo(
     () => ({
@@ -55,20 +70,13 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     }),
     [totalModelCounts, params.currentPage, params.pageSize]
   );
-  const showEmptyScreen = !loading && totalModelCounts === 0 && !params.filterValue.search;
-
-  const handleModelDeleted = useCallback(async () => {
-    reload();
-    notifications.toasts.addSuccess('Model has been deleted.');
-  }, [reload, notifications.toasts]);
-
-  const handleModelDelete = useCallback((modelId: string) => {
-    confirmModelDeleteRef.current?.show(modelId);
-  }, []);
-
-  const handleViewModelDrawer = useCallback((name: string) => {
-    setDrawerModelName(name);
-  }, []);
+  const showEmptyScreen =
+    !loading &&
+    totalModelCounts === 0 &&
+    !params.filterValue.search &&
+    params.filterValue.deployed === undefined &&
+    params.filterValue.tag.length === 0 &&
+    params.filterValue.owner.length === 0;
 
   const handleTableChange = useCallback((criteria: ModelTableCriteria) => {
     const { pagination: newPagination, sort } = criteria;
@@ -136,14 +144,9 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
             models={models}
             pagination={pagination}
             onChange={handleTableChange}
-            onModelNameClick={handleViewModelDrawer}
             onResetClick={handleReset}
             error={!!error}
           />
-          <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
-          {drawerModelName && (
-            <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
-          )}
         </>
       )}
       {showEmptyScreen && <ModelListEmpty />}

@@ -91,16 +91,16 @@ export const modelHandlers = [
     const { searchParams } = req.url;
     const name = searchParams.get('name');
     const ids = searchParams.getAll('ids');
-    const modelGroupId = searchParams.get('modelGroupId');
+    const modelGroupIds = searchParams.getAll('modelGroupIds');
     const data = models.filter((model) => {
       if (name) {
         return model.name === name;
       }
-      if (ids && ids.length > 0) {
+      if (ids.length > 0) {
         return ids.includes(model.id);
       }
-      if (modelGroupId) {
-        return model.model_group_id === modelGroupId;
+      if (modelGroupIds.length > 0) {
+        return modelGroupIds.includes(model.model_group_id);
       }
       return true;
     });

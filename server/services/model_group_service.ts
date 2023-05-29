@@ -18,6 +18,7 @@
  *   permissions and limitations under the License.
  */
 
+import { ModelGroupSort, OpenSearchModelGroup } from '../../common';
 import { IScopedClusterClient } from '../../../../src/core/server';
 
 import {
@@ -26,7 +27,17 @@ import {
   MODEL_GROUP_SEARCH_API,
   MODEL_GROUP_UPDATE_API,
 } from './utils/constants';
-import { generateMustQueries, generateTermQuery } from './utils/query';
+import { generateTermQuery } from './utils/query';
+
+const getSortItem = (sort: ModelGroupSort) => {
+  const [key, direction] = sort.split('-');
+  const keyMapping: { [key: string]: string } = {
+    'owner.name': 'owner.name.keyword',
+    name: 'name.keyword',
+  };
+
+  return { [keyMapping[key] || key]: direction };
+};
 
 export class ModelGroupService {
   public static async register(params: {
@@ -95,16 +106,20 @@ export class ModelGroupService {
 
   public static async search({
     client,
-    id,
+    ids,
     name,
     from,
     size,
+    sort,
+    queryString,
   }: {
     client: IScopedClusterClient;
-    id?: string;
+    ids?: string[];
     name?: string;
     from: number;
     size: number;
+    sort?: ModelGroupSort;
+    queryString?: string;
   }) {
     const {
       body: { hits },
@@ -112,12 +127,30 @@ export class ModelGroupService {
       method: 'GET',
       path: MODEL_GROUP_SEARCH_API,
       body: {
-        query: generateMustQueries([
-          ...(id ? [generateTermQuery('_id', id)] : []),
-          ...(name ? [generateTermQuery('name', name)] : []),
-        ]),
+        query: {
+          bool: {
+            must: [
+              ...(ids ? [generateTermQuery('_id', ids)] : []),
+              ...(name ? [generateTermQuery('name', name)] : []),
+              ...(queryString
+                ? [
+                    {
+                      query_string: {
+                        query: queryString,
+                      },
+                    },
+                  ]
+                : []),
+            ],
+          },
+        },
         from,
         size,
+        ...(sort
+          ? {
+              sort: [getSortItem(sort)],
+            }
+          : {}),
       },
     });
 
@@ -125,7 +158,7 @@ export class ModelGroupService {
       data: hits.hits.map(({ _id, _source }) => ({
         id: _id,
         ..._source,
-      })),
+      })) as OpenSearchModelGroup[],
       total_model_groups: hits.total.value,
     };
   }
