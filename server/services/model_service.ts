@@ -127,7 +127,7 @@ export class ModelService {
     const {
       body: { hits },
     } = await client.asCurrentUser.transport.request({
-      method: 'GET',
+      method: 'POST',
       path: MODEL_GROUP_SEARCH_API,
       body: {
         query: {
