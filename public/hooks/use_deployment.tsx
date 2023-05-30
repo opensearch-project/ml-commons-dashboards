@@ -40,6 +40,7 @@ export const useDeployment = (modelVersionId: string) => {
 
       // Poll task api every 2s for the deployment status
       timer(0, 2000)
+        // task may have state: CREATED, RUNNING, COMPLETED, FAILED, CANCELLED and COMPLETED_WITH_ERROR
         .pipe(switchMap((_) => APIProvider.getAPI('task').getOne(taskData.task_id)))
         // continue polling when task state is CREATED or RUNNING
         .pipe(takeWhile((res) => res.state === 'CREATED' || res.state === 'RUNNING', true))

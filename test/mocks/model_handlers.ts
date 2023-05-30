@@ -5,11 +5,7 @@
 
 import { rest } from 'msw';
 
-import {
-  MODEL_API_ENDPOINT,
-  MODEL_VERSION_LOAD_API_ENDPOINT,
-  MODEL_VERSION_UNLOAD_API_ENDPOINT,
-} from '../../server/routes/constants';
+import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
 
 const models = [
   {
@@ -61,14 +57,5 @@ export const modelHandlers = [
         model_id: '1',
       })
     );
-  }),
-
-  rest.post(`${MODEL_VERSION_LOAD_API_ENDPOINT}/:modelId`, (req, res, ctx) => {
-    return res(ctx.json({ task_id: 'task-id-1', status: 'CREATED' }));
-  }),
-
-  rest.post(`${MODEL_VERSION_UNLOAD_API_ENDPOINT}/:modelId`, (req, res, ctx) => {
-    const { modelId } = req.params;
-    return res(ctx.json({ node_1: { stats: { [modelId as string]: 'undeployed' } } }));
   }),
 ];

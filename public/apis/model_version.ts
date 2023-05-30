@@ -16,7 +16,7 @@ import { InnerHttpProvider } from './inner_http_provider';
 export interface ModelVersionSearchItem {
   id: string;
   name: string;
-  model_group_id: string;
+  model_id: string;
   algorithm: string;
   model_state: MODEL_VERSION_STATE;
   model_version: string;

@@ -56,14 +56,14 @@ export const ModelVersion = () => {
   );
 
   useEffect(() => {
-    if (modelVersionData?.model_group_id) {
+    if (modelVersionData?.model_id) {
       APIProvider.getAPI('model')
-        .getOne(modelVersionData?.model_group_id)
+        .getOne(modelVersionData?.model_id)
         .then((res) => {
           setModelData(res);
         });
     }
-  }, [modelVersionData?.model_group_id]);
+  }, [modelVersionData?.model_id]);
 
   useEffect(() => {
     if (!modelName || !modelVersion) {

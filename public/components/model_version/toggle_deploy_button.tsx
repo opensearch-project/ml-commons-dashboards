@@ -6,15 +6,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { EuiButton, EuiConfirmModal } from '@elastic/eui';
 
-import { MODEL_VERSION_STATE } from '../../../common';
+import { isModelDeployable, isModelUndeployable, MODEL_VERSION_STATE } from '../../../common';
 import { useDeployment } from '../../hooks/use_deployment';
-
-// CREATED,
-// RUNNING,
-// COMPLETED,
-// FAILED,
-// CANCELLED,
-// COMPLETED_WITH_ERROR
 
 export interface Props {
   modelState: MODEL_VERSION_STATE | undefined;
@@ -84,37 +77,35 @@ export const ToggleDeployButton = ({
   );
 
   const toggleButton = useMemo(() => {
-    switch (modelState) {
-      case MODEL_VERSION_STATE.registering:
-      case MODEL_VERSION_STATE.deploying:
-      case MODEL_VERSION_STATE.registerFailed:
-        return undefined;
-      case MODEL_VERSION_STATE.registered:
-      case MODEL_VERSION_STATE.deployFailed:
-      case MODEL_VERSION_STATE.undeployed:
-        return (
-          <EuiButton
-            aria-label="deploy model"
-            isLoading={loading}
-            onClick={() => setIsDeployModalVisible(true)}
-          >
-            Deploy
-          </EuiButton>
-        );
-      case MODEL_VERSION_STATE.deployed:
-      case MODEL_VERSION_STATE.partiallyDeployed:
-        return (
-          <EuiButton
-            aria-label="undeploy model"
-            isLoading={loading}
-            onClick={() => setIsUndeployModalVisible(true)}
-          >
-            Undeploy
-          </EuiButton>
-        );
-      default:
-        return undefined;
+    if (!modelState) {
+      return undefined;
     }
+
+    if (isModelDeployable(modelState)) {
+      return (
+        <EuiButton
+          aria-label="deploy model"
+          isLoading={loading}
+          onClick={() => setIsDeployModalVisible(true)}
+        >
+          Deploy
+        </EuiButton>
+      );
+    }
+
+    if (isModelUndeployable(modelState)) {
+      return (
+        <EuiButton
+          aria-label="undeploy model"
+          isLoading={loading}
+          onClick={() => setIsUndeployModalVisible(true)}
+        >
+          Undeploy
+        </EuiButton>
+      );
+    }
+
+    return undefined;
   }, [modelState, loading]);
 
   return (
