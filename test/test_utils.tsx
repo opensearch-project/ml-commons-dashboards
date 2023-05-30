@@ -6,6 +6,7 @@
 import React, { FC, ReactElement } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { render, RenderOptions } from '@testing-library/react';
+import { renderHook, RenderHookOptions } from '@testing-library/react-hooks';
 import { createBrowserHistory } from 'history';
 import { Router } from 'react-router-dom';
 
@@ -17,7 +18,7 @@ export const history = {
   current: createBrowserHistory(),
 };
 
-const AllTheProviders: FC<{ children: React.ReactNode }> = ({ children }) => {
+const AllTheProviders: FC = ({ children }) => {
   return (
     <Router history={history.current}>
       <I18nProvider>{children}</I18nProvider>
@@ -44,8 +45,16 @@ const customRender = (
   return render(ui, { wrapper: AllTheProviders, ...options });
 };
 
+const customRenderHook = <TProps, TResult>(
+  callback: (props: TProps) => TResult,
+  options?: RenderHookOptions<TProps>
+) => {
+  return renderHook(callback, { wrapper: AllTheProviders, ...options });
+};
+
 export * from '@testing-library/react';
 export { customRender as render };
+export { customRenderHook as renderHook };
 
 export const mockOffsetMethods = () => {
   const originalOffsetHeight = Object.getOwnPropertyDescriptor(

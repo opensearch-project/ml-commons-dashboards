@@ -3,32 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo, useState } from 'react';
-import { takeWhile, switchMap } from 'rxjs/operators';
-import { timer } from 'rxjs';
-import {
-  EuiButton,
-  EuiConfirmModal,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiText,
-  EuiSpacer,
-  EuiModal,
-  EuiModalHeader,
-  EuiModalHeaderTitle,
-  EuiModalBody,
-  EuiCodeBlock,
-  EuiModalFooter,
-  EuiButtonEmpty,
-  EuiLink,
-} from '@elastic/eui';
+import React, { useMemo, useState, useCallback } from 'react';
+import { EuiButton, EuiConfirmModal } from '@elastic/eui';
 
-import { generatePath, useHistory } from 'react-router-dom';
 import { MODEL_VERSION_STATE } from '../../../common';
-import { routerPaths } from '../../../common';
-import { APIProvider } from '../../apis/api_provider';
-import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
-import { mountReactNode } from '../../../../../src/core/public/utils';
+import { useDeployment } from '../../hooks/use_deployment';
 
 // CREATED,
 // RUNNING,
@@ -43,9 +22,7 @@ export interface Props {
   modelName: string;
   modelVersion: string;
   // called when deploy or undeploy completed
-  onComplete: (id: string) => void;
-  // called when deploy or undeploy encountered error
-  onError: (id: string) => void;
+  onComplete: () => void;
 }
 
 export const ToggleDeployButton = ({
@@ -54,164 +31,25 @@ export const ToggleDeployButton = ({
   modelVersion,
   modelVersionId,
   onComplete,
-  onError,
 }: Props) => {
-  const {
-    services: { notifications },
-    overlays,
-  } = useOpenSearchDashboards();
   const [loading, setLoading] = useState(false);
   const [isDeployModalVisible, setIsDeployModalVisible] = useState(false);
   const [isUndeployModalVisible, setIsUndeployModalVisible] = useState(false);
-  const history = useHistory();
-  const modelVersionUrl = history.createHref({
-    pathname: generatePath(routerPaths.modelVersion, { id: modelVersionId }),
-  });
+  const { deploy, undeploy } = useDeployment(modelVersionId);
 
-  const onDeploy = async (id: string) => {
+  const onConfirmDeploy = useCallback(async () => {
+    setIsDeployModalVisible(false);
     setLoading(true);
-    const { task_id: taskId } = await APIProvider.getAPI('modelVersion').load(id);
-
-    // Poll task api every 2s for the deployment status
-    timer(0, 2000)
-      .pipe(switchMap((_) => APIProvider.getAPI('task').getOne(taskId)))
-      // continue polling when task state is CREATED or RUNNING
-      .pipe(takeWhile((res) => res.state === 'CREATED' || res.state === 'RUNNING', true))
-      .subscribe({
-        error: () => {
-          onError(modelVersionId);
-          setLoading(false);
-          notifications?.toasts.addDanger(
-            {
-              title: mountReactNode(
-                <EuiText>
-                  <EuiLink href={modelVersionUrl}>
-                    {modelName} version {modelVersion}
-                  </EuiLink>{' '}
-                  deployment failed.
-                </EuiText>
-              ),
-              text: 'Network error',
-            },
-            { toastLifeTimeMs: 60000 }
-          );
-        },
-        next: (res) => {
-          onComplete(modelVersionId);
-          setLoading(false);
-          if (res.state === 'COMPLETED') {
-            notifications?.toasts.addSuccess({
-              title: mountReactNode(
-                <EuiText>
-                  <EuiLink href={modelVersionUrl}>
-                    {modelName} version {modelVersion}
-                  </EuiLink>{' '}
-                  has been deployed.
-                </EuiText>
-              ),
-            });
-          } else if (res.state === 'FAILED') {
-            notifications?.toasts.addDanger(
-              {
-                title: mountReactNode(
-                  <>
-                    <EuiText>
-                      <EuiLink href={modelVersionUrl}>
-                        {modelName} version {modelVersion}
-                      </EuiLink>{' '}
-                      deployment failed.
-                    </EuiText>
-                    <EuiSpacer />
-                    <EuiFlexGroup justifyContent="flexEnd">
-                      <EuiFlexItem grow={false}>
-                        <EuiButton
-                          color="danger"
-                          onClick={() => {
-                            const overlayRef = overlays?.openModal(
-                              <EuiModal onClose={() => overlayRef.close()}>
-                                <EuiModalHeader>
-                                  <EuiModalHeaderTitle>
-                                    <h2>
-                                      <EuiLink href={modelVersionUrl}>
-                                        {modelName} version {modelVersion}
-                                      </EuiLink>{' '}
-                                      deployment failed
-                                    </h2>
-                                  </EuiModalHeaderTitle>
-                                </EuiModalHeader>
-                                <EuiModalBody>
-                                  <EuiText size="s">Error message:</EuiText>
-                                  <EuiSpacer size="m" />
-                                  <EuiCodeBlock isCopyable={true}>
-                                    {res.error ?? 'Unknown error'}
-                                  </EuiCodeBlock>
-                                </EuiModalBody>
-                                <EuiModalFooter>
-                                  <EuiButtonEmpty onClick={() => overlayRef.close()}>
-                                    Close
-                                  </EuiButtonEmpty>
-                                </EuiModalFooter>
-                              </EuiModal>
-                            );
-                          }}
-                        >
-                          See full error
-                        </EuiButton>
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </>
-                ),
-              },
-              { toastLifeTimeMs: 60000 }
-            );
-          }
-        },
-      });
-  };
-
-  const onUndeploy = async (id: string) => {
-    try {
-      setLoading(true);
-      await APIProvider.getAPI('modelVersion').unload(id);
-      notifications?.toasts.addSuccess({
-        title: mountReactNode(
-          <EuiText>
-            <EuiLink href={modelVersionUrl}>
-              {modelName} version {modelVersion}
-            </EuiLink>{' '}
-            has been undeployed
-          </EuiText>
-        ),
-      });
-      onComplete(modelVersionId);
-    } catch (e) {
-      onError(modelVersionId);
-      notifications?.toasts.addDanger(
-        {
-          title: mountReactNode(
-            <EuiText>
-              <EuiLink href={modelVersionUrl}>
-                {modelName} version {modelVersion}
-              </EuiLink>{' '}
-              undeployment failed
-            </EuiText>
-          ),
-        },
-        { toastLifeTimeMs: 60000 }
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    await deploy();
+    setLoading(false);
+    onComplete();
+  }, [deploy, onComplete]);
 
   const deployModal = isDeployModalVisible && (
     <EuiConfirmModal
       title={`Deploy ${modelName} version ${modelVersion}?`}
       onCancel={() => setIsDeployModalVisible(false)}
-      onConfirm={() => {
-        onDeploy(modelVersionId);
-        setIsDeployModalVisible(false);
-      }}
+      onConfirm={onConfirmDeploy}
       confirmButtonText="Deploy"
       cancelButtonText="Cancel"
     >
@@ -219,14 +57,19 @@ export const ToggleDeployButton = ({
     </EuiConfirmModal>
   );
 
+  const onConfirmUndeploy = useCallback(async () => {
+    setIsUndeployModalVisible(false);
+    setLoading(true);
+    await undeploy();
+    setLoading(false);
+    onComplete();
+  }, [undeploy, onComplete]);
+
   const undeployModal = isUndeployModalVisible && (
     <EuiConfirmModal
       title={`Undeploy ${modelName} version ${modelVersion}?`}
       onCancel={() => setIsUndeployModalVisible(false)}
-      onConfirm={() => {
-        onUndeploy(modelVersionId);
-        setIsUndeployModalVisible(false);
-      }}
+      onConfirm={onConfirmUndeploy}
       confirmButtonText="Undeploy"
       cancelButtonText="Cancel"
     >

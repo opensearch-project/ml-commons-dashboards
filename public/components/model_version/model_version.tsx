@@ -169,7 +169,6 @@ export const ModelVersion = () => {
             modelVersionData && (
               <ToggleDeployButton
                 onComplete={reload}
-                onError={reload}
                 modelName={modelVersionData.name}
                 modelVersion={modelVersionData.model_version}
                 modelState={modelVersionData.model_state}
