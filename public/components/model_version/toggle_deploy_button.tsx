@@ -40,9 +40,15 @@ export const ToggleDeployButton = ({
   const onConfirmDeploy = useCallback(async () => {
     setIsDeployModalVisible(false);
     setLoading(true);
-    await deploy();
-    setLoading(false);
-    onComplete();
+    await deploy({
+      onComplete: () => {
+        onComplete();
+        setLoading(false);
+      },
+      onError: () => {
+        setLoading(false);
+      },
+    });
   }, [deploy, onComplete]);
 
   const deployModal = isDeployModalVisible && (

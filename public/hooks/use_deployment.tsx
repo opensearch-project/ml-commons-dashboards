@@ -8,25 +8,12 @@ import { takeWhile, switchMap } from 'rxjs/operators';
 import { timer } from 'rxjs';
 import { generatePath, useHistory } from 'react-router-dom';
 
-import {
-  EuiButton,
-  EuiButtonEmpty,
-  EuiCodeBlock,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiModal,
-  EuiModalBody,
-  EuiModalFooter,
-  EuiModalHeader,
-  EuiModalHeaderTitle,
-  EuiSpacer,
-  EuiText,
-} from '@elastic/eui';
+import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiLink, EuiText } from '@elastic/eui';
 import { isModelDeployable, isModelUndeployable, routerPaths } from '../../common';
 import { APIProvider } from '../apis/api_provider';
 import { useOpenSearchDashboards } from '../../../../src/plugins/opensearch_dashboards_react/public';
 import { mountReactNode } from '../../../../src/core/public/utils';
+import { ModelVersionErrorDetailsModal } from '../components/common/modals';
 
 export const useDeployment = (modelVersionId: string) => {
   const {
@@ -34,67 +21,72 @@ export const useDeployment = (modelVersionId: string) => {
   } = useOpenSearchDashboards();
   const history = useHistory();
 
-  const deploy = useCallback(async () => {
-    const modelVersionData = await APIProvider.getAPI('modelVersion').getOne(modelVersionId);
-    const modelVersionUrl = history.createHref({
-      pathname: generatePath(routerPaths.modelVersion, { id: modelVersionId }),
-    });
+  const deploy = useCallback(
+    // model deploy is async, so we pass onComplete and onError callback to handle the deployment status
+    async (options?: { onComplete?: () => void; onError?: () => void }) => {
+      const modelVersionData = await APIProvider.getAPI('modelVersion').getOne(modelVersionId);
+      const modelVersionUrl = history.createHref({
+        pathname: generatePath(routerPaths.modelVersion, { id: modelVersionId }),
+      });
 
-    if (!isModelDeployable(modelVersionData.model_state)) {
-      notifications?.toasts.addDanger(
-        `Cannot deploy a model which is ${modelVersionData.model_state}`
-      );
-      return;
-    }
+      if (!isModelDeployable(modelVersionData.model_state)) {
+        notifications?.toasts.addDanger(
+          `Cannot deploy a model which is ${modelVersionData.model_state}`
+        );
+        return;
+      }
 
-    const taskData = await APIProvider.getAPI('modelVersion').load(modelVersionId);
+      const taskData = await APIProvider.getAPI('modelVersion').load(modelVersionId);
 
-    // Poll task api every 2s for the deployment status
-    timer(0, 2000)
-      .pipe(switchMap((_) => APIProvider.getAPI('task').getOne(taskData.task_id)))
-      // continue polling when task state is CREATED or RUNNING
-      .pipe(takeWhile((res) => res.state === 'CREATED' || res.state === 'RUNNING', true))
-      .subscribe({
-        error: () => {
-          notifications?.toasts.addDanger(
-            {
-              title: mountReactNode(
-                <EuiText>
-                  <EuiLink href={modelVersionUrl}>
-                    {modelVersionData.name} version {modelVersionData.model_version}
-                  </EuiLink>{' '}
-                  deployment failed.
-                </EuiText>
-              ),
-              text: 'Network error',
-            },
-            { toastLifeTimeMs: 60000 }
-          );
-        },
-        next: (res) => {
-          if (res.state === 'COMPLETED') {
-            notifications?.toasts.addSuccess({
-              title: mountReactNode(
-                <EuiText>
-                  <EuiLink href={modelVersionUrl}>
-                    {modelVersionData.name} version {modelVersionData.model_version}
-                  </EuiLink>{' '}
-                  has been deployed.
-                </EuiText>
-              ),
-            });
-          } else if (res.state === 'FAILED') {
+      // Poll task api every 2s for the deployment status
+      timer(0, 2000)
+        .pipe(switchMap((_) => APIProvider.getAPI('task').getOne(taskData.task_id)))
+        // continue polling when task state is CREATED or RUNNING
+        .pipe(takeWhile((res) => res.state === 'CREATED' || res.state === 'RUNNING', true))
+        .subscribe({
+          error: () => {
+            options?.onError?.();
             notifications?.toasts.addDanger(
               {
                 title: mountReactNode(
-                  <>
+                  <EuiText>
+                    <EuiLink href={modelVersionUrl}>
+                      {modelVersionData.name} version {modelVersionData.model_version}
+                    </EuiLink>{' '}
+                    deployment failed.
+                  </EuiText>
+                ),
+                text: 'Network error',
+              },
+              { toastLifeTimeMs: 60000 }
+            );
+          },
+          next: (res) => {
+            if (res.state === 'COMPLETED') {
+              options?.onComplete?.();
+              notifications?.toasts.addSuccess({
+                title: mountReactNode(
+                  <EuiText>
+                    <EuiLink href={modelVersionUrl}>
+                      {modelVersionData.name} version {modelVersionData.model_version}
+                    </EuiLink>{' '}
+                    has been deployed.
+                  </EuiText>
+                ),
+              });
+            } else if (res.state === 'FAILED') {
+              options?.onError?.();
+              notifications?.toasts.addDanger(
+                {
+                  title: mountReactNode(
                     <EuiText>
                       <EuiLink href={modelVersionUrl}>
                         {modelVersionData.name} version {modelVersionData.model_version}
                       </EuiLink>{' '}
                       deployment failed.
                     </EuiText>
-                    <EuiSpacer />
+                  ),
+                  text: mountReactNode(
                     <EuiFlexGroup justifyContent="flexEnd">
                       <EuiFlexItem grow={false}>
                         <EuiButton
@@ -102,31 +94,17 @@ export const useDeployment = (modelVersionId: string) => {
                           onClick={() => {
                             const overlayRef = overlays?.openModal(
                               mountReactNode(
-                                <EuiModal onClose={() => overlayRef?.close()}>
-                                  <EuiModalHeader>
-                                    <EuiModalHeaderTitle>
-                                      <h2>
-                                        <EuiLink href={modelVersionUrl}>
-                                          {modelVersionData.name} version{' '}
-                                          {modelVersionData.model_version}
-                                        </EuiLink>{' '}
-                                        deployment failed
-                                      </h2>
-                                    </EuiModalHeaderTitle>
-                                  </EuiModalHeader>
-                                  <EuiModalBody>
-                                    <EuiText size="s">Error message:</EuiText>
-                                    <EuiSpacer size="m" />
-                                    <EuiCodeBlock isCopyable={true}>
-                                      {res.error ?? 'Unknown error'}
-                                    </EuiCodeBlock>
-                                  </EuiModalBody>
-                                  <EuiModalFooter>
-                                    <EuiButtonEmpty onClick={() => overlayRef?.close()}>
-                                      Close
-                                    </EuiButtonEmpty>
-                                  </EuiModalFooter>
-                                </EuiModal>
+                                <ModelVersionErrorDetailsModal
+                                  id={modelVersionId}
+                                  name={modelVersionData.name}
+                                  version={modelVersionData.model_version}
+                                  plainVersionLink={modelVersionUrl}
+                                  errorType="deployment-failed"
+                                  closeModal={() => {
+                                    overlayRef?.close();
+                                  }}
+                                  errorDetails={res.error ? res.error : 'Unknown error'}
+                                />
                               )
                             );
                           }}
@@ -135,15 +113,16 @@ export const useDeployment = (modelVersionId: string) => {
                         </EuiButton>
                       </EuiFlexItem>
                     </EuiFlexGroup>
-                  </>
-                ),
-              },
-              { toastLifeTimeMs: 60000 }
-            );
-          }
-        },
-      });
-  }, [modelVersionId, history, notifications?.toasts, overlays]);
+                  ),
+                },
+                { toastLifeTimeMs: 60000 }
+              );
+            }
+          },
+        });
+    },
+    [modelVersionId, history, notifications?.toasts, overlays]
+  );
 
   const undeploy = useCallback(async () => {
     const modelVersionData = await APIProvider.getAPI('modelVersion').getOne(modelVersionId);
@@ -181,11 +160,39 @@ export const useDeployment = (modelVersionId: string) => {
               undeployment failed
             </EuiText>
           ),
+          text: mountReactNode(
+            <EuiFlexGroup justifyContent="flexEnd">
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  color="danger"
+                  onClick={() => {
+                    const overlayRef = overlays?.openModal(
+                      mountReactNode(
+                        <ModelVersionErrorDetailsModal
+                          id={modelVersionId}
+                          name={modelVersionData.name}
+                          version={modelVersionData.model_version}
+                          plainVersionLink={modelVersionUrl}
+                          errorType="undeployment-failed"
+                          closeModal={() => {
+                            overlayRef?.close();
+                          }}
+                          errorDetails={e instanceof Error ? e.message : JSON.stringify(e)}
+                        />
+                      )
+                    );
+                  }}
+                >
+                  See full error
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          ),
         },
         { toastLifeTimeMs: 60000 }
       );
     }
-  }, [modelVersionId, notifications?.toasts, history]);
+  }, [modelVersionId, notifications?.toasts, history, overlays]);
 
   return { deploy, undeploy };
 };
