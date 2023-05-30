@@ -18,98 +18,132 @@
  *   permissions and limitations under the License.
  */
 
+import { ModelSort, OpenSearchModel } from '../../common';
+import { IScopedClusterClient } from '../../../../src/core/server';
+
 import {
-  IScopedClusterClient,
-  OpenSearchClient,
-  ScopeableRequest,
-  ILegacyClusterClient,
-} from '../../../../src/core/server';
-import { MODEL_STATE } from '../../common';
+  MODEL_GROUP_BASE_API,
+  MODEL_GROUP_REGISTER_API,
+  MODEL_GROUP_SEARCH_API,
+  MODEL_GROUP_UPDATE_API,
+} from './utils/constants';
+import { generateTermQuery } from './utils/query';
 
-import { generateModelSearchQuery } from './utils/model';
-import { RecordNotFoundError } from './errors';
-import { MODEL_BASE_API, MODEL_META_API, MODEL_UPLOAD_API } from './utils/constants';
+const getSortItem = (sort: ModelSort) => {
+  const [key, direction] = sort.split('-');
+  const keyMapping: { [key: string]: string } = {
+    'owner.name': 'owner.name.keyword',
+    name: 'name.keyword',
+  };
 
-const modelSortFieldMapping: { [key: string]: string } = {
-  version: 'model_version',
-  name: 'name.keyword',
-  id: '_id',
+  return { [keyMapping[key] || key]: direction };
 };
 
-interface UploadModelBase {
-  name: string;
-  version?: string;
-  description?: string;
-  modelFormat: string;
-  modelConfig: Record<string, unknown>;
-  modelGroupId: string;
-}
-
-interface UploadModelByURL extends UploadModelBase {
-  url: string;
-}
-
-interface UploadModelByChunk extends UploadModelBase {
-  modelContentHashValue: string;
-  totalChunks: number;
-}
-
-type UploadResultInner<
-  T extends UploadModelByURL | UploadModelByChunk
-> = T extends UploadModelByChunk
-  ? { model_id: string; status: string }
-  : T extends UploadModelByURL
-  ? { task_id: string; status: string }
-  : never;
-
-type UploadResult<T extends UploadModelByURL | UploadModelByChunk> = Promise<UploadResultInner<T>>;
-
-const isUploadModelByURL = (
-  test: UploadModelByURL | UploadModelByChunk
-): test is UploadModelByURL => (test as UploadModelByURL).url !== undefined;
-
 export class ModelService {
-  private osClient: ILegacyClusterClient;
+  public static async register(params: {
+    client: IScopedClusterClient;
+    name: string;
+    description?: string;
+    modelAccessMode: 'public' | 'restricted' | 'private';
+    backendRoles?: string[];
+    addAllBackendRoles?: boolean;
+  }) {
+    const { client, name, description, modelAccessMode, backendRoles, addAllBackendRoles } = params;
+    const result = (
+      await client.asCurrentUser.transport.request({
+        method: 'POST',
+        path: MODEL_GROUP_REGISTER_API,
+        body: {
+          name,
+          description,
+          model_access_mode: modelAccessMode,
+          backend_roles: backendRoles,
+          add_all_backend_roles: addAllBackendRoles,
+        },
+      })
+    ).body as {
+      model_group_id: string;
+      status: 'CREATED';
+    };
+    return {
+      model_id: result.model_group_id,
+      status: result.status,
+    };
+  }
 
-  constructor(osClient: ILegacyClusterClient) {
-    this.osClient = osClient;
+  public static async update({
+    client,
+    id,
+    name,
+    description,
+  }: {
+    client: IScopedClusterClient;
+    id: string;
+    name?: string;
+    description?: string;
+  }) {
+    const result = (
+      await client.asCurrentUser.transport.request({
+        method: 'PUT',
+        path: MODEL_GROUP_UPDATE_API.replace('<model_group_id>', id),
+        body: {
+          name,
+          description,
+        },
+      })
+    ).body as {
+      status: 'UPDATED';
+    };
+    return result;
+  }
+
+  public static async delete({ client, id }: { client: IScopedClusterClient; id: string }) {
+    const result = (
+      await client.asCurrentUser.transport.request({
+        method: 'DELETE',
+        path: `${MODEL_GROUP_BASE_API}/${id}`,
+      })
+    ).body;
+    return result;
   }
 
   public static async search({
+    client,
+    ids,
+    name,
     from,
     size,
     sort,
-    transport,
-    ...restParams
+    extraQuery,
   }: {
-    transport: OpenSearchClient['transport'];
+    client: IScopedClusterClient;
+    ids?: string[];
+    name?: string;
     from: number;
     size: number;
-    sort?: string[];
-    name?: string;
-    states?: MODEL_STATE[];
+    sort?: ModelSort;
     extraQuery?: Record<string, any>;
-    nameOrId?: string;
-    versionOrKeyword?: string;
-    modelGroupId?: string;
   }) {
     const {
       body: { hits },
-    } = await transport.request({
+    } = await client.asCurrentUser.transport.request({
       method: 'POST',
-      path: `${MODEL_BASE_API}/_search`,
+      path: MODEL_GROUP_SEARCH_API,
       body: {
-        query: generateModelSearchQuery(restParams),
+        query: {
+          bool: {
+            must: [
+              ...(ids ? [generateTermQuery('_id', ids)] : []),
+              ...(name ? [generateTermQuery('name', name)] : []),
+              ...(extraQuery ? [extraQuery] : []),
+            ],
+          },
+        },
         from,
         size,
         ...(sort
           ? {
-              sort: sort.map((sorting) => {
-                const [field, direction] = sorting.split('-');
-                return {
-                  [modelSortFieldMapping[field] || field]: direction,
-                };
-              }),
+              sort: [getSortItem(sort)],
             }
           : {}),
       },
@@ -119,119 +153,8 @@ export class ModelService {
       data: hits.hits.map(({ _id, _source }) => ({
         id: _id,
         ..._source,
-      })),
+      })) as OpenSearchModel[],
       total_models: hits.total.value,
     };
-  }
-
-  public async getOne({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const modelSource = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.getOne', {
-        modelId,
-      });
-    return {
-      id: modelId,
-      ...modelSource,
-    };
-  }
-
-  public async delete({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const { result } = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.delete', {
-        modelId,
-      });
-    if (result === 'not_found') {
-      throw new RecordNotFoundError();
-    }
-    return true;
-  }
-
-  public async load({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const result = await this.osClient.asScoped(request).callAsCurrentUser('mlCommonsModel.load', {
-      modelId,
-    });
-    return result;
-  }
-
-  public async unload({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const result = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.unload', {
-        modelId,
-      });
-    return result;
-  }
-
-  public async profile({ request, modelId }: { request: ScopeableRequest; modelId: string }) {
-    const result = await this.osClient
-      .asScoped(request)
-      .callAsCurrentUser('mlCommonsModel.profile', {
-        modelId,
-      });
-    return result;
-  }
-
-  public static async upload<T extends UploadModelByChunk | UploadModelByURL>({
-    client,
-    model,
-  }: {
-    client: IScopedClusterClient;
-    model: T;
-  }): UploadResult<T> {
-    const { name, version, description, modelFormat, modelConfig, modelGroupId } = model;
-    const uploadModelBase = {
-      name,
-      version,
-      description,
-      model_format: modelFormat,
-      model_config: modelConfig,
-      model_group_id: modelGroupId,
-    };
-    if (isUploadModelByURL(model)) {
-      const { task_id: taskId, status } = (
-        await client.asCurrentUser.transport.request({
-          method: 'POST',
-          path: MODEL_UPLOAD_API,
-          body: {
-            ...uploadModelBase,
-            url: model.url,
-          },
-        })
-      ).body;
-      return { task_id: taskId, status } as UploadResultInner<T>;
-    }
-
-    const { model_id: modelId, status } = (
-      await client.asCurrentUser.transport.request({
-        method: 'POST',
-        path: MODEL_META_API,
-        body: {
-          ...uploadModelBase,
-          model_content_hash_value: model.modelContentHashValue,
-          total_chunks: model.totalChunks,
-        },
-      })
-    ).body;
-    return { model_id: modelId, status } as UploadResultInner<T>;
-  }
-
-  public static async uploadModelChunk({
-    client,
-    modelId,
-    chunkId,
-    chunk,
-  }: {
-    client: IScopedClusterClient;
-    modelId: string;
-    chunkId: string;
-    chunk: Buffer;
-  }) {
-    return client.asCurrentUser.transport.request({
-      method: 'POST',
-      path: `${MODEL_BASE_API}/${modelId}/chunk/${chunkId}`,
-      body: chunk,
-    });
   }
 }

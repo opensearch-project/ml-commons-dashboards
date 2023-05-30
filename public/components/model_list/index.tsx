@@ -4,48 +4,102 @@
  */
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { EuiPageHeader, EuiSpacer, EuiPanel, EuiTextColor } from '@elastic/eui';
-import { CoreStart } from '../../../../../src/core/public';
+
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { ModelDrawer } from '../model_drawer';
+import { MODEL_VERSION_STATE, ModelAggregateSort } from '../../../common';
+
 import { ModelTable, ModelTableCriteria, ModelTableSort } from './model_table';
 import { ModelListFilter, ModelListFilterFilterValue } from './model_list_filter';
 import { RegisterNewModelButton } from './register_new_model_button';
-import {
-  ModelConfirmDeleteModal,
-  ModelConfirmDeleteModalInstance,
-} from './model_confirm_delete_modal';
 import { ModelListEmpty } from './model_list_empty';
 
-export const ModelList = ({ notifications }: { notifications: CoreStart['notifications'] }) => {
-  const confirmModelDeleteRef = useRef<ModelConfirmDeleteModalInstance>(null);
-  const [params, setParams] = useState<{
-    sort: ModelTableSort;
-    currentPage: number;
-    pageSize: number;
-    filterValue: ModelListFilterFilterValue;
-  }>({
+const getStatesParam = (deployed?: boolean) => {
+  if (deployed) {
+    return [MODEL_VERSION_STATE.deployed];
+  }
+  if (deployed === false) {
+    return [
+      MODEL_VERSION_STATE.deployFailed,
+      MODEL_VERSION_STATE.deploying,
+      MODEL_VERSION_STATE.partiallyDeployed,
+      MODEL_VERSION_STATE.registerFailed,
+      MODEL_VERSION_STATE.undeployed,
+      MODEL_VERSION_STATE.registered,
+      MODEL_VERSION_STATE.registering,
+    ];
+  }
+  return undefined;
+};
+
+interface Params {
+  sort: ModelTableSort;
+  currentPage: number;
+  pageSize: number;
+  filterValue: ModelListFilterFilterValue;
+}
+
+const getModelAggregateSearchParams = (params: Params) => {
+  return {
+    from: (params.currentPage - 1) * params.pageSize,
+    size: params.pageSize,
+    sort: params.sort
+      ? (`${params.sort.field}-${params.sort.direction}` as ModelAggregateSort)
+      : undefined,
+    states: getStatesParam(params.filterValue.deployed),
+    extraQuery: params.filterValue.search
+      ? JSON.stringify({
+          bool: {
+            should: [
+              {
+                match_phrase: {
+                  name: params.filterValue.search,
+                },
+              },
+              {
+                match_phrase: {
+                  description: params.filterValue.search,
+                },
+              },
+              {
+                nested: {
+                  path: 'owner',
+                  query: {
+                    term: {
+                      'owner.name.keyword': {
+                        value: params.filterValue.search,
+                        boost: 1,
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        })
+      : undefined,
+  };
+};
+
+export const ModelList = () => {
+  const [params, setParams] = useState<Params>({
     currentPage: 1,
     pageSize: 15,
     filterValue: { tag: [], owner: [] },
-    sort: { field: 'created_time', direction: 'desc' },
+    sort: { field: 'last_updated_time', direction: 'desc' },
   });
-  const [drawerModelName, setDrawerModelName] = useState('');
   const searchInputRef = useRef<HTMLInputElement | null>();
 
   const setSearchInputRef = useCallback((node: HTMLInputElement | null) => {
     searchInputRef.current = node;
   }, []);
 
-  const { data, reload, loading, error } = useFetcher(APIProvider.getAPI('modelAggregate').search, {
-    from: Math.max(0, (params.currentPage - 1) * params.pageSize),
-    size: params.pageSize,
-    sort: params.sort?.field,
-    order: params.sort?.direction,
-    name: params.filterValue.search,
-  });
+  const { data, loading, error } = useFetcher(
+    APIProvider.getAPI('modelAggregate').search,
+    getModelAggregateSearchParams(params)
+  );
   const models = useMemo(() => data?.data || [], [data]);
-  const totalModelCounts = data?.total_models || 0;
+  const totalModelCounts = data?.total_models;
 
   const pagination = useMemo(
     () => ({
@@ -55,20 +109,13 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
     }),
     [totalModelCounts, params.currentPage, params.pageSize]
   );
-  const showEmptyScreen = !loading && totalModelCounts === 0 && !params.filterValue.search;
-
-  const handleModelDeleted = useCallback(async () => {
-    reload();
-    notifications.toasts.addSuccess('Model has been deleted.');
-  }, [reload, notifications.toasts]);
-
-  const handleModelDelete = useCallback((modelId: string) => {
-    confirmModelDeleteRef.current?.show(modelId);
-  }, []);
-
-  const handleViewModelDrawer = useCallback((name: string) => {
-    setDrawerModelName(name);
-  }, []);
+  const showEmptyScreen =
+    !loading &&
+    totalModelCounts === 0 &&
+    !params.filterValue.search &&
+    params.filterValue.deployed === undefined &&
+    params.filterValue.tag.length === 0 &&
+    params.filterValue.owner.length === 0;
 
   const handleTableChange = useCallback((criteria: ModelTableCriteria) => {
     const { pagination: newPagination, sort } = criteria;
@@ -136,14 +183,9 @@ export const ModelList = ({ notifications }: { notifications: CoreStart['notific
             models={models}
             pagination={pagination}
             onChange={handleTableChange}
-            onModelNameClick={handleViewModelDrawer}
             onResetClick={handleReset}
             error={!!error}
           />
-          <ModelConfirmDeleteModal ref={confirmModelDeleteRef} onDeleted={handleModelDeleted} />
-          {drawerModelName && (
-            <ModelDrawer onClose={() => setDrawerModelName('')} name={drawerModelName} />
-          )}
         </>
       )}
       {showEmptyScreen && <ModelListEmpty />}

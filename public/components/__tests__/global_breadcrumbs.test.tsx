@@ -6,7 +6,7 @@
 import React from 'react';
 import { GlobalBreadcrumbs } from '../global_breadcrumbs';
 import { history, render, waitFor, act } from '../../../test/test_utils';
-import { Model, ModelDetail } from '../../apis/model';
+import { ModelVersion, ModelVersionDetail } from '../../apis/model_version';
 
 describe('<GlobalBreadcrumbs />', () => {
   it('should call onBreadcrumbsChange with overview title', () => {
@@ -102,7 +102,7 @@ describe('<GlobalBreadcrumbs />', () => {
   it('should NOT call onBreadcrumbs with steal breadcrumbs after pathname changed', async () => {
     jest.useFakeTimers();
     const onBreadcrumbsChange = jest.fn();
-    const modelGetOneMock = jest.spyOn(Model.prototype, 'getOne').mockImplementation(
+    const modelGetOneMock = jest.spyOn(ModelVersion.prototype, 'getOne').mockImplementation(
       (id) =>
         new Promise((resolve) => {
           setTimeout(
@@ -111,7 +111,7 @@ describe('<GlobalBreadcrumbs />', () => {
                 id,
                 name: `model${id}`,
                 model_version: `1.0.${id}`,
-              } as ModelDetail);
+              } as ModelVersionDetail);
             },
             id === '2' ? 1000 : 0
           );

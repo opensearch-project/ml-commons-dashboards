@@ -4,31 +4,20 @@
  */
 
 import React from 'react';
-import moment from 'moment';
 import userEvent from '@testing-library/user-event';
 
 import { ModelTable, ModelTableProps } from '../model_table';
 import { render, screen, within } from '../../../../test/test_utils';
-import { MODEL_STATE } from '../../../../common/model';
 
 const tableData = [
   {
+    id: '1',
     name: 'model1',
-    owner: 'foo',
-    latest_version: '5',
+    owner_name: 'foo',
+    latest_version: 5,
     description: 'model 1 description',
-    latest_version_state: MODEL_STATE.loaded,
     deployed_versions: ['1,2'],
-    created_time: Date.now(),
-  },
-  {
-    name: 'model2',
-    owner: 'bar',
-    latest_version: '3',
-    description: 'model 2 description',
-    latest_version_state: MODEL_STATE.uploading,
-    deployed_versions: ['1,2'],
-    created_time: Date.now(),
+    last_updated_time: 1683699499637,
   },
 ];
 
@@ -40,11 +29,10 @@ const setup = (options?: Partial<ModelTableProps>) => {
     <ModelTable
       models={tableData}
       sort={{
-        field: 'created_time',
+        field: 'last_updated_time',
         direction: 'desc',
       }}
       onChange={onChangeMock}
-      onModelNameClick={onModelNameClickMock}
       pagination={{ currentPage: 1, pageSize: 15, totalRecords: 300 }}
       loading={false}
       error={false}
@@ -69,7 +57,7 @@ describe('<ModelTable />', () => {
     expect(within(tableHeaders[2]).getByText('Description')).toBeInTheDocument();
     expect(within(tableHeaders[3]).getByText('Owner')).toBeInTheDocument();
     expect(within(tableHeaders[4]).getByText('Deployed versions')).toBeInTheDocument();
-    expect(within(tableHeaders[5]).getByText('Created at')).toBeInTheDocument();
+    expect(within(tableHeaders[5]).getByText('Last updated')).toBeInTheDocument();
   });
 
   it('should render consistent table body', () => {
@@ -80,27 +68,13 @@ describe('<ModelTable />', () => {
     expect(model1Cells).not.toBeUndefined();
     expect(within(model1Cells!.item(1)).getByText(tableData[0].latest_version)).toBeInTheDocument();
     expect(within(model1Cells!.item(2)).getByText(tableData[0].description)).toBeInTheDocument();
-    expect(
-      within(model1Cells!.item(3)).getByText(tableData[0].owner.slice(0, 1))
-    ).toBeInTheDocument();
+    expect(within(model1Cells!.item(3)).getByText('f')).toBeInTheDocument();
     expect(
       within(model1Cells!.item(4)).getByText(tableData[0].deployed_versions.join(', '))
     ).toBeInTheDocument();
     expect(
-      within(model1Cells!.item(5)).getByText(
-        moment(tableData[0].created_time).format('MMM D, YYYY')
-      )
+      within(model1Cells!.item(5)).getByText('May 10, 2023 @ 06:18:19.637')
     ).toBeInTheDocument();
-
-    const model2FirstCellContent = renderResult.getByText('New model');
-    expect(model2FirstCellContent).toBeInTheDocument();
-    const model2Cells = model2FirstCellContent.closest('tr')?.querySelectorAll('td');
-    expect(model2Cells).not.toBeUndefined();
-    expect(within(model2Cells!.item(1)).getByRole('progressbar')).toBeInTheDocument();
-    expect(within(model2Cells!.item(2)).getByText('...')).toBeInTheDocument();
-    expect(within(model2Cells!.item(3)).getByRole('progressbar')).toBeInTheDocument();
-    expect(within(model2Cells!.item(4)).getByText('updating')).toBeInTheDocument();
-    expect(within(model2Cells!.item(5)).getByText('updating')).toBeInTheDocument();
   });
 
   it('should call onChange with consistent params after pageSize change', async () => {
@@ -114,7 +88,7 @@ describe('<ModelTable />', () => {
         pageSize: 50,
       },
       sort: {
-        field: 'created_time',
+        field: 'last_updated_time',
         direction: 'desc',
       },
     });
@@ -130,7 +104,7 @@ describe('<ModelTable />', () => {
         pageSize: 15,
       },
       sort: {
-        field: 'created_time',
+        field: 'last_updated_time',
         direction: 'desc',
       },
     });
@@ -139,24 +113,23 @@ describe('<ModelTable />', () => {
   it('should call onChange with consistent params after sort change', async () => {
     const { renderResult, onChangeMock } = setup();
     expect(onChangeMock).not.toHaveBeenCalled();
-    await userEvent.click(renderResult.getByTitle('Created at'));
+    await userEvent.click(renderResult.getByTitle('Last updated'));
     expect(onChangeMock).toHaveBeenCalledWith({
       pagination: {
         currentPage: 1,
         pageSize: 15,
       },
       sort: {
-        field: 'created_time',
+        field: 'last_updated_time',
         direction: 'asc',
       },
     });
   });
 
-  it('should call onModelNameClick with consistent params after model name click', async () => {
-    const { renderResult, onModelNameClickMock } = setup();
-    expect(onModelNameClickMock).not.toHaveBeenCalled();
+  it('should redirect to model detail page after model name click', async () => {
+    const { renderResult } = setup();
     await userEvent.click(renderResult.getByText('model1'));
-    expect(onModelNameClickMock).toHaveBeenCalledWith('model1');
+    expect(location.href).toContain('model-registry/model/1');
   });
 
   it('should show loading screen if property loading equal true', () => {
@@ -224,5 +197,15 @@ describe('<ModelTable />', () => {
     expect(onResetClickMock).not.toHaveBeenCalled();
     await userEvent.click(screen.getByText('Reset search and filters'));
     expect(onResetClickMock).toHaveBeenCalled();
+  });
+
+  it('should navigate to model register version page after register version clicked', async () => {
+    setup();
+
+    await userEvent.click(
+      within(screen.getByText('model1').closest('tr')!).getByLabelText('Register new version')
+    );
+
+    expect(location.href).toContain('model-registry/register-model/1');
   });
 });

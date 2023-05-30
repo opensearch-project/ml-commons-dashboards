@@ -5,36 +5,36 @@
 
 import React, { useEffect } from 'react';
 import { EuiCallOut, EuiLoadingSpinner } from '@elastic/eui';
-import { MODEL_STATE } from '../../../common/model';
+import { MODEL_VERSION_STATE } from '../../../common';
 
 interface ModelVersionCalloutProps {
   modelVersionId: string;
-  modelState: MODEL_STATE;
+  modelState: MODEL_VERSION_STATE;
 }
 
-const MODEL_STATE_MAPPING: {
-  [K in MODEL_STATE]?: {
+const MODEL_VERSION_STATE_MAPPING: {
+  [K in MODEL_VERSION_STATE]?: {
     title: React.ReactNode;
     color: 'danger' | 'warning' | 'primary';
     iconType?: string;
   };
 } = {
-  [MODEL_STATE.registerFailed]: {
+  [MODEL_VERSION_STATE.registerFailed]: {
     title: 'Artifact upload failed',
     color: 'danger' as const,
     iconType: 'alert',
   },
-  [MODEL_STATE.loadFailed]: {
+  [MODEL_VERSION_STATE.deployFailed]: {
     title: 'Deployment failed',
     color: 'danger' as const,
     iconType: 'alert',
   },
-  [MODEL_STATE.partiallyLoaded]: {
+  [MODEL_VERSION_STATE.partiallyDeployed]: {
     title: 'Model partially responding',
     color: 'warning' as const,
     iconType: 'alert',
   },
-  [MODEL_STATE.uploading]: {
+  [MODEL_VERSION_STATE.registering]: {
     title: (
       <span style={{ display: 'flex', alignItems: 'center' }}>
         <EuiLoadingSpinner size="m" style={{ marginRight: '8px' }} />
@@ -43,7 +43,7 @@ const MODEL_STATE_MAPPING: {
     ),
     color: 'primary' as const,
   },
-  [MODEL_STATE.loading]: {
+  [MODEL_VERSION_STATE.deploying]: {
     title: (
       <span style={{ display: 'flex', alignItems: 'center' }}>
         <EuiLoadingSpinner size="m" style={{ marginRight: '8px' }} />
@@ -55,13 +55,13 @@ const MODEL_STATE_MAPPING: {
 };
 
 export const ModelVersionCallout = ({ modelState, modelVersionId }: ModelVersionCalloutProps) => {
-  const calloutProps = MODEL_STATE_MAPPING[modelState];
+  const calloutProps = MODEL_VERSION_STATE_MAPPING[modelState];
 
   useEffect(() => {
     if (calloutProps) {
-      if (modelState === MODEL_STATE.loadFailed) {
+      if (modelState === MODEL_VERSION_STATE.deployFailed) {
         // TODO: call task API to get the error details
-      } else if (modelState === MODEL_STATE.registerFailed) {
+      } else if (modelState === MODEL_VERSION_STATE.registerFailed) {
         // TODO: call task API to get the error details
       }
     }

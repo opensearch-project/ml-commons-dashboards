@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { EuiLoadingSpinner, EuiText } from '@elastic/eui';
-import { MODEL_STATE } from '../../../common/model';
+import { MODEL_VERSION_STATE } from '../../../common';
 
 type ColumnType =
   | 'name'
@@ -32,10 +32,10 @@ export const ModelTableUploadingCell = ({
   latestVersionState,
 }: {
   column: ColumnType;
-  latestVersionState: MODEL_STATE;
+  latestVersionState: MODEL_VERSION_STATE;
   fallback: JSX.Element;
 }) => {
-  if (latestVersionState !== MODEL_STATE.uploading) {
+  if (latestVersionState !== MODEL_VERSION_STATE.registering) {
     return fallback;
   }
   if (column === 'latestVersion' || column === 'owner') {

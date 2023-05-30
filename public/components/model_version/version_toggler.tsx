@@ -29,7 +29,7 @@ export const VersionToggler = ({
   onVersionChange,
 }: VersionTogglerProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const { data: versions } = useFetcher(APIProvider.getAPI('model').search, {
+  const { data: versions } = useFetcher(APIProvider.getAPI('modelVersion').search, {
     name: modelName,
     from: 0,
     // TODO: Implement scroll bottom load more once version toggler UX confirmed

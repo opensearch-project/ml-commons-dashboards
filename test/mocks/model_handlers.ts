@@ -9,80 +9,17 @@ import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
 
 const models = [
   {
+    name: 'model1',
     id: '1',
-    name: 'model1',
-    model_version: '1.0.0',
-    description: 'model1 description',
-    created_time: 1683699467964,
-    last_registered_time: 1683699499632,
-    last_updated_time: 1683699499637,
-    model_config: {
-      all_config: '',
-      embedding_dimension: 768,
-      framework_type: 'SENTENCE_TRANSFORMERS',
-      model_type: 'roberta',
+    latest_version: 1,
+    description: 'foo bar',
+    owner: {
+      backend_roles: ['admin'],
+      name: 'admin',
+      roles: ['admin'],
     },
-    model_format: 'TORCH_SCRIPT',
-    model_state: 'REGISTERED',
-    total_chunks: 34,
-    model_group_id: '1',
-  },
-  {
-    id: '2',
-    name: 'model2',
-    model_version: '1.0.1',
-    description: 'model2 description',
-    created_time: 1683699467964,
-    last_registered_time: 1683699499632,
-    last_updated_time: 1683699499637,
-    model_config: {
-      all_config: '',
-      embedding_dimension: 768,
-      framework_type: 'SENTENCE_TRANSFORMERS',
-      model_type: 'roberta',
-    },
-    model_format: 'TORCH_SCRIPT',
-    model_state: 'REGISTERED',
-    total_chunks: 34,
-    model_group_id: '2',
-  },
-  {
-    id: '3',
-    name: 'model3',
-    model_version: '1.0.0',
-    description: 'model3 description',
-    created_time: 1683699467964,
-    last_registered_time: 1683699499632,
-    last_updated_time: 1683699499637,
-    model_config: {
-      all_config: '',
-      embedding_dimension: 768,
-      framework_type: 'SENTENCE_TRANSFORMERS',
-      model_type: 'roberta',
-    },
-    model_format: 'TORCH_SCRIPT',
-    model_state: 'DEPLOYED',
-    total_chunks: 34,
-    model_group_id: '3',
-  },
-  {
-    id: '4',
-    name: 'model1',
-    model_version: '1.0.1',
-    description: 'model1 version 1.0.1 description',
-    created_time: 1683699469964,
-    last_registered_time: 1683699599632,
-    last_updated_time: 1683699599637,
-    model_config: {
-      all_config: '',
-      embedding_dimension: 768,
-      framework_type: 'SENTENCE_TRANSFORMERS',
-      model_type: 'roberta',
-    },
-    model_format: 'TORCH_SCRIPT',
-    model_state: 'DEPLOYED',
-    total_chunks: 34,
-    model_group_id: '1',
+    created_time: 1683699499637,
+    last_updated_time: 1685073391256,
   },
 ];
 
@@ -91,30 +28,34 @@ export const modelHandlers = [
     const { searchParams } = req.url;
     const name = searchParams.get('name');
     const ids = searchParams.getAll('ids');
-    const modelGroupId = searchParams.get('modelGroupId');
-    const data = models.filter((model) => {
-      if (name) {
-        return model.name === name;
-      }
-      if (ids && ids.length > 0) {
+    const from = parseInt(searchParams.get('from') || '0', 10);
+    const size = parseInt(searchParams.get('size') || `${models.length}`, 10);
+    const filteredData = models.filter((model) => {
+      if (ids.length > 0) {
         return ids.includes(model.id);
       }
-      if (modelGroupId) {
-        return model.model_group_id === modelGroupId;
+      if (name && name !== model.name) {
+        return false;
       }
       return true;
     });
+    const end = size ? from + size : filteredData.length;
+
     return res(
       ctx.status(200),
       ctx.json({
-        data,
-        total_models: data.length,
+        data: filteredData.slice(from, end),
+        total_models: filteredData.length,
       })
     );
   }),
 
-  rest.get(`${MODEL_API_ENDPOINT}/:modelId`, (req, res, ctx) => {
-    const [modelId, ..._restParts] = req.url.pathname.split('/').reverse();
-    return res(ctx.status(200), ctx.json(models.find((model) => model.id === modelId)));
+  rest.post(MODEL_API_ENDPOINT, (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        model_id: '1',
+      })
+    );
   }),
 ];
