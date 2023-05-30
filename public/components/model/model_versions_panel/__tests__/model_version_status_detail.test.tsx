@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionStatusDetail } from '../model_version_status_detail';
-import { MODEL_STATE } from '../../../../../common';
+import { MODEL_VERSION_STATE } from '../../../../../common';
 
 describe('<ModelVersionStatusDetail />', () => {
   it('should render "In progress..." and uploading tip', async () => {
@@ -17,7 +17,7 @@ describe('<ModelVersionStatusDetail />', () => {
         id="1"
         name="model-1"
         version="1"
-        state={MODEL_STATE.uploading}
+        state={MODEL_VERSION_STATE.registering}
         createdTime={1683276773541}
       />
     );
@@ -36,7 +36,7 @@ describe('<ModelVersionStatusDetail />', () => {
         id="1"
         name="model-1"
         version="1"
-        state={MODEL_STATE.loaded}
+        state={MODEL_VERSION_STATE.deployed}
         createdTime={1683276773541}
         lastDeployedTime={1683276773541}
       />
@@ -60,7 +60,7 @@ describe('<ModelVersionStatusDetail />', () => {
         name="model-1"
         version="1"
         createdTime={1683276773541}
-        state={MODEL_STATE.trained}
+        state={MODEL_VERSION_STATE.trained}
       />
     );
 
@@ -73,7 +73,7 @@ describe('<ModelVersionStatusDetail />', () => {
         id="1"
         name="model-1"
         version="1.0.0"
-        state={MODEL_STATE.loadFailed}
+        state={MODEL_VERSION_STATE.deployFailed}
         createdTime={1683276773541}
         lastDeployedTime={1683276773541}
       />
@@ -92,7 +92,7 @@ describe('<ModelVersionStatusDetail />', () => {
         id="1"
         name="model-1"
         version="1.0.0"
-        state={MODEL_STATE.registerFailed}
+        state={MODEL_VERSION_STATE.registerFailed}
         createdTime={1683276773541}
       />
     );

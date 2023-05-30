@@ -14,7 +14,7 @@ import {
 } from '@elastic/eui';
 import { Link, generatePath } from 'react-router-dom';
 
-import { MODEL_STATE, routerPaths } from '../../../../common';
+import { MODEL_VERSION_STATE, routerPaths } from '../../../../common';
 import { UiSettingDateFormatTime } from '../../common';
 import { APIProvider } from '../../../apis/api_provider';
 
@@ -22,26 +22,26 @@ import { ModelVersionErrorDetailsModal } from '../../common';
 
 // TODO: Change to related time field after confirmed
 export const state2DetailContentMap: {
-  [key in MODEL_STATE]?: {
+  [key in MODEL_VERSION_STATE]?: {
     title: string;
     description: (versionLink: React.ReactNode) => React.ReactNode;
     timeTitle?: string;
     timeField?: 'createdTime' | 'lastRegisteredTime' | 'lastDeployedTime' | 'lastUndeployedTime';
   };
 } = {
-  [MODEL_STATE.uploading]: {
+  [MODEL_VERSION_STATE.registering]: {
     title: 'In progress...',
     description: (versionLink: React.ReactNode) => (
       <>The model artifact for {versionLink} is uploading.</>
     ),
   },
-  [MODEL_STATE.loading]: {
+  [MODEL_VERSION_STATE.deploying]: {
     title: 'In progress...',
     description: (versionLink: React.ReactNode) => (
       <>The model artifact for {versionLink} is deploying.</>
     ),
   },
-  [MODEL_STATE.uploaded]: {
+  [MODEL_VERSION_STATE.registered]: {
     title: 'Success',
     description: (versionLink: React.ReactNode) => (
       <>The model artifact for {versionLink} uploaded.</>
@@ -49,31 +49,31 @@ export const state2DetailContentMap: {
     timeTitle: 'Uploaded on',
     timeField: 'lastRegisteredTime',
   },
-  [MODEL_STATE.loaded]: {
+  [MODEL_VERSION_STATE.deployed]: {
     title: 'Success',
     description: (versionLink: React.ReactNode) => <>{versionLink} deployed.</>,
     timeTitle: 'Deployed on',
     timeField: 'lastDeployedTime',
   },
-  [MODEL_STATE.unloaded]: {
+  [MODEL_VERSION_STATE.undeployed]: {
     title: 'Success',
     description: (versionLink: React.ReactNode) => <>{versionLink} undeployed.</>,
     timeTitle: 'Undeployed on',
     timeField: 'lastUndeployedTime',
   },
-  [MODEL_STATE.loadFailed]: {
+  [MODEL_VERSION_STATE.deployFailed]: {
     title: 'Error',
     description: (versionLink: React.ReactNode) => <>{versionLink} deployment failed.</>,
     timeTitle: 'Deployment failed on',
     timeField: 'lastDeployedTime',
   },
-  [MODEL_STATE.registerFailed]: {
+  [MODEL_VERSION_STATE.registerFailed]: {
     title: 'Error',
     description: (versionLink: React.ReactNode) => <>{versionLink} artifact upload failed.</>,
     timeTitle: 'Upload failed on',
     timeField: 'createdTime',
   },
-  [MODEL_STATE.partiallyLoaded]: {
+  [MODEL_VERSION_STATE.partiallyDeployed]: {
     title: 'Warning',
     description: (versionLink: React.ReactNode) => (
       <>{versionLink} is deployed and partially responding.</>
@@ -91,7 +91,7 @@ export const ModelVersionStatusDetail = ({
   ...restProps
 }: {
   id: string;
-  state: MODEL_STATE;
+  state: MODEL_VERSION_STATE;
   name: string;
   version: string;
   createdTime: number;
@@ -104,9 +104,9 @@ export const ModelVersionStatusDetail = ({
   const [errorDetails, setErrorDetails] = useState<string>();
 
   const handleSeeFullErrorClick = useCallback(async () => {
-    const state2TaskTypeMap: { [key in MODEL_STATE]?: string } = {
-      [MODEL_STATE.loadFailed]: 'DEPLOY_MODEL',
-      [MODEL_STATE.registerFailed]: 'REGISTER_MODEL',
+    const state2TaskTypeMap: { [key in MODEL_VERSION_STATE]?: string } = {
+      [MODEL_VERSION_STATE.deployFailed]: 'DEPLOY_MODEL',
+      [MODEL_VERSION_STATE.registerFailed]: 'REGISTER_MODEL',
     };
     if (!(state in state2TaskTypeMap)) {
       return;
@@ -169,7 +169,8 @@ export const ModelVersionStatusDetail = ({
               </EuiText>
             </>
           )}
-          {(state === MODEL_STATE.loadFailed || state === MODEL_STATE.registerFailed) && (
+          {(state === MODEL_VERSION_STATE.deployFailed ||
+            state === MODEL_VERSION_STATE.registerFailed) && (
             <>
               <EuiSpacer size="s" />
               <EuiFlexGroup justifyContent="flexEnd" gutterSize="none">
@@ -193,7 +194,9 @@ export const ModelVersionStatusDetail = ({
           version={version}
           errorDetails={errorDetails}
           errorType={
-            state === MODEL_STATE.loadFailed ? 'deployment-failed' : 'artifact-upload-failed'
+            state === MODEL_VERSION_STATE.deployFailed
+              ? 'deployment-failed'
+              : 'artifact-upload-failed'
           }
           closeModal={handleCloseModal}
         />

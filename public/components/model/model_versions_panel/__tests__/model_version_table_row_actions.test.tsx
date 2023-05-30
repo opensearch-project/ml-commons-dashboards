@@ -8,16 +8,16 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionTableRowActions } from '../model_version_table_row_actions';
-import { MODEL_STATE } from '../../../../../common';
+import { MODEL_VERSION_STATE } from '../../../../../common';
 
-const setup = (state: MODEL_STATE) => {
+const setup = (state: MODEL_VERSION_STATE) => {
   return render(<ModelVersionTableRowActions id="1" name="model-1" version="1" state={state} />);
 };
 
 describe('<ModelVersionTableRowActions />', () => {
   it('should render "actions icon" and "Delete" button after clicked', async () => {
     const user = userEvent.setup();
-    setup(MODEL_STATE.uploading);
+    setup(MODEL_VERSION_STATE.registering);
 
     expect(screen.getByLabelText('show actions')).toBeInTheDocument();
     await user.click(screen.getByLabelText('show actions'));
@@ -27,7 +27,7 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should render "Upload new artifact" button for REGISTER_FAILED state', async () => {
     const user = userEvent.setup();
-    setup(MODEL_STATE.registerFailed);
+    setup(MODEL_VERSION_STATE.registerFailed);
     await user.click(screen.getByLabelText('show actions'));
 
     expect(screen.getByText('Upload new artifact')).toBeInTheDocument();
@@ -35,19 +35,24 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should render "Deploy" button for REGISTERED, DEPLOY_FAILED and UNDEPLOYED state', async () => {
     const user = userEvent.setup();
-    const { rerender } = setup(MODEL_STATE.uploaded);
+    const { rerender } = setup(MODEL_VERSION_STATE.registered);
     await user.click(screen.getByLabelText('show actions'));
 
     expect(screen.getByText('Deploy')).toBeInTheDocument();
 
     rerender(
-      <ModelVersionTableRowActions state={MODEL_STATE.unloaded} id="1" name="model-1" version="1" />
+      <ModelVersionTableRowActions
+        state={MODEL_VERSION_STATE.undeployed}
+        id="1"
+        name="model-1"
+        version="1"
+      />
     );
     expect(screen.getByText('Deploy')).toBeInTheDocument();
 
     rerender(
       <ModelVersionTableRowActions
-        state={MODEL_STATE.loadFailed}
+        state={MODEL_VERSION_STATE.deployFailed}
         id="1"
         name="model-1"
         version="1"
@@ -58,14 +63,14 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should render "Undeploy" button for DEPLOYED and PARTIALLY_DEPLOYED state', async () => {
     const user = userEvent.setup();
-    const { rerender } = setup(MODEL_STATE.loaded);
+    const { rerender } = setup(MODEL_VERSION_STATE.deployed);
     await user.click(screen.getByLabelText('show actions'));
 
     expect(screen.getByText('Undeploy')).toBeInTheDocument();
 
     rerender(
       <ModelVersionTableRowActions
-        state={MODEL_STATE.partiallyLoaded}
+        state={MODEL_VERSION_STATE.partiallyDeployed}
         id="1"
         name="model-1"
         version="1"
@@ -76,7 +81,7 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should call close popover after menuitem click', async () => {
     const user = userEvent.setup();
-    setup(MODEL_STATE.loaded);
+    setup(MODEL_VERSION_STATE.deployed);
 
     await user.click(screen.getByLabelText('show actions'));
     await user.click(screen.getByText('Delete'));
@@ -88,7 +93,7 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should show deploy confirm modal after "Deploy" button clicked', async () => {
     const user = userEvent.setup();
-    setup(MODEL_STATE.uploaded);
+    setup(MODEL_VERSION_STATE.registered);
     await user.click(screen.getByLabelText('show actions'));
     await user.click(screen.getByText('Deploy'));
 
@@ -100,7 +105,7 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should hide deploy confirm modal after "Cancel" button clicked', async () => {
     const user = userEvent.setup();
-    setup(MODEL_STATE.uploaded);
+    setup(MODEL_VERSION_STATE.registered);
     await user.click(screen.getByLabelText('show actions'));
     await user.click(screen.getByText('Deploy'));
     await user.click(screen.getByText('Cancel'));
@@ -110,7 +115,7 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should show undeploy confirm modal after "Deploy" button clicked', async () => {
     const user = userEvent.setup();
-    setup(MODEL_STATE.loaded);
+    setup(MODEL_VERSION_STATE.deployed);
     await user.click(screen.getByLabelText('show actions'));
     await user.click(screen.getByText('Undeploy'));
 
@@ -124,7 +129,7 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should hide undeploy confirm modal after "Cancel" button clicked', async () => {
     const user = userEvent.setup();
-    setup(MODEL_STATE.loaded);
+    setup(MODEL_VERSION_STATE.deployed);
     await user.click(screen.getByLabelText('show actions'));
     await user.click(screen.getByText('Undeploy'));
     await user.click(screen.getByText('Cancel'));

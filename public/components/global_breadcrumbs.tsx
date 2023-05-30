@@ -47,7 +47,7 @@ const getModelRegisterBreadcrumbs = (basename: string, matchedParams: {}) => {
       staticBreadcrumbs: baseModelRegistryBreadcrumbs,
       // TODO: Change to model group API
       asyncBreadcrumbsLoader: () =>
-        APIProvider.getAPI('modelGroup')
+        APIProvider.getAPI('model')
           .getOne(modelId)
           .then(
             (model) =>
@@ -80,7 +80,7 @@ const getModelBreadcrumbs = (basename: string, matchedParams: {}) => {
     return {
       staticBreadcrumbs: baseModelRegistryBreadcrumbs,
       asyncBreadcrumbsLoader: () => {
-        return APIProvider.getAPI('modelGroup')
+        return APIProvider.getAPI('model')
           .getOne(modelId)
           .then(
             (model) =>
@@ -106,7 +106,7 @@ const getModelVersionBreadcrumbs = (basename: string, matchedParams: {}) => {
       staticBreadcrumbs: baseModelRegistryBreadcrumbs,
       // TODO: Change to model group API
       asyncBreadcrumbsLoader: () =>
-        APIProvider.getAPI('model')
+        APIProvider.getAPI('modelVersion')
           .getOne(modelId)
           .then(
             (model) =>

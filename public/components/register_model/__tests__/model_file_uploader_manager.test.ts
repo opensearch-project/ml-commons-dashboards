@@ -4,14 +4,14 @@
  */
 
 import { waitFor } from '@testing-library/dom';
-import { Model } from '../../../../public/apis/model';
+import { ModelVersion } from '../../../../public/apis/model_version';
 import { ModelFileUploadManager } from '../model_file_upload_manager';
 
 describe('ModelFileUploadManager', () => {
   const uploadChunkMock = jest.fn();
 
   beforeEach(() => {
-    jest.spyOn(Model.prototype, 'uploadChunk').mockImplementation(uploadChunkMock);
+    jest.spyOn(ModelVersion.prototype, 'uploadChunk').mockImplementation(uploadChunkMock);
   });
 
   afterEach(() => {
@@ -71,7 +71,7 @@ describe('ModelFileUploadManager', () => {
   });
 
   it('should call onError', async () => {
-    jest.spyOn(Model.prototype, 'uploadChunk').mockRejectedValue(new Error());
+    jest.spyOn(ModelVersion.prototype, 'uploadChunk').mockRejectedValue(new Error());
     const onErrorMock = jest.fn();
     const uploader = new ModelFileUploadManager();
     const file = new File(['test model file'], 'model.zip', { type: 'application/zip' });

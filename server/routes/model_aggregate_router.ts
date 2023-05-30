@@ -7,6 +7,7 @@ import { schema } from '@osd/config-schema';
 import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
 import { ModelAggregateService } from '../services/model_aggregate_service';
 import { MODEL_AGGREGATE_API_ENDPOINT } from './constants';
+import { modelStateSchema } from './model_version_router';
 
 export const modelAggregateRouter = (router: IRouter) => {
   router.get(
@@ -16,21 +17,40 @@ export const modelAggregateRouter = (router: IRouter) => {
         query: schema.object({
           from: schema.number(),
           size: schema.number(),
-          sort: schema.literal('created_time'),
-          order: schema.oneOf([schema.literal('asc'), schema.literal('desc')]),
+          sort: schema.maybe(
+            schema.oneOf([
+              schema.literal('name-asc'),
+              schema.literal('name-desc'),
+              schema.literal('latest_version-asc'),
+              schema.literal('latest_version-desc'),
+              schema.literal('description-asc'),
+              schema.literal('description-desc'),
+              schema.literal('owner_name-asc'),
+              schema.literal('owner_name-desc'),
+              schema.literal('last_updated_time-asc'),
+              schema.literal('last_updated_time-desc'),
+            ])
+          ),
           name: schema.maybe(schema.string()),
+          states: schema.maybe(schema.oneOf([modelStateSchema, schema.arrayOf(modelStateSchema)])),
+          extraQuery: schema.maybe(schema.recordOf(schema.string(), schema.any())),
         }),
       },
     },
     async (context, request) => {
+      const { states, extraQuery, ...restQuery } = request.query;
       try {
         const payload = await ModelAggregateService.search({
           client: context.core.opensearch.client,
-          ...request.query,
+          states: typeof states === 'string' ? [states] : states,
+          extraQuery,
+          ...restQuery,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
-      } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+      } catch (error) {
+        return opensearchDashboardsResponseFactory.badRequest({
+          body: error instanceof Error ? error.message : JSON.stringify(error),
+        });
       }
     }
   );

@@ -2,12 +2,9 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-
-import React from 'react';
-
-import { render, screen, waitFor } from '../../../../test/test_utils';
+import { screen, waitFor } from '../../../../test/test_utils';
 import { setup } from './setup';
-import { Model } from '../../../../public/apis/model';
+import { ModelVersion } from '../../../../public/apis/model_version';
 import * as PluginContext from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import * as formAPI from '../register_model_api';
 
@@ -41,7 +38,7 @@ describe('<RegisterModel /> Form', () => {
       },
     });
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
-    jest.spyOn(Model.prototype, 'uploadChunk').mockResolvedValue({});
+    jest.spyOn(ModelVersion.prototype, 'uploadChunk').mockResolvedValue({});
   });
 
   afterEach(() => {

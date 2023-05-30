@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render, screen } from '../../../../../test/test_utils';
 import { ModelVersionCell } from '../model_version_cell';
-import { MODEL_STATE } from '../../../../../common';
+import { MODEL_VERSION_STATE } from '../../../../../common';
 
 const setup = (options: { columnId: string; isDetails?: boolean }) =>
   render(
@@ -16,7 +16,7 @@ const setup = (options: { columnId: string; isDetails?: boolean }) =>
         id: '1',
         name: 'model-1',
         version: '1.0.0',
-        state: MODEL_STATE.uploading,
+        state: MODEL_VERSION_STATE.registering,
         tags: {},
         lastUpdatedTime: 1682604957236,
         createdTime: 1682604957236,
@@ -48,7 +48,7 @@ describe('<ModelVersionCell />', () => {
           id: '1',
           name: 'model-1',
           version: '1.0.0',
-          state: MODEL_STATE.loaded,
+          state: MODEL_VERSION_STATE.deployed,
           tags: {},
           lastUpdatedTime: 1682604957236,
           createdTime: 1682604957236,
@@ -65,7 +65,7 @@ describe('<ModelVersionCell />', () => {
           id: '1',
           name: 'model-1',
           version: '1.0.0',
-          state: MODEL_STATE.partiallyLoaded,
+          state: MODEL_VERSION_STATE.partiallyDeployed,
           tags: {},
           lastUpdatedTime: 1682604957236,
           createdTime: 1682604957236,

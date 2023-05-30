@@ -3,29 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export interface OpenSearchModel {
+export interface ModelAggregateItem {
   id: string;
-  owner: {
-    backend_roles: string[];
-    roles: string[];
-    name: string;
-  };
-  latest_version: number;
-  created_time: number;
-  last_updated_time: number;
   name: string;
   description?: string;
-  access: 'public' | 'restricted' | 'private';
+  latest_version: number;
+  deployed_versions: string[];
+  owner_name: string;
+  created_time?: number;
+  last_updated_time: number;
 }
 
-export type ModelSort =
+export type ModelAggregateSort =
   | 'name-asc'
   | 'name-desc'
   | 'latest_version-asc'
   | 'latest_version-desc'
   | 'description-asc'
   | 'description-desc'
-  | 'owner.name-asc'
-  | 'owner.name-desc'
+  | 'owner_name-asc'
+  | 'owner_name-desc'
   | 'last_updated_time-asc'
   | 'last_updated_time-desc';

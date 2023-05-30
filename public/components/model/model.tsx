@@ -26,7 +26,7 @@ import { ModelTagsPanel } from './model_tags_panel';
 
 export const Model = () => {
   const { id: modelId } = useParams<{ id: string }>();
-  const { data, loading, error } = useFetcher(APIProvider.getAPI('modelGroup').getOne, modelId);
+  const { data, loading, error } = useFetcher(APIProvider.getAPI('model').getOne, modelId);
   const tabs = useMemo(
     () => [
       {

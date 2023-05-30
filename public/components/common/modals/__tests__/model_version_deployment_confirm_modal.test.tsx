@@ -9,7 +9,7 @@ import { EuiToast } from '@elastic/eui';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionDeploymentConfirmModal } from '../model_version_deployment_confirm_modal';
-import { Model } from '../../../../apis/model';
+import { ModelVersion } from '../../../../apis/model_version';
 
 import * as PluginContext from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { MountWrapper } from '../../../../../../../src/core/public/utils';
@@ -98,7 +98,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
 
     it('should call model load after deploy button clicked', async () => {
       const modelLoadMock = jest
-        .spyOn(Model.prototype, 'load')
+        .spyOn(ModelVersion.prototype, 'load')
         .mockReturnValue(Promise.resolve({ task_id: 'foo', status: 'succeeded' }));
       render(
         <ModelVersionDeploymentConfirmModal
@@ -120,7 +120,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
     it('should show error toast if model load throw error', async () => {
       const useOpenSearchDashboardsMock = mockAddDangerAndOverlay();
       const modelLoadMock = jest
-        .spyOn(Model.prototype, 'load')
+        .spyOn(ModelVersion.prototype, 'load')
         .mockRejectedValue(new Error('error'));
       render(
         <ModelVersionDeploymentConfirmModal
@@ -144,7 +144,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
     it('should show full error after "See full error" clicked', async () => {
       const useOpenSearchDashboardsMock = mockAddDangerAndOverlay();
       const modelLoadMock = jest
-        .spyOn(Model.prototype, 'load')
+        .spyOn(ModelVersion.prototype, 'load')
         .mockRejectedValue(new Error('This is a full error message.'));
       render(
         <ModelVersionDeploymentConfirmModal
@@ -169,7 +169,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
     it('should hide full error after close button clicked', async () => {
       const useOpenSearchDashboardsMock = mockAddDangerAndOverlay();
       const modelLoadMock = jest
-        .spyOn(Model.prototype, 'load')
+        .spyOn(ModelVersion.prototype, 'load')
         .mockRejectedValue(new Error('This is a full error message.'));
       render(
         <ModelVersionDeploymentConfirmModal
@@ -217,7 +217,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
     });
 
     it('should call model unload after undeploy button clicked', async () => {
-      const modelLoadMock = jest.spyOn(Model.prototype, 'unload').mockImplementation();
+      const modelLoadMock = jest.spyOn(ModelVersion.prototype, 'unload').mockImplementation();
       render(
         <ModelVersionDeploymentConfirmModal
           id="1"
@@ -247,7 +247,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
             },
           },
         });
-      const modelLoadMock = jest.spyOn(Model.prototype, 'unload').mockImplementation();
+      const modelLoadMock = jest.spyOn(ModelVersion.prototype, 'unload').mockImplementation();
       render(
         <ModelVersionDeploymentConfirmModal
           id="1"
@@ -273,7 +273,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
     it('should show error toast if model unload throw error', async () => {
       const useOpenSearchDashboardsMock = mockAddDangerAndOverlay();
       const modelLoadMock = jest
-        .spyOn(Model.prototype, 'unload')
+        .spyOn(ModelVersion.prototype, 'unload')
         .mockRejectedValue(new Error('error'));
       render(
         <ModelVersionDeploymentConfirmModal
@@ -297,7 +297,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
     it('should show full error after "See full error" clicked', async () => {
       const useOpenSearchDashboardsMock = mockAddDangerAndOverlay();
       const modelLoadMock = jest
-        .spyOn(Model.prototype, 'unload')
+        .spyOn(ModelVersion.prototype, 'unload')
         .mockRejectedValue(new Error('This is a full error message.'));
       render(
         <ModelVersionDeploymentConfirmModal
@@ -322,7 +322,7 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
     it('should hide full error after close button clicked', async () => {
       const useOpenSearchDashboardsMock = mockAddDangerAndOverlay();
       const modelLoadMock = jest
-        .spyOn(Model.prototype, 'unload')
+        .spyOn(ModelVersion.prototype, 'unload')
         .mockRejectedValue(new Error('This is a full error message.'));
       render(
         <ModelVersionDeploymentConfirmModal

@@ -6,7 +6,7 @@
 import React, { useMemo, useCallback, useRef } from 'react';
 import { EuiBasicTable, Direction, Criteria, EuiBasicTableColumn } from '@elastic/eui';
 
-import { ModelSearchItem } from '../../apis/model';
+import { ModelVersionSearchItem } from '../../apis/model_version';
 import { renderTime } from '../../utils';
 import type { VersionTableSort } from './';
 
@@ -15,7 +15,7 @@ export interface VersionTableCriteria {
 }
 
 export function VersionTable(props: {
-  models: ModelSearchItem[];
+  models: ModelVersionSearchItem[];
   sort: VersionTableSort;
   onChange: (criteria: VersionTableCriteria) => void;
 }) {
@@ -23,7 +23,7 @@ export function VersionTable(props: {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const columns: Array<EuiBasicTableColumn<ModelSearchItem>> = [
+  const columns: Array<EuiBasicTableColumn<ModelVersionSearchItem>> = [
     {
       field: 'model_version',
       name: 'Version',
@@ -60,13 +60,13 @@ export function VersionTable(props: {
     const [field, direction] = sort.split('-');
     return {
       sort: {
-        field: field as keyof ModelSearchItem,
+        field: field as keyof ModelVersionSearchItem,
         direction: direction as Direction,
       },
     };
   }, [sort]);
 
-  const handleChange = useCallback(({ sort: newSort }: Criteria<ModelSearchItem>) => {
+  const handleChange = useCallback(({ sort: newSort }: Criteria<ModelVersionSearchItem>) => {
     if (newSort) {
       onChangeRef.current({
         sort: `${newSort.field}-${newSort.direction}` as VersionTableSort,
@@ -75,7 +75,7 @@ export function VersionTable(props: {
   }, []);
 
   return (
-    <EuiBasicTable<ModelSearchItem>
+    <EuiBasicTable<ModelVersionSearchItem>
       columns={columns}
       items={models}
       rowProps={rowProps}
