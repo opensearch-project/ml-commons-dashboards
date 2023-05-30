@@ -7,7 +7,7 @@ import { useMemo, useCallback, useState } from 'react';
 
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { MODEL_STATE } from '../../../common';
+import { MODEL_VERSION_STATE } from '../../../common';
 
 import { ModelDeployStatus } from './types';
 
@@ -31,29 +31,33 @@ const fetchDeployedModels = async (params: Params) => {
   const states = params.status?.map((status) => {
     switch (status) {
       case 'not-responding':
-        return MODEL_STATE.loadFailed;
+        return MODEL_VERSION_STATE.deployFailed;
       case 'responding':
-        return MODEL_STATE.loaded;
+        return MODEL_VERSION_STATE.deployed;
       case 'partial-responding':
-        return MODEL_STATE.partiallyLoaded;
+        return MODEL_VERSION_STATE.partiallyDeployed;
     }
   });
-  const result = await APIProvider.getAPI('model').search({
+  const result = await APIProvider.getAPI('modelVersion').search({
     from: (params.currentPage - 1) * params.pageSize,
     size: params.pageSize,
     nameOrId: params.nameOrId,
     states:
       !states || states.length === 0
-        ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partiallyLoaded]
+        ? [
+            MODEL_VERSION_STATE.deployFailed,
+            MODEL_VERSION_STATE.deployed,
+            MODEL_VERSION_STATE.partiallyDeployed,
+          ]
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
   });
-  const totalPages = Math.ceil(result.total_models / params.pageSize);
+  const totalPages = Math.ceil(result.total_model_versions / params.pageSize);
   return {
     pagination: {
       currentPage: params.currentPage,
       pageSize: params.pageSize,
-      totalRecords: result.total_models,
+      totalRecords: result.total_model_versions,
       totalPages,
     },
     data: result.data.map(

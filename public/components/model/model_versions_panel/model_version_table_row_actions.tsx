@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { EuiPopover, EuiButtonIcon, EuiContextMenuPanel, EuiContextMenuItem } from '@elastic/eui';
 
-import { MODEL_STATE } from '../../../../common';
+import { MODEL_VERSION_STATE } from '../../../../common';
 import { ModelVersionDeploymentConfirmModal } from '../../common';
 
 export const ModelVersionTableRowActions = ({
@@ -15,7 +15,7 @@ export const ModelVersionTableRowActions = ({
   name,
   version,
 }: {
-  state: MODEL_STATE;
+  state: MODEL_VERSION_STATE;
   id: string;
   name: string;
   version: string;
@@ -69,7 +69,7 @@ export const ModelVersionTableRowActions = ({
           <EuiContextMenuPanel
             onClick={closePopover}
             items={[
-              ...(state === MODEL_STATE.registerFailed
+              ...(state === MODEL_VERSION_STATE.registerFailed
                 ? [
                     <EuiContextMenuItem
                       key="upload-new-artifact"
@@ -80,9 +80,9 @@ export const ModelVersionTableRowActions = ({
                     </EuiContextMenuItem>,
                   ]
                 : []),
-              ...(state === MODEL_STATE.uploaded ||
-              state === MODEL_STATE.unloaded ||
-              state === MODEL_STATE.loadFailed
+              ...(state === MODEL_VERSION_STATE.registered ||
+              state === MODEL_VERSION_STATE.undeployed ||
+              state === MODEL_VERSION_STATE.deployFailed
                 ? [
                     <EuiContextMenuItem
                       key="deploy"
@@ -94,7 +94,8 @@ export const ModelVersionTableRowActions = ({
                     </EuiContextMenuItem>,
                   ]
                 : []),
-              ...(state === MODEL_STATE.loaded || state === MODEL_STATE.partiallyLoaded
+              ...(state === MODEL_VERSION_STATE.deployed ||
+              state === MODEL_VERSION_STATE.partiallyDeployed
                 ? [
                     <EuiContextMenuItem
                       key="undeploy"

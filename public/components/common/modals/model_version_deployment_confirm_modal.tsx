@@ -46,14 +46,14 @@ export const ModelVersionDeploymentConfirmModal = ({
       description: 'This version will begin deploying.',
       errorMessage: 'deployment failed.',
       errorType: 'deployment-failed' as const,
-      action: APIProvider.getAPI('model').load,
+      action: APIProvider.getAPI('modelVersion').load,
     },
     undeploy: {
       title: 'Undeploy',
       description: 'This version will be undeployed. You can deploy it again later.',
       errorMessage: 'undeployment failed.',
       errorType: 'undeployment-failed' as const,
-      action: APIProvider.getAPI('model').unload,
+      action: APIProvider.getAPI('modelVersion').unload,
     },
   };
   const { title, description, errorMessage, errorType, action } = mapping[mode];
