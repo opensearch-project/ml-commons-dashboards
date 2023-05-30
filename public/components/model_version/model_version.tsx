@@ -19,7 +19,7 @@ import {
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { routerPaths } from '../../../common';
+import { OpenSearchModel, routerPaths } from '../../../common';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 
@@ -30,11 +30,10 @@ import { ModelVersionInformation } from './version_information';
 import { ModelVersionArtifact } from './version_artifact';
 import { ModelVersionTags } from './version_tags';
 import { ModelVersionFormData } from './types';
-import { ModelGroupSearchItem } from '../../apis/model_group';
 import { ToggleDeployButton } from './toggle_deploy_button';
 
 export const ModelVersion = () => {
-  const [modelData, setModelData] = useState<ModelGroupSearchItem>();
+  const [modelData, setModelData] = useState<OpenSearchModel>();
   const { id: modelVersionId } = useParams<{ id: string }>();
   const { data: modelVersionData, loading: modelVersionLoading, reload } = useFetcher(
     APIProvider.getAPI('modelVersion').getOne,
