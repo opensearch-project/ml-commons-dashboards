@@ -16,9 +16,7 @@ import { InnerHttpProvider } from './inner_http_provider';
 export interface ModelVersionSearchItem {
   id: string;
   name: string;
-  // TODO: the new version details API may not have this field, because model description is on model group level
-  // we should fix this when integrating the new API changes
-  description: string;
+  model_id: string;
   algorithm: string;
   model_state: MODEL_VERSION_STATE;
   model_version: string;

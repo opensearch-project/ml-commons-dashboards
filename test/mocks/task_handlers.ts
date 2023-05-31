@@ -41,4 +41,18 @@ export const taskHandlers = [
       })
     );
   }),
+
+  rest.get(`${TASK_API_ENDPOINT}/:taskId`, (req, res, ctx) => {
+    const { taskId } = req.params;
+    return res(
+      ctx.json({
+        model_id: '1',
+        task_type: 'DEPLOY_MODEL',
+        state: 'COMPLETED',
+        create_time: 1685360406270,
+        last_update_time: 1685360406471,
+        worker_node: ['node-1'],
+      })
+    );
+  }),
 ];

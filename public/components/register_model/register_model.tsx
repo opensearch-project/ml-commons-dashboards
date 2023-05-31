@@ -231,6 +231,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
           // TODO: Fill model format here
           const { config, url } = preTrainedModel;
           form.setValue('modelURL', url);
+          form.setValue('modelFileFormat', 'TORCH_SCRIPT');
           if (config.name) {
             form.setValue('name', config.name);
           }
