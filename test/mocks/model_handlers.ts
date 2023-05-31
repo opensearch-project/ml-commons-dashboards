@@ -10,7 +10,7 @@ import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
 const models = [
   {
     name: 'model1',
-    id: '1',
+    id: 'model-id-1',
     latest_version: 1,
     description: 'foo bar',
     owner: {
