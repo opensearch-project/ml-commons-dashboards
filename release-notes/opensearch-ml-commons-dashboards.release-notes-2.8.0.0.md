@@ -6,7 +6,6 @@ Compatible with OpenSearch 2.8.0
 ### Features
 
 * Remove experiment warning banner. ([#194](https://github.com/opensearch-project/ml-commons-dashboards/pull/194))
-* Update plugin config to enable plugin by default. ([#200](https://github.com/opensearch-project/ml-commons-dashboards/pull/200))
 
 ### Infrastructure
 
