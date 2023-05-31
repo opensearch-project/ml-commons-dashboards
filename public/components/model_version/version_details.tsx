@@ -20,14 +20,18 @@ interface Props {
   description?: string;
   createdTime?: number;
   lastUpdatedTime?: number;
-  modelId?: string;
+  modelVersionId?: string;
+  owner?: string;
+  versionNotes?: string;
 }
 
 export const ModelVersionDetails = ({
   description,
   createdTime,
   lastUpdatedTime,
-  modelId,
+  modelVersionId,
+  owner,
+  versionNotes,
 }: Props) => {
   return (
     <EuiPanel>
@@ -42,7 +46,7 @@ export const ModelVersionDetails = ({
         <h4>Version notes</h4>
       </EuiTitle>
       <EuiText size="s" style={{ maxWidth: 1000 }}>
-        TODO
+        {versionNotes ?? '-'}
       </EuiText>
       <EuiSpacer size="l" />
       <EuiFlexGroup>
@@ -50,7 +54,7 @@ export const ModelVersionDetails = ({
           <EuiTitle size="xs">
             <h4>Owner</h4>
           </EuiTitle>
-          <EuiText size="s">TODO</EuiText>
+          <EuiText size="s">{owner ?? '-'}</EuiText>
         </EuiFlexItem>
         <EuiFlexItem style={{ maxWidth: 250 }}>
           <EuiTitle size="xs">
@@ -72,10 +76,10 @@ export const ModelVersionDetails = ({
           <EuiTitle size="xs">
             <h4>ID</h4>
           </EuiTitle>
-          <EuiCopy textToCopy={modelId ?? ''} beforeMessage="Copy model ID">
+          <EuiCopy textToCopy={modelVersionId ?? ''} beforeMessage="Copy model ID">
             {(copy) => (
               <EuiText size="s" onClick={copy}>
-                {modelId ?? '-'} <EuiIcon type="copy" />
+                {modelVersionId ?? '-'} <EuiIcon type="copy" />
               </EuiText>
             )}
           </EuiCopy>

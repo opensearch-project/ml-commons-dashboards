@@ -46,7 +46,7 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('should init form when id param in url route', async () => {
-    await setup({ route: '/1', mode: 'version' });
+    await setup({ route: '/model-id-1', mode: 'version' });
 
     await waitFor(() => {
       expect(screen.getByText<HTMLInputElement>('model1')).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('<RegisterModel /> Form', () => {
   });
 
   it('submit button label should be `Register version` when register new version', async () => {
-    await setup({ route: '/1', mode: 'version' });
+    await setup({ route: '/model-id-1', mode: 'version' });
 
     expect(screen.getByRole('button', { name: /register version/i })).toBeInTheDocument();
   });
@@ -128,13 +128,13 @@ describe('<RegisterModel /> Form', () => {
 
   it('should call submit with file with provided model id and name', async () => {
     jest.spyOn(formAPI, 'submitModelWithFile').mockImplementation(onSubmitMock);
-    const { user } = await setup({ route: '/1', mode: 'version' });
+    const { user } = await setup({ route: '/model-id-1', mode: 'version' });
     await user.click(screen.getByRole('button', { name: /register version/i }));
 
     expect(onSubmitMock).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'model1',
-        modelId: '1',
+        modelId: 'model-id-1',
       })
     );
   });

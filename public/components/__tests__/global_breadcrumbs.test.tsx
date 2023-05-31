@@ -37,7 +37,7 @@ describe('<GlobalBreadcrumbs />', () => {
   it('should call onBreadcrumbsChange with register version breadcrumbs', async () => {
     const onBreadcrumbsChange = jest.fn();
     render(<GlobalBreadcrumbs onBreadcrumbsChange={onBreadcrumbsChange} basename="/" />, {
-      route: '/model-registry/register-model/1',
+      route: '/model-registry/register-model/model-id-1',
     });
 
     expect(onBreadcrumbsChange).toHaveBeenCalledWith([
@@ -50,7 +50,7 @@ describe('<GlobalBreadcrumbs />', () => {
       expect(onBreadcrumbsChange).toHaveBeenLastCalledWith([
         { text: 'Machine Learning', href: '/' },
         { text: 'Model Registry', href: '/model-registry/model-list' },
-        { text: 'model1', href: '/model-registry/model/1' },
+        { text: 'model1', href: '/model-registry/model/model-id-1' },
         { text: 'Register version' },
       ]);
     });
@@ -59,7 +59,7 @@ describe('<GlobalBreadcrumbs />', () => {
   it('should call onBreadcrumbsChange with model breadcrumbs', async () => {
     const onBreadcrumbsChange = jest.fn();
     render(<GlobalBreadcrumbs onBreadcrumbsChange={onBreadcrumbsChange} basename="/" />, {
-      route: '/model-registry/model/1',
+      route: '/model-registry/model/model-id-1',
     });
 
     expect(onBreadcrumbsChange).toHaveBeenCalledWith([
@@ -126,7 +126,7 @@ describe('<GlobalBreadcrumbs />', () => {
       { text: 'Model Registry', href: '/model-registry/model-list' },
     ]);
 
-    history.current.push('/model-registry/model/1');
+    history.current.push('/model-registry/model/model-id-1');
 
     await act(async () => {
       jest.advanceTimersByTime(200);

@@ -17,7 +17,7 @@ const setup = () => {
     <Route path={routerPaths.model}>
       <Model />
     </Route>,
-    { route: generatePath(routerPaths.model, { id: '1' }) }
+    { route: generatePath(routerPaths.model, { id: 'model-id-1' }) }
   );
 
   return {

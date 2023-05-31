@@ -14,11 +14,12 @@ import {
   EuiPanel,
   EuiLoadingContent,
   EuiTabbedContent,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { MODEL_VERSION_STATE, routerPaths } from '../../../common';
+import { OpenSearchModel, routerPaths } from '../../../common';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 
@@ -29,14 +30,19 @@ import { ModelVersionInformation } from './version_information';
 import { ModelVersionArtifact } from './version_artifact';
 import { ModelVersionTags } from './version_tags';
 import { ModelVersionFormData } from './types';
+import { ToggleDeployButton } from './toggle_deploy_button';
 
 export const ModelVersion = () => {
-  const { id: modelId } = useParams<{ id: string }>();
-  const { data: model, loading } = useFetcher(APIProvider.getAPI('modelVersion').getOne, modelId);
+  const [modelData, setModelData] = useState<OpenSearchModel>();
+  const { id: modelVersionId } = useParams<{ id: string }>();
+  const { data: modelVersionData, loading: modelVersionLoading, reload } = useFetcher(
+    APIProvider.getAPI('modelVersion').getOne,
+    modelVersionId
+  );
   const [modelInfo, setModelInfo] = useState<{ version: string; name: string }>();
   const history = useHistory();
-  const modelName = model?.name;
-  const modelVersion = model?.model_version;
+  const modelName = modelVersionData?.name;
+  const modelVersion = modelVersionData?.model_version;
   const form = useForm<ModelVersionFormData>();
 
   const onVersionChange = useCallback(
@@ -48,6 +54,16 @@ export const ModelVersion = () => {
     },
     [history]
   );
+
+  useEffect(() => {
+    if (modelVersionData?.model_id) {
+      APIProvider.getAPI('model')
+        .getOne(modelVersionData?.model_id)
+        .then((res) => {
+          setModelData(res);
+        });
+    }
+  }, [modelVersionData?.model_id]);
 
   useEffect(() => {
     if (!modelName || !modelVersion) {
@@ -65,7 +81,7 @@ export const ModelVersion = () => {
   }, [modelName, modelVersion]);
 
   useEffect(() => {
-    if (model) {
+    if (modelVersionData) {
       form.reset({
         versionNotes: 'TODO', // TODO: read from model.versionNotes
         tags: [
@@ -73,21 +89,21 @@ export const ModelVersion = () => {
           { key: 'Precision', value: '0.64', type: 'number' as const },
           { key: 'Task', value: 'Image classification', type: 'string' as const },
         ], // TODO: read from model.tags
-        configuration: JSON.stringify(model.model_config, undefined, 2),
-        modelFileFormat: model.model_format,
+        configuration: JSON.stringify(modelVersionData.model_config, undefined, 2),
+        modelFileFormat: modelVersionData.model_format,
         // TODO: read model url or model filename
         artifactSource: 'source_not_changed',
         // modelFile: new File([], 'artifact.zip'),
         modelURL: 'http://url.to/artifact.zip',
       });
     }
-  }, [model, form]);
+  }, [modelVersionData, form]);
 
   const tabs = [
     {
       id: 'version-information',
       name: 'Version information',
-      content: loading ? (
+      content: modelVersionLoading ? (
         <>
           <EuiSpacer size="m" />
           <EuiPanel style={{ minHeight: 200 }}>
@@ -106,7 +122,7 @@ export const ModelVersion = () => {
     {
       id: 'artifact-configuration',
       name: 'Artifact and configuration',
-      content: loading ? (
+      content: modelVersionLoading ? (
         <>
           <EuiSpacer size="m" />
           <EuiPanel style={{ minHeight: 200 }}>
@@ -145,27 +161,43 @@ export const ModelVersion = () => {
           }
           rightSideGroupProps={{
             gutterSize: 'm',
+            alignItems: 'center',
           }}
           rightSideItems={[
             <EuiButton fill>Register version</EuiButton>,
-            <EuiButton>Deploy</EuiButton>,
-            <EuiButton color="danger">Delete</EuiButton>,
+            modelVersionData && (
+              <ToggleDeployButton
+                onComplete={reload}
+                modelName={modelVersionData.name}
+                modelVersion={modelVersionData.model_version}
+                modelState={modelVersionData.model_state}
+                modelVersionId={modelVersionId}
+              />
+            ),
+            <EuiButtonIcon iconType="trash" color="danger">
+              Delete
+            </EuiButtonIcon>,
           ]}
         />
       )}
-      <ModelVersionCallout modelVersionId="" modelState={MODEL_VERSION_STATE.deploying} />
-      <ModelVersionCallout modelVersionId="" modelState={MODEL_VERSION_STATE.deployFailed} />
+      {modelVersionData && (
+        <ModelVersionCallout
+          modelVersionId={modelVersionId}
+          modelState={modelVersionData.model_state}
+        />
+      )}
       <EuiSpacer size="m" />
-      {loading ? (
+      {modelVersionLoading ? (
         <EuiPanel style={{ minHeight: 200 }}>
           <EuiLoadingContent data-test-subj="ml-versionDetailsLoading" lines={2} />
         </EuiPanel>
       ) : (
         <ModelVersionDetails
-          description={model?.description}
-          modelId={model?.id}
-          createdTime={model?.created_time}
-          lastUpdatedTime={model?.last_updated_time}
+          description={modelData?.description}
+          modelVersionId={modelVersionData?.id}
+          createdTime={modelVersionData?.created_time}
+          lastUpdatedTime={modelVersionData?.last_updated_time}
+          owner={modelData?.owner.name}
         />
       )}
       <EuiSpacer size="m" />
