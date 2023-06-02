@@ -6,6 +6,8 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { EuiLink, EuiSpacer, EuiText } from '@elastic/eui';
 import { Link, generatePath, useHistory } from 'react-router-dom';
+import { timer } from 'rxjs';
+import { scan, switchMap, takeWhile } from 'rxjs/operators';
 
 import { useOpenSearchDashboards } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { mountReactNode } from '../../../../../../src/core/public/utils';
@@ -64,35 +66,45 @@ export const ModelVersionDeleteConfirmModal = ({
      * Add this polling here to make sure version can't searchable.
      *
      **/
-    for (let i = 0; i < 200; i++) {
-      if (!mountedRef.current) {
-        return;
-      }
-      const deleted =
-        (
-          await APIProvider.getAPI('modelVersion').search({
+    timer(0, 300)
+      .pipe(scan((acc) => acc + 1, 0))
+      .pipe(takeWhile(() => mountedRef.current))
+      .pipe(
+        switchMap(async (times) => {
+          const searchResult = await APIProvider.getAPI('modelVersion').search({
             ids: [id],
             from: 0,
             size: 1,
-          })
-        ).total_model_versions === 0;
-      if (deleted) {
-        notifications?.toasts.addSuccess({
-          title: mountReactNode(
-            <>
-              <b>
-                {name} version {version}
-              </b>{' '}
-              has been deleted
-            </>
-          ),
-        });
-        closeModal(true);
-        return;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 300));
-    }
-    closeModal(false);
+          });
+          return {
+            searchResult,
+            times,
+          };
+        })
+      )
+      .pipe(
+        takeWhile(({ searchResult, times }) => searchResult.total_model_versions > 0 || times < 200)
+      )
+      .subscribe(({ times, searchResult }) => {
+        if (searchResult.total_model_versions === 0) {
+          notifications?.toasts.addSuccess({
+            title: mountReactNode(
+              <>
+                <b>
+                  {name} version {version}
+                </b>{' '}
+                has been deleted
+              </>
+            ),
+          });
+          closeModal(true);
+          return;
+        }
+        if (times === 200) {
+          closeModal(false);
+          return;
+        }
+      });
   }, [id, name, version, history, notifications, closeModal]);
 
   const handleModalCancel = useCallback(() => {
