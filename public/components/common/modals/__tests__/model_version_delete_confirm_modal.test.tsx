@@ -162,4 +162,48 @@ describe('<ModelVersionDeleteConfirmModal />', () => {
 
     jest.useRealTimers();
   });
+
+  it('should not call model search if previous call not response', async () => {
+    jest.useFakeTimers();
+
+    const modelDeleteMock = jest.spyOn(ModelVersion.prototype, 'delete').mockResolvedValue({});
+    const modelSearchMock = jest
+      .spyOn(ModelVersion.prototype, 'search')
+      .mockImplementation(async () => {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 2000);
+        });
+        return { data: [], total_model_versions: 1 };
+      });
+
+    setup();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
+    await user.type(screen.getByLabelText('confirm text input'), 'model1 version 1');
+    await user.click(screen.getByText('Delete version'));
+
+    expect(modelSearchMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+    expect(modelSearchMock).toHaveBeenCalledTimes(1);
+
+    // Should not call model search immediately after API response
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+    expect(modelSearchMock).toHaveBeenCalledTimes(1);
+
+    // Should call model search again after 100+200ms delay
+    await act(async () => {
+      jest.advanceTimersByTime(200);
+    });
+    expect(modelSearchMock).toHaveBeenCalledTimes(2);
+
+    modelDeleteMock.mockRestore();
+    modelSearchMock.mockRestore();
+
+    jest.useRealTimers();
+  });
 });

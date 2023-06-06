@@ -6,8 +6,8 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { EuiLink, EuiSpacer, EuiText } from '@elastic/eui';
 import { Link, generatePath, useHistory } from 'react-router-dom';
-import { timer } from 'rxjs';
-import { scan, switchMap, takeWhile } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { delay, scan, switchMap, takeWhile, retryWhen, map } from 'rxjs/operators';
 
 import { useOpenSearchDashboards } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { mountReactNode } from '../../../../../../src/core/public/utils';
@@ -66,27 +66,36 @@ export const ModelVersionDeleteConfirmModal = ({
      * Add this polling here to make sure version can't searchable.
      *
      **/
-    timer(0, 300)
-      .pipe(scan((acc) => acc + 1, 0))
+    of(null)
       .pipe(takeWhile(() => mountedRef.current))
       .pipe(
-        switchMap(async (times) => {
-          const searchResult = await APIProvider.getAPI('modelVersion').search({
+        switchMap(async () => {
+          const result = await APIProvider.getAPI('modelVersion').search({
             ids: [id],
             from: 0,
             size: 1,
           });
-          return {
-            searchResult,
-            times,
-          };
+          if (result.total_model_versions > 0) {
+            throw new Error('Model version searchable.');
+          }
+          return result;
         })
       )
       .pipe(
-        takeWhile(({ searchResult, times }) => searchResult.total_model_versions > 0 || times < 200)
+        retryWhen((errors) =>
+          errors.pipe(
+            delay(300),
+            scan((acc) => acc + 1, 0),
+            map((times) => {
+              if (times >= 200) {
+                throw new Error('Exceed max retries.');
+              }
+            })
+          )
+        )
       )
-      .subscribe(({ times, searchResult }) => {
-        if (searchResult.total_model_versions === 0) {
+      .subscribe({
+        next: () => {
           notifications?.toasts.addSuccess({
             title: mountReactNode(
               <>
@@ -98,12 +107,10 @@ export const ModelVersionDeleteConfirmModal = ({
             ),
           });
           closeModal(true);
-          return;
-        }
-        if (times === 200) {
+        },
+        error: () => {
           closeModal(false);
-          return;
-        }
+        },
       });
   }, [id, name, version, history, notifications, closeModal]);
 
