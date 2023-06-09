@@ -11,7 +11,7 @@ describe('<ExperimentalWarning />', () => {
     render(<ExperimentalWarning />);
     const link = screen.getByText('Machine Learning Documentation');
     expect(link.getAttribute('href')).toBe(
-      'https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashbaord/'
+      'https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashboard/'
     );
   });
 
