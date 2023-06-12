@@ -133,6 +133,7 @@ export class ModelVersionService {
     return {
       id,
       ...modelSource,
+      model_id: modelSource.model_group_id,
     };
   }
 
