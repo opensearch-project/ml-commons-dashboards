@@ -207,7 +207,7 @@ export const ModelDeploymentTable = ({
                 Deployed models will appear here. For more information, see{' '}
                 <EuiLink
                   role="link"
-                  href="https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashbaord/"
+                  href="https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashboard/"
                   external
                 >
                   Machine Learning Documentation
