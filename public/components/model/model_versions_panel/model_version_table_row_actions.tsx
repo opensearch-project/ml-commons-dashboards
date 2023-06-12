@@ -7,22 +7,32 @@ import React, { useState, useCallback } from 'react';
 import { EuiPopover, EuiButtonIcon, EuiContextMenuPanel, EuiContextMenuItem } from '@elastic/eui';
 
 import { MODEL_VERSION_STATE } from '../../../../common';
-import { ModelVersionDeploymentConfirmModal } from '../../common';
+import {
+  ModelVersionDeleteConfirmModal,
+  ModelVersionDeploymentConfirmModal,
+  ModelVersionUnableDoActionModal,
+} from '../../common';
 
-export const ModelVersionTableRowActions = ({
-  state,
-  id,
-  name,
-  version,
-}: {
-  state: MODEL_VERSION_STATE;
+interface ModelVersionTableRowActionsProps {
   id: string;
   name: string;
   version: string;
-}) => {
+  state: MODEL_VERSION_STATE;
+  onDeleted: (id: string) => void;
+}
+
+export const ModelVersionTableRowActions = ({
+  id,
+  name,
+  state,
+  version,
+  onDeleted,
+}: ModelVersionTableRowActionsProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isDeployConfirmModalShow, setIsDeployConfirmModalShow] = useState(false);
   const [isUndeployConfirmModalShow, setIsUndeployConfirmModalShow] = useState(false);
+  const [isDeleteConfirmModalShow, setIsDeleteConfirmModalShow] = useState(false);
+  const [isUnableDeleteModalShow, setIsUnableDeleteModalShow] = useState(false);
 
   const handleShowActionsClick = useCallback(() => {
     setIsPopoverOpen((flag) => !flag);
@@ -46,6 +56,34 @@ export const ModelVersionTableRowActions = ({
 
   const closeUndeployConfirmModal = useCallback(() => {
     setIsUndeployConfirmModalShow(false);
+  }, []);
+
+  const handleDeleteClick = useCallback(() => {
+    if (
+      [
+        MODEL_VERSION_STATE.deployed,
+        MODEL_VERSION_STATE.deploying,
+        MODEL_VERSION_STATE.registering,
+      ].includes(state)
+    ) {
+      setIsUnableDeleteModalShow(true);
+      return;
+    }
+    setIsDeleteConfirmModalShow(true);
+  }, [state]);
+
+  const handleDeleteConfirmModalClose = useCallback(
+    (versionDeleted: boolean) => {
+      setIsDeleteConfirmModalShow(false);
+      if (versionDeleted) {
+        onDeleted(id);
+      }
+    },
+    [id, onDeleted]
+  );
+
+  const closeUnableDeleteModal = useCallback(() => {
+    setIsUnableDeleteModalShow(false);
   }, []);
 
   return (
@@ -112,6 +150,7 @@ export const ModelVersionTableRowActions = ({
                 icon="trash"
                 color="danger"
                 style={{ padding: 8, color: '#BD271E' }}
+                onClick={handleDeleteClick}
               >
                 Delete
               </EuiContextMenuItem>,
@@ -135,6 +174,24 @@ export const ModelVersionTableRowActions = ({
           name={name}
           version={version}
           closeModal={closeUndeployConfirmModal}
+        />
+      )}
+      {isDeleteConfirmModalShow && (
+        <ModelVersionDeleteConfirmModal
+          id={id}
+          name={name}
+          version={version}
+          closeModal={handleDeleteConfirmModalClose}
+        />
+      )}
+      {isUnableDeleteModalShow && (
+        <ModelVersionUnableDoActionModal
+          actionType="delete"
+          id={id}
+          name={name}
+          version={version}
+          state={state}
+          closeModal={closeUnableDeleteModal}
         />
       )}
     </>

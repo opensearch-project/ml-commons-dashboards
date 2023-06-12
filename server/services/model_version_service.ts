@@ -131,6 +131,7 @@ export class ModelVersionService {
     ).body;
     return {
       id,
+      model_id: modelSource.model_group_id,
       ...modelSource,
       model_id: modelSource.model_group_id,
     };

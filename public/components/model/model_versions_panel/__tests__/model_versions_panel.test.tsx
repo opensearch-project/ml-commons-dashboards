@@ -292,4 +292,30 @@ describe('<ModelVersionsPanel />', () => {
     },
     20 * 1000
   );
+
+  it(
+    'should reload model version data after version delete successfully',
+    async () => {
+      render(<ModelVersionsPanel modelId="2" />);
+      await waitFor(() => {
+        expect(screen.getAllByLabelText('show actions').length).toBeGreaterThanOrEqual(1);
+      });
+      await userEvent.click(screen.getAllByLabelText('show actions')[0]);
+      await userEvent.click(within(screen.getByRole('dialog')).getByText('Delete'));
+      await userEvent.type(screen.getByLabelText('confirm text input'), 'model2 version 1.0.1');
+      expect(screen.getByText('Delete version')).toBeEnabled();
+
+      const searchMock = jest
+        .spyOn(ModelVersion.prototype, 'search')
+        .mockResolvedValue({ data: [], total_model_versions: 0 });
+      await userEvent.click(screen.getByText('Delete version'));
+
+      expect(searchMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          modelIds: ['2'],
+        })
+      );
+    },
+    20 * 1000
+  );
 });
