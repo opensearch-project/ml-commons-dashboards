@@ -85,7 +85,7 @@ export function ModelTable(props: ModelTableProps) {
         field: 'owner_name',
         name: 'Owner',
         width: '79px',
-        render: (name: string) => <ModelOwner name={name} />,
+        render: (name: string) => (name ? <ModelOwner name={name} /> : '-'),
         align: 'center',
         sortable: true,
       },

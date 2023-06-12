@@ -8,7 +8,6 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionDeploymentConfirmModal } from '../model_version_deployment_confirm_modal';
-import { ModelVersion } from '../../../../apis/model_version';
 import * as Hooks from '../../../../hooks/use_deployment';
 
 describe('<ModelVersionDeploymentConfirmModal />', () => {

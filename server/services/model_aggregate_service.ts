@@ -69,7 +69,7 @@ export class ModelAggregateService {
         aggs: {
           models: {
             terms: {
-              field: 'model_group_id.keyword',
+              field: 'model_group_id',
               size: MAX_MODEL_BUCKET_NUM,
             },
           },
@@ -117,7 +117,7 @@ export class ModelAggregateService {
     return {
       data: models.map((model) => ({
         ...model,
-        owner_name: model.owner.name,
+        owner_name: model.owner?.name,
         deployed_versions: (modelId2Version[model.id] || []).map(
           (deployedVersion) => deployedVersion.model_version
         ),

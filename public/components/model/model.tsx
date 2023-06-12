@@ -97,7 +97,7 @@ export const Model = () => {
       />
       <ModelOverviewCard
         id={data.id}
-        owner={data.owner.name}
+        owner={data.owner?.name || '-'}
         isModelOwner={false}
         createdTime={data.created_time}
         updatedTime={data.last_updated_time}

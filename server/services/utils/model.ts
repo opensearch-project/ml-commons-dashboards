@@ -88,7 +88,7 @@ export const generateModelSearchQuery = ({
             },
           ]
         : []),
-      ...(modelIds ? [generateTermQuery('model_group_id.keyword', modelIds)] : []),
+      ...(modelIds ? [generateTermQuery('model_group_id', modelIds)] : []),
     ],
     must_not: {
       exists: {

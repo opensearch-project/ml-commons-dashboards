@@ -5,7 +5,7 @@
 
 export interface OpenSearchModel {
   id: string;
-  owner: {
+  owner?: {
     backend_roles: string[];
     roles: string[];
     name: string;

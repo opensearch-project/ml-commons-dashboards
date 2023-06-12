@@ -11,7 +11,15 @@ import { ModelVersionTableRowActions } from '../model_version_table_row_actions'
 import { MODEL_VERSION_STATE } from '../../../../../common';
 
 const setup = (state: MODEL_VERSION_STATE) => {
-  return render(<ModelVersionTableRowActions id="1" name="model-1" version="1" state={state} />);
+  return render(
+    <ModelVersionTableRowActions
+      id="1"
+      name="model-1"
+      version="1"
+      state={state}
+      onDeleted={jest.fn()}
+    />
+  );
 };
 
 describe('<ModelVersionTableRowActions />', () => {
@@ -46,6 +54,7 @@ describe('<ModelVersionTableRowActions />', () => {
         id="1"
         name="model-1"
         version="1"
+        onDeleted={jest.fn()}
       />
     );
     expect(screen.getByText('Deploy')).toBeInTheDocument();
@@ -56,6 +65,7 @@ describe('<ModelVersionTableRowActions />', () => {
         id="1"
         name="model-1"
         version="1"
+        onDeleted={jest.fn()}
       />
     );
     expect(screen.getByText('Deploy')).toBeInTheDocument();
@@ -74,6 +84,7 @@ describe('<ModelVersionTableRowActions />', () => {
         id="1"
         name="model-1"
         version="1"
+        onDeleted={jest.fn()}
       />
     );
     expect(screen.getByText('Undeploy')).toBeInTheDocument();
@@ -137,5 +148,25 @@ describe('<ModelVersionTableRowActions />', () => {
     expect(
       screen.queryByText('This version will be undeployed. You can deploy it again later.')
     ).not.toBeInTheDocument();
+  });
+
+  it('should show delete confirm modal after "Delete" button clicked', async () => {
+    const user = userEvent.setup();
+    setup(MODEL_VERSION_STATE.registered);
+    await user.click(screen.getByLabelText('show actions'));
+    await user.click(screen.getByText('Delete'));
+
+    expect(screen.getByTestId('confirmModalTitleText')).toHaveTextContent(
+      'Delete model-1 version 1?'
+    );
+  });
+
+  it('should show unable to delete modal after "Delete" button clicked if state was registering', async () => {
+    const user = userEvent.setup();
+    setup(MODEL_VERSION_STATE.registering);
+    await user.click(screen.getByLabelText('show actions'));
+    await user.click(screen.getByText('Delete'));
+
+    expect(screen.getByText('Unable to delete')).toBeInTheDocument();
   });
 });

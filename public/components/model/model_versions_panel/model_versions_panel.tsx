@@ -253,6 +253,7 @@ export const ModelVersionsPanel = ({ modelId }: ModelVersionsPanelProps) => {
           pagination={pagination}
           totalVersionCount={totalVersionCount}
           sorting={versionsSorting}
+          onVersionDeleted={reload}
         />
       )}
       {panelStatus === 'loading' && (

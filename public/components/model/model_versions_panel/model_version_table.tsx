@@ -38,10 +38,11 @@ const ExpandCopyIDButton = ({ textToCopy }: { textToCopy: string }) => {
   );
 };
 
-interface VersionTableProps extends Pick<EuiDataGridProps, 'pagination' | 'sorting'> {
+interface ModelVersionTableProps extends Pick<EuiDataGridProps, 'pagination' | 'sorting'> {
   tags: string[];
   versions: VersionTableDataItem[];
   totalVersionCount?: number;
+  onVersionDeleted: (id: string) => void;
 }
 
 export const ModelVersionTable = ({
@@ -50,7 +51,8 @@ export const ModelVersionTable = ({
   versions,
   pagination,
   totalVersionCount,
-}: VersionTableProps) => {
+  onVersionDeleted,
+}: ModelVersionTableProps) => {
   const columns = useMemo<EuiDataGridColumn[]>(
     () => [
       {
@@ -114,12 +116,18 @@ export const ModelVersionTable = ({
         rowCellRender: ({ rowIndex }: EuiDataGridCellValueElementProps) => {
           const { id, name, version, state } = versions[rowIndex];
           return (
-            <ModelVersionTableRowActions id={id} name={name} state={state} version={version} />
+            <ModelVersionTableRowActions
+              id={id}
+              name={name}
+              state={state}
+              version={version}
+              onDeleted={onVersionDeleted}
+            />
           );
         },
       },
     ],
-    [versions]
+    [versions, onVersionDeleted]
   );
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const tagHiddenByDefaultColumns = tags.slice(3);
