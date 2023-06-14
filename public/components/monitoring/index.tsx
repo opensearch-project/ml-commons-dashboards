@@ -14,14 +14,16 @@ import {
 } from '@elastic/eui';
 import React, { useState, useRef, useCallback } from 'react';
 
+import { useUiSetting } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { ModelDeploymentProfile } from '../../apis/profile';
 import { RefreshInterval } from '../common/refresh_interval';
 import { PreviewPanel } from '../preview_panel';
 import { ExperimentalWarning } from '../experiment_warning';
+
 import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
 import { ModelStatusFilter } from './model_status_filter';
 import { SearchBar } from './search_bar';
-import { ModelDeploymentProfile } from '../../apis/profile';
 
 export const Monitoring = () => {
   const {
@@ -35,6 +37,7 @@ export const Monitoring = () => {
     reload,
     searchByStatus,
   } = useMonitoring();
+  const darkMode = useUiSetting<boolean>('theme:darkMode');
   const [previewModel, setPreviewModel] = useState<ModelDeploymentItem | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>();
 
@@ -75,7 +78,7 @@ export const Monitoring = () => {
       <EuiPageHeader
         pageTitle="Overview"
         rightSideItems={[
-          <div style={{ backgroundColor: '#fff' }}>
+          <div style={{ backgroundColor: darkMode ? undefined : '#fff' }}>
             <RefreshInterval onRefresh={reload} />
           </div>,
         ]}
