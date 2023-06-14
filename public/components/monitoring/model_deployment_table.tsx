@@ -209,6 +209,7 @@ export const ModelDeploymentTable = ({
                   role="link"
                   href="https://opensearch.org/docs/latest/ml-commons-plugin/ml-dashboard/"
                   external
+                  target="_blank"
                 >
                   Machine Learning Documentation
                 </EuiLink>
