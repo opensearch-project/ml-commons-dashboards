@@ -4,19 +4,15 @@
   "config": {
     "id": "mlCommonsDashboards"
   },
-  "version": "2.7.0.0",
+  "version": "2.8.0.0",
   "scripts": {
     "build": "yarn plugin-helpers build",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "osd": "node ../../scripts/osd",
     "lint:es": "node ../../scripts/eslint",
     "test:jest": "TZ=UTC ../../node_modules/.bin/jest --config ./test/jest.config.js",
-    "test:watch": "TZ=UTC ../../node_modules/.bin/jest --config ./test/jest.config.js --watch"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "test:watch": "TZ=UTC ../../node_modules/.bin/jest --config ./test/jest.config.js --watch",
+    "prepare": "husky install"
   },
   "dependencies": {
     "hash-wasm": "^4.9.0",
@@ -27,7 +23,7 @@
   "devDependencies": {
     "@testing-library/user-event": "^14.4.3",
     "@types/papaparse": "^5.3.5",
-    "husky": "^3.0.0",
+    "husky": "^8.0.0",
     "lint-staged": "^10.0.0",
     "msw": "^1.1.0"
   }
