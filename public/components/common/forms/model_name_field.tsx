@@ -24,12 +24,16 @@ interface ModelNameFieldProps<TFieldValues extends ModelNameFormData> {
 }
 
 const isDuplicateModelName = async (name: string) => {
-  const searchResult = await APIProvider.getAPI('model').search({
-    name,
-    from: 0,
-    size: 1,
-  });
-  return searchResult.total_models >= 1;
+  try {
+    const searchResult = await APIProvider.getAPI('model').search({
+      name,
+      from: 0,
+      size: 1,
+    });
+    return searchResult.total_models >= 1;
+  } catch (e) {
+    return false;
+  }
 };
 
 export const ModelNameField = <TFieldValues extends ModelNameFormData>({
