@@ -19,6 +19,10 @@ interface ModelVersionTableRowActionsProps {
   version: string;
   state: MODEL_VERSION_STATE;
   onDeleted: (id: string) => void;
+  onDeployed: (id: string) => void;
+  onUndeployed: (id: string) => void;
+  onDeployFailed: (id: string) => void;
+  onUndeployFailed: (id: string) => void;
 }
 
 export const ModelVersionTableRowActions = ({
@@ -27,6 +31,10 @@ export const ModelVersionTableRowActions = ({
   state,
   version,
   onDeleted,
+  onDeployed,
+  onDeployFailed,
+  onUndeployed,
+  onUndeployFailed,
 }: ModelVersionTableRowActionsProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isDeployConfirmModalShow, setIsDeployConfirmModalShow] = useState(false);
@@ -50,13 +58,31 @@ export const ModelVersionTableRowActions = ({
     setIsUndeployConfirmModalShow(true);
   }, []);
 
-  const closeDeployConfirmModal = useCallback(() => {
-    setIsDeployConfirmModalShow(false);
-  }, []);
+  const handleDeployConfirmModalClose = useCallback(
+    ({ id: versionId, succeed, canceled }: { succeed: boolean; id: string; canceled: boolean }) => {
+      if (succeed) {
+        onDeployed(versionId);
+      }
+      if (!succeed && !canceled) {
+        onDeployFailed(versionId);
+      }
+      setIsDeployConfirmModalShow(false);
+    },
+    [onDeployed, onDeployFailed]
+  );
 
-  const closeUndeployConfirmModal = useCallback(() => {
-    setIsUndeployConfirmModalShow(false);
-  }, []);
+  const handleUndeployConfirmModalClose = useCallback(
+    ({ id: versionId, succeed, canceled }: { canceled: boolean; succeed: boolean; id: string }) => {
+      if (succeed) {
+        onUndeployed(versionId);
+      }
+      if (!succeed && !canceled) {
+        onUndeployFailed(versionId);
+      }
+      setIsUndeployConfirmModalShow(false);
+    },
+    [onUndeployed, onUndeployFailed]
+  );
 
   const handleDeleteClick = useCallback(() => {
     if (
@@ -164,7 +190,7 @@ export const ModelVersionTableRowActions = ({
           id={id}
           name={name}
           version={version}
-          closeModal={closeDeployConfirmModal}
+          closeModal={handleDeployConfirmModalClose}
         />
       )}
       {isUndeployConfirmModalShow && (
@@ -173,7 +199,7 @@ export const ModelVersionTableRowActions = ({
           id={id}
           name={name}
           version={version}
-          closeModal={closeUndeployConfirmModal}
+          closeModal={handleUndeployConfirmModalClose}
         />
       )}
       {isDeleteConfirmModalShow && (

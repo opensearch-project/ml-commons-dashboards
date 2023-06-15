@@ -21,7 +21,7 @@ export const ModelVersionDeploymentConfirmModal = ({
   mode: 'deploy' | 'undeploy';
   name: string;
   version: string;
-  closeModal: () => void;
+  closeModal: (data: { canceled: boolean; succeed: boolean; id: string }) => void;
 }) => {
   const { deploy, undeploy } = useDeployment(id);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,12 +39,23 @@ export const ModelVersionDeploymentConfirmModal = ({
   };
   const { title, description, action } = mapping[mode];
 
+  const handleCancel = useCallback(() => {
+    closeModal({ canceled: true, succeed: false, id });
+  }, [closeModal, id]);
+
   const handleConfirm = useCallback(async () => {
     setIsSubmitting(true);
-    await action();
-    setIsSubmitting(false);
-    closeModal();
-  }, [action, closeModal]);
+    await action({
+      onComplete: () => {
+        setIsSubmitting(false);
+        closeModal({ canceled: false, succeed: true, id });
+      },
+      onError: () => {
+        setIsSubmitting(false);
+        closeModal({ canceled: false, succeed: false, id });
+      },
+    });
+  }, [id, action, closeModal]);
 
   return (
     <EuiConfirmModal
@@ -58,7 +69,7 @@ export const ModelVersionDeploymentConfirmModal = ({
       }
       confirmButtonText={title}
       cancelButtonText="Cancel"
-      onCancel={closeModal}
+      onCancel={handleCancel}
       onConfirm={handleConfirm}
       confirmButtonDisabled={isSubmitting}
       isLoading={isSubmitting}
