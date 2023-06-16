@@ -45,17 +45,28 @@ export const ModelVersionDeploymentConfirmModal = ({
 
   const handleConfirm = useCallback(async () => {
     setIsSubmitting(true);
-    await action({
-      onComplete: () => {
-        setIsSubmitting(false);
-        closeModal({ canceled: false, succeed: true, id });
-      },
-      onError: () => {
-        setIsSubmitting(false);
-        closeModal({ canceled: false, succeed: false, id });
-      },
-    });
-  }, [id, action, closeModal]);
+    try {
+      await action({
+        onComplete: () => {
+          setIsSubmitting(false);
+          closeModal({ canceled: false, succeed: true, id });
+        },
+        onError: () => {
+          setIsSubmitting(false);
+          closeModal({ canceled: false, succeed: false, id });
+        },
+      });
+    } catch (e) {
+      setIsSubmitting(false);
+      closeModal({ canceled: false, succeed: false, id });
+      return;
+    }
+    // undeploy action won't call onComplete after success, so need to handle undeploy success here
+    if (mode === 'undeploy') {
+      setIsSubmitting(false);
+      closeModal({ canceled: false, succeed: true, id });
+    }
+  }, [id, mode, action, closeModal]);
 
   return (
     <EuiConfirmModal
