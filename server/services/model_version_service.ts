@@ -41,32 +41,25 @@ interface UploadModelBase {
   version?: string;
   description?: string;
   modelFormat: string;
-  modelConfig: Record<string, unknown>;
   modelId: string;
 }
 
 interface UploadModelByURL extends UploadModelBase {
   url: string;
+  modelConfig: Record<string, unknown>;
 }
 
 interface UploadModelByChunk extends UploadModelBase {
   modelContentHashValue: string;
   totalChunks: number;
+  modelConfig: Record<string, unknown>;
 }
 
-type UploadResultInner<
-  T extends UploadModelByURL | UploadModelByChunk
-> = T extends UploadModelByChunk
+type UploadResultInner<T extends UploadModelBase> = T extends UploadModelByChunk
   ? { model_version_id: string; status: string }
-  : T extends UploadModelByURL
-  ? { task_id: string; status: string }
-  : never;
+  : { task_id: string; status: string };
 
-type UploadResult<T extends UploadModelByURL | UploadModelByChunk> = Promise<UploadResultInner<T>>;
-
-const isUploadModelByURL = (
-  test: UploadModelByURL | UploadModelByChunk
-): test is UploadModelByURL => (test as UploadModelByURL).url !== undefined;
+type UploadResult<T extends UploadModelBase> = Promise<UploadResultInner<T>>;
 
 export class ModelVersionService {
   constructor() {}
@@ -133,7 +126,6 @@ export class ModelVersionService {
       id,
       model_id: modelSource.model_group_id,
       ...modelSource,
-      model_id: modelSource.model_group_id,
     };
   }
 
@@ -177,48 +169,47 @@ export class ModelVersionService {
     ).body;
   }
 
-  public static async upload<T extends UploadModelByChunk | UploadModelByURL>({
+  public static async upload<T extends UploadModelByChunk | UploadModelByURL | UploadModelBase>({
     client,
     model,
   }: {
     client: IScopedClusterClient;
     model: T;
   }): UploadResult<T> {
-    const { name, version, description, modelFormat, modelConfig, modelId } = model;
+    const { name, version, description, modelFormat, modelId } = model;
     const uploadModelBase = {
       name,
       version,
       description,
       model_format: modelFormat,
-      model_config: modelConfig,
+      model_config: 'modelConfig' in model ? model.modelConfig : undefined,
       model_group_id: modelId,
     };
-    if (isUploadModelByURL(model)) {
-      const { task_id: taskId, status } = (
+    if ('totalChunks' in model) {
+      const { model_id: modelVersionId, status } = (
         await client.asCurrentUser.transport.request({
           method: 'POST',
-          path: MODEL_UPLOAD_API,
+          path: MODEL_META_API,
           body: {
             ...uploadModelBase,
-            url: model.url,
+            model_content_hash_value: model.modelContentHashValue,
+            total_chunks: model.totalChunks,
           },
         })
       ).body;
-      return { task_id: taskId, status } as UploadResultInner<T>;
+      return { model_version_id: modelVersionId, status } as UploadResultInner<T>;
     }
-
-    const { model_id: modelVersionId, status } = (
+    const { task_id: taskId, status } = (
       await client.asCurrentUser.transport.request({
         method: 'POST',
-        path: MODEL_META_API,
+        path: MODEL_UPLOAD_API,
         body: {
           ...uploadModelBase,
-          model_content_hash_value: model.modelContentHashValue,
-          total_chunks: model.totalChunks,
+          url: 'url' in model ? model.url : undefined,
         },
       })
     ).body;
-    return { model_version_id: modelVersionId, status } as UploadResultInner<T>;
+    return { task_id: taskId, status } as UploadResultInner<T>;
   }
 
   public static async uploadModelChunk({
