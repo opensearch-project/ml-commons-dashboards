@@ -80,17 +80,18 @@ interface UploadModelBase {
   version?: string;
   description?: string;
   modelFormat: string;
-  modelConfig: Record<string, unknown>;
   modelId: string;
 }
 
 export interface UploadModelByURL extends UploadModelBase {
   url: string;
+  modelConfig: Record<string, unknown>;
 }
 
 export interface UploadModelByChunk extends UploadModelBase {
   modelContentHashValue: string;
   totalChunks: number;
+  modelConfig: Record<string, unknown>;
 }
 
 export class ModelVersion {
@@ -139,15 +140,9 @@ export class ModelVersion {
     );
   }
 
-  public upload<T extends UploadModelByURL | UploadModelByChunk>(
+  public upload<T extends UploadModelBase>(
     model: T
-  ): Promise<
-    T extends UploadModelByURL
-      ? { task_id: string }
-      : T extends UploadModelByChunk
-      ? { model_version_id: string }
-      : never
-  > {
+  ): Promise<T extends UploadModelByChunk ? { model_version_id: string } : { task_id: string }> {
     return InnerHttpProvider.getHttp().post(MODEL_VERSION_UPLOAD_API_ENDPOINT, {
       body: JSON.stringify(model),
     });
