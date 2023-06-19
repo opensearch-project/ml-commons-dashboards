@@ -6,18 +6,20 @@
 import { APIProvider } from '../../apis/api_provider';
 import { MAX_CHUNK_SIZE } from '../common/forms/form_constants';
 import { getModelContentHashValue } from './get_model_content_hash_value';
-import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { ModelFileFormData, ModelUrlFormData, ModelFormBase } from './register_model.types';
 
 const getModelUploadBase = ({
   name,
+  version,
   versionNotes,
   modelFileFormat,
   configuration,
-}: ModelFileFormData | ModelUrlFormData) => ({
+}: ModelFormBase & { configuration?: string }) => ({
   name,
+  version,
   description: versionNotes,
   modelFormat: modelFileFormat,
-  modelConfig: JSON.parse(configuration),
+  modelConfig: configuration ? JSON.parse(configuration) : undefined,
 });
 
 const createModelIfNeedAndUploadVersion = async <T>({
@@ -78,14 +80,14 @@ export async function submitModelWithFile(model: ModelFileFormData) {
   };
 }
 
-export async function submitModelWithURL(model: ModelUrlFormData) {
+export async function submitModelWithURL(model: ModelUrlFormData | ModelFormBase) {
   const result = await createModelIfNeedAndUploadVersion({
     ...model,
     uploader: (modelId: string) =>
       APIProvider.getAPI('modelVersion').upload({
         ...getModelUploadBase(model),
         modelId,
-        url: model.modelURL,
+        url: 'modelURL' in model ? model.modelURL : undefined,
       }),
   });
 

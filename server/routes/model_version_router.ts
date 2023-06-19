@@ -52,24 +52,23 @@ export const modelStateSchema = schema.oneOf([
   schema.literal(MODEL_VERSION_STATE.registerFailed),
 ]);
 
-const modelUploadBaseSchema = {
+const modelUploadBaseSchema = schema.object({
   name: schema.string(),
   version: schema.maybe(schema.string()),
   description: schema.maybe(schema.string()),
   modelFormat: schema.string(),
-  modelConfig: schema.object({}, { unknowns: 'allow' }),
   modelId: schema.string(),
-};
-
-const modelUploadByURLSchema = schema.object({
-  ...modelUploadBaseSchema,
-  url: schema.string(),
 });
 
-const modelUploadByChunkSchema = schema.object({
-  ...modelUploadBaseSchema,
+const modelUploadByURLSchema = modelUploadBaseSchema.extends({
+  url: schema.string(),
+  modelConfig: schema.object({}, { unknowns: 'allow' }),
+});
+
+const modelUploadByChunkSchema = modelUploadBaseSchema.extends({
   modelContentHashValue: schema.string(),
   totalChunks: schema.number(),
+  modelConfig: schema.object({}, { unknowns: 'allow' }),
 });
 
 export const modelVersionRouter = (router: IRouter) => {
@@ -259,7 +258,11 @@ export const modelVersionRouter = (router: IRouter) => {
     {
       path: MODEL_VERSION_UPLOAD_API_ENDPOINT,
       validate: {
-        body: schema.oneOf([modelUploadByURLSchema, modelUploadByChunkSchema]),
+        body: schema.oneOf([
+          modelUploadByURLSchema,
+          modelUploadByChunkSchema,
+          modelUploadBaseSchema,
+        ]),
       },
     },
     async (context, request) => {

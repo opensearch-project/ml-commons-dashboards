@@ -38,7 +38,7 @@ import { ModelVersionNotesPanel } from './model_version_notes';
 import { modelFileUploadManager } from './model_file_upload_manager';
 import { MAX_CHUNK_SIZE, FORM_ERRORS } from '../common/forms/form_constants';
 import { ModelDetailsPanel } from './model_details';
-import type { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import type { ModelFileFormData, ModelFormBase, ModelUrlFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';
 import { ConfigurationPanel } from './model_configuration';
 import { ModelTagsPanel } from './model_tags';
@@ -115,7 +115,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
   const formErrors = useMemo(() => ({ ...form.formState.errors }), [form.formState]);
 
   const onSubmit = useCallback(
-    async (data: ModelFileFormData | ModelUrlFormData) => {
+    async (data: ModelFileFormData | ModelUrlFormData | ModelFormBase) => {
       try {
         const onComplete = () => {
           notifications?.toasts.addSuccess({
@@ -229,17 +229,16 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
       .subscribe(
         (preTrainedModel) => {
           // TODO: Fill model format here
-          const { config, url } = preTrainedModel;
-          form.setValue('modelURL', url);
+          const { config } = preTrainedModel;
           form.setValue('modelFileFormat', 'TORCH_SCRIPT');
           if (config.name) {
-            form.setValue('name', config.name);
+            form.setValue('name', `huggingface/${config.name}`);
+          }
+          if (config.version) {
+            form.setValue('version', config.version);
           }
           if (config.description) {
             form.setValue('description', config.description);
-          }
-          if (config.model_config) {
-            form.setValue('configuration', JSON.stringify(config.model_config));
           }
           setPreTrainedModelLoading(false);
         },
@@ -253,6 +252,10 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
       subscriber.unsubscribe();
     };
   }, [nameParams, form]);
+
+  useEffect(() => {
+    form.setValue('type', formType);
+  }, [formType, form]);
 
   const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
     // TODO
