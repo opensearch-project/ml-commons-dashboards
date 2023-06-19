@@ -94,7 +94,7 @@ export const ModelList = () => {
     searchInputRef.current = node;
   }, []);
 
-  const { data, loading, error } = useFetcher(
+  const { data, loading, error, reload } = useFetcher(
     APIProvider.getAPI('modelAggregate').search,
     getModelAggregateSearchParams(params)
   );
@@ -185,6 +185,7 @@ export const ModelList = () => {
             onChange={handleTableChange}
             onResetClick={handleReset}
             error={!!error}
+            onModelDeleted={reload}
           />
         </>
       )}
