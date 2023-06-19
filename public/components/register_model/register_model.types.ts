@@ -5,14 +5,15 @@
 
 import type { Tag } from '../model/types';
 
-interface ModelFormBase {
+export interface ModelFormBase {
   name: string;
+  version?: string;
   modelId?: string;
   description?: string;
-  configuration: string;
   modelFileFormat: string;
   tags?: Tag[];
   versionNotes?: string;
+  type?: 'import' | 'upload';
 }
 
 /**
@@ -20,6 +21,7 @@ interface ModelFormBase {
  */
 export interface ModelFileFormData extends ModelFormBase {
   modelFile: File;
+  configuration: string;
 }
 
 /**
@@ -27,4 +29,5 @@ export interface ModelFileFormData extends ModelFormBase {
  */
 export interface ModelUrlFormData extends ModelFormBase {
   modelURL: string;
+  configuration: string;
 }

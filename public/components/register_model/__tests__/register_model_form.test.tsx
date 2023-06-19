@@ -75,19 +75,17 @@ describe('<RegisterModel /> Form', () => {
     });
     await waitFor(() =>
       expect(screen.getByLabelText<HTMLInputElement>(/^name$/i).value).toEqual(
-        'sentence-transformers/all-distilroberta-v1'
+        'huggingface/sentence-transformers/all-distilroberta-v1'
       )
     );
     expect(onSubmitMock).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: /register model/i }));
     expect(onSubmitMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        name: 'sentence-transformers/all-distilroberta-v1',
+        name: 'huggingface/sentence-transformers/all-distilroberta-v1',
+        version: '1.0.1',
         description:
           'This is a sentence-transformers model: It maps sentences & paragraphs to a 768 dimensional dense vector space and can be used for tasks like clustering or semantic search.',
-        modelURL:
-          'https://artifacts.opensearch.org/models/ml-models/huggingface/sentence-transformers/all-distilroberta-v1/1.0.1/torch_script/sentence-transformers_all-distilroberta-v1-1.0.1-torch_script.zip',
-        configuration: expect.stringContaining('sentence_transformers'),
       })
     );
   });

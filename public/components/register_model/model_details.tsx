@@ -12,14 +12,15 @@ import { ModelNameField, ModelDescriptionField } from '../../components/common';
 import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
 
 export const ModelDetailsPanel = () => {
-  const { control, trigger } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { control, trigger, watch } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const type = watch('type');
 
   return (
     <div>
       <EuiText size="s">
         <h3>Details</h3>
       </EuiText>
-      <ModelNameField control={control} trigger={trigger} />
+      <ModelNameField readOnly={type === 'import'} control={control} trigger={trigger} />
       <ModelDescriptionField control={control} />
     </div>
   );

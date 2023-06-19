@@ -9,7 +9,7 @@ import { EuiFormRow, EuiTextArea } from '@elastic/eui';
 import { Control, FieldPathByValue, useController } from 'react-hook-form';
 
 interface ModeDescriptionFormData {
-  description: string;
+  description?: string;
 }
 
 const DESCRIPTION_MAX_LENGTH = 200;

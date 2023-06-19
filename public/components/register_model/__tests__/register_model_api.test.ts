@@ -174,5 +174,24 @@ describe('register model api', () => {
         taskId: 'foo',
       });
     });
+
+    it('should call register model group API without URL and configuration', async () => {
+      expect(ModelVersion.prototype.upload).not.toHaveBeenCalled();
+
+      await submitModelWithURL({
+        name: 'foo',
+        description: 'bar',
+        configuration: '{}',
+        modelFileFormat: '',
+      });
+
+      expect(ModelVersion.prototype.upload).toHaveBeenCalled();
+      expect(ModelVersion.prototype.upload).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.any(String),
+          modelConfig: expect.anything(),
+        })
+      );
+    });
   });
 });
