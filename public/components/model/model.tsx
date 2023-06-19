@@ -23,6 +23,7 @@ import { ModelOverviewCard } from './model_overview_card';
 import { ModelVersionsPanel } from './model_versions_panel';
 import { ModelDetailsPanel } from './model_details_panel';
 import { ModelTagsPanel } from './model_tags_panel';
+import { ModelDeleteButton } from './model_delete_button';
 
 export const Model = () => {
   const { id: modelId } = useParams<{ id: string }>();
@@ -88,11 +89,12 @@ export const Model = () => {
             <h1>{data.name}</h1>
           </EuiText>
         }
+        rightSideGroupProps={{ alignItems: 'center' }}
         rightSideItems={[
           <Link to={generatePath(routerPaths.registerModel, { id: modelId })}>
             <EuiButton fill>Register version</EuiButton>
           </Link>,
-          <EuiButton color="danger">Delete</EuiButton>,
+          <ModelDeleteButton id={modelId} name={data.name} />,
         ]}
       />
       <ModelOverviewCard

@@ -44,7 +44,7 @@ describe('<Model />', () => {
         expect(screen.queryByTestId('model-group-loading-indicator')).toBeNull();
       });
       expect(screen.getByText('model1')).toBeInTheDocument();
-      expect(screen.getByText('Delete')).toBeInTheDocument();
+      expect(screen.getByLabelText('Delete model')).toBeInTheDocument();
       expect(screen.getByText('Register version')).toBeInTheDocument();
       expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
       expect(screen.queryByTestId('model-group-overview-card')).toBeInTheDocument();
