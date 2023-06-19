@@ -27,6 +27,7 @@ import { routerPaths } from '../../../common';
 
 import { ModelOwner } from './model_owner';
 import { ModelDeployedVersions } from './model_deployed_versions';
+import { ModelTableRowDeleteButton } from './model_table_row_delete_button';
 
 export interface ModelTableSort {
   field: 'name' | 'latest_version' | 'description' | 'owner_name' | 'last_updated_time';
@@ -50,10 +51,11 @@ export interface ModelTableProps {
   loading: boolean;
   error: boolean;
   onResetClick: () => void;
+  onModelDeleted: () => void;
 }
 
 export function ModelTable(props: ModelTableProps) {
-  const { models, sort, onChange, loading, onResetClick, error } = props;
+  const { models, sort, onChange, loading, onResetClick, error, onModelDeleted } = props;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
@@ -113,12 +115,14 @@ export function ModelTable(props: ModelTableProps) {
             ),
           },
           {
-            render: () => <EuiButtonIcon aria-label="Delete model" iconType="trash" />,
+            render: ({ id, name }) => (
+              <ModelTableRowDeleteButton id={id} name={name} onDeleted={onModelDeleted} />
+            ),
           },
         ],
       },
     ],
-    []
+    [onModelDeleted]
   );
 
   const pagination = useMemo(
