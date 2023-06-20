@@ -7,19 +7,35 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
-import { ModelVersionTableRowActions } from '../model_version_table_row_actions';
 import { MODEL_VERSION_STATE } from '../../../../../common';
+import * as useDeploymentExports from '../../../../hooks/use_deployment';
+import { ModelVersionTableRowActions } from '../model_version_table_row_actions';
 
 const setup = (state: MODEL_VERSION_STATE) => {
-  return render(
+  const onDeployedFailedMock = jest.fn();
+  const onDeployedMock = jest.fn();
+  const onUndeployedFailedMock = jest.fn();
+  const onUndeployedMock = jest.fn();
+  const result = render(
     <ModelVersionTableRowActions
       id="1"
       name="model-1"
       version="1"
       state={state}
       onDeleted={jest.fn()}
+      onDeployed={onDeployedMock}
+      onDeployFailed={onDeployedFailedMock}
+      onUndeployed={onUndeployedMock}
+      onUndeployFailed={onUndeployedFailedMock}
     />
   );
+  return {
+    renderResult: result,
+    onDeployedMock,
+    onDeployedFailedMock,
+    onUndeployedMock,
+    onUndeployedFailedMock,
+  };
 };
 
 describe('<ModelVersionTableRowActions />', () => {
@@ -43,7 +59,9 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should render "Deploy" button for REGISTERED, DEPLOY_FAILED and UNDEPLOYED state', async () => {
     const user = userEvent.setup();
-    const { rerender } = setup(MODEL_VERSION_STATE.registered);
+    const {
+      renderResult: { rerender },
+    } = setup(MODEL_VERSION_STATE.registered);
     await user.click(screen.getByLabelText('show actions'));
 
     expect(screen.getByText('Deploy')).toBeInTheDocument();
@@ -55,6 +73,10 @@ describe('<ModelVersionTableRowActions />', () => {
         name="model-1"
         version="1"
         onDeleted={jest.fn()}
+        onDeployed={jest.fn()}
+        onDeployFailed={jest.fn()}
+        onUndeployed={jest.fn()}
+        onUndeployFailed={jest.fn()}
       />
     );
     expect(screen.getByText('Deploy')).toBeInTheDocument();
@@ -66,6 +88,10 @@ describe('<ModelVersionTableRowActions />', () => {
         name="model-1"
         version="1"
         onDeleted={jest.fn()}
+        onDeployed={jest.fn()}
+        onDeployFailed={jest.fn()}
+        onUndeployed={jest.fn()}
+        onUndeployFailed={jest.fn()}
       />
     );
     expect(screen.getByText('Deploy')).toBeInTheDocument();
@@ -73,7 +99,9 @@ describe('<ModelVersionTableRowActions />', () => {
 
   it('should render "Undeploy" button for DEPLOYED and PARTIALLY_DEPLOYED state', async () => {
     const user = userEvent.setup();
-    const { rerender } = setup(MODEL_VERSION_STATE.deployed);
+    const {
+      renderResult: { rerender },
+    } = setup(MODEL_VERSION_STATE.deployed);
     await user.click(screen.getByLabelText('show actions'));
 
     expect(screen.getByText('Undeploy')).toBeInTheDocument();
@@ -85,6 +113,10 @@ describe('<ModelVersionTableRowActions />', () => {
         name="model-1"
         version="1"
         onDeleted={jest.fn()}
+        onDeployed={jest.fn()}
+        onDeployFailed={jest.fn()}
+        onUndeployed={jest.fn()}
+        onUndeployFailed={jest.fn()}
       />
     );
     expect(screen.getByText('Undeploy')).toBeInTheDocument();
@@ -168,5 +200,81 @@ describe('<ModelVersionTableRowActions />', () => {
     await user.click(screen.getByText('Delete'));
 
     expect(screen.getByText('Unable to delete')).toBeInTheDocument();
+  });
+
+  it('should call onDeployed after deployed', async () => {
+    const user = userEvent.setup();
+    const useDeploymentMock = jest
+      .spyOn(useDeploymentExports, 'useDeployment')
+      .mockImplementation(() => ({
+        deploy: async (options?: { onComplete?: () => void; onError?: () => void }) => {
+          options?.onComplete?.();
+        },
+        undeploy: jest.fn(),
+      }));
+
+    const { onDeployedMock } = setup(MODEL_VERSION_STATE.deployFailed);
+    await user.click(screen.getByLabelText('show actions'));
+    await user.click(screen.getByText('Deploy'));
+    await user.click(screen.getByRole('button', { name: 'Deploy' }));
+
+    expect(onDeployedMock).toHaveBeenCalled();
+    useDeploymentMock.mockRestore();
+  });
+
+  it('should call onDeployedFailed after deploy failed', async () => {
+    const user = userEvent.setup();
+    const useDeploymentMock = jest
+      .spyOn(useDeploymentExports, 'useDeployment')
+      .mockImplementation(() => ({
+        deploy: async (options?: { onComplete?: () => void; onError?: () => void }) => {
+          options?.onError?.();
+        },
+        undeploy: jest.fn(),
+      }));
+
+    const { onDeployedFailedMock } = setup(MODEL_VERSION_STATE.deployFailed);
+    await user.click(screen.getByLabelText('show actions'));
+    await user.click(screen.getByText('Deploy'));
+    await user.click(screen.getByRole('button', { name: 'Deploy' }));
+
+    expect(onDeployedFailedMock).toHaveBeenCalled();
+    useDeploymentMock.mockRestore();
+  });
+
+  it('should call onUndeployed after undeploy failed', async () => {
+    const user = userEvent.setup();
+    const useDeploymentMock = jest
+      .spyOn(useDeploymentExports, 'useDeployment')
+      .mockImplementation(() => ({
+        deploy: jest.fn(),
+        undeploy: jest.fn().mockResolvedValue({}),
+      }));
+
+    const { onUndeployedMock } = setup(MODEL_VERSION_STATE.deployed);
+    await user.click(screen.getByLabelText('show actions'));
+    await user.click(screen.getByText('Undeploy'));
+    await user.click(screen.getByRole('button', { name: 'Undeploy' }));
+
+    expect(onUndeployedMock).toHaveBeenCalled();
+    useDeploymentMock.mockRestore();
+  });
+
+  it('should call onUndeployedFailed after undeploy failed', async () => {
+    const user = userEvent.setup();
+    const useDeploymentMock = jest
+      .spyOn(useDeploymentExports, 'useDeployment')
+      .mockImplementation(() => ({
+        deploy: jest.fn(),
+        undeploy: jest.fn().mockRejectedValue(new Error('Undeploy failed')),
+      }));
+
+    const { onUndeployedFailedMock } = setup(MODEL_VERSION_STATE.deployed);
+    await user.click(screen.getByLabelText('show actions'));
+    await user.click(screen.getByText('Undeploy'));
+    await user.click(screen.getByRole('button', { name: 'Undeploy' }));
+
+    expect(onUndeployedFailedMock).toHaveBeenCalled();
+    useDeploymentMock.mockRestore();
   });
 });

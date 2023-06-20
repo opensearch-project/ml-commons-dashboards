@@ -106,4 +106,70 @@ describe('<ModelVersionDeploymentConfirmModal />', () => {
       });
     });
   });
+
+  it('should call closeModal with canceled after cancel button clicked', async () => {
+    const closeModalMock = jest.fn(() => {});
+    render(
+      <ModelVersionDeploymentConfirmModal
+        id="1"
+        name="model-1"
+        version="1"
+        closeModal={closeModalMock}
+        mode="undeploy"
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(closeModalMock).toHaveBeenCalledWith({ canceled: true, succeed: false, id: '1' });
+  });
+
+  it('should call closeModal with succeed equal true after undeploy button clicked and deploy complete', async () => {
+    const closeModalMock = jest.fn(() => {});
+    render(
+      <ModelVersionDeploymentConfirmModal
+        id="1"
+        name="model-1"
+        version="1"
+        closeModal={closeModalMock}
+        mode="undeploy"
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Undeploy' }));
+
+    await waitFor(() => {
+      expect(undeployMock.mock.calls.length).toBeGreaterThan(0);
+      expect(
+        undeployMock.mock.calls[undeployMock.mock.calls.length - 1][0].onComplete
+      ).not.toBeUndefined();
+    });
+
+    undeployMock.mock.calls[undeployMock.mock.calls.length - 1][0].onComplete();
+    expect(closeModalMock).toHaveBeenCalledWith({ canceled: false, succeed: true, id: '1' });
+  });
+
+  it('should call closeModal with succeed equal false after undeploy button clicked and deploy complete', async () => {
+    const closeModalMock = jest.fn(() => {});
+    render(
+      <ModelVersionDeploymentConfirmModal
+        id="1"
+        name="model-1"
+        version="1"
+        closeModal={closeModalMock}
+        mode="undeploy"
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Undeploy' }));
+
+    await waitFor(() => {
+      expect(undeployMock.mock.calls.length).toBeGreaterThan(0);
+      expect(
+        undeployMock.mock.calls[undeployMock.mock.calls.length - 1][0].onError
+      ).not.toBeUndefined();
+    });
+
+    undeployMock.mock.calls[undeployMock.mock.calls.length - 1][0].onError();
+    expect(closeModalMock).toHaveBeenCalledWith({ canceled: false, succeed: false, id: '1' });
+  });
 });
