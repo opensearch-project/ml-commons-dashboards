@@ -43,6 +43,10 @@ interface ModelVersionTableProps extends Pick<EuiDataGridProps, 'pagination' | '
   versions: VersionTableDataItem[];
   totalVersionCount?: number;
   onVersionDeleted: (id: string) => void;
+  onVersionDeployed: (id: string) => void;
+  onVersionDeployFailed: (id: string) => void;
+  onVersionUndeployed: (id: string) => void;
+  onVersionUndeployFailed: (id: string) => void;
 }
 
 export const ModelVersionTable = ({
@@ -52,6 +56,10 @@ export const ModelVersionTable = ({
   pagination,
   totalVersionCount,
   onVersionDeleted,
+  onVersionDeployed,
+  onVersionDeployFailed,
+  onVersionUndeployed,
+  onVersionUndeployFailed,
 }: ModelVersionTableProps) => {
   const columns = useMemo<EuiDataGridColumn[]>(
     () => [
@@ -122,12 +130,23 @@ export const ModelVersionTable = ({
               state={state}
               version={version}
               onDeleted={onVersionDeleted}
+              onDeployed={onVersionDeployed}
+              onDeployFailed={onVersionDeployFailed}
+              onUndeployed={onVersionUndeployed}
+              onUndeployFailed={onVersionUndeployFailed}
             />
           );
         },
       },
     ],
-    [versions, onVersionDeleted]
+    [
+      versions,
+      onVersionDeleted,
+      onVersionDeployed,
+      onVersionUndeployed,
+      onVersionDeployFailed,
+      onVersionUndeployFailed,
+    ]
   );
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const tagHiddenByDefaultColumns = tags.slice(3);
