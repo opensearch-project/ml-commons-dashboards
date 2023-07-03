@@ -9,9 +9,11 @@ import { generateTermQuery } from './query';
 export const generateModelSearchQuery = ({
   states,
   nameOrId,
+  exclude,
 }: {
   states?: MODEL_STATE[];
   nameOrId?: string;
+  exclude?: 'REMOTE_MODEL';
 }) => ({
   bool: {
     must: [
@@ -33,10 +35,21 @@ export const generateModelSearchQuery = ({
           ]
         : []),
     ],
-    must_not: {
-      exists: {
-        field: 'chunk_number',
+    must_not: [
+      {
+        exists: {
+          field: 'chunk_number',
+        },
       },
-    },
+      ...(exclude === 'REMOTE_MODEL'
+        ? [
+            {
+              term: {
+                algorithm: 'REMOTE',
+              },
+            },
+          ]
+        : []),
+    ],
   },
 });
