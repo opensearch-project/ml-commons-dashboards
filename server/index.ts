@@ -19,6 +19,6 @@ export { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
 
 export const config: PluginConfigDescriptor = {
   schema: schema.object({
-    enabled: schema.boolean({ defaultValue: false }),
+    enabled: schema.boolean({ defaultValue: true }),
   }),
 };
