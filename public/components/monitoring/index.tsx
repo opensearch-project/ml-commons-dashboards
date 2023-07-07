@@ -18,7 +18,6 @@ import { useUiSetting } from '../../../../../src/plugins/opensearch_dashboards_r
 import { ModelDeploymentProfile } from '../../apis/profile';
 import { RefreshInterval } from '../common/refresh_interval';
 import { PreviewPanel } from '../preview_panel';
-import { ExperimentalWarning } from '../experiment_warning';
 
 import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
@@ -72,7 +71,6 @@ export const Monitoring = () => {
 
   return (
     <div>
-      <ExperimentalWarning />
       <EuiSpacer size="s" />
       <EuiSpacer size="xs" />
       <EuiPageHeader
