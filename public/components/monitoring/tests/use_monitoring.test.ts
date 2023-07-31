@@ -18,7 +18,7 @@ const mockEmptyRecords = () =>
 
 describe('useMonitoring', () => {
   beforeEach(() => {
-    jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
+    jest.spyOn(Model.prototype, 'search').mockResolvedValue({
       data: [
         {
           id: 'model-1-id',
@@ -171,6 +171,62 @@ describe('useMonitoring', () => {
     });
 
     searchMock.mockRestore();
+  });
+
+  it('should call searchByNameOrId with from 0 after page changed', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    result.current.handleTableChange({
+      pagination: {
+        currentPage: 2,
+        pageSize: 15,
+      },
+    });
+
+    await waitFor(() => {
+      expect(result.current.pagination?.currentPage).toBe(2);
+    });
+
+    act(() => {
+      result.current.searchByNameOrId('foo');
+    });
+
+    await waitFor(() => {
+      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
+      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          from: 0,
+        })
+      );
+    });
+  });
+
+  it('should call searchByStatus with from 0 after page changed', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    result.current.handleTableChange({
+      pagination: {
+        currentPage: 2,
+        pageSize: 15,
+      },
+    });
+
+    await waitFor(() => {
+      expect(result.current.pagination?.currentPage).toBe(2);
+    });
+
+    act(() => {
+      result.current.searchByStatus(['responding']);
+    });
+
+    await waitFor(() => {
+      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
+      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          from: 0,
+        })
+      );
+    });
   });
 });
 
