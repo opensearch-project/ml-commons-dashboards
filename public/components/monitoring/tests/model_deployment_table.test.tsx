@@ -125,7 +125,7 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
     });
 
-    it('should source name at third column', () => {
+    it('should display source name at third column', () => {
       const columnIndex = 2;
       setup();
       const header = screen.getAllByRole('columnheader')[columnIndex];
