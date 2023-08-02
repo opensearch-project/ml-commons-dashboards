@@ -122,6 +122,7 @@ export const useMonitoring = () => {
     setParams((previousValue) => ({
       ...previousValue,
       nameOrId,
+      currentPage: 1,
     }));
   }, []);
 
@@ -129,6 +130,7 @@ export const useMonitoring = () => {
     setParams((previousValue) => ({
       ...previousValue,
       status,
+      currentPage: 1,
     }));
   }, []);
 
