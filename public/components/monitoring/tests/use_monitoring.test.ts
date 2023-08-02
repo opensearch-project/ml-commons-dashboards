@@ -124,6 +124,54 @@ describe('useMonitoring', () => {
     });
     await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(2));
   });
+
+  it('should return consistent deployedModels', async () => {
+    jest.spyOn(Model.prototype, 'search').mockRestore();
+    const searchMock = jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+      data: [
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'TEXT_EMBEDDING',
+          model_state: '',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+        },
+        {
+          id: 'model-2-id',
+          name: 'model-2-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: '',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+        },
+      ],
+      total_models: 2,
+    });
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => {
+      expect(result.current.deployedModels).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'model-1-id',
+            name: 'model-1-name',
+            respondingNodesCount: 1,
+            notRespondingNodesCount: 2,
+            planningNodesCount: 3,
+            planningWorkerNodes: ['node1', 'node2', 'node3'],
+          }),
+          expect.objectContaining({ source: 'External' }),
+        ])
+      );
+    });
+
+    searchMock.mockRestore();
+  });
 });
 
 describe('useMonitoring.pageStatus', () => {
@@ -194,22 +242,5 @@ describe('useMonitoring.pageStatus', () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
     await waitFor(() => expect(result.current.pageStatus).toBe('empty'));
-  });
-
-  it('should return consistent deployedModels', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
-
-    await waitFor(() =>
-      expect(result.current.deployedModels).toEqual([
-        {
-          id: 'model-1-id',
-          name: 'model-1-name',
-          respondingNodesCount: 1,
-          notRespondingNodesCount: 2,
-          planningNodesCount: 3,
-          planningWorkerNodes: ['node1', 'node2', 'node3'],
-        },
-      ])
-    );
   });
 });
