@@ -19,6 +19,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         notRespondingNodesCount: 2,
         planningNodesCount: 3,
         planningWorkerNodes: [],
+        source: 'Local',
       },
       {
         id: 'model-2-id',
@@ -27,6 +28,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         notRespondingNodesCount: 0,
         planningNodesCount: 3,
         planningWorkerNodes: [],
+        source: 'Local',
       },
       {
         id: 'model-3-id',
@@ -35,6 +37,7 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         notRespondingNodesCount: 3,
         planningNodesCount: 3,
         planningWorkerNodes: [],
+        source: 'External',
       },
     ],
     pagination: { currentPage: 1, pageSize: 10, totalRecords: 100 },
@@ -122,11 +125,26 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
     });
 
-    it('should render Model ID at third column and copy to clipboard after text clicked', async () => {
+    it('should source name at third column', () => {
+      const columnIndex = 2;
+      setup();
+      const header = screen.getAllByRole('columnheader')[columnIndex];
+      const columnContent = header
+        .closest('table')
+        ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
+      expect(within(header).getByText('Source')).toBeInTheDocument();
+      expect(columnContent?.length).toBe(3);
+      const cells = columnContent!;
+      expect(within(cells[0] as HTMLElement).getByText('Local')).toBeInTheDocument();
+      expect(within(cells[1] as HTMLElement).getByText('Local')).toBeInTheDocument();
+      expect(within(cells[2] as HTMLElement).getByText('External')).toBeInTheDocument();
+    });
+
+    it('should render Model ID at forth column and copy to clipboard after text clicked', async () => {
       const execCommandOrigin = document.execCommand;
       document.execCommand = jest.fn(() => true);
 
-      const columnIndex = 2;
+      const columnIndex = 3;
       setup();
       const header = screen.getAllByRole('columnheader')[columnIndex];
       const columnContent = header
@@ -146,7 +164,7 @@ describe('<DeployedModelTable />', () => {
     });
 
     it('should render Action column and call onViewDetail with the model item of the current table row', async () => {
-      const columnIndex = 3;
+      const columnIndex = 4;
       const onViewDetailMock = jest.fn();
       const { finalProps } = setup({
         onViewDetail: onViewDetailMock,
@@ -258,7 +276,7 @@ describe('<DeployedModelTable />', () => {
       },
     });
 
-    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('Model ID'));
+    await userEvent.click(within(screen.getAllByRole('columnheader')[3]).getByText('Model ID'));
     expect(finalProps.onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: {
@@ -277,7 +295,7 @@ describe('<DeployedModelTable />', () => {
         }}
       />
     );
-    await userEvent.click(within(screen.getAllByRole('columnheader')[2]).getByText('Model ID'));
+    await userEvent.click(within(screen.getAllByRole('columnheader')[3]).getByText('Model ID'));
     expect(finalProps.onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: {

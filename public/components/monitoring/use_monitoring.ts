@@ -63,6 +63,7 @@ const fetchDeployedModels = async (params: Params) => {
         current_worker_node_count: workerCount,
         planning_worker_node_count: planningCount,
         planning_worker_nodes: planningWorkerNodes,
+        algorithm,
       }) => {
         return {
           id,
@@ -74,6 +75,7 @@ const fetchDeployedModels = async (params: Params) => {
               ? planningCount - workerCount
               : undefined,
           planningWorkerNodes,
+          source: algorithm === 'REMOTE' ? 'External' : 'Local',
         };
       }
     ),

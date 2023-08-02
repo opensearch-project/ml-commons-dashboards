@@ -31,6 +31,7 @@ export interface PreviewModel {
   name: string;
   id: string;
   planningWorkerNodes: string[];
+  source: string;
 }
 
 interface Props {
@@ -39,7 +40,7 @@ interface Props {
 }
 
 export const PreviewPanel = ({ onClose, model }: Props) => {
-  const { id, name } = model;
+  const { id, name, source } = model;
   const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
     if (loading) {
@@ -101,6 +102,8 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
           <EuiDescriptionListDescription>
             <CopyableText text={id} iconLeft={false} tooltipText="Copy model ID" />
           </EuiDescriptionListDescription>
+          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>Source</EuiDescriptionListTitle>
+          <EuiDescriptionListDescription>{source}</EuiDescriptionListDescription>
           <EuiDescriptionListTitle style={{ fontSize: '14px' }}>
             Model status by node
           </EuiDescriptionListTitle>
