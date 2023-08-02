@@ -30,7 +30,6 @@ export class Model {
     size: number;
     states?: MODEL_STATE[];
     nameOrId?: string;
-    exclude?: 'REMOTE_MODEL';
   }) {
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
       query,

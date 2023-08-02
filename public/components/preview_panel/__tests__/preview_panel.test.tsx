@@ -13,6 +13,7 @@ const MODEL = {
   id: 'id1',
   name: 'test',
   planningWorkerNodes: ['node-1', 'node-2', 'node-3'],
+  source: 'External',
 };
 
 function setup({ model = MODEL, onClose = jest.fn() }) {
@@ -26,10 +27,11 @@ describe('<PreviewPanel />', () => {
     jest.clearAllMocks();
   });
 
-  it('should render id and name in panel', () => {
+  it('should render id, name and source in panel', () => {
     setup({});
     expect(screen.getByText('test')).toBeInTheDocument();
     expect(screen.getByText('id1')).toBeInTheDocument();
+    expect(screen.getByText('External')).toBeInTheDocument();
   });
 
   it('should call onClose when close panel', async () => {

@@ -43,7 +43,6 @@ export class ModelService {
     sort?: ModelSearchSort[];
     states?: MODEL_STATE[];
     nameOrId?: string;
-    exclude?: 'REMOTE_MODEL';
   }) {
     const {
       body: { hits },
