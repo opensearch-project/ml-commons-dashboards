@@ -47,7 +47,6 @@ const fetchDeployedModels = async (params: Params) => {
         ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partiallyLoaded]
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
-    exclude: 'REMOTE_MODEL',
   });
   const totalPages = Math.ceil(result.total_models / params.pageSize);
   return {
