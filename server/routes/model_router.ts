@@ -42,12 +42,11 @@ export const modelRouter = (router: IRouter) => {
           ),
           states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
           nameOrId: schema.maybe(schema.string()),
-          exclude: schema.maybe(schema.literal('REMOTE_MODEL')),
         }),
       },
     },
     async (context, request) => {
-      const { from, size, sort, states, nameOrId, exclude } = request.query;
+      const { from, size, sort, states, nameOrId } = request.query;
       try {
         const payload = await ModelService.search({
           client: context.core.opensearch.client,
@@ -56,7 +55,6 @@ export const modelRouter = (router: IRouter) => {
           sort: typeof sort === 'string' ? [sort] : sort,
           states: typeof states === 'string' ? [states] : states,
           nameOrId,
-          exclude,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (err) {

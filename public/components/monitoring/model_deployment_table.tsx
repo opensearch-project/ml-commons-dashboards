@@ -80,7 +80,7 @@ export const ModelDeploymentTable = ({
       {
         field: 'model_state',
         name: 'Status',
-        width: '37.5%',
+        width: '34.5%',
         sortable: true,
         truncateText: true,
         render: (
@@ -125,9 +125,16 @@ export const ModelDeploymentTable = ({
         },
       },
       {
+        field: 'source',
+        name: 'Source',
+        width: '7%',
+        sortable: false,
+        truncateText: true,
+      },
+      {
         field: 'id',
         name: 'Model ID',
-        width: '25%',
+        width: '21%',
         sortable: true,
         render: (id: string) => (
           <EuiCopy

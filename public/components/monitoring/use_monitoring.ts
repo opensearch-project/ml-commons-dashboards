@@ -47,7 +47,6 @@ const fetchDeployedModels = async (params: Params) => {
         ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partiallyLoaded]
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
-    exclude: 'REMOTE_MODEL',
   });
   const totalPages = Math.ceil(result.total_models / params.pageSize);
   return {
@@ -64,6 +63,7 @@ const fetchDeployedModels = async (params: Params) => {
         current_worker_node_count: workerCount,
         planning_worker_node_count: planningCount,
         planning_worker_nodes: planningWorkerNodes,
+        algorithm,
       }) => {
         return {
           id,
@@ -75,6 +75,7 @@ const fetchDeployedModels = async (params: Params) => {
               ? planningCount - workerCount
               : undefined,
           planningWorkerNodes,
+          source: algorithm === 'REMOTE' ? 'External' : 'Local',
         };
       }
     ),
