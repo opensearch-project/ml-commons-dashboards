@@ -98,15 +98,13 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         <EuiDescriptionList>
-          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>Model ID</EuiDescriptionListTitle>
+          <EuiDescriptionListTitle>Model ID</EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
             <CopyableText text={id} iconLeft={false} tooltipText="Copy model ID" />
           </EuiDescriptionListDescription>
-          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>Source</EuiDescriptionListTitle>
+          <EuiDescriptionListTitle>Source</EuiDescriptionListTitle>
           <EuiDescriptionListDescription>{source}</EuiDescriptionListDescription>
-          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>
-            Model status by node
-          </EuiDescriptionListTitle>
+          <EuiDescriptionListTitle>Model status by node</EuiDescriptionListTitle>
           <EuiDescriptionListDescription>{respondingStatus}</EuiDescriptionListDescription>
         </EuiDescriptionList>
         <EuiSpacer />

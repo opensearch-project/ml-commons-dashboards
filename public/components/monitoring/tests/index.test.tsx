@@ -6,7 +6,6 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import * as opensearchDashboardsReactExports from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { render, screen, waitFor, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
@@ -329,19 +328,5 @@ describe('<Monitoring />', () => {
     await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
     await user.click(screen.getByLabelText('Close this dialog'));
     expect(reload).not.toHaveBeenCalled();
-  });
-
-  it('should NOT render background for refresh interval picker in the dark mode', () => {
-    const useUiSettingMock = jest
-      .spyOn(opensearchDashboardsReactExports, 'useUiSetting')
-      .mockReturnValue(true);
-
-    setup();
-    expect(
-      screen.getByLabelText('current interval value').closest('div.euiFormControlLayout')
-        ?.parentElement
-    ).not.toHaveStyle('background-color: rgb(255, 255, 255);');
-
-    useUiSettingMock.mockRestore();
   });
 });
