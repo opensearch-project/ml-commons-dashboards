@@ -1,7 +1,7 @@
 .ml-nodesTableNodeIdCellText {
   &:hover{
     cursor: pointer;
-    color: #006BB4;
+    color: $ouiLinkColor;
     text-decoration: underline;
   }
 }
