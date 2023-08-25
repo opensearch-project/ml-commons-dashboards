@@ -5,3 +5,4 @@
 
 export { modelRouter } from './model_router';
 export { profileRouter } from './profile_router';
+export { connectorRouter } from './connector_router';

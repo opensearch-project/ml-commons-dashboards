@@ -23,4 +23,7 @@ export const PROFILE_BASE_API = `${API_ROUTE_PREFIX}/profile`;
 export const MODEL_BASE_API = `${API_ROUTE_PREFIX}/models`;
 export const MODEL_SEARCH_API = `${MODEL_BASE_API}/_search`;
 
+export const CONNECTOR_BASE_API = `${API_ROUTE_PREFIX}/connectors`;
+export const CONNECTOR_SEARCH_API = `${CONNECTOR_BASE_API}/_search`;
+
 export const MODEL_INDEX = '.plugins-ml-model';

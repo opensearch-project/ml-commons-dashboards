@@ -8,7 +8,7 @@ import { act, renderHook } from '@testing-library/react-hooks';
 import { Model, ModelSearchResponse } from '../../../apis/model';
 import { useMonitoring } from '../use_monitoring';
 
-jest.mock('../../../apis/model');
+jest.mock('../../../apis/connector');
 
 const mockEmptyRecords = () =>
   jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
@@ -137,6 +137,20 @@ describe('useMonitoring', () => {
           model_state: '',
           model_version: '',
           planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector_id: 'external-connector-1-id',
+        },
+        {
+          id: 'model-3-id',
+          name: 'model-3-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: '',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector: {
+            name: 'Internal Connector 1',
+          },
         },
       ],
       total_models: 2,
@@ -154,7 +168,16 @@ describe('useMonitoring', () => {
             planningNodesCount: 3,
             planningWorkerNodes: ['node1', 'node2', 'node3'],
           }),
-          expect.objectContaining({ source: 'External' }),
+          expect.objectContaining({
+            connector: expect.objectContaining({
+              name: 'External Connector 1',
+            }),
+          }),
+          expect.objectContaining({
+            connector: expect.objectContaining({
+              name: 'Internal Connector 1',
+            }),
+          }),
         ])
       );
     });
@@ -212,6 +235,109 @@ describe('useMonitoring', () => {
         })
       );
     });
+  });
+
+  it('should call search API with consistent extraQuery after source filter applied', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => result.current.pageStatus === 'normal');
+
+    result.current.searchBySource(['local']);
+    await waitFor(() =>
+      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: {
+            bool: {
+              must_not: [
+                {
+                  term: {
+                    algorithm: {
+                      value: 'REMOTE',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        })
+      )
+    );
+
+    result.current.searchBySource(['external']);
+    await waitFor(() =>
+      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: {
+            bool: {
+              must: [
+                {
+                  term: {
+                    algorithm: {
+                      value: 'REMOTE',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        })
+      )
+    );
+
+    result.current.searchBySource(['external', 'local']);
+    await waitFor(() =>
+      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: undefined,
+        })
+      )
+    );
+  });
+
+  it('should call search API with consistent extraQuery after connector filter applied', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => result.current.pageStatus === 'normal');
+
+    result.current.searchByConnector([
+      { name: 'Sagemaker', ids: ['external-connector-id-1', 'external-connector-id-2'] },
+    ]);
+    await waitFor(() =>
+      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    should: [
+                      {
+                        wildcard: {
+                          'connector.name.keyword': {
+                            value: '*Sagemaker*',
+                            case_insensitive: true,
+                          },
+                        },
+                      },
+                      {
+                        terms: {
+                          'connector_id.keyword': [
+                            'external-connector-id-1',
+                            'external-connector-id-2',
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        })
+      )
+    );
+
+    await waitFor(() => result.current.pageStatus === 'normal');
   });
 });
 
@@ -271,6 +397,30 @@ describe('useMonitoring.pageStatus', () => {
     // assume result is empty
     mockEmptyRecords();
     result.current.searchByStatus(['responding']);
+    await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
+  });
+
+  it("should return 'reset-filter' when filter by source but no result was found", async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    // Page status is normal for the initial run(search returns mocked results)
+    await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
+
+    // assume result is empty
+    mockEmptyRecords();
+    result.current.searchBySource(['local']);
+    await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
+  });
+
+  it("should return 'reset-filter' when filter by connector but no result was found", async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    // Page status is normal for the initial run(search returns mocked results)
+    await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
+
+    // assume result is empty
+    mockEmptyRecords();
+    result.current.searchByConnector([{ name: 'Sagemaker', ids: [] }]);
     await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
   });
 

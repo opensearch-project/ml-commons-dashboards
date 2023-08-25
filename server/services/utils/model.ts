@@ -9,9 +9,11 @@ import { generateTermQuery } from './query';
 export const generateModelSearchQuery = ({
   states,
   nameOrId,
+  extraQuery,
 }: {
   states?: MODEL_STATE[];
   nameOrId?: string;
+  extraQuery?: Record<string, any>;
 }) => ({
   bool: {
     must: [
@@ -32,6 +34,7 @@ export const generateModelSearchQuery = ({
             },
           ]
         : []),
+      ...(extraQuery ? [extraQuery] : []),
     ],
     must_not: {
       exists: {

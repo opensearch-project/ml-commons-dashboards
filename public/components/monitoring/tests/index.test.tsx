@@ -26,6 +26,8 @@ const setup = (
       currentPage: 1,
       pageSize: 15,
       sort: { field: 'name', direction: 'asc' },
+      connector: [],
+      source: [],
     },
     pageStatus: 'normal',
     pagination: {
@@ -42,6 +44,9 @@ const setup = (
         notRespondingNodesCount: 2,
         planningNodesCount: 3,
         planningWorkerNodes: ['node1', 'node2', 'node3'],
+        connector: {
+          name: 'Internal Connector 1',
+        },
       },
       {
         id: 'model-2-id',
@@ -50,6 +55,9 @@ const setup = (
         notRespondingNodesCount: 0,
         planningNodesCount: 3,
         planningWorkerNodes: ['node1', 'node2', 'node3'],
+        connector: {
+          name: 'External Connector 1',
+        },
       },
       {
         id: 'model-3-id',
@@ -60,9 +68,17 @@ const setup = (
         planningWorkerNodes: ['node1', 'node2', 'node3'],
       },
     ],
+    allExternalConnectors: [
+      {
+        id: 'external-connector-id-1',
+        name: 'External Connector 1',
+      },
+    ],
     reload: jest.fn(),
     searchByNameOrId: jest.fn(),
     searchByStatus: jest.fn(),
+    searchByConnector: jest.fn(),
+    searchBySource: jest.fn(),
     updateDeployedModel: jest.fn(),
     resetSearch: jest.fn(),
     handleTableChange: jest.fn(),
@@ -158,9 +174,10 @@ describe('<Monitoring />', () => {
     });
     it('should render normal monitoring', () => {
       setup();
-      expect(screen.getByText('model-1-id')).toBeInTheDocument();
+      expect(screen.getByText('Internal Connector 1')).toBeInTheDocument();
       expect(screen.getByText('model 2 name')).toBeInTheDocument();
-      expect(screen.getByText('model-3-id')).toBeInTheDocument();
+      expect(screen.getByText('Local')).toBeInTheDocument();
+      expect(screen.getAllByText('External')).toHaveLength(2);
     });
   });
 
@@ -272,6 +289,42 @@ describe('<Monitoring />', () => {
     expect(searchByStatus).not.toHaveBeenCalled();
     await user.click(screen.getByRole('option', { name: 'Responding' }));
     expect(searchByStatus).not.toHaveBeenCalledWith([{ value: 'responding', checked: 'on' }]);
+
+    clearOffsetMethodsMock();
+  });
+
+  it('should call searchBySource after source filter option clicked', async () => {
+    const clearOffsetMethodsMock = mockOffsetMethods();
+
+    const {
+      finalMonitoringReturnValue: { searchBySource },
+      user,
+    } = setup({});
+
+    await user.click(screen.getByText('Source', { selector: "[data-text='Source']" }));
+
+    expect(searchBySource).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole('dialog')).getByText('Local'));
+    expect(searchBySource).toHaveBeenLastCalledWith(['local']);
+
+    clearOffsetMethodsMock();
+  });
+
+  it('should call searchByConnector after connector filter option clicked', async () => {
+    const clearOffsetMethodsMock = mockOffsetMethods();
+
+    const {
+      finalMonitoringReturnValue: { searchByConnector },
+      user,
+    } = setup({});
+
+    await user.click(screen.getByText('Connector', { selector: "[data-text='Connector']" }));
+
+    expect(searchByConnector).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole('dialog')).getByText('External Connector 1'));
+    expect(searchByConnector).toHaveBeenLastCalledWith([
+      { name: 'External Connector 1', ids: ['external-connector-id-1'] },
+    ]);
 
     clearOffsetMethodsMock();
   });

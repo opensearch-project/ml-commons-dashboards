@@ -11,6 +11,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
+  EuiFilterGroup,
 } from '@elastic/eui';
 import React, { useState, useRef, useCallback } from 'react';
 
@@ -22,6 +23,8 @@ import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_ta
 import { useMonitoring } from './use_monitoring';
 import { ModelStatusFilter } from './model_status_filter';
 import { SearchBar } from './search_bar';
+import { ModelSourceFilter } from './model_source_filter';
+import { ModelConnectorFilter } from './model_connector_filter';
 
 export const Monitoring = () => {
   const {
@@ -34,6 +37,9 @@ export const Monitoring = () => {
     searchByNameOrId,
     reload,
     searchByStatus,
+    searchBySource,
+    searchByConnector,
+    allExternalConnectors,
   } = useMonitoring();
   const [previewModel, setPreviewModel] = useState<ModelDeploymentItem | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>();
@@ -96,7 +102,15 @@ export const Monitoring = () => {
                 <SearchBar inputRef={setInputRef} onSearch={searchByNameOrId} />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
+                <EuiFilterGroup>
+                  <ModelSourceFilter value={params.source} onChange={searchBySource} />
+                  <ModelConnectorFilter
+                    value={params.connector}
+                    onChange={searchByConnector}
+                    allExternalConnectors={allExternalConnectors}
+                  />
+                  <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
+                </EuiFilterGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size="m" />

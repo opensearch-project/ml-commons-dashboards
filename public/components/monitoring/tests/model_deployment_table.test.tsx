@@ -9,6 +9,8 @@ import React from 'react';
 import { render, screen, within } from '../../../../test/test_utils';
 import { ModelDeploymentTableProps, ModelDeploymentTable } from '../model_deployment_table';
 
+jest.mock('../../../apis/connector');
+
 const setup = (props?: Partial<ModelDeploymentTableProps>) => {
   const finalProps = {
     items: [
@@ -38,6 +40,9 @@ const setup = (props?: Partial<ModelDeploymentTableProps>) => {
         planningNodesCount: 3,
         planningWorkerNodes: [],
         source: 'External',
+        connector: {
+          name: 'Sagemaker',
+        },
       },
     ],
     pagination: { currentPage: 1, pageSize: 10, totalRecords: 100 },
@@ -107,26 +112,8 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('model 3 name')).toBeInTheDocument();
     });
 
-    it('should render status at second column', () => {
+    it('should render source at second column', () => {
       const columnIndex = 1;
-      setup();
-      const header = screen.getAllByRole('columnheader')[columnIndex];
-      const columnContent = header
-        .closest('table')
-        ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
-      expect(within(header).getByText('Status')).toBeInTheDocument();
-      expect(columnContent?.length).toBe(3);
-      const cells = columnContent!;
-      expect(within(cells[0] as HTMLElement).getByText('Partially responding')).toBeInTheDocument();
-      expect(within(cells[0] as HTMLElement).getByText('on 1 of 3 nodes')).toBeInTheDocument();
-      expect(within(cells[1] as HTMLElement).getByText('Responding')).toBeInTheDocument();
-      expect(within(cells[1] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
-      expect(within(cells[2] as HTMLElement).getByText('Not responding')).toBeInTheDocument();
-      expect(within(cells[2] as HTMLElement).getByText('on 3 of 3 nodes')).toBeInTheDocument();
-    });
-
-    it('should display source name at third column', () => {
-      const columnIndex = 2;
       setup();
       const header = screen.getAllByRole('columnheader')[columnIndex];
       const columnContent = header
@@ -140,27 +127,34 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('External')).toBeInTheDocument();
     });
 
-    it('should render Model ID at forth column and copy to clipboard after text clicked', async () => {
-      const execCommandOrigin = document.execCommand;
-      document.execCommand = jest.fn(() => true);
+    it('should render connector name at second column', () => {
+      const columnIndex = 2;
+      setup();
+      const header = screen.getAllByRole('columnheader')[columnIndex];
+      const columnContent = header
+        .closest('table')
+        ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
+      expect(within(header).getByText('Connector Name')).toBeInTheDocument();
+      expect(columnContent?.length).toBe(3);
+      const cells = columnContent!;
+      expect(within(cells[0] as HTMLElement).getByText('-')).toBeInTheDocument();
+      expect(within(cells[1] as HTMLElement).getByText('-')).toBeInTheDocument();
+      expect(within(cells[2] as HTMLElement).getByText('Sagemaker')).toBeInTheDocument();
+    });
 
+    it('should render status at fourth column', () => {
       const columnIndex = 3;
       setup();
       const header = screen.getAllByRole('columnheader')[columnIndex];
       const columnContent = header
         .closest('table')
         ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
-      expect(within(header).getByText('Model ID')).toBeInTheDocument();
+      expect(within(header).getByText('Status')).toBeInTheDocument();
       expect(columnContent?.length).toBe(3);
       const cells = columnContent!;
-      expect(within(cells[0] as HTMLElement).getByText('model-1-id')).toBeInTheDocument();
-      expect(within(cells[1] as HTMLElement).getByText('model-2-id')).toBeInTheDocument();
-      expect(within(cells[2] as HTMLElement).getByText('model-3-id')).toBeInTheDocument();
-
-      await userEvent.click(within(cells[0] as HTMLElement).getByText('model-1-id'));
-      expect(document.execCommand).toHaveBeenCalledWith('copy');
-
-      document.execCommand = execCommandOrigin;
+      expect(within(cells[0] as HTMLElement).getByText('Partially responding')).toBeInTheDocument();
+      expect(within(cells[1] as HTMLElement).getByText('Responding')).toBeInTheDocument();
+      expect(within(cells[2] as HTMLElement).getByText('Not responding')).toBeInTheDocument();
     });
 
     it('should render Action column and call onViewDetail with the model item of the current table row', async () => {
@@ -225,6 +219,7 @@ describe('<DeployedModelTable />', () => {
   });
 
   it('should call onChange with consistent status sort parameters', async () => {
+    const statusColumnIndex = 3;
     const {
       finalProps,
       result: { rerender },
@@ -235,7 +230,9 @@ describe('<DeployedModelTable />', () => {
       },
     });
 
-    await userEvent.click(within(screen.getAllByRole('columnheader')[1]).getByText('Status'));
+    await userEvent.click(
+      within(screen.getAllByRole('columnheader')[statusColumnIndex]).getByText('Status')
+    );
     expect(finalProps.onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: {
@@ -254,52 +251,13 @@ describe('<DeployedModelTable />', () => {
         }}
       />
     );
-    await userEvent.click(within(screen.getAllByRole('columnheader')[1]).getByText('Status'));
+    await userEvent.click(
+      within(screen.getAllByRole('columnheader')[statusColumnIndex]).getByText('Status')
+    );
     expect(finalProps.onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         sort: {
           field: 'model_state',
-          direction: 'asc',
-        },
-      })
-    );
-  });
-
-  it('should call onChange with consistent model id sort parameters', async () => {
-    const {
-      finalProps,
-      result: { rerender },
-    } = setup({
-      sort: {
-        field: 'id',
-        direction: 'asc',
-      },
-    });
-
-    await userEvent.click(within(screen.getAllByRole('columnheader')[3]).getByText('Model ID'));
-    expect(finalProps.onChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sort: {
-          field: 'id',
-          direction: 'desc',
-        },
-      })
-    );
-
-    rerender(
-      <ModelDeploymentTable
-        {...finalProps}
-        sort={{
-          field: 'id',
-          direction: 'desc',
-        }}
-      />
-    );
-    await userEvent.click(within(screen.getAllByRole('columnheader')[3]).getByText('Model ID'));
-    expect(finalProps.onChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sort: {
-          field: 'id',
           direction: 'asc',
         },
       })

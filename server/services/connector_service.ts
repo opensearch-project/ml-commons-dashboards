@@ -19,51 +19,30 @@
  */
 
 import { IScopedClusterClient } from '../../../../src/core/server';
-import { MODEL_STATE, ModelSearchSort } from '../../common';
 
-import { generateModelSearchQuery } from './utils/model';
-import { MODEL_BASE_API } from './utils/constants';
+import { CONNECTOR_SEARCH_API, MODEL_SEARCH_API } from './utils/constants';
 
-const modelSortFieldMapping: { [key: string]: string } = {
-  name: 'name.keyword',
-  id: '_id',
-};
-
-export class ModelService {
+export class ConnectorService {
   public static async search({
     from,
     size,
-    sort,
     client,
-    ...restParams
   }: {
     client: IScopedClusterClient;
     from: number;
     size: number;
-    sort?: ModelSearchSort[];
-    states?: MODEL_STATE[];
-    extraQuery?: Record<string, any>;
-    nameOrId?: string;
   }) {
     const {
       body: { hits },
     } = await client.asCurrentUser.transport.request({
       method: 'POST',
-      path: `${MODEL_BASE_API}/_search`,
+      path: CONNECTOR_SEARCH_API,
       body: {
-        query: generateModelSearchQuery(restParams),
+        query: {
+          match_all: {},
+        },
         from,
         size,
-        ...(sort
-          ? {
-              sort: sort.map((sorting) => {
-                const [field, direction] = sorting.split('-');
-                return {
-                  [modelSortFieldMapping[field] || field]: direction,
-                };
-              }),
-            }
-          : {}),
       },
     });
 
@@ -72,7 +51,38 @@ export class ModelService {
         id: _id,
         ..._source,
       })),
-      total_models: hits.total.value,
+      total_connectors: hits.total.value,
     };
+  }
+
+  public static async getUniqueInternalConnectorNames({
+    client,
+    size,
+  }: {
+    client: IScopedClusterClient;
+    size: number;
+  }) {
+    const {
+      body: {
+        aggregations: {
+          unique_connector_names: { buckets },
+        },
+      },
+    } = await client.asCurrentUser.transport.request({
+      method: 'POST',
+      path: MODEL_SEARCH_API,
+      body: {
+        size: 0,
+        aggs: {
+          unique_connector_names: {
+            terms: {
+              field: 'connector.name.keyword',
+              size,
+            },
+          },
+        },
+      },
+    });
+    return buckets.map(({ key }) => key);
   }
 }
