@@ -15,12 +15,15 @@ import {
   EuiDescriptionListDescription,
   EuiSpacer,
   EuiTextColor,
+  EuiFlexGroup,
+  EuiFlexItem,
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { NodesTable } from './nodes_table';
 import { CopyableText } from '../common';
 import { ModelDeploymentProfile } from '../../apis/profile';
+import { ConnectorDetails } from './connector_details';
 
 export interface INode {
   id: string;
@@ -31,7 +34,11 @@ export interface PreviewModel {
   name: string;
   id: string;
   planningWorkerNodes: string[];
-  source: string;
+  connector?: {
+    id?: string;
+    name?: string;
+    description?: string;
+  };
 }
 
 interface Props {
@@ -40,7 +47,7 @@ interface Props {
 }
 
 export const PreviewPanel = ({ onClose, model }: Props) => {
-  const { id, name, source } = model;
+  const { id, name, connector } = model;
   const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
   const nodes = useMemo(() => {
     if (loading) {
@@ -56,33 +63,45 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
 
   const respondingStatus = useMemo(() => {
     if (loading) {
-      return (
-        <EuiTextColor color="subdued" data-test-subj="preview-panel-color-loading-text">
-          Loading...
-        </EuiTextColor>
-      );
+      return {
+        overall: (
+          <EuiTextColor color="subdued" data-test-subj="preview-panel-color-loading-text">
+            Loading...
+          </EuiTextColor>
+        ),
+        nodes: 'Loading...',
+      };
     }
     const deployedNodesNum = nodes.filter(({ deployed }) => deployed).length;
     const targetNodesNum = nodes.length;
     if (deployedNodesNum === 0) {
-      return (
-        <EuiHealth className="ml-modelStatusCell" color="danger">
-          Not responding on {targetNodesNum} of {targetNodesNum} nodes
-        </EuiHealth>
-      );
+      return {
+        overall: (
+          <EuiHealth className="ml-modelStatusCell" color="danger">
+            Not responding
+          </EuiHealth>
+        ),
+        nodes: `Not responding on ${targetNodesNum} of ${targetNodesNum} nodes`,
+      };
     }
     if (deployedNodesNum < targetNodesNum) {
-      return (
-        <EuiHealth className="ml-modelStatusCell" color="warning">
-          Partially responding on {deployedNodesNum} of {targetNodesNum} nodes
-        </EuiHealth>
-      );
+      return {
+        overall: (
+          <EuiHealth className="ml-modelStatusCell" color="warning">
+            Partially responding
+          </EuiHealth>
+        ),
+        nodes: `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`,
+      };
     }
-    return (
-      <EuiHealth className="ml-modelStatusCell" color="success">
-        Responding on {deployedNodesNum} of {targetNodesNum} nodes
-      </EuiHealth>
-    );
+    return {
+      overall: (
+        <EuiHealth className="ml-modelStatusCell" color="success">
+          Responding
+        </EuiHealth>
+      ),
+      nodes: `Responding on ${deployedNodesNum} of ${targetNodesNum} nodes`,
+    };
   }, [nodes, loading]);
 
   const onCloseFlyout = useCallback(() => {
@@ -91,26 +110,54 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
 
   return (
     <EuiFlyout onClose={onCloseFlyout}>
-      <EuiFlyoutHeader>
-        <EuiTitle size="s">
-          <h3>{name}</h3>
+      <EuiFlyoutHeader hasBorder>
+        <EuiTitle size="m">
+          <h2>{name}</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         <EuiDescriptionList>
-          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>Model ID</EuiDescriptionListTitle>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiDescriptionListTitle>
+                <EuiTitle size="xxs">
+                  <h5>Status</h5>
+                </EuiTitle>
+              </EuiDescriptionListTitle>
+              <EuiDescriptionListDescription>
+                {respondingStatus.overall}
+              </EuiDescriptionListDescription>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiDescriptionListTitle>
+                <EuiTitle size="xxs">
+                  <h5>Source</h5>
+                </EuiTitle>
+              </EuiDescriptionListTitle>
+              <EuiDescriptionListDescription>
+                {connector ? 'External' : 'Local'}
+              </EuiDescriptionListDescription>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size="m" />
+          <EuiDescriptionListTitle>
+            <EuiTitle size="xxs">
+              <h5>Model ID</h5>
+            </EuiTitle>
+          </EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
             <CopyableText text={id} iconLeft={false} tooltipText="Copy model ID" />
           </EuiDescriptionListDescription>
-          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>Source</EuiDescriptionListTitle>
-          <EuiDescriptionListDescription>{source}</EuiDescriptionListDescription>
-          <EuiDescriptionListTitle style={{ fontSize: '14px' }}>
-            Model status by node
-          </EuiDescriptionListTitle>
-          <EuiDescriptionListDescription>{respondingStatus}</EuiDescriptionListDescription>
         </EuiDescriptionList>
-        <EuiSpacer />
-        <NodesTable loading={loading} nodes={nodes} />
+        {connector ? (
+          <ConnectorDetails
+            id={connector.id}
+            name={connector.name}
+            description={connector.description}
+          />
+        ) : (
+          <NodesTable loading={loading} nodes={nodes} nodesStatus={respondingStatus.nodes} />
+        )}
       </EuiFlyoutBody>
     </EuiFlyout>
   );
