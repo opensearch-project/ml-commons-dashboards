@@ -41,7 +41,7 @@ export interface ModelDeploymentItem {
   planningWorkerNodes: string[];
   connector?: {
     id?: string;
-    name?: string;
+    name: string;
     description?: string;
   };
 }
