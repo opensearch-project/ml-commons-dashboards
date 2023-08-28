@@ -32,22 +32,30 @@ export class ConnectorService {
     from: number;
     size: number;
   }) {
-    const {
-      body: { hits },
-    } = await client.asCurrentUser.transport.request({
-      method: 'POST',
-      path: CONNECTOR_SEARCH_API,
-      body: {
-        query: {
-          match_all: {},
+    let result;
+    try {
+      result = await client.asCurrentUser.transport.request({
+        method: 'POST',
+        path: CONNECTOR_SEARCH_API,
+        body: {
+          query: {
+            match_all: {},
+          },
+          from,
+          size,
         },
-        from,
-        size,
-      },
-    });
-
+      });
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('index_not_found_exception')) {
+        return {
+          data: [],
+          total_connectors: 0,
+        };
+      }
+      throw e;
+    }
     return {
-      data: hits.hits.map(({ _id, _source }) => ({
+      data: result.body.hits.map(({ _id, _source }) => ({
         id: _id,
         ..._source,
       })),
@@ -62,27 +70,29 @@ export class ConnectorService {
     client: IScopedClusterClient;
     size: number;
   }) {
-    const {
-      body: {
-        aggregations: {
-          unique_connector_names: { buckets },
-        },
-      },
-    } = await client.asCurrentUser.transport.request({
-      method: 'POST',
-      path: MODEL_SEARCH_API,
-      body: {
-        size: 0,
-        aggs: {
-          unique_connector_names: {
-            terms: {
-              field: 'connector.name.keyword',
-              size,
+    let result;
+    try {
+      result = await client.asCurrentUser.transport.request({
+        method: 'POST',
+        path: MODEL_SEARCH_API,
+        body: {
+          size: 0,
+          aggs: {
+            unique_connector_names: {
+              terms: {
+                field: 'connector.name.keyword',
+                size,
+              },
             },
           },
         },
-      },
-    });
-    return buckets.map(({ key }) => key);
+      });
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('index_not_found_exception')) {
+        return [];
+      }
+      throw e;
+    }
+    return result.body.aggregations.unique_connector_names.buckets.map(({ key }) => key);
   }
 }
