@@ -55,11 +55,11 @@ export class ConnectorService {
       throw e;
     }
     return {
-      data: result.body.hits.map(({ _id, _source }) => ({
+      data: result.body.hits.hits.map(({ _id, _source }) => ({
         id: _id,
         ..._source,
       })),
-      total_connectors: hits.total.value,
+      total_connectors: result.body.hits.total.value,
     };
   }
 
