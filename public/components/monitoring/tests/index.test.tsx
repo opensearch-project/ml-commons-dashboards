@@ -322,9 +322,7 @@ describe('<Monitoring />', () => {
 
     expect(searchByConnector).not.toHaveBeenCalled();
     await user.click(within(screen.getByRole('dialog')).getByText('External Connector 1'));
-    expect(searchByConnector).toHaveBeenLastCalledWith([
-      { name: 'External Connector 1', ids: ['external-connector-id-1'] },
-    ]);
+    expect(searchByConnector).toHaveBeenLastCalledWith(['External Connector 1']);
 
     clearOffsetMethodsMock();
   });

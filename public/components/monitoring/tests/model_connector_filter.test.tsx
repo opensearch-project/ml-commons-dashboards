@@ -6,11 +6,11 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor, within } from '../../../../test/test_utils';
-import { ModelConnectorFilter, ModelConnectorFilterValue } from '../model_connector_filter';
+import { ModelConnectorFilter } from '../model_connector_filter';
 
 jest.mock('../../../apis/connector');
 
-async function setup(value: ModelConnectorFilterValue[]) {
+async function setup(value: string[]) {
   const onChangeMock = jest.fn();
   const user = userEvent.setup({});
   render(
@@ -58,14 +58,14 @@ describe('<ModelConnector />', () => {
   });
 
   it('should render Connector filter and 1 selected filter number', async () => {
-    await setup([{ name: 'External Connector 1', ids: ['external-connector-id-1'] }]);
+    await setup(['External Connector 1']);
     expect(screen.getByText('Connector')).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByLabelText('1 active filters')).toBeInTheDocument();
   });
 
   it('should render all connectors in the option list', async () => {
-    await setup([{ name: 'External Connector 1', ids: ['external-connector-id-1'] }]);
+    await setup(['External Connector 1']);
     await waitFor(() => {
       expect(
         within(screen.getByRole('dialog')).getByText('Internal Connector 1')
@@ -78,15 +78,10 @@ describe('<ModelConnector />', () => {
   });
 
   it('should call onChange with consistent params after option click', async () => {
-    const { user, onChangeMock } = await setup([
-      { name: 'External Connector 1', ids: ['external-connector-id-1'] },
-    ]);
+    const { user, onChangeMock } = await setup(['External Connector 1']);
 
     await user.click(screen.getByText('Common Connector'));
 
-    expect(onChangeMock).toHaveBeenLastCalledWith([
-      { name: 'External Connector 1', ids: ['external-connector-id-1'] },
-      { name: 'Common Connector', ids: ['common-connector-id'] },
-    ]);
+    expect(onChangeMock).toHaveBeenLastCalledWith(['External Connector 1', 'Common Connector']);
   });
 });

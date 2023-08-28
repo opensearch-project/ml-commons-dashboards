@@ -15,13 +15,16 @@ interface Params {
   nameOrId?: string;
   status?: ModelDeployStatus[];
   source: Array<'local' | 'external'>;
-  connector: Array<{ name: string; ids: string[] }>;
+  connector: string[];
   currentPage: number;
   pageSize: number;
   sort: { field: 'name' | 'model_state' | 'id'; direction: 'asc' | 'desc' };
 }
 
-const generateExtraQuery = ({ source, connector }: Pick<Params, 'connector' | 'source'>) => {
+const generateExtraQuery = ({
+  source,
+  connector,
+}: Pick<Params, 'source'> & { connector: Array<{ name: string; ids: string[] }> }) => {
   if (connector.length === 0 && source.length === 0) {
     return undefined;
   }
@@ -89,6 +92,7 @@ const fetchDeployedModels = async (params: Params) => {
         return MODEL_STATE.partiallyLoaded;
     }
   });
+  const externalConnectorsData = await APIProvider.getAPI('connector').getAll();
   const result = await APIProvider.getAPI('model').search({
     from: (params.currentPage - 1) * params.pageSize,
     size: params.pageSize,
@@ -98,9 +102,19 @@ const fetchDeployedModels = async (params: Params) => {
         ? [MODEL_STATE.loadFailed, MODEL_STATE.loaded, MODEL_STATE.partiallyLoaded]
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
-    extraQuery: generateExtraQuery(params),
+    extraQuery: generateExtraQuery({
+      ...params,
+      connector:
+        params.connector.length > 0
+          ? params.connector.map((connectorItem) => ({
+              name: connectorItem,
+              ids: externalConnectorsData.data
+                .filter((item) => item.name === connectorItem)
+                .map(({ id }) => id),
+            }))
+          : [],
+    }),
   });
-  const externalConnectorsData = await APIProvider.getAPI('connector').getAll();
   const externalConnectorMap = externalConnectorsData.data.reduce<{
     [key: string]: {
       id: string;

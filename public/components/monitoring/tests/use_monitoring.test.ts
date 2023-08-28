@@ -299,9 +299,7 @@ describe('useMonitoring', () => {
 
     await waitFor(() => result.current.pageStatus === 'normal');
 
-    result.current.searchByConnector([
-      { name: 'Sagemaker', ids: ['external-connector-id-1', 'external-connector-id-2'] },
-    ]);
+    result.current.searchByConnector(['External Connector 1']);
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -314,17 +312,14 @@ describe('useMonitoring', () => {
                       {
                         wildcard: {
                           'connector.name.keyword': {
-                            value: '*Sagemaker*',
+                            value: '*External Connector 1*',
                             case_insensitive: true,
                           },
                         },
                       },
                       {
                         terms: {
-                          'connector_id.keyword': [
-                            'external-connector-id-1',
-                            'external-connector-id-2',
-                          ],
+                          'connector_id.keyword': ['external-connector-1-id'],
                         },
                       },
                     ],
