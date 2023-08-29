@@ -19,9 +19,9 @@ const NODES = [
   },
 ];
 
-function setup({ nodes = NODES, loading = false }) {
+function setup({ nodes = NODES, loading = false, nodesStatus = 'Responding on 1 of 2 nodes' }) {
   const user = userEvent.setup({});
-  render(<NodesTable nodes={nodes} loading={loading} />);
+  render(<NodesTable nodes={nodes} loading={loading} nodesStatus={nodesStatus} />);
   return { user };
 }
 
@@ -31,6 +31,7 @@ describe('<NodesTable />', () => {
     expect(screen.getAllByRole('columnheader').length).toBe(2);
     expect(screen.getByText('id1')).toBeInTheDocument();
     expect(screen.getByText('id2')).toBeInTheDocument();
+    expect(screen.getByText('Responding on 1 of 2 nodes')).toBeInTheDocument();
   });
 
   it('should render status at first column with asc by default', () => {
