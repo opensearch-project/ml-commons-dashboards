@@ -59,6 +59,11 @@ export const ModelConnectorFilter = ({
   );
 
   return (
-    <OptionsFilter name="Connector" searchPlaceholder="Search" options={options} {...restProps} />
+    <OptionsFilter
+      name="Connector name"
+      searchPlaceholder="Search"
+      options={options}
+      {...restProps}
+    />
   );
 };

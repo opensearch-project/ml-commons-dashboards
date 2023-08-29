@@ -23,7 +23,7 @@ async function setup(value: string[]) {
       onChange={onChangeMock}
     />
   );
-  await user.click(screen.getByText('Connector'));
+  await user.click(screen.getByText('Connector name'));
   return { user, onChangeMock };
 }
 
@@ -59,7 +59,7 @@ describe('<ModelConnector />', () => {
 
   it('should render Connector filter and 1 selected filter number', async () => {
     await setup(['External Connector 1']);
-    expect(screen.getByText('Connector')).toBeInTheDocument();
+    expect(screen.getByText('Connector name')).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByLabelText('1 active filters')).toBeInTheDocument();
   });

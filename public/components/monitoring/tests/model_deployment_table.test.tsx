@@ -134,7 +134,7 @@ describe('<DeployedModelTable />', () => {
       const columnContent = header
         .closest('table')
         ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
-      expect(within(header).getByText('Connector Name')).toBeInTheDocument();
+      expect(within(header).getByText('Connector name')).toBeInTheDocument();
       expect(columnContent?.length).toBe(3);
       const cells = columnContent!;
       expect(within(cells[0] as HTMLElement).getByText('-')).toBeInTheDocument();

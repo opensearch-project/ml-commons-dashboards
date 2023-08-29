@@ -210,15 +210,15 @@ describe('<Monitoring />', () => {
       pageStatus: 'reset-filter',
       deployedModels: [],
     });
-    await user.type(screen.getByLabelText(/Search by name or ID/i), 'test model name');
+    await user.type(screen.getByLabelText(/Search by model name or ID/i), 'test model name');
 
     expect(screen.getByLabelText('no models results')).toBeInTheDocument();
-    expect(screen.getByLabelText(/Search by name or ID/i)).toHaveValue('test model name');
+    expect(screen.getByLabelText(/Search by model name or ID/i)).toHaveValue('test model name');
 
     await user.click(screen.getByText('Reset search'));
     expect(resetSearch).toHaveBeenCalled();
     // Search input should get reset
-    expect(screen.getByLabelText(/Search by name or ID/i)).toHaveValue('');
+    expect(screen.getByLabelText(/Search by model name or ID/i)).toHaveValue('');
   });
 
   it('should search with user input', async () => {
@@ -231,7 +231,7 @@ describe('<Monitoring />', () => {
       deployedModels: [],
       searchByNameOrId: mockSearchByNameOrId,
     });
-    await user.type(screen.getByLabelText(/Search by name or ID/i), 'test model name');
+    await user.type(screen.getByLabelText(/Search by model name or ID/i), 'test model name');
     await waitFor(() => expect(searchByNameOrId).toHaveBeenCalledWith('test model name'));
   });
 
@@ -318,7 +318,9 @@ describe('<Monitoring />', () => {
       user,
     } = setup({});
 
-    await user.click(screen.getByText('Connector', { selector: "[data-text='Connector']" }));
+    await user.click(
+      screen.getByText('Connector name', { selector: "[data-text='Connector name']" })
+    );
 
     expect(searchByConnector).not.toHaveBeenCalled();
     await user.click(within(screen.getByRole('dialog')).getByText('External Connector 1'));

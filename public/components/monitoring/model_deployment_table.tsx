@@ -92,7 +92,7 @@ export const ModelDeploymentTable = ({
       },
       {
         field: 'id',
-        name: 'Connector Name',
+        name: 'Connector name',
         width: '22.61%',
         truncateText: true,
         textOnly: true,

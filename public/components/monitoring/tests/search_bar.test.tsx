@@ -11,7 +11,7 @@ import { render, screen } from '../../../../test/test_utils';
 describe('<SearchBar />', () => {
   it('should render default search bar', () => {
     render(<SearchBar onSearch={jest.fn} />);
-    expect(screen.getByPlaceholderText('Search by name or ID')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search by model name or ID')).toBeInTheDocument();
   });
 
   it('should call onSearch with 400ms debounce', async () => {
@@ -21,7 +21,7 @@ describe('<SearchBar />', () => {
     const onSearch = jest.fn();
     render(<SearchBar onSearch={onSearch} />);
 
-    await user.type(screen.getByPlaceholderText('Search by name or ID'), 'foo');
+    await user.type(screen.getByPlaceholderText('Search by model name or ID'), 'foo');
     expect(onSearch).not.toHaveBeenCalled();
     jest.advanceTimersByTime(400);
     expect(onSearch).toHaveBeenCalled();
