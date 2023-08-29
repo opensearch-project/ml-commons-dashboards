@@ -8,31 +8,6 @@ import { OptionsFilter, OptionsFilterProps } from '../common/options_filter';
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 
-const generateAllConnectors = (
-  allExternalConnectors: Array<{ id: string; name: string }> = [],
-  internalConnectorNames: string[] = []
-) => {
-  const uniqueExternalConnectors = allExternalConnectors.reduce<{
-    [key: string]: string[];
-  }>(
-    (previousValue, { id, name }) => ({
-      ...previousValue,
-      [name]: (previousValue[name] || []).concat(id),
-    }),
-    {}
-  );
-
-  for (const connectorName of internalConnectorNames) {
-    if (!uniqueExternalConnectors[connectorName]) {
-      uniqueExternalConnectors[connectorName] = [];
-    }
-  }
-  return Object.keys(uniqueExternalConnectors).map((key) => ({
-    name: key,
-    ids: uniqueExternalConnectors[key],
-  }));
-};
-
 interface ModelConnectorFilterProps
   extends Omit<
     OptionsFilterProps,
@@ -52,8 +27,12 @@ export const ModelConnectorFilter = ({
   );
   const options = useMemo(
     () =>
-      generateAllConnectors(allExternalConnectors, internalConnectorsResult?.data).map(
-        ({ name }) => name
+      Array.from(
+        new Set(
+          (allExternalConnectors ?? [])
+            ?.map(({ name }) => name)
+            .concat(internalConnectorsResult?.data ?? [])
+        )
       ),
     [internalConnectorsResult?.data, allExternalConnectors]
   );
