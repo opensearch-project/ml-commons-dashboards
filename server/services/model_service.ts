@@ -42,6 +42,7 @@ export class ModelService {
     size: number;
     sort?: ModelSearchSort[];
     states?: MODEL_STATE[];
+    extraQuery?: Record<string, any>;
     nameOrId?: string;
   }) {
     const {

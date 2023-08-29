@@ -12,7 +12,7 @@ import {
 } from '../../../src/core/server';
 
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
-import { modelRouter, profileRouter } from './routes';
+import { connectorRouter, modelRouter, profileRouter } from './routes';
 
 export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPluginStart> {
   private readonly logger: Logger;
@@ -27,6 +27,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
 
     modelRouter(router);
     profileRouter(router);
+    connectorRouter(router);
 
     return {};
   }

@@ -16,6 +16,11 @@ export interface ModelSearchItem {
   current_worker_node_count: number;
   planning_worker_node_count: number;
   planning_worker_nodes: string[];
+  connector_id?: string;
+  connector?: {
+    name: string;
+    description?: string;
+  };
 }
 
 export interface ModelSearchResponse {
@@ -30,9 +35,11 @@ export class Model {
     size: number;
     states?: MODEL_STATE[];
     nameOrId?: string;
+    extraQuery?: Record<string, any>;
   }) {
+    const { extraQuery, ...restQuery } = query;
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
-      query,
+      query: extraQuery ? { ...restQuery, extra_query: JSON.stringify(extraQuery) } : restQuery,
     });
   }
 }
