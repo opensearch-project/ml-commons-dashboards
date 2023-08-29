@@ -153,7 +153,7 @@ describe('useMonitoring', () => {
           },
         },
       ],
-      total_models: 2,
+      total_models: 3,
     });
     const { result, waitFor } = renderHook(() => useMonitoring());
 
@@ -177,6 +177,39 @@ describe('useMonitoring', () => {
             connector: expect.objectContaining({
               name: 'Internal Connector 1',
             }),
+          }),
+        ])
+      );
+    });
+
+    searchMock.mockRestore();
+  });
+
+  it('should return empty connector if connector id not exists in all connectors', async () => {
+    jest.spyOn(Model.prototype, 'search').mockRestore();
+    const searchMock = jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+      data: [
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: '',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector_id: 'not-exists-external-connector-id',
+        },
+      ],
+      total_models: 1,
+    });
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => {
+      expect(result.current.deployedModels).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            connector: {},
           }),
         ])
       );

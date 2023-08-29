@@ -151,7 +151,9 @@ const fetchDeployedModels = async (params: Params) => {
               ? planningCount - workerCount
               : undefined,
           planningWorkerNodes,
-          connector: rest.connector_id ? externalConnectorMap[rest.connector_id] : rest.connector,
+          connector: rest.connector_id
+            ? externalConnectorMap[rest.connector_id] || {}
+            : rest.connector,
         };
       }
     ),
