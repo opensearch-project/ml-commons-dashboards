@@ -6,6 +6,7 @@
 import { useMemo, useCallback, useState } from 'react';
 
 import { APIProvider } from '../../apis/api_provider';
+import { GetAllConnectorResponse } from '../../apis/connector';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { MODEL_STATE } from '../../../common';
 
@@ -92,7 +93,12 @@ const fetchDeployedModels = async (params: Params) => {
         return MODEL_STATE.partiallyLoaded;
     }
   });
-  const externalConnectorsData = await APIProvider.getAPI('connector').getAll();
+  let externalConnectorsData: GetAllConnectorResponse;
+  try {
+    externalConnectorsData = await APIProvider.getAPI('connector').getAll();
+  } catch (_e) {
+    externalConnectorsData = { data: [], total_connectors: 0 };
+  }
   const result = await APIProvider.getAPI('model').search({
     from: (params.currentPage - 1) * params.pageSize,
     size: params.pageSize,

@@ -9,7 +9,7 @@ import {
 } from '../../server/routes/constants';
 import { InnerHttpProvider } from './inner_http_provider';
 
-interface GetAllConnectorResponse {
+export interface GetAllConnectorResponse {
   data: Array<{
     id: string;
     name: string;

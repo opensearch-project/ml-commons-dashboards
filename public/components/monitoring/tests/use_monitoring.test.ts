@@ -6,6 +6,7 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 
 import { Model, ModelSearchResponse } from '../../../apis/model';
+import { Connector } from '../../../apis/connector';
 import { useMonitoring } from '../use_monitoring';
 
 jest.mock('../../../apis/connector');
@@ -216,6 +217,45 @@ describe('useMonitoring', () => {
     });
 
     searchMock.mockRestore();
+  });
+
+  it('should return empty connector if failed to load all external connectors', async () => {
+    jest.spyOn(Model.prototype, 'search').mockRestore();
+    const getAllExternalConnectorsMock = jest
+      .spyOn(Connector.prototype, 'getAll')
+      .mockImplementation(async () => {
+        throw new Error();
+      });
+    const searchMock = jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+      data: [
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: '',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector_id: 'not-exists-external-connector-id',
+        },
+      ],
+      total_models: 1,
+    });
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => {
+      expect(result.current.deployedModels).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            connector: {},
+          }),
+        ])
+      );
+    });
+
+    searchMock.mockRestore();
+    getAllExternalConnectorsMock.mockRestore();
   });
 
   it('should call searchByNameOrId with from 0 after page changed', async () => {
