@@ -8,7 +8,7 @@ import { OptionsFilter, OptionsFilterProps } from '../common/options_filter';
 
 type SourceOptionValue = 'local' | 'external';
 
-const sourceOptions = [
+const SOURCE_OPTIONS = [
   {
     name: 'Local',
     value: 'local' as const,
@@ -24,9 +24,10 @@ export const ModelSourceFilter = (
 ) => {
   return (
     <OptionsFilter<SourceOptionValue>
+      id="modelSourceFilter"
       name="Source"
       searchPlaceholder="Search"
-      options={sourceOptions}
+      options={SOURCE_OPTIONS}
       {...props}
     />
   );
