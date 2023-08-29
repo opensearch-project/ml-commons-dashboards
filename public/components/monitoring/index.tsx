@@ -85,7 +85,7 @@ export const Monitoring = () => {
       <EuiPanel>
         <EuiText size="s">
           <h2>
-            Deployed models{' '}
+            Models{' '}
             {pageStatus !== 'empty' && (
               <EuiTextColor aria-label="total number of results" color="subdued">
                 ({pagination?.totalRecords ?? 0})
