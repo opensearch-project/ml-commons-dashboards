@@ -5,7 +5,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { act, render, screen, waitFor } from '../../../../test/test_utils';
+import { render, screen, waitFor } from '../../../../test/test_utils';
 import { PreviewPanel } from '../';
 import { APIProvider } from '../../../apis/api_provider';
 
@@ -13,7 +13,9 @@ const MODEL = {
   id: 'id1',
   name: 'test',
   planningWorkerNodes: ['node-1', 'node-2', 'node-3'],
-  source: 'External',
+  connector: {
+    name: 'Connector',
+  },
 };
 
 function setup({ model = MODEL, onClose = jest.fn() }) {

@@ -12,12 +12,10 @@ import {
   EuiBasicTable,
   EuiButton,
   EuiButtonIcon,
-  EuiCopy,
   EuiEmptyPrompt,
   EuiHealth,
   EuiSpacer,
   EuiLink,
-  EuiText,
   EuiToolTip,
 } from '@elastic/eui';
 
@@ -41,6 +39,11 @@ export interface ModelDeploymentItem {
   planningNodesCount: number | undefined;
   notRespondingNodesCount: number | undefined;
   planningWorkerNodes: string[];
+  connector?: {
+    id?: string;
+    name?: string;
+    description?: string;
+  };
 }
 
 export interface ModelDeploymentTableProps {
@@ -73,14 +76,34 @@ export const ModelDeploymentTable = ({
       {
         field: 'name',
         name: 'Name',
-        width: '27.5%',
+        width: '23.84%',
         sortable: true,
         truncateText: true,
       },
       {
+        field: 'id',
+        name: 'Source',
+        width: '23.84%',
+        sortable: false,
+        truncateText: true,
+        render: (_id: string, modelDeploymentItem: ModelDeploymentItem) => {
+          return modelDeploymentItem.connector ? 'External' : 'Local';
+        },
+      },
+      {
+        field: 'id',
+        name: 'Connector name',
+        width: '22.61%',
+        truncateText: true,
+        textOnly: true,
+        render: (_id: string, modelDeploymentItem: ModelDeploymentItem) => {
+          return modelDeploymentItem.connector?.name || '-';
+        },
+      },
+      {
         field: 'model_state',
         name: 'Status',
-        width: '34.5%',
+        width: '23.84%',
         sortable: true,
         truncateText: true,
         render: (
@@ -97,64 +120,29 @@ export const ModelDeploymentTable = ({
           if (respondingNodesCount === 0) {
             return (
               <EuiHealth className="ml-modelStatusCell" color="danger">
-                <div className="eui-textTruncate">
-                  <strong>Not responding</strong> on {planningNodesCount} of {planningNodesCount}{' '}
-                  nodes
-                </div>
+                <div className="eui-textTruncate">Not responding</div>
               </EuiHealth>
             );
           }
           if (notRespondingNodesCount === 0) {
             return (
               <EuiHealth className="ml-modelStatusCell" color="success">
-                <div className="eui-textTruncate">
-                  <strong>Responding</strong> on {planningNodesCount} of {planningNodesCount} nodes
-                </div>
+                <div className="eui-textTruncate">Responding</div>
               </EuiHealth>
             );
           }
           return (
             <EuiHealth className="ml-modelStatusCell" color="warning">
-              <div className="eui-textTruncate">
-                <strong>Partially responding</strong> on {respondingNodesCount} of{' '}
-                {planningNodesCount} nodes
-              </div>
+              <div className="eui-textTruncate">Partially responding</div>
             </EuiHealth>
           );
         },
       },
       {
-        field: 'source',
-        name: 'Source',
-        width: '7%',
-        sortable: false,
-        truncateText: true,
-      },
-      {
-        field: 'id',
-        name: 'Model ID',
-        width: '21%',
-        sortable: true,
-        render: (id: string) => (
-          <EuiCopy
-            className="ml-modelModelIdCellTextWrapper"
-            textToCopy={id}
-            beforeMessage="Copy model ID"
-            anchorClassName="ml-modelModelIdCell"
-          >
-            {(copy) => (
-              <EuiText onClick={copy} className="eui-textTruncate ml-modelModelIdText" size="s">
-                {id}
-              </EuiText>
-            )}
-          </EuiCopy>
-        ),
-      },
-      {
         field: 'id',
         name: 'Action',
         align: 'right' as const,
-        width: '10%',
+        width: '5.87%',
         render: (id: string, modelDeploymentItem: ModelDeploymentItem) => {
           return (
             <EuiToolTip content="View status details">

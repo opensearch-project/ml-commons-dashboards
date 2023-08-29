@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export * from './use_fetcher';
+export { OptionsFilter, OptionsFilterProps } from './options_filter';
