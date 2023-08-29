@@ -23,11 +23,11 @@ export const SearchBar = ({ onSearch, inputRef }: SearchBarProps) => {
     <EuiFieldSearch
       autoFocus
       inputRef={inputRef}
-      placeholder="Search by name or ID"
+      placeholder="Search by model name or ID"
       incremental={true}
       onSearch={onSearchDebounce}
       onChange={onChange}
-      aria-label="Search by name or ID"
+      aria-label="Search by model name or ID"
       fullWidth
     />
   );

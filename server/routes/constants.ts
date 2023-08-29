@@ -8,3 +8,5 @@ export const API_PREFIX = '/api/ml-commons';
 export const MODEL_API_ENDPOINT = `${API_PREFIX}/model`;
 export const PROFILE_API_ENDPOINT = `${API_PREFIX}/profile`;
 export const DEPLOYED_MODEL_PROFILE_API_ENDPOINT = `${PROFILE_API_ENDPOINT}/deployed-model`;
+export const CONNECTOR_API_ENDPOINT = `${API_PREFIX}/connector`;
+export const INTERNAL_CONNECTOR_API_ENDPOINT = `${API_PREFIX}/internal-connector`;
