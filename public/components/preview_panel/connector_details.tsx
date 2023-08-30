@@ -24,22 +24,14 @@ export const ConnectorDetails = (props: { name?: string; id?: string; descriptio
         <h3>Connector details</h3>
       </EuiTitle>
       <EuiSpacer size="m" />
-      <EuiDescriptionList>
+      <EuiDescriptionList compressed>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiDescriptionListTitle>
-              <EuiTitle size="xxs">
-                <h5>Connector name</h5>
-              </EuiTitle>
-            </EuiDescriptionListTitle>
-            <EuiDescriptionListDescription>{name}</EuiDescriptionListDescription>
+            <EuiDescriptionListTitle>Connector name</EuiDescriptionListTitle>
+            <EuiDescriptionListDescription>{name ? name : '-'}</EuiDescriptionListDescription>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiDescriptionListTitle>
-              <EuiTitle size="xxs">
-                <h5>Connector ID</h5>
-              </EuiTitle>
-            </EuiDescriptionListTitle>
+            <EuiDescriptionListTitle>Connector ID</EuiDescriptionListTitle>
             <EuiDescriptionListDescription>
               {id ? (
                 <CopyableText text={id} iconLeft={false} tooltipText="Copy connector ID" />
@@ -50,12 +42,10 @@ export const ConnectorDetails = (props: { name?: string; id?: string; descriptio
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="m" />
-        <EuiDescriptionListTitle>
-          <EuiTitle size="xxs">
-            <h5>Connector description</h5>
-          </EuiTitle>
-        </EuiDescriptionListTitle>
-        <EuiDescriptionListDescription>{description}</EuiDescriptionListDescription>
+        <EuiDescriptionListTitle>Connector description</EuiDescriptionListTitle>
+        <EuiDescriptionListDescription>
+          {description ? description : '-'}
+        </EuiDescriptionListDescription>
       </EuiDescriptionList>
     </>
   );
