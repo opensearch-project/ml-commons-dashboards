@@ -28,7 +28,7 @@ export const ConnectorDetails = (props: { name?: string; id?: string; descriptio
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiDescriptionListTitle>Connector name</EuiDescriptionListTitle>
-            <EuiDescriptionListDescription>{name ? name : '-'}</EuiDescriptionListDescription>
+            <EuiDescriptionListDescription>{name ? name : '\u2014'}</EuiDescriptionListDescription>
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiDescriptionListTitle>Connector ID</EuiDescriptionListTitle>
@@ -36,7 +36,7 @@ export const ConnectorDetails = (props: { name?: string; id?: string; descriptio
               {id ? (
                 <CopyableText text={id} iconLeft={false} tooltipText="Copy connector ID" />
               ) : (
-                '-'
+                '\u2014'
               )}
             </EuiDescriptionListDescription>
           </EuiFlexItem>
@@ -44,7 +44,7 @@ export const ConnectorDetails = (props: { name?: string; id?: string; descriptio
         <EuiSpacer size="m" />
         <EuiDescriptionListTitle>Connector description</EuiDescriptionListTitle>
         <EuiDescriptionListDescription>
-          {description ? description : '-'}
+          {description ? description : '\u2014'}
         </EuiDescriptionListDescription>
       </EuiDescriptionList>
     </>
