@@ -22,9 +22,9 @@ describe('<ConnectorDetails />', () => {
     expect(screen.getByText('Connector description')).toBeInTheDocument();
   });
 
-  it('should render - when id is empty', () => {
+  it('should render em dash when id is empty', () => {
     setup({ id: '' });
-    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.getByText('\u2014')).toBeInTheDocument();
     expect(screen.queryByTestId('copyable-text-div')).not.toBeInTheDocument();
   });
 
