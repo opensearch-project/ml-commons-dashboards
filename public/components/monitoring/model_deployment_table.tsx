@@ -97,7 +97,7 @@ export const ModelDeploymentTable = ({
         truncateText: true,
         textOnly: true,
         render: (_id: string, modelDeploymentItem: ModelDeploymentItem) => {
-          return modelDeploymentItem.connector?.name || '-';
+          return modelDeploymentItem.connector?.name || '\u2014';
         },
       },
       {
@@ -115,7 +115,7 @@ export const ModelDeploymentTable = ({
             respondingNodesCount === undefined ||
             notRespondingNodesCount === undefined
           ) {
-            return '-';
+            return '\u2014';
           }
           if (respondingNodesCount === 0) {
             return (

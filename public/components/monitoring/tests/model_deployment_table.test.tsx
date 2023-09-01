@@ -137,8 +137,8 @@ describe('<DeployedModelTable />', () => {
       expect(within(header).getByText('Connector name')).toBeInTheDocument();
       expect(columnContent?.length).toBe(3);
       const cells = columnContent!;
-      expect(within(cells[0] as HTMLElement).getByText('-')).toBeInTheDocument();
-      expect(within(cells[1] as HTMLElement).getByText('-')).toBeInTheDocument();
+      expect(within(cells[0] as HTMLElement).getByText('\u2014')).toBeInTheDocument();
+      expect(within(cells[1] as HTMLElement).getByText('\u2014')).toBeInTheDocument();
       expect(within(cells[2] as HTMLElement).getByText('Sagemaker')).toBeInTheDocument();
     });
 
