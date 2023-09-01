@@ -116,35 +116,23 @@ export const PreviewPanel = ({ onClose, model }: Props) => {
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
-        <EuiDescriptionList>
+        <EuiDescriptionList compressed>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiDescriptionListTitle>
-                <EuiTitle size="xxs">
-                  <h5>Status</h5>
-                </EuiTitle>
-              </EuiDescriptionListTitle>
+              <EuiDescriptionListTitle>Status</EuiDescriptionListTitle>
               <EuiDescriptionListDescription>
                 {respondingStatus.overall}
               </EuiDescriptionListDescription>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiDescriptionListTitle>
-                <EuiTitle size="xxs">
-                  <h5>Source</h5>
-                </EuiTitle>
-              </EuiDescriptionListTitle>
+              <EuiDescriptionListTitle>Source</EuiDescriptionListTitle>
               <EuiDescriptionListDescription>
                 {connector ? 'External' : 'Local'}
               </EuiDescriptionListDescription>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size="m" />
-          <EuiDescriptionListTitle>
-            <EuiTitle size="xxs">
-              <h5>Model ID</h5>
-            </EuiTitle>
-          </EuiDescriptionListTitle>
+          <EuiDescriptionListTitle>Model ID</EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
             <CopyableText text={id} iconLeft={false} tooltipText="Copy model ID" />
           </EuiDescriptionListDescription>
