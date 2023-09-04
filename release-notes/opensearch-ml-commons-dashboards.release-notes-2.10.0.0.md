@@ -17,4 +17,5 @@ Compatible with OpenSearch 2.10.0
 ### Bug Fixes
 
 * Fix no model show up when search a model. ([#238](https://github.com/opensearch-project/ml-commons-dashboards/pull/238))
-* Use em dash to fallback when connector detail value is null. ([#254](https://github.com/opensearch-project/ml-commons-dashboards/pull/254),[#255](https://github.com/opensearch-project/ml-commons-dashboards/pull/255))
+* Migrate style to oui attributes and add fallback dash. ([#254](https://github.com/opensearch-project/ml-commons-dashboards/pull/254))
+* Replace dash with em dash. ([#255](https://github.com/opensearch-project/ml-commons-dashboards/pull/255))
