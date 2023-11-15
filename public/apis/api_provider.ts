@@ -5,6 +5,7 @@
 
 import { ModelVersion } from './model_version';
 import { ModelAggregate } from './model_aggregate';
+import { Connector } from './connector';
 import { Model } from './model';
 import { ModelRepository } from './model_repository';
 import { Profile } from './profile';
@@ -19,6 +20,7 @@ const apiInstanceStore: {
   task: Task | undefined;
   modelRepository: ModelRepository | undefined;
   model: Model | undefined;
+  connector: Connector | undefined;
 } = {
   modelVersion: undefined,
   modelAggregate: undefined,
@@ -27,6 +29,7 @@ const apiInstanceStore: {
   task: undefined,
   modelRepository: undefined,
   model: undefined,
+  connector: undefined,
 };
 
 export class APIProvider {
@@ -37,6 +40,7 @@ export class APIProvider {
   public static getAPI(type: 'security'): Security;
   public static getAPI(type: 'modelRepository'): ModelRepository;
   public static getAPI(type: 'model'): Model;
+  public static getAPI(type: 'connector'): Connector;
   public static getAPI(type: keyof typeof apiInstanceStore) {
     if (apiInstanceStore[type]) {
       return apiInstanceStore[type]!;
@@ -75,6 +79,11 @@ export class APIProvider {
       case 'model': {
         const newInstance = new Model();
         apiInstanceStore.model = newInstance;
+        return newInstance;
+      }
+      case 'connector': {
+        const newInstance = new Connector();
+        apiInstanceStore.connector = newInstance;
         return newInstance;
       }
     }

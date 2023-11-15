@@ -95,6 +95,7 @@ export const modelVersionRouter = (router: IRouter) => {
           nameOrId: schema.maybe(schema.string()),
           versionOrKeyword: schema.maybe(schema.string()),
           modelIds: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
+          extra_query: schema.maybe(schema.recordOf(schema.string(), schema.any())),
         }),
       },
     },
@@ -110,6 +111,7 @@ export const modelVersionRouter = (router: IRouter) => {
         nameOrId,
         modelIds,
         versionOrKeyword,
+        extra_query: extraQuery,
       } = request.query;
       try {
         const payload = await ModelVersionService.search({
@@ -124,6 +126,7 @@ export const modelVersionRouter = (router: IRouter) => {
           nameOrId,
           modelIds: typeof modelIds === 'string' ? [modelIds] : modelIds,
           versionOrKeyword,
+          extraQuery,
         });
         return opensearchDashboardsResponseFactory.ok({ body: payload });
       } catch (err) {

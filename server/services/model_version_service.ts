@@ -82,6 +82,7 @@ export class ModelVersionService {
     nameOrId?: string;
     versionOrKeyword?: string;
     modelIds?: string[];
+    extraQuery?: Record<string, any>;
   }) {
     const {
       body: { hits },

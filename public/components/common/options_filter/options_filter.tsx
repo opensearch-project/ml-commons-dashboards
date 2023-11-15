@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   EuiPopover,
   EuiPopoverTitle,
@@ -16,6 +16,7 @@ import {
 import { OptionsFilterItem } from './options_filter_item';
 
 export interface OptionsFilterProps<T extends string | number = string> {
+  id?: string;
   name: string;
   searchPlaceholder: string;
   searchWidth?: number;
@@ -33,11 +34,8 @@ export const OptionsFilter = <T extends string | number = string>({
   searchPlaceholder,
   searchWidth,
   onChange,
+  ...restProps
 }: OptionsFilterProps<T>) => {
-  const valueRef = useRef(value);
-  valueRef.current = value;
-  const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [searchText, setSearchText] = useState<string>();
 
@@ -61,17 +59,19 @@ export const OptionsFilter = <T extends string | number = string>({
     setIsPopoverOpen(false);
   }, []);
 
-  const handleFilterItemClick = useCallback((clickItemValue: T) => {
-    onChangeRef.current(
-      valueRef.current.includes(clickItemValue)
-        ? valueRef.current.filter((item) => item !== clickItemValue)
-        : valueRef.current.concat(clickItemValue)
-    );
-  }, []);
+  const handleFilterItemClick = useCallback(
+    (clickItemValue: T) => {
+      onChange(
+        value.includes(clickItemValue)
+          ? value.filter((item) => item !== clickItemValue)
+          : value.concat(clickItemValue)
+      );
+    },
+    [value, onChange]
+  );
 
   return (
     <EuiPopover
-      id="popoverExampleMultiSelect"
       button={
         <EuiFilterButton
           iconType="arrowDown"
@@ -85,6 +85,7 @@ export const OptionsFilter = <T extends string | number = string>({
       isOpen={isPopoverOpen}
       closePopover={closePopover}
       panelPaddingSize="none"
+      {...restProps}
     >
       <EuiPopoverTitle style={{ padding: 12 }}>
         <EuiFieldSearch

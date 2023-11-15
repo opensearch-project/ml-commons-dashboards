@@ -5,7 +5,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { within } from '@testing-library/dom';
+import { within, fireEvent } from '@testing-library/dom';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionTable } from '../model_version_table';
@@ -45,7 +45,6 @@ describe('<ModelVersionTable />', () => {
   it(
     'should render sorted column and call onSort after sort change',
     async () => {
-      const user = userEvent.setup();
       const onSortMock = jest.fn();
       render(
         <ModelVersionTable
@@ -66,16 +65,19 @@ describe('<ModelVersionTable />', () => {
           timeout: 2000,
         }
       );
-      await user.click(screen.getByText('Version'));
+
       await waitFor(async () => {
+        fireEvent.click(screen.getByText('Version'));
         expect(screen.getByText('Sort A-Z').closest('li')).toHaveClass(
           'euiDataGridHeader__action--selected'
         );
       });
 
       expect(onSortMock).not.toHaveBeenCalled();
-      await user.click(screen.getByText('Sort Z-A'));
-      expect(onSortMock).toHaveBeenCalledWith([{ direction: 'desc', id: 'version' }]);
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('Sort Z-A'));
+        expect(onSortMock).toHaveBeenCalledWith([{ direction: 'desc', id: 'version' }]);
+      });
     },
     40 * 1000
   );
@@ -83,14 +85,18 @@ describe('<ModelVersionTable />', () => {
   it(
     'should NOT render sort button for state and status column',
     async () => {
-      const user = userEvent.setup();
       render(<ModelVersionTable versions={[]} tags={[]} />);
 
-      await user.click(screen.getByText('State'));
-      expect(screen.queryByTitle('Sort A-Z')).toBeNull();
+      expect(screen.getByTestId('dataGridHeaderCell-state')).toBeInTheDocument();
+      await waitFor(() => {
+        fireEvent.click(screen.getByTestId('dataGridHeaderCell-state'));
+        expect(screen.queryByTitle('Sort A-Z')).toBeNull();
+      });
 
-      await user.click(screen.getByText('Status'));
-      expect(screen.queryByTitle('Sort A-Z')).toBeNull();
+      await waitFor(() => {
+        fireEvent.click(screen.getByTestId('dataGridHeaderCell-status'));
+        expect(screen.queryByTitle('Sort A-Z')).toBeNull();
+      });
     },
     20 * 1000
   );

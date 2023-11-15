@@ -13,6 +13,7 @@ import {
 
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
 import {
+  connectorRouter,
   modelVersionRouter,
   modelAggregateRouter,
   profileRouter,
@@ -40,6 +41,7 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     taskRouter(router);
     modelRepositoryRouter(router);
     modelRouter(router);
+    connectorRouter(router);
 
     return {};
   }

@@ -11,17 +11,20 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
+  EuiFilterGroup,
 } from '@elastic/eui';
 import React, { useState, useRef, useCallback } from 'react';
 
+import { ModelDeploymentProfile } from '../../apis/profile';
 import { RefreshInterval } from '../common/refresh_interval';
 import { DebouncedSearchBar } from '../common';
 import { PreviewPanel } from '../preview_panel';
-import { ExperimentalWarning } from '../experiment_warning';
+
 import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
 import { ModelStatusFilter } from './model_status_filter';
-import { ModelDeploymentProfile } from '../../apis/profile';
+import { ModelSourceFilter } from './model_source_filter';
+import { ModelConnectorFilter } from './model_connector_filter';
 
 export const Monitoring = () => {
   const {
@@ -34,6 +37,9 @@ export const Monitoring = () => {
     searchByNameOrId,
     reload,
     searchByStatus,
+    searchBySource,
+    searchByConnector,
+    allExternalConnectors,
   } = useMonitoring();
   const [previewModel, setPreviewModel] = useState<ModelDeploymentItem | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>();
@@ -69,22 +75,17 @@ export const Monitoring = () => {
 
   return (
     <div>
-      <ExperimentalWarning />
       <EuiSpacer size="s" />
       <EuiSpacer size="xs" />
       <EuiPageHeader
         pageTitle="Overview"
-        rightSideItems={[
-          <div style={{ backgroundColor: '#fff' }}>
-            <RefreshInterval onRefresh={reload} />
-          </div>,
-        ]}
+        rightSideItems={[<RefreshInterval onRefresh={reload} />]}
       />
       <EuiSpacer size="m" />
       <EuiPanel>
         <EuiText size="s">
           <h2>
-            Deployed models{' '}
+            Models{' '}
             {pageStatus !== 'empty' && (
               <EuiTextColor aria-label="total number of results" color="subdued">
                 ({pagination?.totalRecords ?? 0})
@@ -101,12 +102,20 @@ export const Monitoring = () => {
                 <DebouncedSearchBar
                   inputRef={setInputRef}
                   onSearch={searchByNameOrId}
-                  placeholder="Search by name or ID"
-                  aria-label="Search by name or ID"
+                  placeholder="Search by model name or ID"
+                  aria-label="Search by model name or ID"
                 />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
+                <EuiFilterGroup>
+                  <ModelSourceFilter value={params.source} onChange={searchBySource} />
+                  <ModelConnectorFilter
+                    value={params.connector}
+                    onChange={searchByConnector}
+                    allExternalConnectors={allExternalConnectors}
+                  />
+                  <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
+                </EuiFilterGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size="m" />
