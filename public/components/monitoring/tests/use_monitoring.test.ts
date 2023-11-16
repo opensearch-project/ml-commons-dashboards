@@ -6,7 +6,10 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 
 import { ModelVersion, ModelVersionSearchResponse } from '../../../apis/model_version';
+import { Connector } from '../../../apis/connector';
 import { useMonitoring } from '../use_monitoring';
+
+jest.mock('../../../apis/connector');
 
 const mockEmptyRecords = () =>
   jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValueOnce({
@@ -16,7 +19,21 @@ const mockEmptyRecords = () =>
 
 describe('useMonitoring', () => {
   beforeEach(() => {
-    jest.spyOn(ModelVersion.prototype, 'search');
+    jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
+      data: [
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: '',
+          model_state: 'DEPLOYED' as cosnt,
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+        },
+      ],
+      total_model_versions: 1,
+    });
   });
 
   afterEach(() => {
@@ -28,9 +45,7 @@ describe('useMonitoring', () => {
 
     await waitFor(() => result.current.pageStatus === 'normal');
 
-    act(() => {
-      result.current.searchByNameOrId('foo');
-    });
+    result.current.searchByNameOrId('foo');
     await waitFor(() =>
       expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -40,9 +55,7 @@ describe('useMonitoring', () => {
       )
     );
 
-    act(() => {
-      result.current.searchByStatus(['responding']);
-    });
+    result.current.searchByStatus(['responding']);
     await waitFor(() =>
       expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -52,13 +65,10 @@ describe('useMonitoring', () => {
       )
     );
 
-    act(() => {
-      result.current.resetSearch();
-    });
+    result.current.resetSearch();
     await waitFor(() => result.current.pageStatus === 'normal');
-    act(() => {
-      result.current.searchByStatus(['partial-responding']);
-    });
+
+    result.current.searchByStatus(['partial-responding']);
     await waitFor(() =>
       expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -81,11 +91,9 @@ describe('useMonitoring', () => {
       )
     );
 
-    act(() => {
-      result.current.handleTableChange({
-        sort: { field: 'name', direction: 'desc' },
-        pagination: { currentPage: 2, pageSize: 10 },
-      });
+    result.current.handleTableChange({
+      sort: { field: 'name', direction: 'desc' },
+      pagination: { currentPage: 2, pageSize: 10 },
     });
     await waitFor(() =>
       expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
@@ -103,10 +111,301 @@ describe('useMonitoring', () => {
 
     await waitFor(() => expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(1));
 
-    act(() => {
-      result.current.reload();
-    });
+    result.current.reload();
     await waitFor(() => expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(2));
+  });
+
+  it('should return consistent deployedModels', async () => {
+    jest.spyOn(ModelVersion.prototype, 'search').mockRestore();
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
+      data: [
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'TEXT_EMBEDDING',
+          model_state: 'DEPLOYED',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+        },
+        {
+          id: 'model-2-id',
+          name: 'model-2-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: 'DEPLOYED',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector_id: 'external-connector-1-id',
+        },
+        {
+          id: 'model-3-id',
+          name: 'model-3-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: 'DEPLOYED',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector: {
+            name: 'Internal Connector 1',
+          },
+        },
+      ],
+      total_model_versions: 3,
+    });
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => {
+      expect(result.current.deployedModels).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'model-1-id',
+            name: 'model-1-name',
+            respondingNodesCount: 1,
+            notRespondingNodesCount: 2,
+            planningNodesCount: 3,
+            planningWorkerNodes: ['node1', 'node2', 'node3'],
+          }),
+          expect.objectContaining({
+            connector: expect.objectContaining({
+              name: 'External Connector 1',
+            }),
+          }),
+          expect.objectContaining({
+            connector: expect.objectContaining({
+              name: 'Internal Connector 1',
+            }),
+          }),
+        ])
+      );
+    });
+
+    searchMock.mockRestore();
+  });
+
+  it('should return empty connector if connector id not exists in all connectors', async () => {
+    jest.spyOn(ModelVersion.prototype, 'search').mockRestore();
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
+      data: [
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: 'DEPLOYED',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector_id: 'not-exists-external-connector-id',
+        },
+      ],
+      total_model_versions: 1,
+    });
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => {
+      expect(result.current.deployedModels).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            connector: {},
+          }),
+        ])
+      );
+    });
+
+    searchMock.mockRestore();
+  });
+
+  it('should return empty connector if failed to load all external connectors', async () => {
+    jest.spyOn(ModelVersion.prototype, 'search').mockRestore();
+    const getAllExternalConnectorsMock = jest
+      .spyOn(Connector.prototype, 'getAll')
+      .mockImplementation(async () => {
+        throw new Error();
+      });
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
+      data: [
+        {
+          id: 'model-1-id',
+          name: 'model-1-name',
+          current_worker_node_count: 1,
+          planning_worker_node_count: 3,
+          algorithm: 'REMOTE',
+          model_state: 'DEPLOYED',
+          model_version: '',
+          planning_worker_nodes: ['node1', 'node2', 'node3'],
+          connector_id: 'not-exists-external-connector-id',
+        },
+      ],
+      total_model_versions: 1,
+    });
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => {
+      expect(result.current.deployedModels).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            connector: {},
+          }),
+        ])
+      );
+    });
+
+    searchMock.mockRestore();
+    getAllExternalConnectorsMock.mockRestore();
+  });
+
+  it('should call searchByNameOrId with from 0 after page changed', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    result.current.handleTableChange({
+      pagination: {
+        currentPage: 2,
+        pageSize: 15,
+      },
+    });
+
+    await waitFor(() => {
+      expect(result.current.pagination?.currentPage).toBe(2);
+    });
+
+    result.current.searchByNameOrId('foo');
+
+    await waitFor(() => {
+      expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(3);
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          from: 0,
+        })
+      );
+    });
+  });
+
+  it('should call searchByStatus with from 0 after page changed', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    result.current.handleTableChange({
+      pagination: {
+        currentPage: 2,
+        pageSize: 15,
+      },
+    });
+
+    await waitFor(() => {
+      expect(result.current.pagination?.currentPage).toBe(2);
+    });
+
+    result.current.searchByStatus(['responding']);
+
+    await waitFor(() => {
+      expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(3);
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          from: 0,
+        })
+      );
+    });
+  });
+
+  it('should call search API with consistent extraQuery after source filter applied', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => result.current.pageStatus === 'normal');
+
+    result.current.searchBySource(['local']);
+    await waitFor(() =>
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: {
+            bool: {
+              must_not: [
+                {
+                  term: {
+                    algorithm: {
+                      value: 'REMOTE',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        })
+      )
+    );
+
+    result.current.searchBySource(['external']);
+    await waitFor(() =>
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: {
+            bool: {
+              must: [
+                {
+                  term: {
+                    algorithm: {
+                      value: 'REMOTE',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        })
+      )
+    );
+
+    result.current.searchBySource(['external', 'local']);
+    await waitFor(() =>
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: undefined,
+        })
+      )
+    );
+  });
+
+  it('should call search API with consistent extraQuery after connector filter applied', async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    await waitFor(() => result.current.pageStatus === 'normal');
+
+    result.current.searchByConnector(['External Connector 1']);
+    await waitFor(() =>
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          extraQuery: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    should: [
+                      {
+                        wildcard: {
+                          'connector.name.keyword': {
+                            value: '*External Connector 1*',
+                            case_insensitive: true,
+                          },
+                        },
+                      },
+                      {
+                        terms: {
+                          'connector_id.keyword': ['external-connector-1-id'],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        })
+      )
+    );
+
+    await waitFor(() => result.current.pageStatus === 'normal');
   });
 });
 
@@ -153,9 +452,7 @@ describe('useMonitoring.pageStatus', () => {
 
     // Mock search function to return empty result
     mockEmptyRecords();
-    act(() => {
-      result.current.searchByNameOrId('foo');
-    });
+    result.current.searchByNameOrId('foo');
     await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
   });
 
@@ -167,9 +464,31 @@ describe('useMonitoring.pageStatus', () => {
 
     // assume result is empty
     mockEmptyRecords();
-    act(() => {
-      result.current.searchByStatus(['responding']);
-    });
+    result.current.searchByStatus(['responding']);
+    await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
+  });
+
+  it("should return 'reset-filter' when filter by source but no result was found", async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    // Page status is normal for the initial run(search returns mocked results)
+    await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
+
+    // assume result is empty
+    mockEmptyRecords();
+    result.current.searchBySource(['local']);
+    await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
+  });
+
+  it("should return 'reset-filter' when filter by connector but no result was found", async () => {
+    const { result, waitFor } = renderHook(() => useMonitoring());
+
+    // Page status is normal for the initial run(search returns mocked results)
+    await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
+
+    // assume result is empty
+    mockEmptyRecords();
+    result.current.searchByConnector(['Sagemaker']);
     await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
   });
 
@@ -178,20 +497,5 @@ describe('useMonitoring.pageStatus', () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
     await waitFor(() => expect(result.current.pageStatus).toBe('empty'));
-  });
-
-  it('should return consistent deployedModels', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
-
-    await waitFor(() =>
-      expect(result.current.deployedModels[0]).toEqual({
-        id: '1',
-        name: 'model1',
-        respondingNodesCount: 1,
-        planningNodesCount: 3,
-        notRespondingNodesCount: 2,
-        planningWorkerNodes: ['node1', 'node2', 'node3'],
-      })
-    );
   });
 });

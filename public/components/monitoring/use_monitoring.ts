@@ -6,6 +6,7 @@
 import { useMemo, useCallback, useState } from 'react';
 
 import { APIProvider } from '../../apis/api_provider';
+import { GetAllConnectorResponse } from '../../apis/connector';
 import { useFetcher } from '../../hooks/use_fetcher';
 import { MODEL_VERSION_STATE } from '../../../common';
 
@@ -14,10 +15,61 @@ import { ModelDeployStatus } from './types';
 interface Params {
   nameOrId?: string;
   status?: ModelDeployStatus[];
+  source: Array<'local' | 'external'>;
+  connector: string[];
   currentPage: number;
   pageSize: number;
   sort: { field: 'name' | 'model_state' | 'id'; direction: 'asc' | 'desc' };
 }
+
+const generateExtraQuery = ({
+  source,
+  connector,
+}: Pick<Params, 'source'> & { connector: Array<{ name: string; ids: string[] }> }) => {
+  if (connector.length === 0 && source.length === 0) {
+    return undefined;
+  }
+  const must: Array<Record<string, any>> = [];
+  const mustNot: Array<Record<string, any>> = [];
+
+  if (source.length === 1) {
+    (source[0] === 'external' ? must : mustNot).push({
+      term: {
+        algorithm: { value: 'REMOTE' },
+      },
+    });
+  }
+
+  if (connector.length > 0) {
+    const should: Array<Record<string, any>> = [];
+    connector.forEach(({ name, ids }) => {
+      should.push({
+        wildcard: {
+          'connector.name.keyword': { value: `*${name}*`, case_insensitive: true },
+        },
+      });
+      if (ids.length > 0) {
+        should.push({
+          terms: {
+            'connector_id.keyword': ids,
+          },
+        });
+      }
+    });
+    must.push({ bool: { should } });
+  }
+
+  if (must.length === 0 && mustNot.length === 0) {
+    return undefined;
+  }
+
+  return {
+    bool: {
+      ...(must.length > 0 ? { must } : {}),
+      ...(mustNot.length > 0 ? { must_not: mustNot } : {}),
+    },
+  };
+};
 
 const isValidNameOrIdFilter = (nameOrId: string | undefined): nameOrId is string => !!nameOrId;
 const isValidStatusFilter = (
@@ -25,7 +77,10 @@ const isValidStatusFilter = (
 ): status is ModelDeployStatus[] => !!status && status.length > 0;
 
 const checkFilterExists = (params: Params) =>
-  isValidNameOrIdFilter(params.nameOrId) || isValidStatusFilter(params.status);
+  isValidNameOrIdFilter(params.nameOrId) ||
+  isValidStatusFilter(params.status) ||
+  params.connector.length > 0 ||
+  params.source.length > 0;
 
 const fetchDeployedModels = async (params: Params) => {
   const states = params.status?.map((status) => {
@@ -38,6 +93,12 @@ const fetchDeployedModels = async (params: Params) => {
         return MODEL_VERSION_STATE.partiallyDeployed;
     }
   });
+  let externalConnectorsData: GetAllConnectorResponse;
+  try {
+    externalConnectorsData = await APIProvider.getAPI('connector').getAll();
+  } catch (_e) {
+    externalConnectorsData = { data: [], total_connectors: 0 };
+  }
   const result = await APIProvider.getAPI('modelVersion').search({
     from: (params.currentPage - 1) * params.pageSize,
     size: params.pageSize,
@@ -51,7 +112,27 @@ const fetchDeployedModels = async (params: Params) => {
           ]
         : states,
     sort: [`${params.sort.field}-${params.sort.direction}`],
+    extraQuery: generateExtraQuery({
+      ...params,
+      connector:
+        params.connector.length > 0
+          ? params.connector.map((connectorItem) => ({
+              name: connectorItem,
+              ids: externalConnectorsData.data
+                .filter((item) => item.name === connectorItem)
+                .map(({ id }) => id),
+            }))
+          : [],
+    }),
   });
+  const externalConnectorMap = externalConnectorsData.data.reduce<{
+    [key: string]: {
+      id: string;
+      name: string;
+      description?: string;
+    };
+  }>((previousValue, currentValue) => ({ ...previousValue, [currentValue.id]: currentValue }), {});
+
   const totalPages = Math.ceil(result.total_model_versions / params.pageSize);
   return {
     pagination: {
@@ -67,6 +148,8 @@ const fetchDeployedModels = async (params: Params) => {
         current_worker_node_count: workerCount,
         planning_worker_node_count: planningCount,
         planning_worker_nodes: planningWorkerNodes,
+        algorithm,
+        ...rest
       }) => {
         return {
           id,
@@ -78,9 +161,13 @@ const fetchDeployedModels = async (params: Params) => {
               ? planningCount - workerCount
               : undefined,
           planningWorkerNodes,
+          connector: rest.connector_id
+            ? externalConnectorMap[rest.connector_id] || {}
+            : rest.connector,
         };
       }
     ),
+    allExternalConnectors: externalConnectorsData.data,
   };
 };
 
@@ -89,6 +176,8 @@ export const useMonitoring = () => {
     currentPage: 1,
     pageSize: 10,
     sort: { field: 'model_state', direction: 'asc' },
+    source: [],
+    connector: [],
   });
   const { data, loading, reload } = useFetcher(fetchDeployedModels, params);
   const filterExists = checkFilterExists(params);
@@ -117,6 +206,8 @@ export const useMonitoring = () => {
       currentPage: previousValue.currentPage,
       pageSize: previousValue.pageSize,
       sort: previousValue.sort,
+      source: [],
+      connector: [],
     }));
   }, []);
 
@@ -124,6 +215,7 @@ export const useMonitoring = () => {
     setParams((previousValue) => ({
       ...previousValue,
       nameOrId,
+      currentPage: 1,
     }));
   }, []);
 
@@ -131,6 +223,23 @@ export const useMonitoring = () => {
     setParams((previousValue) => ({
       ...previousValue,
       status,
+      currentPage: 1,
+    }));
+  }, []);
+
+  const searchBySource = useCallback((source: Params['source']) => {
+    setParams((previousValue) => ({
+      ...previousValue,
+      source,
+      currentPage: 1,
+    }));
+  }, []);
+
+  const searchByConnector = useCallback((connector: Params['connector']) => {
+    setParams((previousValue) => ({
+      ...previousValue,
+      connector,
+      currentPage: 1,
     }));
   }, []);
 
@@ -166,9 +275,12 @@ export const useMonitoring = () => {
      * Data of the current page
      */
     deployedModels,
+    allExternalConnectors: data?.allExternalConnectors,
     reload,
     searchByStatus,
     searchByNameOrId,
+    searchBySource,
+    searchByConnector,
     resetSearch,
     handleTableChange,
   };

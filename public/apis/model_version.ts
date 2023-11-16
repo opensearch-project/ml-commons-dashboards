@@ -34,6 +34,11 @@ export interface ModelVersionSearchItem {
   last_registered_time?: number;
   last_deployed_time?: number;
   last_undeployed_time?: number;
+  connector_id?: string;
+  connector?: {
+    name: string;
+    description?: string;
+  };
 }
 
 export interface ModelVersionDetail extends ModelVersionSearchItem {
@@ -106,9 +111,11 @@ export class ModelVersion {
     nameOrId?: string;
     versionOrKeyword?: string;
     modelIds?: string[];
+    extraQuery?: Record<string, any>;
   }) {
+    const { extraQuery, ...restQuery } = query;
     return InnerHttpProvider.getHttp().get<ModelVersionSearchResponse>(MODEL_VERSION_API_ENDPOINT, {
-      query,
+      query: extraQuery ? { ...restQuery, extra_query: JSON.stringify(extraQuery) } : restQuery,
     });
   }
 

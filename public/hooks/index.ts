@@ -4,4 +4,3 @@
  */
 
 export * from './use_fetcher';
-export * from './use_polling_until';

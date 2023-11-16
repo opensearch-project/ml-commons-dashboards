@@ -14,11 +14,16 @@ import {
   EuiEmptyPrompt,
   EuiCopy,
   EuiText,
+  EuiDescriptionList,
+  EuiDescriptionListTitle,
+  EuiTitle,
+  EuiSpacer,
+  EuiDescriptionListDescription,
 } from '@elastic/eui';
 import { INode } from './';
 
-export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
-  const { nodes, loading } = props;
+export function NodesTable(props: { nodes: INode[]; loading: boolean; nodesStatus: string }) {
+  const { nodes, loading, nodesStatus } = props;
   const [sort, setSort] = useState<{ field: keyof INode; direction: Direction }>({
     field: 'deployed',
     direction: 'asc',
@@ -108,16 +113,28 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean }) {
   );
 
   return (
-    <EuiBasicTable<INode>
-      columns={columns}
-      items={items}
-      sorting={{ sort }}
-      pagination={pagination}
-      onChange={handleTableChange}
-      loading={loading}
-      noItemsMessage={
-        loading ? <EuiEmptyPrompt body={<>Loading...</>} aria-label="loading nodes" /> : undefined
-      }
-    />
+    <>
+      <EuiSpacer size="l" />
+      <EuiDescriptionList>
+        <EuiDescriptionListTitle>
+          <EuiTitle size="s">
+            <h3>Status by node</h3>
+          </EuiTitle>
+        </EuiDescriptionListTitle>
+        <EuiDescriptionListDescription>{nodesStatus}</EuiDescriptionListDescription>
+      </EuiDescriptionList>
+      <EuiSpacer size="m" />
+      <EuiBasicTable<INode>
+        columns={columns}
+        items={items}
+        sorting={{ sort }}
+        pagination={pagination}
+        onChange={handleTableChange}
+        loading={loading}
+        noItemsMessage={
+          loading ? <EuiEmptyPrompt body={<>Loading...</>} aria-label="loading nodes" /> : undefined
+        }
+      />
+    </>
   );
 }

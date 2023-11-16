@@ -43,4 +43,7 @@ export const CLUSTER = {
   PREDICT: 'opensearch_mlCommonsPredict',
 };
 
+export const CONNECTOR_BASE_API = `${ML_COMMONS_API_PREFIX}/connectors`;
+export const CONNECTOR_SEARCH_API = `${CONNECTOR_BASE_API}/_search`;
+
 export const MODEL_INDEX = '.plugins-ml-model';

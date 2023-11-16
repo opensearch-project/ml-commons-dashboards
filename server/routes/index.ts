@@ -10,3 +10,4 @@ export { securityRouter } from './security_router';
 export { taskRouter } from './task_router';
 export { modelRepositoryRouter } from './model_repository_router';
 export { modelRouter } from './model_router';
+export { connectorRouter } from './connector_router';
