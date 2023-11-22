@@ -37,7 +37,6 @@ export const ModelFileFormatSelect = ({ readOnly = false }: Props) => {
   });
 
   const { ref: fileFormatInputRef, ...fileFormatField } = modelFileFormatController.field;
-
   const selectedFileFormatOption = useMemo(() => {
     if (fileFormatField.value) {
       return FILE_FORMAT_OPTIONS.find((fmt) => fmt.value === fileFormatField.value);

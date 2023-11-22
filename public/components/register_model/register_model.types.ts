@@ -13,7 +13,7 @@ export interface ModelFormBase {
   modelFileFormat: string;
   tags?: Tag[];
   versionNotes?: string;
-  type?: 'import' | 'upload';
+  type?: 'import' | 'upload' | 'external';
 }
 
 /**

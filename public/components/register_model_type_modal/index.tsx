@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState, useCallback, Fragment, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -16,11 +16,8 @@ import {
   EuiFlexItem,
   EuiCheckableCard,
   EuiText,
-  EuiSelectable,
   EuiTextColor,
-  EuiLink,
   EuiSelectableOption,
-  EuiHighlight,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
 import { generatePath } from 'react-router-dom';
@@ -30,6 +27,7 @@ import { modelRepositoryManager } from '../../utils/model_repository_manager';
 enum ModelSource {
   USER_MODEL = 'UserModel',
   PRE_TRAINED_MODEL = 'PreTrainedModel',
+  EXTERNAL_MODEL = 'External_Model',
 }
 interface Props {
   onCloseModal: () => void;
@@ -39,19 +37,6 @@ interface IItem {
   checked?: 'on' | undefined;
   description: string;
 }
-const renderModelOption = (option: IItem, searchValue: string) => {
-  return (
-    <>
-      <EuiHighlight search={searchValue}>{option.label}</EuiHighlight>
-      <br />
-      <EuiTextColor color="subdued">
-        <small>
-          <EuiHighlight search={searchValue}>{option.description}</EuiHighlight>
-        </small>
-      </EuiTextColor>
-    </>
-  );
-};
 export function RegisterModelTypeModal({ onCloseModal }: Props) {
   const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
     []
@@ -65,19 +50,19 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
     (selectedOption) => {
       selectedOption = onChange(modelRepoSelection);
       switch (modelSource) {
-        case ModelSource.USER_MODEL:
-          selectedOption = modelRepoSelection.find((option) => option.checked === 'on');
-          if (selectedOption?.label) {
-            history.push(
-              `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import&name=${
-                selectedOption?.label
-              }&version=${selectedOption?.label}`
-            );
-          }
-          break;
         case ModelSource.PRE_TRAINED_MODEL:
           history.push(
+            `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import`
+          );
+          break;
+        case ModelSource.USER_MODEL:
+          history.push(
             `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=upload`
+          );
+          break;
+        case ModelSource.EXTERNAL_MODEL:
+          history.push(
+            `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=external`
           );
           break;
       }
@@ -127,8 +112,8 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
                   </div>
                 }
                 aria-label="Opensearch model repository"
-                checked={modelSource === ModelSource.USER_MODEL}
-                onChange={() => setModelSource(ModelSource.USER_MODEL)}
+                checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
+                onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
               />
             </EuiFlexItem>
             <EuiFlexItem>
@@ -146,58 +131,31 @@ export function RegisterModelTypeModal({ onCloseModal }: Props) {
                   </div>
                 }
                 aria-label="Add your own model"
-                checked={modelSource === ModelSource.PRE_TRAINED_MODEL}
-                onChange={() => setModelSource(ModelSource.PRE_TRAINED_MODEL)}
+                checked={modelSource === ModelSource.USER_MODEL}
+                onChange={() => setModelSource(ModelSource.USER_MODEL)}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiCheckableCard
+                id={htmlIdGenerator()()}
+                label={
+                  <div>
+                    <span style={{ fontSize: 20 }}>External source</span>
+                    <EuiSpacer />
+                    <EuiTextColor color="subdued" style={{ lineHeight: '22px' }}>
+                      <small>Connect to an external source with a connector.</small>
+                    </EuiTextColor>
+                  </div>
+                }
+                aria-label="External source"
+                checked={modelSource === ModelSource.EXTERNAL_MODEL}
+                onChange={() => setModelSource(ModelSource.EXTERNAL_MODEL)}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
         </div>
         <EuiSpacer />
         <EuiSpacer />
-        <div style={{ display: modelSource === ModelSource.USER_MODEL ? 'block' : 'none' }}>
-          <small>
-            <strong>Model</strong>
-          </small>
-          <EuiSpacer size="s" />
-          <div>
-            <EuiTextColor color="subdued">
-              <small>For more information on each model, see </small>
-            </EuiTextColor>
-            <small>
-              <EuiLink href="#" external>
-                OpenSearch model repository documentation
-              </EuiLink>
-            </small>
-          </div>
-          <EuiSpacer size="m" />
-          <EuiSelectable
-            aria-label="OpenSearch model repository models"
-            searchable
-            searchProps={{
-              'data-test-subj': 'findModel',
-              placeholder: 'Find model',
-            }}
-            options={modelRepoSelection}
-            onChange={onChange}
-            singleSelection={true}
-            noMatchesMessage="No model found"
-            height={240}
-            renderOption={renderModelOption}
-            listProps={{
-              rowHeight: 50,
-              'data-test-subj': 'opensearchModelList',
-              showIcons: true,
-            }}
-            isLoading={modelRepoSelection.length === 0}
-          >
-            {(list, search) => (
-              <Fragment>
-                {search}
-                {list}
-              </Fragment>
-            )}
-          </EuiSelectable>
-        </div>
       </EuiModalBody>
       <EuiModalFooter>
         <EuiButton
