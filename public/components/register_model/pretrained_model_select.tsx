@@ -21,9 +21,6 @@ interface IItem {
   checked?: 'on' | undefined;
   description: string;
 }
-interface Props {
-  getPreSelected: (val: boolean) => void;
-}
 const renderModelOption = (option: IItem, searchValue: string) => {
   return (
     <>
@@ -37,7 +34,7 @@ const renderModelOption = (option: IItem, searchValue: string) => {
     </>
   );
 };
-export const PreTrainedModelSelect = ({ getPreSelected }: Props) => {
+export const PreTrainedModelSelect = () => {
   useEffect(() => {
     const subscribe = modelRepositoryManager.getPreTrainedModels$().subscribe((models) => {
       setModelRepoSelection(
@@ -52,12 +49,6 @@ export const PreTrainedModelSelect = ({ getPreSelected }: Props) => {
       subscribe.unsubscribe();
     };
   }, []);
-  const ShowRest = useCallback(
-    (selected: boolean) => {
-      getPreSelected(selected);
-    },
-    [getPreSelected]
-  );
   const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
     []
   );
@@ -65,9 +56,10 @@ export const PreTrainedModelSelect = ({ getPreSelected }: Props) => {
   const onChange = useCallback(
     (modelSelection: Array<EuiSelectableOption<IItem>>) => {
       setModelRepoSelection(modelSelection);
-      ShowRest(true);
+      // ShowRest(true);
     },
-    [ShowRest]
+    // [ShowRest]
+    []
   );
   useEffect(() => {
     const selectedOption = modelRepoSelection.find((option) => option.checked === 'on');
@@ -75,7 +67,7 @@ export const PreTrainedModelSelect = ({ getPreSelected }: Props) => {
       history.push(
         `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import&name=${
           selectedOption?.label
-        }&version=${selectedOption?.label}`
+        }`
       );
     }
   }, [modelRepoSelection, history]);

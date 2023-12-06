@@ -36,6 +36,7 @@ export const ModelConnectorFilter = ({
       ),
     [internalConnectorsResult?.data, allExternalConnectors]
   );
+
   return (
     <OptionsFilter
       id="modelConnectorNameFilter"

@@ -43,6 +43,7 @@ export const Monitoring = () => {
   } = useMonitoring();
   const [previewModel, setPreviewModel] = useState<ModelDeploymentItem | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>();
+
   const setInputRef = useCallback((node: HTMLInputElement | null) => {
     searchInputRef.current = node;
   }, []);

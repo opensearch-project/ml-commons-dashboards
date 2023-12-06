@@ -14,6 +14,7 @@ export interface ModelFormBase {
   tags?: Tag[];
   versionNotes?: string;
   type?: 'import' | 'upload' | 'external';
+  deployment: boolean;
 }
 
 /**

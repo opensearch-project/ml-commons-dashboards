@@ -18,8 +18,6 @@ import {
   EuiFlexItem,
   EuiTextColor,
   EuiLink,
-  EuiFormRow,
-  EuiCheckbox,
   EuiPageContent,
 } from '@elastic/eui';
 import useObservable from 'react-use/lib/useObservable';
@@ -32,7 +30,7 @@ import { mountReactNode } from '../../../../../src/core/public/utils';
 import { routerPaths } from '../../../common/router_paths';
 import { ErrorCallOut } from '../../components/common';
 import { modelRepositoryManager } from '../../utils/model_repository_manager';
-import { PreTrainedModelSelect } from './pretrainedmodel_select';
+import { PreTrainedModelSelect } from './pretrained_model_select';
 import { modelTaskManager } from './model_task_manager';
 import { ModelVersionNotesPanel } from './model_version_notes';
 import { modelFileUploadManager } from './model_file_upload_manager';
@@ -44,7 +42,7 @@ import { ConfigurationPanel } from './model_configuration';
 import { ModelTagsPanel } from './model_tags';
 import { submitModelWithFile, submitModelWithURL } from './register_model_api';
 import { ModelSource } from './model_source';
-
+import { ModelDeployment } from './model_deployment';
 const DEFAULT_VALUES = {
   name: '',
   description: '',
@@ -89,36 +87,42 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     services: { chrome, notifications },
   } = useOpenSearchDashboards();
   const isLocked = useObservable(chrome?.getIsNavDrawerLocked$() ?? from([false]));
-  const [preSelected, setPreSelect] = useState(false);
-  const getPreSelected = (val: boolean) => {
-    setPreSelect(val);
-  };
   const formType = isValidModelRegisterFormType(typeParams) ? typeParams : 'upload';
-  const partials =
-    formType === 'import'
-      ? [
-          PreTrainedModelSelect,
-          ...(!preSelected ? [] : [ModelDetailsPanel]),
-          ...(!preSelected ? [] : [ModelTagsPanel]),
-          ...(!preSelected ? [] : [ModelVersionNotesPanel]),
-        ]
-      : formType === 'upload'
-      ? [
-          ...(registerToModelId ? [] : [ModelOverviewTitle]),
-          ...(registerToModelId ? [] : [ModelDetailsPanel]),
-          ...(registerToModelId ? [] : [ModelTagsPanel]),
-          ...(registerToModelId ? [] : [FileAndVersionTitle]),
-          ArtifactPanel,
-          ConfigurationPanel,
-          ...(registerToModelId ? [ModelTagsPanel] : []),
-          ModelVersionNotesPanel,
-        ]
-      : [
-          ...(registerToModelId ? [] : [ModelDetailsPanel]),
-          ...(registerToModelId ? [] : [ModelTagsPanel]),
-          ModelSource,
-          ModelVersionNotesPanel,
-        ];
+  const partials = (() => {
+    if (formType === 'import') {
+      if (!nameParams) {
+        return [PreTrainedModelSelect];
+      }
+      return [
+        PreTrainedModelSelect,
+        ModelDetailsPanel,
+        ModelTagsPanel,
+        ModelVersionNotesPanel,
+        ModelDeployment,
+      ];
+    }
+    if (formType === 'external') {
+      return [
+        ...(registerToModelId ? [] : [ModelDetailsPanel]),
+        ...(registerToModelId ? [] : [ModelTagsPanel]),
+        ModelSource,
+        ModelVersionNotesPanel,
+        ModelDeployment,
+      ];
+    }
+    return [
+      ...(registerToModelId ? [] : [ModelOverviewTitle]),
+      ...(registerToModelId ? [] : [ModelDetailsPanel]),
+      ...(registerToModelId ? [] : [ModelTagsPanel]),
+      ...(registerToModelId ? [] : [FileAndVersionTitle]),
+      ArtifactPanel,
+      ConfigurationPanel,
+      ...(registerToModelId ? [ModelTagsPanel] : []),
+      ModelVersionNotesPanel,
+      ModelDeployment,
+    ];
+  })();
+
   const form = useForm<ModelFileFormData | ModelUrlFormData>({
     mode: 'onChange',
     defaultValues,
@@ -275,21 +279,23 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     // eslint-disable-next-line no-console
     console.log(errors);
   }, []);
-
+  const getPageTitle = () => {
+    if (registerToModelId) {
+      return 'Register version';
+    }
+    switch (formType) {
+      case 'external':
+        return 'Register external model';
+      case 'external':
+        return 'Register pre-trained model';
+      default:
+        return 'Register your own model';
+    }
+  };
   const errorCount = Object.keys(form.formState.errors).length;
   const formHeader = (
     <>
-      <EuiPageHeader
-        pageTitle={
-          registerToModelId
-            ? 'Register version'
-            : formType === 'external'
-            ? 'Register external model'
-            : formType === 'import'
-            ? 'Register pre-trained model'
-            : 'Register your own model'
-        }
-      />
+      <EuiPageHeader pageTitle={getPageTitle} />
       <EuiText style={{ maxWidth: 725 }}>
         <small>
           {registerToModelId && (
@@ -313,33 +319,6 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
         </small>
       </EuiText>
     </>
-  );
-  const [checked, setChecked] = useState(false);
-  const onChange = (e: any) => {
-    setChecked(e.target.checked);
-  };
-  const formFooter = (
-    <EuiFormRow label={formType === 'external' ? 'Activation' : 'Deployment'}>
-      <div>
-        {<EuiText size="xs">Needs a description</EuiText>}
-        {(formType === 'upload' || formType === 'import') && (
-          <EuiCheckbox
-            id="deployment"
-            label="Start deployment automatically"
-            checked={checked}
-            onChange={(e) => onChange(e)}
-          />
-        )}
-        {formType === 'external' && !registerToModelId && (
-          <EuiCheckbox
-            id="activation"
-            label="Activate on registration"
-            checked={checked}
-            onChange={(e) => onChange(e)}
-          />
-        )}
-      </div>
-    </EuiFormRow>
   );
   return (
     <EuiPageContent
@@ -366,11 +345,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
             )}
             {partials.map((FormPartial, i) => (
               <React.Fragment key={i}>
-                {FormPartial === PreTrainedModelSelect ? (
-                  <FormPartial getPreSelected={getPreSelected} />
-                ) : (
-                  <FormPartial />
-                )}
+                {FormPartial === PreTrainedModelSelect ? <FormPartial /> : <FormPartial />}
                 {FormPartial === ModelOverviewTitle || FormPartial === FileAndVersionTitle ? (
                   <EuiSpacer size="s" />
                 ) : (
@@ -378,7 +353,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
                 )}
               </React.Fragment>
             ))}
-            {formType === 'import' ? preSelected && formFooter : formFooter}
+            {/* {formType === 'import' ? nameParams && formFooter : formFooter} */}
           </EuiPanel>
           <EuiSpacer size="xxl" />
           <EuiSpacer size="xxl" />
@@ -398,7 +373,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
                 </EuiFlexItem>
               )}
               <EuiFlexItem grow={false}>
-                <EuiButton onClick={() => setIsSubmitted(true)} iconType="cross" color="ghost">
+                <EuiButton onClick={() => setIsSubmitted(false)} iconType="cross" color="ghost">
                   Cancel
                 </EuiButton>
               </EuiFlexItem>

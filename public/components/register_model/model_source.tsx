@@ -18,8 +18,8 @@ import { useMonitoring } from '../monitoring/use_monitoring';
 
 export const ModelSource = () => {
   const { allExternalConnectors } = useMonitoring();
-  const CONNECTOR_OPTIONS = allExternalConnectors?.map((item) => {
-    return Object.assign({}, { label: item.name, value: item.description });
+  const connectorOptions = allExternalConnectors?.map((item) => {
+    return Object.assign({}, { label: item.name, value: item.id });
   });
   const { control } = useFormContext<{ modelConnector: string }>();
 
@@ -36,9 +36,9 @@ export const ModelSource = () => {
   const { ref: fileFormatInputRef, ...fileFormatField } = modelConnectorController.field;
   const selectedConnectorOption = useMemo(() => {
     if (fileFormatField.value) {
-      return CONNECTOR_OPTIONS?.find((connector) => connector.value === fileFormatField.value);
+      return connectorOptions?.find((connector) => connector.value === fileFormatField.value);
     }
-  }, [fileFormatField, CONNECTOR_OPTIONS]);
+  }, [fileFormatField, connectorOptions]);
 
   const onConnectorChange = useCallback(
     (options: Array<EuiComboBoxOptionOption<string>>) => {
@@ -65,7 +65,7 @@ export const ModelSource = () => {
       <EuiFormRow label="Model connector">
         <EuiComboBox
           inputRef={fileFormatInputRef}
-          options={CONNECTOR_OPTIONS}
+          options={connectorOptions}
           singleSelection={{ asPlainText: true }}
           selectedOptions={selectedConnectorOption ? [selectedConnectorOption] : []}
           placeholder="Select a connector"
