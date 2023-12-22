@@ -12,15 +12,20 @@ import {
   EuiFormRow,
   EuiComboBox,
 } from '@elastic/eui';
-
 import { useController, useFormContext } from 'react-hook-form';
-import { useMonitoring } from '../monitoring/use_monitoring';
+
+import { useFetcher } from '../../hooks';
+import { APIProvider } from '../../apis/api_provider';
 
 export const ModelSource = () => {
-  const { allExternalConnectors } = useMonitoring();
-  const connectorOptions = allExternalConnectors?.map((item) => {
-    return Object.assign({}, { label: item.name, value: item.id });
-  });
+  const { data: allConnectorsData } = useFetcher(APIProvider.getAPI('connector').getAll);
+  const connectorOptions = useMemo(
+    () =>
+      allConnectorsData?.data?.map((item) => {
+        return Object.assign({}, { label: item.name, value: item.id });
+      }),
+    [allConnectorsData]
+  );
   const { control } = useFormContext<{ modelConnector: string }>();
 
   const modelConnectorController = useController({

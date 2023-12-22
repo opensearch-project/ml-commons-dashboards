@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useState, Fragment, useEffect } from 'react';
+import React, { useCallback, Fragment } from 'react';
 import {
   EuiSpacer,
   EuiTextColor,
@@ -12,10 +12,12 @@ import {
   EuiSelectableOption,
   EuiHighlight,
 } from '@elastic/eui';
-import { useHistory } from 'react-router-dom';
-import { generatePath } from 'react-router-dom';
+import { useHistory, generatePath } from 'react-router-dom';
+import { useObservable } from 'react-use';
+
 import { modelRepositoryManager } from '../../utils/model_repository_manager';
 import { routerPaths } from '../../../common/router_paths';
+
 interface IItem {
   label: string;
   checked?: 'on' | undefined;
@@ -34,43 +36,36 @@ const renderModelOption = (option: IItem, searchValue: string) => {
     </>
   );
 };
-export const PreTrainedModelSelect = () => {
-  useEffect(() => {
-    const subscribe = modelRepositoryManager.getPreTrainedModels$().subscribe((models) => {
-      setModelRepoSelection(
-        Object.keys(models).map((name) => ({
-          label: name,
-          description: models[name].description,
-          checked: undefined,
-        }))
-      );
-    });
-    return () => {
-      subscribe.unsubscribe();
-    };
-  }, []);
-  const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
-    []
-  );
+export const PreTrainedModelSelect = ({
+  checkedPreTrainedModel,
+}: {
+  checkedPreTrainedModel?: string;
+}) => {
+  const preTrainedModels = useObservable(modelRepositoryManager.getPreTrainedModels$());
+  const preTrainedModelOptions = preTrainedModels
+    ? Object.keys(preTrainedModels).map((name) => ({
+        label: name,
+        description: preTrainedModels[name].description,
+        checked: checkedPreTrainedModel === name ? ('on' as const) : undefined,
+      }))
+    : [];
+
   const history = useHistory();
   const onChange = useCallback(
-    (modelSelection: Array<EuiSelectableOption<IItem>>) => {
-      setModelRepoSelection(modelSelection);
-      // ShowRest(true);
+    (options: Array<EuiSelectableOption<IItem>>) => {
+      const selectedOption = options.find((option) => option.checked === 'on');
+
+      if (selectedOption?.label) {
+        history.push(
+          `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import&name=${
+            selectedOption.label
+          }`
+        );
+      }
     },
-    // [ShowRest]
-    []
+    [history]
   );
-  useEffect(() => {
-    const selectedOption = modelRepoSelection.find((option) => option.checked === 'on');
-    if (selectedOption?.label) {
-      history.push(
-        `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import&name=${
-          selectedOption?.label
-        }`
-      );
-    }
-  }, [modelRepoSelection, history]);
+
   return (
     <div>
       <small>
@@ -95,7 +90,7 @@ export const PreTrainedModelSelect = () => {
           'data-test-subj': 'findModel',
           placeholder: 'Find model',
         }}
-        options={modelRepoSelection}
+        options={preTrainedModelOptions}
         onChange={onChange}
         singleSelection={true}
         noMatchesMessage="No model found"
@@ -106,7 +101,7 @@ export const PreTrainedModelSelect = () => {
           'data-test-subj': 'opensearchModelList',
           showIcons: true,
         }}
-        isLoading={modelRepoSelection.length === 0}
+        isLoading={!preTrainedModels}
       >
         {(list, search) => (
           <Fragment>

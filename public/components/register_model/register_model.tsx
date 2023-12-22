@@ -295,7 +295,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
   const errorCount = Object.keys(form.formState.errors).length;
   const formHeader = (
     <>
-      <EuiPageHeader pageTitle={getPageTitle} />
+      <EuiPageHeader pageTitle={getPageTitle()} />
       <EuiText style={{ maxWidth: 725 }}>
         <small>
           {registerToModelId && (
@@ -353,7 +353,6 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
                 )}
               </React.Fragment>
             ))}
-            {/* {formType === 'import' ? nameParams && formFooter : formFooter} */}
           </EuiPanel>
           <EuiSpacer size="xxl" />
           <EuiSpacer size="xxl" />
@@ -380,7 +379,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
               <EuiFlexItem grow={false}>
                 <EuiButton
                   form={FORM_ID}
-                  disabled={form.formState.isSubmitting}
+                  disabled={(formType === 'import' && !nameParams) || form.formState.isSubmitting}
                   isLoading={form.formState.isSubmitting}
                   type="submit"
                   onClick={() => setIsSubmitted(true)}
