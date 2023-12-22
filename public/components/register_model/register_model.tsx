@@ -250,7 +250,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
           const { config } = preTrainedModel;
           form.setValue('modelFileFormat', 'TORCH_SCRIPT');
           if (config.name) {
-            form.setValue('name', config.name);
+            form.setValue('name', `huggingface/${config.name}`);
           }
           if (config.version) {
             form.setValue('version', config.version);
