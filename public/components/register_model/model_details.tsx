@@ -9,10 +9,10 @@ import { useFormContext } from 'react-hook-form';
 
 import { ModelNameField, ModelDescriptionField } from '../../components/common';
 
-import { ModelFileFormData, ModelUrlFormData } from './register_model.types';
+import { ModelFormData } from './register_model.types';
 
 export const ModelDetailsPanel = () => {
-  const { control, trigger, watch } = useFormContext<ModelFileFormData | ModelUrlFormData>();
+  const { control, trigger, watch } = useFormContext<ModelFormData>();
   const type = watch('type');
 
   return (

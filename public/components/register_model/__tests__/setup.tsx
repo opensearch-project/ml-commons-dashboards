@@ -10,13 +10,13 @@ import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 
 import { RegisterModelForm } from '../register_model';
 import { render, RenderWithRouteProps, screen, waitFor } from '../../../../test/test_utils';
-import { ModelFileFormData, ModelUrlFormData } from '../register_model.types';
+import { ModelFormData } from '../register_model.types';
 
 jest.mock('../../../apis/task');
 
 interface SetupOptions extends Partial<RenderWithRouteProps> {
   mode?: 'model' | 'version' | 'import';
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+  defaultValues?: Partial<ModelFormData>;
 }
 
 interface SetupReturn {
@@ -45,12 +45,12 @@ const DEFAULT_VALUES = {
 export async function setup(options: {
   route?: string;
   mode: 'version';
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+  defaultValues?: Partial<ModelFormData>;
 }): Promise<Omit<SetupReturn, 'nameInput' | 'descriptionInput'>>;
 export async function setup(options?: {
   route?: string;
   mode?: 'model' | 'import';
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+  defaultValues?: Partial<ModelFormData>;
 }): Promise<SetupReturn>;
 export async function setup(
   { route, mode, defaultValues }: SetupOptions = {

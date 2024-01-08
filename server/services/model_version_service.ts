@@ -40,19 +40,25 @@ interface UploadModelBase {
   name: string;
   version?: string;
   description?: string;
-  modelFormat: string;
   modelId: string;
+  deployment: boolean;
 }
 
 interface UploadModelByURL extends UploadModelBase {
   url: string;
+  modelFormat: string;
   modelConfig: Record<string, unknown>;
 }
 
 interface UploadModelByChunk extends UploadModelBase {
   modelContentHashValue: string;
   totalChunks: number;
+  modelFormat: string;
   modelConfig: Record<string, unknown>;
+}
+
+interface UploadExternalModel extends UploadModelBase {
+  connectorId: string;
 }
 
 type UploadResultInner<T extends UploadModelBase> = T extends UploadModelByChunk
@@ -170,14 +176,10 @@ export class ModelVersionService {
     ).body;
   }
 
-  public static async upload<T extends UploadModelByChunk | UploadModelByURL | UploadModelBase>({
-    client,
-    model,
-  }: {
-    client: IScopedClusterClient;
-    model: T;
-  }): UploadResult<T> {
-    const { name, version, description, modelFormat, modelId } = model;
+  public static async upload<
+    T extends UploadModelByChunk | UploadModelByURL | UploadExternalModel | UploadModelBase
+  >({ client, model }: { client: IScopedClusterClient; model: T }): UploadResult<T> {
+    const { name, version, description, modelFormat, modelId, deployment } = model;
     const uploadModelBase = {
       name,
       version,
@@ -204,8 +206,12 @@ export class ModelVersionService {
       await client.asCurrentUser.transport.request({
         method: 'POST',
         path: MODEL_UPLOAD_API,
+        querystring: deployment ? { deploy: deployment } : {},
         body: {
           ...uploadModelBase,
+          ...('connectorId' in model
+            ? { connector_id: model.connectorId, function_name: 'remote' }
+            : {}),
           url: 'url' in model ? model.url : undefined,
         },
       })

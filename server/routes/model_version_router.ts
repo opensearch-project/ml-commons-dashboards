@@ -55,19 +55,27 @@ const modelUploadBaseSchema = schema.object({
   name: schema.string(),
   version: schema.maybe(schema.string()),
   description: schema.maybe(schema.string()),
-  modelFormat: schema.string(),
   modelId: schema.string(),
+  deployment: schema.boolean({
+    defaultValue: false,
+  }),
 });
 
 const modelUploadByURLSchema = modelUploadBaseSchema.extends({
+  modelFormat: schema.string(),
   url: schema.string(),
   modelConfig: schema.object({}, { unknowns: 'allow' }),
 });
 
 const modelUploadByChunkSchema = modelUploadBaseSchema.extends({
+  modelFormat: schema.string(),
   modelContentHashValue: schema.string(),
   totalChunks: schema.number(),
   modelConfig: schema.object({}, { unknowns: 'allow' }),
+});
+
+const modelUploadByExternalSchema = modelUploadBaseSchema.extends({
+  connectorId: schema.string(),
 });
 
 export const modelVersionRouter = (router: IRouter) => {
@@ -256,6 +264,7 @@ export const modelVersionRouter = (router: IRouter) => {
           modelUploadByURLSchema,
           modelUploadByChunkSchema,
           modelUploadBaseSchema,
+          modelUploadByExternalSchema,
         ]),
       },
     },

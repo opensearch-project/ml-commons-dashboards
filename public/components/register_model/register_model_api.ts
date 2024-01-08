@@ -6,7 +6,12 @@
 import { APIProvider } from '../../apis/api_provider';
 import { MAX_CHUNK_SIZE } from '../common/forms/form_constants';
 import { getModelContentHashValue } from './get_model_content_hash_value';
-import { ModelFileFormData, ModelUrlFormData, ModelFormBase } from './register_model.types';
+import {
+  ModelFileFormData,
+  ModelUrlFormData,
+  ModelFormBase,
+  ExternalModelFormData,
+} from './register_model.types';
 
 const getModelUploadBase = ({
   name,
@@ -14,9 +19,11 @@ const getModelUploadBase = ({
   versionNotes,
   modelFileFormat,
   configuration,
-}: ModelFormBase & { configuration?: string }) => ({
+  deployment,
+}: ModelFormBase & { configuration?: string; modelFileFormat?: string }) => ({
   name,
   version,
+  deployment,
   description: versionNotes,
   modelFormat: modelFileFormat,
   modelConfig: configuration ? JSON.parse(configuration) : undefined,
@@ -88,6 +95,24 @@ export async function submitModelWithURL(model: ModelUrlFormData | ModelFormBase
         ...getModelUploadBase(model),
         modelId,
         url: 'modelURL' in model ? model.modelURL : undefined,
+      }),
+  });
+
+  return {
+    modelId: result.modelId,
+    taskId: result.uploadResult.task_id,
+  };
+}
+
+export async function submitExternalModel(model: ExternalModelFormData) {
+  const result = await createModelIfNeedAndUploadVersion({
+    ...model,
+    uploader: (modelId: string) =>
+      APIProvider.getAPI('modelVersion').upload({
+        ...getModelUploadBase(model),
+        modelFormat: undefined,
+        modelId,
+        connectorId: model.connectorId,
       }),
   });
 

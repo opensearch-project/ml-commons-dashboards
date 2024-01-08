@@ -84,8 +84,9 @@ interface UploadModelBase {
   name: string;
   version?: string;
   description?: string;
-  modelFormat: string;
+  modelFormat?: string;
   modelId: string;
+  deployment: boolean;
 }
 
 export interface UploadModelByURL extends UploadModelBase {

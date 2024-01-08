@@ -16,6 +16,7 @@ import { useController, useFormContext } from 'react-hook-form';
 
 import { useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
+import { ExternalModelFormData } from './register_model.types';
 
 export const ModelSource = () => {
   const { data: allConnectorsData } = useFetcher(APIProvider.getAPI('connector').getAll);
@@ -26,19 +27,19 @@ export const ModelSource = () => {
       }),
     [allConnectorsData]
   );
-  const { control } = useFormContext<{ modelConnector: string }>();
+  const { control } = useFormContext<ExternalModelFormData>();
 
   const modelConnectorController = useController({
-    name: 'modelConnector',
+    name: 'connectorId',
     control,
     rules: {
       required: {
         value: true,
-        message: '',
+        message: 'Model connector is required',
       },
     },
   });
-  const { ref: fileFormatInputRef, ...fileFormatField } = modelConnectorController.field;
+  const { ref: connectorInputRef, ...fileFormatField } = modelConnectorController.field;
   const selectedConnectorOption = useMemo(() => {
     if (fileFormatField.value) {
       return connectorOptions?.find((connector) => connector.value === fileFormatField.value);
@@ -69,7 +70,7 @@ export const ModelSource = () => {
       <EuiSpacer size="m" />
       <EuiFormRow label="Model connector">
         <EuiComboBox
-          inputRef={fileFormatInputRef}
+          inputRef={connectorInputRef}
           options={connectorOptions}
           singleSelection={{ asPlainText: true }}
           selectedOptions={selectedConnectorOption ? [selectedConnectorOption] : []}

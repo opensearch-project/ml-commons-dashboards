@@ -36,11 +36,11 @@ import { ModelVersionNotesPanel } from './model_version_notes';
 import { modelFileUploadManager } from './model_file_upload_manager';
 import { MAX_CHUNK_SIZE, FORM_ERRORS } from '../common/forms/form_constants';
 import { ModelDetailsPanel } from './model_details';
-import type { ModelFileFormData, ModelFormBase, ModelUrlFormData } from './register_model.types';
+import type { ModelFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';
 import { ConfigurationPanel } from './model_configuration';
 import { ModelTagsPanel } from './model_tags';
-import { submitModelWithFile, submitModelWithURL } from './register_model_api';
+import { submitExternalModel, submitModelWithFile, submitModelWithURL } from './register_model_api';
 import { ModelSource } from './model_source';
 import { ModelDeployment } from './model_deployment';
 const DEFAULT_VALUES = {
@@ -55,7 +55,7 @@ const DEFAULT_VALUES = {
 const FORM_ID = 'mlModelUploadForm';
 
 interface RegisterModelFormProps {
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+  defaultValues?: Partial<ModelFormData>;
 }
 
 const ModelOverviewTitle = () => {
@@ -123,7 +123,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     ];
   })();
 
-  const form = useForm<ModelFileFormData | ModelUrlFormData>({
+  const form = useForm<ModelFormData>({
     mode: 'onChange',
     defaultValues,
     criteriaMode: 'all',
@@ -133,7 +133,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
   const formErrors = useMemo(() => ({ ...form.formState.errors }), [form.formState]);
 
   const onSubmit = useCallback(
-    async (data: ModelFileFormData | ModelUrlFormData | ModelFormBase) => {
+    async (data: ModelFormData) => {
       try {
         const onComplete = () => {
           notifications?.toasts.addSuccess({
@@ -168,6 +168,9 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
             onComplete,
             onError,
           });
+          modelId = result.modelId;
+        } else if ('connectorId' in data) {
+          const result = await submitExternalModel(data);
           modelId = result.modelId;
         } else {
           const result = await submitModelWithURL(data);
@@ -274,7 +277,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     form.setValue('type', formType);
   }, [formType, form]);
 
-  const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
+  const onError = useCallback((errors: FieldErrors<ModelFormData>) => {
     // TODO
     // eslint-disable-next-line no-console
     console.log(errors);

@@ -14,6 +14,7 @@ export const ModelDeployment = () => {
   const modelDeploymentController = useController({
     name: 'deployment',
     control,
+    defaultValue: false,
   });
   const isRegisterExternal = typeParams === 'external';
 
@@ -24,6 +25,7 @@ export const ModelDeployment = () => {
         {<EuiText size="xs">Needs a description</EuiText>}
         <EuiCheckbox
           id="deployment"
+          label={isRegisterExternal ? 'Activate on registration' : 'Start deployment automatically'}
           aria-label={
             isRegisterExternal ? 'Activate on registration' : 'Start deployment automatically'
           }
