@@ -15,7 +15,7 @@ import { ModelFormData } from '../register_model.types';
 jest.mock('../../../apis/task');
 
 interface SetupOptions extends Partial<RenderWithRouteProps> {
-  mode?: 'model' | 'version' | 'import';
+  mode?: 'model' | 'version' | 'import' | 'external';
   defaultValues?: Partial<ModelFormData>;
 }
 
@@ -26,6 +26,7 @@ interface SetupReturn {
   form: HTMLElement;
   user: UserEvent;
   versionNotesInput: HTMLTextAreaElement;
+  connectorInput: HTMLSelectElement;
 }
 
 const CONFIGURATION = `{
@@ -46,10 +47,10 @@ export async function setup(options: {
   route?: string;
   mode: 'version';
   defaultValues?: Partial<ModelFormData>;
-}): Promise<Omit<SetupReturn, 'nameInput' | 'descriptionInput'>>;
+}): Promise<Pick<SetupReturn, 'form' | 'user' | 'versionNotesInput' | 'submitButton'>>;
 export async function setup(options?: {
   route?: string;
-  mode?: 'model' | 'import';
+  mode?: 'model' | 'import' | 'external';
   defaultValues?: Partial<ModelFormData>;
 }): Promise<SetupReturn>;
 export async function setup(
@@ -75,6 +76,7 @@ export async function setup(
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
   const versionNotesInput = screen.getByLabelText<HTMLTextAreaElement>(/notes/i);
+  const connectorInput = screen.queryByLabelText('Model connector');
 
   // fill model file
   if (modelFileInput) {
@@ -106,11 +108,11 @@ export async function setup(
   }
 
   // fill model name
-  if (mode === 'model') {
+  if (mode === 'model' || mode === 'external') {
     await user.type(nameInput, 'test model name');
   }
   // fill model description
-  if (mode === 'model') {
+  if (mode === 'model' || mode === 'external') {
     await user.type(descriptionInput, 'test model description');
   }
 
@@ -121,5 +123,6 @@ export async function setup(
     form,
     user,
     versionNotesInput,
+    connectorInput,
   };
 }

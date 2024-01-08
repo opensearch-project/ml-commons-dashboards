@@ -39,19 +39,19 @@ export const ModelSource = () => {
       },
     },
   });
-  const { ref: connectorInputRef, ...fileFormatField } = modelConnectorController.field;
+  const { ref: connectorInputRef, ...connectorField } = modelConnectorController.field;
   const selectedConnectorOption = useMemo(() => {
-    if (fileFormatField.value) {
-      return connectorOptions?.find((connector) => connector.value === fileFormatField.value);
+    if (connectorField.value) {
+      return connectorOptions?.find((connector) => connector.value === connectorField.value);
     }
-  }, [fileFormatField, connectorOptions]);
+  }, [connectorField, connectorOptions]);
 
   const onConnectorChange = useCallback(
     (options: Array<EuiComboBoxOptionOption<string>>) => {
       const value = options[0]?.value;
-      fileFormatField.onChange(value);
+      connectorField.onChange(value);
     },
-    [fileFormatField]
+    [connectorField]
   );
   return (
     <div>
@@ -68,7 +68,11 @@ export const ModelSource = () => {
         </small>
       </EuiText>
       <EuiSpacer size="m" />
-      <EuiFormRow label="Model connector">
+      <EuiFormRow
+        label="Model connector"
+        isInvalid={Boolean(modelConnectorController.fieldState.error)}
+        error={modelConnectorController.fieldState.error?.message}
+      >
         <EuiComboBox
           inputRef={connectorInputRef}
           options={connectorOptions}
@@ -76,6 +80,7 @@ export const ModelSource = () => {
           selectedOptions={selectedConnectorOption ? [selectedConnectorOption] : []}
           placeholder="Select a connector"
           onChange={onConnectorChange}
+          isInvalid={Boolean(modelConnectorController.fieldState.error)}
         />
       </EuiFormRow>
     </div>
