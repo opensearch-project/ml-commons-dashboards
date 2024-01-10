@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { EuiSpacer } from '@elastic/eui';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   EuiButton,
@@ -17,12 +17,10 @@ import {
   EuiCheckableCard,
   EuiText,
   EuiTextColor,
-  EuiSelectableOption,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui';
 import { generatePath } from 'react-router-dom';
 import { routerPaths } from '../../../common/router_paths';
-import { modelRepositoryManager } from '../../utils/model_repository_manager';
 
 enum ModelSource {
   USER_MODEL = 'UserModel',
@@ -32,58 +30,26 @@ enum ModelSource {
 interface Props {
   onCloseModal: () => void;
 }
-interface IItem {
-  label: string;
-  checked?: 'on' | undefined;
-  description: string;
-}
+
 export function RegisterModelTypeModal({ onCloseModal }: Props) {
-  const [modelRepoSelection, setModelRepoSelection] = useState<Array<EuiSelectableOption<IItem>>>(
-    []
-  );
   const history = useHistory();
   const [modelSource, setModelSource] = useState<ModelSource>(ModelSource.PRE_TRAINED_MODEL);
-  const onChange = useCallback((modelSelection: Array<EuiSelectableOption<IItem>>) => {
-    setModelRepoSelection(modelSelection);
-  }, []);
-  const handleContinue = useCallback(
-    (selectedOption) => {
-      selectedOption = onChange(modelRepoSelection);
-      switch (modelSource) {
-        case ModelSource.PRE_TRAINED_MODEL:
-          history.push(
-            `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import`
-          );
-          break;
-        case ModelSource.USER_MODEL:
-          history.push(
-            `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=upload`
-          );
-          break;
-        case ModelSource.EXTERNAL_MODEL:
-          history.push(
-            `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=external`
-          );
-          break;
-      }
-    },
-    [history, modelSource, modelRepoSelection, onChange]
-  );
+  const handleContinue = useCallback(() => {
+    switch (modelSource) {
+      case ModelSource.PRE_TRAINED_MODEL:
+        history.push(`${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import`);
+        break;
+      case ModelSource.USER_MODEL:
+        history.push(`${generatePath(routerPaths.registerModel, { id: undefined })}/?type=upload`);
+        break;
+      case ModelSource.EXTERNAL_MODEL:
+        history.push(
+          `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=external`
+        );
+        break;
+    }
+  }, [history, modelSource]);
 
-  useEffect(() => {
-    const subscribe = modelRepositoryManager.getPreTrainedModels$().subscribe((models) => {
-      setModelRepoSelection(
-        Object.keys(models).map((name) => ({
-          label: name,
-          description: models[name].description,
-          checked: undefined,
-        }))
-      );
-    });
-    return () => {
-      subscribe.unsubscribe();
-    };
-  }, []);
   return (
     <EuiModal onClose={() => onCloseModal()} maxWidth="1000px">
       <EuiModalHeader>
