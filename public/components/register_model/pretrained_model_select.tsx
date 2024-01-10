@@ -3,62 +3,56 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, Fragment } from 'react';
+import React, { useCallback } from 'react';
 import {
   EuiSpacer,
   EuiTextColor,
-  EuiSelectable,
   EuiLink,
-  EuiSelectableOption,
   EuiHighlight,
+  EuiComboBox,
+  EuiComboBoxProps,
 } from '@elastic/eui';
 import { useHistory, generatePath } from 'react-router-dom';
 import { useObservable } from 'react-use';
 
 import { modelRepositoryManager } from '../../utils/model_repository_manager';
 import { routerPaths } from '../../../common/router_paths';
+import { useSearchParams } from '../../hooks/use_search_params';
 
-interface IItem {
-  label: string;
-  checked?: 'on' | undefined;
-  description: string;
-}
-const renderModelOption = (option: IItem, searchValue: string) => {
-  return (
-    <>
-      <EuiHighlight search={searchValue}>{option.label}</EuiHighlight>
-      <br />
+type PreTrainedModelProps = Required<EuiComboBoxProps<{ name: string; description: string }>>;
+
+const renderOption: PreTrainedModelProps['renderOption'] = (option, searchValue) => (
+  <>
+    {option.value && <EuiHighlight search={searchValue}>{option.value?.name}</EuiHighlight>}
+    <br />
+    {option.value && (
       <EuiTextColor color="subdued">
         <small>
-          <EuiHighlight search={searchValue}>{option.description}</EuiHighlight>
+          <EuiHighlight search={searchValue}>{option.value.description}</EuiHighlight>
         </small>
       </EuiTextColor>
-    </>
-  );
-};
-export const PreTrainedModelSelect = ({
-  checkedPreTrainedModel,
-}: {
-  checkedPreTrainedModel?: string;
-}) => {
+    )}
+  </>
+);
+
+export const PreTrainedModelSelect = () => {
+  const searchParams = useSearchParams();
+  const nameParams = searchParams.get('name');
   const preTrainedModels = useObservable(modelRepositoryManager.getPreTrainedModels$());
   const preTrainedModelOptions = preTrainedModels
     ? Object.keys(preTrainedModels).map((name) => ({
         label: name,
-        description: preTrainedModels[name].description,
-        checked: checkedPreTrainedModel === name ? ('on' as const) : undefined,
+        value: { name, description: preTrainedModels[name].description },
       }))
     : [];
 
   const history = useHistory();
-  const onChange = useCallback(
-    (options: Array<EuiSelectableOption<IItem>>) => {
-      const selectedOption = options.find((option) => option.checked === 'on');
-
-      if (selectedOption?.label) {
+  const onChange = useCallback<PreTrainedModelProps['onChange']>(
+    (options) => {
+      if (options[0].value) {
         history.push(
           `${generatePath(routerPaths.registerModel, { id: undefined })}/?type=import&name=${
-            selectedOption.label
+            options[0].value.name
           }`
         );
       }
@@ -83,33 +77,16 @@ export const PreTrainedModelSelect = ({
         </small>
       </div>
       <EuiSpacer size="m" />
-      <EuiSelectable
-        aria-label="OpenSearch model repository models"
-        searchable
-        searchProps={{
-          'data-test-subj': 'findModel',
-          placeholder: 'Find model',
-        }}
+      <EuiComboBox
         options={preTrainedModelOptions}
+        selectedOptions={nameParams ? [{ label: nameParams }] : []}
+        singleSelection
+        placeholder="Find model"
+        rowHeight={50}
+        renderOption={renderOption}
         onChange={onChange}
-        singleSelection={true}
-        noMatchesMessage="No model found"
-        height={240}
-        renderOption={renderModelOption}
-        listProps={{
-          rowHeight: 50,
-          'data-test-subj': 'opensearchModelList',
-          showIcons: true,
-        }}
-        isLoading={!preTrainedModels}
-      >
-        {(list, search) => (
-          <Fragment>
-            {search}
-            {list}
-          </Fragment>
-        )}
-      </EuiSelectable>
+        isClearable={false}
+      />
     </div>
   );
 };
