@@ -10,10 +10,10 @@ export interface ModelFormBase {
   version?: string;
   modelId?: string;
   description?: string;
-  modelFileFormat: string;
   tags?: Tag[];
   versionNotes?: string;
-  type?: 'import' | 'upload';
+  type?: 'import' | 'upload' | 'external';
+  deployment: boolean;
 }
 
 /**
@@ -22,6 +22,7 @@ export interface ModelFormBase {
 export interface ModelFileFormData extends ModelFormBase {
   modelFile: File;
   configuration: string;
+  modelFileFormat: string;
 }
 
 /**
@@ -30,4 +31,14 @@ export interface ModelFileFormData extends ModelFormBase {
 export interface ModelUrlFormData extends ModelFormBase {
   modelURL: string;
   configuration: string;
+  modelFileFormat: string;
 }
+
+/**
+ * The type of the external model form data via connector
+ */
+export interface ExternalModelFormData extends ModelFormBase {
+  connectorId: string;
+}
+
+export type ModelFormData = ModelFileFormData | ModelUrlFormData | ExternalModelFormData;

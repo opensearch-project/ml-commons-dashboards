@@ -18,12 +18,10 @@ import {
   EuiFlexItem,
   EuiTextColor,
   EuiLink,
-  EuiLoadingSpinner,
   EuiPageContent,
 } from '@elastic/eui';
 import useObservable from 'react-use/lib/useObservable';
 import { from } from 'rxjs';
-
 import { APIProvider } from '../../apis/api_provider';
 import { useSearchParams } from '../../hooks/use_search_params';
 import { isValidModelRegisterFormType } from './utils';
@@ -32,18 +30,19 @@ import { mountReactNode } from '../../../../../src/core/public/utils';
 import { routerPaths } from '../../../common/router_paths';
 import { ErrorCallOut } from '../../components/common';
 import { modelRepositoryManager } from '../../utils/model_repository_manager';
-
+import { PreTrainedModelSelect } from './pretrained_model_select';
 import { modelTaskManager } from './model_task_manager';
 import { ModelVersionNotesPanel } from './model_version_notes';
 import { modelFileUploadManager } from './model_file_upload_manager';
 import { MAX_CHUNK_SIZE, FORM_ERRORS } from '../common/forms/form_constants';
 import { ModelDetailsPanel } from './model_details';
-import type { ModelFileFormData, ModelFormBase, ModelUrlFormData } from './register_model.types';
+import type { ModelFormData } from './register_model.types';
 import { ArtifactPanel } from './artifact';
 import { ConfigurationPanel } from './model_configuration';
 import { ModelTagsPanel } from './model_tags';
-import { submitModelWithFile, submitModelWithURL } from './register_model_api';
-
+import { submitExternalModel, submitModelWithFile, submitModelWithURL } from './register_model_api';
+import { ModelSource } from './model_source';
+import { ModelDeployment } from './model_deployment';
 const DEFAULT_VALUES = {
   name: '',
   description: '',
@@ -56,7 +55,7 @@ const DEFAULT_VALUES = {
 const FORM_ID = 'mlModelUploadForm';
 
 interface RegisterModelFormProps {
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+  defaultValues?: Partial<ModelFormData>;
 }
 
 const ModelOverviewTitle = () => {
@@ -88,24 +87,43 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     services: { chrome, notifications },
   } = useOpenSearchDashboards();
   const isLocked = useObservable(chrome?.getIsNavDrawerLocked$() ?? from([false]));
-
   const formType = isValidModelRegisterFormType(typeParams) ? typeParams : 'upload';
-  const [preTrainedModelLoading, setPreTrainedModelLoading] = useState(formType === 'import');
-  const partials =
-    formType === 'import'
-      ? [ModelDetailsPanel, ModelTagsPanel, ModelVersionNotesPanel]
-      : [
-          ...(registerToModelId ? [] : [ModelOverviewTitle]),
-          ...(registerToModelId ? [] : [ModelDetailsPanel]),
-          ...(registerToModelId ? [] : [ModelTagsPanel]),
-          ...(registerToModelId ? [] : [FileAndVersionTitle]),
-          ArtifactPanel,
-          ConfigurationPanel,
-          ...(registerToModelId ? [ModelTagsPanel] : []),
-          ModelVersionNotesPanel,
-        ];
+  const partials = (() => {
+    if (formType === 'import') {
+      if (!nameParams) {
+        return [PreTrainedModelSelect];
+      }
+      return [
+        PreTrainedModelSelect,
+        ModelDetailsPanel,
+        ModelTagsPanel,
+        ModelVersionNotesPanel,
+        ModelDeployment,
+      ];
+    }
+    if (formType === 'external') {
+      return [
+        ...(registerToModelId ? [] : [ModelDetailsPanel]),
+        ...(registerToModelId ? [] : [ModelTagsPanel]),
+        ModelSource,
+        ModelVersionNotesPanel,
+        ModelDeployment,
+      ];
+    }
+    return [
+      ...(registerToModelId ? [] : [ModelOverviewTitle]),
+      ...(registerToModelId ? [] : [ModelDetailsPanel]),
+      ...(registerToModelId ? [] : [ModelTagsPanel]),
+      ...(registerToModelId ? [] : [FileAndVersionTitle]),
+      ArtifactPanel,
+      ConfigurationPanel,
+      ...(registerToModelId ? [ModelTagsPanel] : []),
+      ModelVersionNotesPanel,
+      ModelDeployment,
+    ];
+  })();
 
-  const form = useForm<ModelFileFormData | ModelUrlFormData>({
+  const form = useForm<ModelFormData>({
     mode: 'onChange',
     defaultValues,
     criteriaMode: 'all',
@@ -115,7 +133,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
   const formErrors = useMemo(() => ({ ...form.formState.errors }), [form.formState]);
 
   const onSubmit = useCallback(
-    async (data: ModelFileFormData | ModelUrlFormData | ModelFormBase) => {
+    async (data: ModelFormData) => {
       try {
         const onComplete = () => {
           notifications?.toasts.addSuccess({
@@ -150,6 +168,9 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
             onComplete,
             onError,
           });
+          modelId = result.modelId;
+        } else if ('connectorId' in data) {
+          const result = await submitExternalModel(data);
           modelId = result.modelId;
         } else {
           const result = await submitModelWithURL(data);
@@ -240,7 +261,6 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
           if (config.description) {
             form.setValue('description', config.description);
           }
-          setPreTrainedModelLoading(false);
         },
         (error) => {
           // TODO: Should handle loading error here
@@ -257,16 +277,28 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
     form.setValue('type', formType);
   }, [formType, form]);
 
-  const onError = useCallback((errors: FieldErrors<ModelFileFormData | ModelUrlFormData>) => {
+  const onError = useCallback((errors: FieldErrors<ModelFormData>) => {
     // TODO
     // eslint-disable-next-line no-console
     console.log(errors);
   }, []);
-
+  const getPageTitle = () => {
+    if (registerToModelId) {
+      return 'Register version';
+    }
+    switch (formType) {
+      case 'external':
+        return 'Register external model';
+      case 'external':
+        return 'Register pre-trained model';
+      default:
+        return 'Register your own model';
+    }
+  };
   const errorCount = Object.keys(form.formState.errors).length;
   const formHeader = (
     <>
-      <EuiPageHeader pageTitle={registerToModelId ? 'Register version' : 'Register model'} />
+      <EuiPageHeader pageTitle={getPageTitle()} />
       <EuiText style={{ maxWidth: 725 }}>
         <small>
           {registerToModelId && (
@@ -279,6 +311,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
               .
             </>
           )}
+          {formType === 'external' && !registerToModelId && <>Description lorem.</>}
           {formType === 'import' && !registerToModelId && <>Register a pre-trained model.</>}
           {formType === 'upload' && !registerToModelId && (
             <>
@@ -290,17 +323,6 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
       </EuiText>
     </>
   );
-
-  if (preTrainedModelLoading) {
-    return (
-      <EuiPanel>
-        {formHeader}
-        <EuiSpacer size="s" />
-        <EuiLoadingSpinner aria-label="Model Form Loading" size="l" />
-      </EuiPanel>
-    );
-  }
-
   return (
     <EuiPageContent
       verticalPosition="center"
@@ -326,7 +348,7 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
             )}
             {partials.map((FormPartial, i) => (
               <React.Fragment key={i}>
-                <FormPartial />
+                {FormPartial === PreTrainedModelSelect ? <FormPartial /> : <FormPartial />}
                 {FormPartial === ModelOverviewTitle || FormPartial === FileAndVersionTitle ? (
                   <EuiSpacer size="s" />
                 ) : (
@@ -353,9 +375,14 @@ export const RegisterModelForm = ({ defaultValues = DEFAULT_VALUES }: RegisterMo
                 </EuiFlexItem>
               )}
               <EuiFlexItem grow={false}>
+                <EuiButton onClick={() => setIsSubmitted(false)} iconType="cross" color="ghost">
+                  Cancel
+                </EuiButton>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
                 <EuiButton
                   form={FORM_ID}
-                  disabled={form.formState.isSubmitting}
+                  disabled={(formType === 'import' && !nameParams) || form.formState.isSubmitting}
                   isLoading={form.formState.isSubmitting}
                   type="submit"
                   onClick={() => setIsSubmitted(true)}

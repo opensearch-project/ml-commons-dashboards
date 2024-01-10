@@ -354,7 +354,7 @@ export const TagField = ({
             <EuiButtonIcon
               display="base"
               size="m"
-              iconType="cross"
+              iconType="trash"
               aria-label={`Remove tag at row ${index + 1}`}
               onClick={() => onRemove(index)}
             />

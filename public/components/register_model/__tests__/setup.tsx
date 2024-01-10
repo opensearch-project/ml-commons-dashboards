@@ -10,13 +10,13 @@ import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 
 import { RegisterModelForm } from '../register_model';
 import { render, RenderWithRouteProps, screen, waitFor } from '../../../../test/test_utils';
-import { ModelFileFormData, ModelUrlFormData } from '../register_model.types';
+import { ModelFormData } from '../register_model.types';
 
 jest.mock('../../../apis/task');
 
 interface SetupOptions extends Partial<RenderWithRouteProps> {
-  mode?: 'model' | 'version' | 'import';
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+  mode?: 'model' | 'version' | 'import' | 'external';
+  defaultValues?: Partial<ModelFormData>;
 }
 
 interface SetupReturn {
@@ -26,6 +26,7 @@ interface SetupReturn {
   form: HTMLElement;
   user: UserEvent;
   versionNotesInput: HTMLTextAreaElement;
+  connectorInput: HTMLSelectElement;
 }
 
 const CONFIGURATION = `{
@@ -45,12 +46,12 @@ const DEFAULT_VALUES = {
 export async function setup(options: {
   route?: string;
   mode: 'version';
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
-}): Promise<Omit<SetupReturn, 'nameInput' | 'descriptionInput'>>;
+  defaultValues?: Partial<ModelFormData>;
+}): Promise<Pick<SetupReturn, 'form' | 'user' | 'versionNotesInput' | 'submitButton'>>;
 export async function setup(options?: {
   route?: string;
-  mode?: 'model' | 'import';
-  defaultValues?: Partial<ModelFileFormData> | Partial<ModelUrlFormData>;
+  mode?: 'model' | 'import' | 'external';
+  defaultValues?: Partial<ModelFormData>;
 }): Promise<SetupReturn>;
 export async function setup(
   { route, mode, defaultValues }: SetupOptions = {
@@ -75,6 +76,7 @@ export async function setup(
   const form = screen.getByTestId('mlCommonsPlugin-registerModelForm');
   const user = userEvent.setup();
   const versionNotesInput = screen.getByLabelText<HTMLTextAreaElement>(/notes/i);
+  const connectorInput = screen.queryByLabelText('Model connector');
 
   // fill model file
   if (modelFileInput) {
@@ -106,11 +108,11 @@ export async function setup(
   }
 
   // fill model name
-  if (mode === 'model') {
+  if (mode === 'model' || mode === 'external') {
     await user.type(nameInput, 'test model name');
   }
   // fill model description
-  if (mode === 'model') {
+  if (mode === 'model' || mode === 'external') {
     await user.type(descriptionInput, 'test model description');
   }
 
@@ -121,5 +123,6 @@ export async function setup(
     form,
     user,
     versionNotesInput,
+    connectorInput,
   };
 }
