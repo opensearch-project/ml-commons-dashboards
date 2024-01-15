@@ -46,9 +46,7 @@ export const MlCommonsPluginApp = ({
     <I18nProvider>
       <>
         <EuiPage>
-          <EuiPageSideBar>
-            <NavPanel />
-          </EuiPageSideBar>
+          <NavPanel />
           <EuiPageBody component="main">
             <Switch>
               {ROUTES.map(({ path, Component, exact }) => (
