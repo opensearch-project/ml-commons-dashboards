@@ -32,7 +32,7 @@ export const ROUTES: RouteConfig[] = [
     path: routerPaths.registerModel,
     label: 'Register Model',
     Component: RegisterModelForm,
-    nav: true,
+    nav: false,
   },
   {
     path: routerPaths.modelList,
