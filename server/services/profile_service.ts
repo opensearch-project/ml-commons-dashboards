@@ -18,7 +18,7 @@
  *   permissions and limitations under the License.
  */
 
-import { IScopedClusterClient } from '../../../../src/core/server';
+import { OpenSearchClient } from '../../../../src/core/server';
 import { OpenSearchMLCommonsProfile } from '../../common/profile';
 
 import { PROFILE_BASE_API } from './utils/constants';
@@ -34,10 +34,13 @@ export class ProfileService {
     };
   }
 
-  public static async getModel(params: { client: IScopedClusterClient; modelId: string }) {
-    const { client, modelId } = params;
+  public static async getModel(params: {
+    transport: OpenSearchClient['transport'];
+    modelId: string;
+  }) {
+    const { transport, modelId } = params;
     const result = (
-      await client.asCurrentUser.transport.request({
+      await transport.request({
         method: 'GET',
         path: `${PROFILE_BASE_API}/models/${modelId}?view=model`,
       })

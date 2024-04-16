@@ -20,10 +20,10 @@ import {
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
-import { NodesTable } from './nodes_table';
 import { CopyableText } from '../common';
 import { ModelDeploymentProfile } from '../../apis/profile';
 import { ConnectorDetails } from './connector_details';
+import { NodesTable } from './nodes_table';
 
 export interface INode {
   id: string;
@@ -44,11 +44,14 @@ export interface PreviewModel {
 interface Props {
   onClose: (data: ModelDeploymentProfile | null) => void;
   model: PreviewModel;
+  dataSourceId: string | undefined;
 }
 
-export const PreviewPanel = ({ onClose, model }: Props) => {
+export const PreviewPanel = ({ onClose, model, dataSourceId }: Props) => {
   const { id, name, connector } = model;
-  const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id);
+  const { data, loading } = useFetcher(APIProvider.getAPI('profile').getModel, id, {
+    dataSourceId,
+  });
   const nodes = useMemo(() => {
     if (loading) {
       return [];

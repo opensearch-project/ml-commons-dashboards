@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useState, useContext, useEffect } from 'react';
 
 import { APIProvider } from '../../apis/api_provider';
 import { GetAllConnectorResponse } from '../../apis/connector';
-import { useFetcher } from '../../hooks/use_fetcher';
+import { DO_NOT_FETCH, useFetcher } from '../../hooks/use_fetcher';
 import { MODEL_STATE } from '../../../common';
-
+import { DataSourceContext } from '../../contexts';
 import { ModelDeployStatus } from './types';
+import { DATA_SOURCE_FETCHING_ID, DataSourceId, getDataSourceId } from '../../utils/data_source';
 
 interface Params {
   nameOrId?: string;
@@ -20,6 +21,7 @@ interface Params {
   currentPage: number;
   pageSize: number;
   sort: { field: 'name' | 'model_state' | 'id'; direction: 'asc' | 'desc' };
+  dataSourceId?: DataSourceId;
 }
 
 const generateExtraQuery = ({
@@ -82,7 +84,9 @@ const checkFilterExists = (params: Params) =>
   params.connector.length > 0 ||
   params.source.length > 0;
 
-const fetchDeployedModels = async (params: Params) => {
+const fetchDeployedModels = async (
+  params: Omit<Params, 'dataSourceId'> & { dataSourceId?: string }
+) => {
   const states = params.status?.map((status) => {
     switch (status) {
       case 'not-responding':
@@ -95,7 +99,9 @@ const fetchDeployedModels = async (params: Params) => {
   });
   let externalConnectorsData: GetAllConnectorResponse;
   try {
-    externalConnectorsData = await APIProvider.getAPI('connector').getAll();
+    externalConnectorsData = await APIProvider.getAPI('connector').getAll({
+      dataSourceId: params.dataSourceId,
+    });
   } catch (_e) {
     externalConnectorsData = { data: [], total_connectors: 0 };
   }
@@ -120,6 +126,7 @@ const fetchDeployedModels = async (params: Params) => {
             }))
           : [],
     }),
+    dataSourceId: params.dataSourceId,
   });
   const externalConnectorMap = externalConnectorsData.data.reduce<{
     [key: string]: {
@@ -168,14 +175,21 @@ const fetchDeployedModels = async (params: Params) => {
 };
 
 export const useMonitoring = () => {
+  const { dataSourceEnabled, selectedDataSourceOption } = useContext(DataSourceContext);
   const [params, setParams] = useState<Params>({
     currentPage: 1,
     pageSize: 10,
     sort: { field: 'model_state', direction: 'asc' },
     source: [],
     connector: [],
+    dataSourceId: getDataSourceId(dataSourceEnabled, selectedDataSourceOption),
   });
-  const { data, loading, reload } = useFetcher(fetchDeployedModels, params);
+  const { data, loading, reload } = useFetcher(
+    fetchDeployedModels,
+    typeof params.dataSourceId === 'symbol'
+      ? DO_NOT_FETCH
+      : { ...params, dataSourceId: params.dataSourceId }
+  );
   const filterExists = checkFilterExists(params);
   const totalRecords = data?.pagination.totalRecords;
   const deployedModels = useMemo(() => data?.data ?? [], [data]);
@@ -188,22 +202,24 @@ export const useMonitoring = () => {
    * "empty" is for no deployed models in current system
    */
   const pageStatus = useMemo(() => {
-    if (loading) {
+    if (loading || params.dataSourceId === DATA_SOURCE_FETCHING_ID) {
       return 'loading' as const;
     }
     if (totalRecords) {
       return 'normal' as const;
     }
     return filterExists ? ('reset-filter' as const) : ('empty' as const);
-  }, [loading, totalRecords, filterExists]);
+  }, [loading, totalRecords, filterExists, params.dataSourceId]);
 
   const resetSearch = useCallback(() => {
     setParams((previousValue) => ({
+      ...previousValue,
       currentPage: previousValue.currentPage,
       pageSize: previousValue.pageSize,
       sort: previousValue.sort,
       source: [],
       connector: [],
+      status: undefined,
     }));
   }, []);
 
@@ -262,6 +278,20 @@ export const useMonitoring = () => {
     },
     []
   );
+
+  useEffect(() => {
+    setParams((previousParams) => {
+      const dataSourceId = getDataSourceId(dataSourceEnabled, selectedDataSourceOption);
+      if (previousParams.dataSourceId === dataSourceId) {
+        return previousParams;
+      }
+      return {
+        ...previousParams,
+        dataSourceId,
+        connector: [],
+      };
+    });
+  }, [dataSourceEnabled, selectedDataSourceOption]);
 
   return {
     params,

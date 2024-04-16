@@ -18,7 +18,7 @@
  *   permissions and limitations under the License.
  */
 
-import { IScopedClusterClient } from '../../../../src/core/server';
+import { OpenSearchClient } from '../../../../src/core/server';
 
 import { CONNECTOR_SEARCH_API, MODEL_SEARCH_API } from './utils/constants';
 
@@ -26,15 +26,15 @@ export class ConnectorService {
   public static async search({
     from,
     size,
-    client,
+    transport,
   }: {
-    client: IScopedClusterClient;
+    transport: OpenSearchClient['transport'];
     from: number;
     size: number;
   }) {
     let result;
     try {
-      result = await client.asCurrentUser.transport.request({
+      result = await transport.request({
         method: 'POST',
         path: CONNECTOR_SEARCH_API,
         body: {
@@ -64,15 +64,15 @@ export class ConnectorService {
   }
 
   public static async getUniqueInternalConnectorNames({
-    client,
+    transport,
     size,
   }: {
-    client: IScopedClusterClient;
+    transport: OpenSearchClient['transport'];
     size: number;
   }) {
     let result;
     try {
-      result = await client.asCurrentUser.transport.request({
+      result = await transport.request({
         method: 'POST',
         path: MODEL_SEARCH_API,
         body: {
@@ -92,6 +92,9 @@ export class ConnectorService {
         return [];
       }
       throw e;
+    }
+    if (!result.body.aggregations) {
+      return [];
     }
     return result.body.aggregations.unique_connector_names.buckets.map(({ key }) => key);
   }

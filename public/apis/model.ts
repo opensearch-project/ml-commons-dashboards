@@ -36,10 +36,13 @@ export class Model {
     states?: MODEL_STATE[];
     nameOrId?: string;
     extraQuery?: Record<string, any>;
+    dataSourceId?: string;
   }) {
-    const { extraQuery, ...restQuery } = query;
+    const { extraQuery, dataSourceId, ...restQuery } = query;
     return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
-      query: extraQuery ? { ...restQuery, extra_query: JSON.stringify(extraQuery) } : restQuery,
+      query: extraQuery
+        ? { ...restQuery, extra_query: JSON.stringify(extraQuery), data_source_id: dataSourceId }
+        : { ...restQuery, data_source_id: dataSourceId },
     });
   }
 }

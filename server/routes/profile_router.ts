@@ -4,9 +4,11 @@
  */
 
 import { schema } from '@osd/config-schema';
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+
+import { IRouter } from '../../../../src/core/server';
 import { ProfileService } from '../services/profile_service';
 import { DEPLOYED_MODEL_PROFILE_API_ENDPOINT } from './constants';
+import { getOpenSearchClientTransport } from './utils';
 
 export const profileRouter = (router: IRouter) => {
   router.get(
@@ -22,17 +24,23 @@ export const profileRouter = (router: IRouter) => {
             },
           }),
         }),
+        query: schema.object({
+          data_source_id: schema.maybe(schema.string()),
+        }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const payload = await ProfileService.getModel({
-          client: context.core.opensearch.client,
+          transport: await getOpenSearchClientTransport({
+            dataSourceId: request.query.data_source_id,
+            context,
+          }),
           modelId: request.params.modelId,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: error as Error });
+        return response.badRequest({ body: error as Error });
       }
     }
   );

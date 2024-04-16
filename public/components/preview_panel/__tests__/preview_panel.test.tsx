@@ -17,7 +17,7 @@ const MODEL = {
 
 function setup({ model = MODEL, onClose = jest.fn() }) {
   const user = userEvent.setup({});
-  render(<PreviewPanel model={model} onClose={onClose} />);
+  render(<PreviewPanel dataSourceId="foo" model={model} onClose={onClose} />);
   return { user };
 }
 
@@ -39,14 +39,14 @@ describe('<PreviewPanel />', () => {
   });
 
   it('source should be external and should not render nodes details when connector params passed', async () => {
-    const modelWithConntector = {
+    const modelWithConnector = {
       ...MODEL,
       connector: {
         name: 'connector',
       },
     };
     setup({
-      model: modelWithConntector,
+      model: modelWithConnector,
     });
     expect(screen.getByText('External')).toBeInTheDocument();
     expect(screen.queryByText('Status by node')).not.toBeInTheDocument();
@@ -136,5 +136,20 @@ describe('<PreviewPanel />', () => {
       expect(screen.getByText('node-2')).toBeInTheDocument();
       expect(screen.getByText('node-3')).toBeInTheDocument();
     });
+  });
+
+  it('should call get model with passed data source id', async () => {
+    const getModelMock = jest
+      .spyOn(APIProvider.getAPI('profile'), 'getModel')
+      .mockResolvedValueOnce({});
+    setup({});
+    await waitFor(() =>
+      expect(getModelMock).toHaveBeenCalledWith(
+        'id1',
+        expect.objectContaining({
+          dataSourceId: 'foo',
+        })
+      )
+    );
   });
 });
