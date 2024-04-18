@@ -56,7 +56,7 @@ export const MlCommonsPluginApp = ({
   savedObjects,
   setActionMenu,
 }: MlCommonsPluginAppDeps) => {
-  const dataSourceEnabled = !!dataSource?.dataSourceEnabled;
+  const dataSourceEnabled = !!dataSource;
   return (
     <I18nProvider>
       <DataSourceContextProvider
@@ -86,7 +86,6 @@ export const MlCommonsPluginApp = ({
           {dataSourceEnabled && (
             <DataSourceTopNavMenu
               notifications={notifications}
-              dataSource={dataSource}
               dataSourceManagement={dataSourceManagement}
               setActionMenu={setActionMenu}
               savedObjects={savedObjects}

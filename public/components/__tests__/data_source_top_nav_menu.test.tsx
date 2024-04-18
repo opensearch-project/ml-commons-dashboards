@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '../../../test/test_utils';
 import { DataSourceTopNavMenu, DataSourceTopNavMenuProps } from '../data_source_top_nav_menu';
 import { coreMock } from '../../../../../src/core/public/mocks';
-import { DataSourceContext, DataSourceContextProvider } from '../../contexts';
+import { DataSourceContext } from '../../contexts';
 
 function setup(options: Partial<DataSourceTopNavMenuProps> = {}) {
   const user = userEvent.setup({});
@@ -38,15 +38,10 @@ function setup(options: Partial<DataSourceTopNavMenuProps> = {}) {
   );
 
   const DataSourceConsumer = () => {
-    const { dataSourceEnabled, selectedDataSourceOption } = useContext(DataSourceContext);
+    const { selectedDataSourceOption } = useContext(DataSourceContext);
 
     return (
       <div>
-        <input
-          value={JSON.stringify(dataSourceEnabled)}
-          aria-label="dataSourceEnabled"
-          onChange={() => {}}
-        />
         <input
           value={
             selectedDataSourceOption === undefined
@@ -65,13 +60,6 @@ function setup(options: Partial<DataSourceTopNavMenuProps> = {}) {
       <DataSourceTopNavMenu
         notifications={coreStart.notifications}
         savedObjects={coreStart.savedObjects}
-        dataSource={{
-          dataSourceEnabled: true,
-          noAuthenticationTypeEnabled: true,
-          awsSigV4AuthEnabled: true,
-          hideLocalCluster: false,
-          usernamePasswordAuthEnabled: true,
-        }}
         dataSourceManagement={{
           registerAuthenticationMethod: jest.fn(),
           ui: {
@@ -89,34 +77,9 @@ function setup(options: Partial<DataSourceTopNavMenuProps> = {}) {
 }
 
 describe('<DataSourceTopNavMenu />', () => {
-  it('should not render data source menu when data source and data source management not defined', () => {
-    setup({
-      dataSource: undefined,
-      dataSourceManagement: undefined,
-    });
-    expect(screen.queryByText('Data Source Menu')).not.toBeInTheDocument();
-  });
-  it('should not render data source menu when data source not defined', () => {
-    setup({
-      dataSource: undefined,
-    });
-    expect(screen.queryByText('Data Source Menu')).not.toBeInTheDocument();
-  });
   it('should not render data source menu when data source management not defined', () => {
     setup({
       dataSourceManagement: undefined,
-    });
-    expect(screen.queryByText('Data Source Menu')).not.toBeInTheDocument();
-  });
-  it('should not render data source menu when data source not enabled', () => {
-    setup({
-      dataSource: {
-        dataSourceEnabled: false,
-        noAuthenticationTypeEnabled: false,
-        awsSigV4AuthEnabled: false,
-        hideLocalCluster: false,
-        usernamePasswordAuthEnabled: false,
-      },
     });
     expect(screen.queryByText('Data Source Menu')).not.toBeInTheDocument();
   });
@@ -124,7 +87,6 @@ describe('<DataSourceTopNavMenu />', () => {
   it('should render data source menu and data source context', () => {
     setup();
     expect(screen.getByText('Data Source Menu')).toBeInTheDocument();
-    expect(screen.getByLabelText('dataSourceEnabled')).toHaveValue('true');
     expect(screen.getByLabelText('selectedDataSourceOption')).toHaveValue('null');
   });
 
