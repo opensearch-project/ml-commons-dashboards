@@ -5,6 +5,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+/**
+ *
+ * This symbol is for prevent fetcher be executed when component mount,
+ * the fetcher won't be executed if second parameters of useFetcher hook is DO_NOT_FETCH.
+ *
+ */
 export const DO_NOT_FETCH = Symbol('DO_NOT_FETCH');
 
 export type DoNotFetchParams = [typeof DO_NOT_FETCH];
