@@ -5,13 +5,26 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+/**
+ *
+ * This symbol is for prevent fetcher be executed when component mount,
+ * the fetcher won't be executed if second parameters of useFetcher hook is DO_NOT_FETCH.
+ *
+ */
+export const DO_NOT_FETCH = Symbol('DO_NOT_FETCH');
+
+export type DoNotFetchParams = [typeof DO_NOT_FETCH];
+
+const isDoNotFetch = (test: string | any[] | DoNotFetchParams): test is DoNotFetchParams =>
+  test[0] === DO_NOT_FETCH;
+
 export const useFetcher = <TParams extends any[], TResponse>(
   fetcher: (...params: TParams) => Promise<TResponse>,
-  ...params: TParams
+  ...params: TParams | [typeof DO_NOT_FETCH]
 ) => {
   const [, setCount] = useState(0);
   const dataRef = useRef<TResponse | null>(null);
-  const loadingRef = useRef(true);
+  const loadingRef = useRef(!isDoNotFetch(params));
   const errorRef = useRef<unknown | null>(null);
   const usedRef = useRef({
     data: false,
@@ -20,7 +33,7 @@ export const useFetcher = <TParams extends any[], TResponse>(
   });
   const paramsRef = useRef(params);
   paramsRef.current = params;
-  const stringifyParams = JSON.stringify(params);
+  const paramsKey = isDoNotFetch(params) ? params : JSON.stringify(params);
 
   const forceUpdate = useCallback(() => {
     setCount((prevCount) => (prevCount === Number.MAX_SAFE_INTEGER ? 0 : prevCount + 1));
@@ -61,7 +74,9 @@ export const useFetcher = <TParams extends any[], TResponse>(
   );
 
   const reload = useCallback(() => {
-    loadData(paramsRef.current);
+    if (!isDoNotFetch(paramsRef.current)) {
+      loadData(paramsRef.current);
+    }
   }, [loadData]);
 
   const update = useCallback(
@@ -80,12 +95,15 @@ export const useFetcher = <TParams extends any[], TResponse>(
   );
 
   useEffect(() => {
+    if (isDoNotFetch(paramsKey)) {
+      return;
+    }
     let changed = false;
-    loadData(JSON.parse(stringifyParams), () => !changed);
+    loadData(JSON.parse(paramsKey), () => !changed);
     return () => {
       changed = true;
     };
-  }, [stringifyParams, loadData]);
+  }, [paramsKey, loadData]);
 
   return Object.defineProperties(
     {

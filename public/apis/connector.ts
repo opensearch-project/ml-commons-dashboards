@@ -23,13 +23,22 @@ interface GetAllInternalConnectorResponse {
 }
 
 export class Connector {
-  public getAll() {
-    return InnerHttpProvider.getHttp().get<GetAllConnectorResponse>(CONNECTOR_API_ENDPOINT);
+  public getAll({ dataSourceId }: { dataSourceId?: string }) {
+    return InnerHttpProvider.getHttp().get<GetAllConnectorResponse>(CONNECTOR_API_ENDPOINT, {
+      query: {
+        data_source_id: dataSourceId,
+      },
+    });
   }
 
-  public getAllInternal() {
+  public getAllInternal({ dataSourceId }: { dataSourceId?: string }) {
     return InnerHttpProvider.getHttp().get<GetAllInternalConnectorResponse>(
-      INTERNAL_CONNECTOR_API_ENDPOINT
+      INTERNAL_CONNECTOR_API_ENDPOINT,
+      {
+        query: {
+          data_source_id: dataSourceId,
+        },
+      }
     );
   }
 }

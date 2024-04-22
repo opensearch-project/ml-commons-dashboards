@@ -14,9 +14,14 @@ export interface ModelDeploymentProfile {
 }
 
 export class Profile {
-  public getModel(modelId: string) {
+  public getModel(modelId: string, { dataSourceId }: { dataSourceId?: string }) {
     return InnerHttpProvider.getHttp().get<ModelDeploymentProfile>(
-      `${DEPLOYED_MODEL_PROFILE_API_ENDPOINT}/${modelId}`
+      `${DEPLOYED_MODEL_PROFILE_API_ENDPOINT}/${modelId}`,
+      {
+        query: {
+          data_source_id: dataSourceId,
+        },
+      }
     );
   }
 }

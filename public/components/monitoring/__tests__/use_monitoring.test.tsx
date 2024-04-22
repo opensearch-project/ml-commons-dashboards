@@ -2,12 +2,52 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import React, { useContext } from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 
 import { Model, ModelSearchResponse } from '../../../apis/model';
 import { Connector } from '../../../apis/connector';
 import { useMonitoring } from '../use_monitoring';
+import {
+  DataSourceContext,
+  DataSourceContextProvider,
+  DataSourceContextProviderProps,
+  DataSourceOption,
+} from '../../../contexts';
+
+const setup = ({
+  initDataSourceContextValue,
+}: {
+  initDataSourceContextValue?: Partial<DataSourceContextProviderProps['initialValue']>;
+} = {}) => {
+  let setSelectedDataSourceOption: (
+    dataSourceOption: DataSourceOption | null | undefined
+  ) => void = () => {};
+  const DataSourceConsumer = () => {
+    const context = useContext(DataSourceContext);
+    setSelectedDataSourceOption = context.setSelectedDataSourceOption;
+    return null;
+  };
+  const renderHookResult = renderHook(() => useMonitoring(), {
+    wrapper: ({ children }) => (
+      <DataSourceContextProvider
+        initialValue={{
+          dataSourceEnabled: true,
+          selectedDataSourceOption: null,
+          ...initDataSourceContextValue,
+        }}
+      >
+        {children}
+        <DataSourceConsumer />
+      </DataSourceContextProvider>
+    ),
+  });
+
+  return {
+    renderHookResult,
+    setSelectedDataSourceOption,
+  };
+};
 
 jest.mock('../../../apis/connector');
 
@@ -45,7 +85,9 @@ describe('useMonitoring', () => {
 
     await waitFor(() => result.current.pageStatus === 'normal');
 
-    result.current.searchByNameOrId('foo');
+    act(() => {
+      result.current.searchByNameOrId('foo');
+    });
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -55,7 +97,9 @@ describe('useMonitoring', () => {
       )
     );
 
-    result.current.searchByStatus(['responding']);
+    act(() => {
+      result.current.searchByStatus(['responding']);
+    });
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -65,10 +109,14 @@ describe('useMonitoring', () => {
       )
     );
 
-    result.current.resetSearch();
+    act(() => {
+      result.current.resetSearch();
+    });
     await waitFor(() => result.current.pageStatus === 'normal');
 
-    result.current.searchByStatus(['partial-responding']);
+    act(() => {
+      result.current.searchByStatus(['partial-responding']);
+    });
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -91,9 +139,11 @@ describe('useMonitoring', () => {
       )
     );
 
-    result.current.handleTableChange({
-      sort: { field: 'name', direction: 'desc' },
-      pagination: { currentPage: 2, pageSize: 10 },
+    act(() => {
+      result.current.handleTableChange({
+        sort: { field: 'name', direction: 'desc' },
+        pagination: { currentPage: 2, pageSize: 10 },
+      });
     });
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
@@ -111,7 +161,9 @@ describe('useMonitoring', () => {
 
     await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(1));
 
-    result.current.reload();
+    act(() => {
+      result.current.reload();
+    });
     await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(2));
   });
 
@@ -261,18 +313,22 @@ describe('useMonitoring', () => {
   it('should call searchByNameOrId with from 0 after page changed', async () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
-    result.current.handleTableChange({
-      pagination: {
-        currentPage: 2,
-        pageSize: 15,
-      },
+    act(() => {
+      result.current.handleTableChange({
+        pagination: {
+          currentPage: 2,
+          pageSize: 15,
+        },
+      });
     });
 
     await waitFor(() => {
       expect(result.current.pagination?.currentPage).toBe(2);
     });
 
-    result.current.searchByNameOrId('foo');
+    act(() => {
+      result.current.searchByNameOrId('foo');
+    });
 
     await waitFor(() => {
       expect(Model.prototype.search).toHaveBeenCalledTimes(3);
@@ -287,18 +343,22 @@ describe('useMonitoring', () => {
   it('should call searchByStatus with from 0 after page changed', async () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
-    result.current.handleTableChange({
-      pagination: {
-        currentPage: 2,
-        pageSize: 15,
-      },
+    act(() => {
+      result.current.handleTableChange({
+        pagination: {
+          currentPage: 2,
+          pageSize: 15,
+        },
+      });
     });
 
     await waitFor(() => {
       expect(result.current.pagination?.currentPage).toBe(2);
     });
 
-    result.current.searchByStatus(['responding']);
+    act(() => {
+      result.current.searchByStatus(['responding']);
+    });
 
     await waitFor(() => {
       expect(Model.prototype.search).toHaveBeenCalledTimes(3);
@@ -315,7 +375,9 @@ describe('useMonitoring', () => {
 
     await waitFor(() => result.current.pageStatus === 'normal');
 
-    result.current.searchBySource(['local']);
+    act(() => {
+      result.current.searchBySource(['local']);
+    });
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -336,7 +398,9 @@ describe('useMonitoring', () => {
       )
     );
 
-    result.current.searchBySource(['external']);
+    act(() => {
+      result.current.searchBySource(['external']);
+    });
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -357,7 +421,9 @@ describe('useMonitoring', () => {
       )
     );
 
-    result.current.searchBySource(['external', 'local']);
+    act(() => {
+      result.current.searchBySource(['external', 'local']);
+    });
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -371,8 +437,10 @@ describe('useMonitoring', () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
     await waitFor(() => result.current.pageStatus === 'normal');
+    act(() => {
+      result.current.searchByConnector(['External Connector 1']);
+    });
 
-    result.current.searchByConnector(['External Connector 1']);
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -406,6 +474,61 @@ describe('useMonitoring', () => {
     );
 
     await waitFor(() => result.current.pageStatus === 'normal');
+  });
+
+  it('should not call model search if selected data source is null', async () => {
+    const {
+      renderHookResult: { waitFor },
+    } = setup({
+      initDataSourceContextValue: {
+        selectedDataSourceOption: null,
+      },
+    });
+    await waitFor(() => {
+      expect(Model.prototype.search).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should call model search and connector get all with data source id', async () => {
+    const getAllConnectorMock = jest.spyOn(Connector.prototype, 'getAll');
+    const {
+      renderHookResult: { waitFor },
+    } = setup({
+      initDataSourceContextValue: {
+        selectedDataSourceOption: { id: 'foo' },
+      },
+    });
+    const dataSourceIdExpect = expect.objectContaining({
+      dataSourceId: 'foo',
+    });
+    await waitFor(() => {
+      expect(Model.prototype.search).toHaveBeenCalledWith(dataSourceIdExpect);
+      expect(getAllConnectorMock).toHaveBeenCalledWith(dataSourceIdExpect);
+    });
+  });
+
+  it('should reset connector filter after selected data source option change', async () => {
+    const {
+      renderHookResult: { result, waitFor },
+      setSelectedDataSourceOption,
+    } = setup({
+      initDataSourceContextValue: {
+        selectedDataSourceOption: { id: 'foo' },
+      },
+    });
+    act(() => {
+      result.current.searchByConnector(['connector-1']);
+    });
+    await waitFor(() => {
+      expect(Model.prototype.search).toHaveBeenCalledTimes(2);
+    });
+    act(() => {
+      setSelectedDataSourceOption({ id: 'bar' });
+    });
+    await waitFor(() => {
+      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
+      expect(result.current.params.connector).toEqual([]);
+    });
   });
 });
 
@@ -452,7 +575,9 @@ describe('useMonitoring.pageStatus', () => {
 
     // Mock search function to return empty result
     mockEmptyRecords();
-    result.current.searchByNameOrId('foo');
+    act(() => {
+      result.current.searchByNameOrId('foo');
+    });
     await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
   });
 
@@ -464,7 +589,9 @@ describe('useMonitoring.pageStatus', () => {
 
     // assume result is empty
     mockEmptyRecords();
-    result.current.searchByStatus(['responding']);
+    act(() => {
+      result.current.searchByStatus(['responding']);
+    });
     await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
   });
 
@@ -476,7 +603,9 @@ describe('useMonitoring.pageStatus', () => {
 
     // assume result is empty
     mockEmptyRecords();
-    result.current.searchBySource(['local']);
+    act(() => {
+      result.current.searchBySource(['local']);
+    });
     await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
   });
 
@@ -488,7 +617,9 @@ describe('useMonitoring.pageStatus', () => {
 
     // assume result is empty
     mockEmptyRecords();
-    result.current.searchByConnector([{ name: 'Sagemaker', ids: [] }]);
+    act(() => {
+      result.current.searchByConnector(['Sagemaker']);
+    });
     await waitFor(() => expect(result.current.pageStatus).toBe('reset-filter'));
   });
 
@@ -497,5 +628,15 @@ describe('useMonitoring.pageStatus', () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
     await waitFor(() => expect(result.current.pageStatus).toBe('empty'));
+  });
+
+  it('should return "loading" and not call model search when data source id is fetching', async () => {
+    const {
+      renderHookResult: { result, waitFor },
+    } = setup();
+
+    await waitFor(() => {
+      expect(result.current.pageStatus).toBe('loading');
+    });
   });
 });

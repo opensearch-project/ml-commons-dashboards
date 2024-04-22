@@ -5,8 +5,9 @@
 
 import React, { useMemo } from 'react';
 import { OptionsFilter, OptionsFilterProps } from '../common/options_filter';
-import { useFetcher } from '../../hooks';
+import { DO_NOT_FETCH, useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
+import { DataSourceId } from '../../utils/data_source';
 
 interface ModelConnectorFilterProps
   extends Omit<
@@ -16,14 +17,17 @@ interface ModelConnectorFilterProps
   allExternalConnectors?: Array<{ id: string; name: string }>;
   value: string[];
   onChange: (value: string[]) => void;
+  dataSourceId: DataSourceId;
 }
 
 export const ModelConnectorFilter = ({
+  dataSourceId,
   allExternalConnectors,
   ...restProps
 }: ModelConnectorFilterProps) => {
   const { data: internalConnectorsResult } = useFetcher(
-    APIProvider.getAPI('connector').getAllInternal
+    APIProvider.getAPI('connector').getAllInternal,
+    typeof dataSourceId === 'symbol' ? DO_NOT_FETCH : { dataSourceId }
   );
   const options = useMemo(
     () =>
