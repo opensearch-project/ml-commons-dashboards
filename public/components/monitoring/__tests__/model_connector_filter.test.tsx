@@ -7,10 +7,16 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor, within } from '../../../../test/test_utils';
 import { ModelConnectorFilter } from '../model_connector_filter';
+import {
+  DATA_SOURCE_FETCHING_ID,
+  DATA_SOURCE_INVALID_ID,
+  DataSourceId,
+} from '../../../utils/data_source';
+import { Connector } from '../../../apis/connector';
 
 jest.mock('../../../apis/connector');
 
-async function setup(value: string[]) {
+async function setup(value: string[], dataSourceId?: DataSourceId) {
   const onChangeMock = jest.fn();
   const user = userEvent.setup({});
   render(
@@ -21,6 +27,7 @@ async function setup(value: string[]) {
       ]}
       value={value}
       onChange={onChangeMock}
+      dataSourceId={dataSourceId}
     />
   );
   await user.click(screen.getByText('Connector name'));
@@ -65,7 +72,7 @@ describe('<ModelConnector />', () => {
   });
 
   it('should render all connectors in the option list', async () => {
-    await setup(['External Connector 1']);
+    await setup(['External Connector 1'], 'foo');
     await waitFor(() => {
       expect(
         within(screen.getByRole('dialog')).getByText('Internal Connector 1')
@@ -83,5 +90,17 @@ describe('<ModelConnector />', () => {
     await user.click(screen.getByText('Common Connector'));
 
     expect(onChangeMock).toHaveBeenLastCalledWith(['External Connector 1', 'Common Connector']);
+  });
+
+  it('should not call getAllInternal when data source id is fetching', async () => {
+    jest.spyOn(Connector.prototype, 'getAllInternal');
+    await setup(['External Connector 1'], DATA_SOURCE_FETCHING_ID);
+    expect(Connector.prototype.getAllInternal).not.toHaveBeenCalled();
+  });
+
+  it('should not call getAllInternal when data source id is invalid', async () => {
+    jest.spyOn(Connector.prototype, 'getAllInternal');
+    await setup(['External Connector 1'], DATA_SOURCE_INVALID_ID);
+    expect(Connector.prototype.getAllInternal).not.toHaveBeenCalled();
   });
 });

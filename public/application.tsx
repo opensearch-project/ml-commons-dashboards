@@ -14,7 +14,7 @@ import { APIProvider } from './apis/api_provider';
 import { OpenSearchDashboardsContextProvider } from '../../../src/plugins/opensearch_dashboards_react/public';
 
 export const renderApp = (
-  { element, history, appBasePath }: AppMountParameters,
+  { element, history, appBasePath, setHeaderActionMenu }: AppMountParameters,
   services: MLServices
 ) => {
   InnerHttpProvider.setHttp(services.http);
@@ -31,6 +31,10 @@ export const renderApp = (
             chrome={services.chrome}
             data={services.data}
             uiSettingsClient={services.uiSettings}
+            savedObjects={services.savedObjects}
+            setActionMenu={setHeaderActionMenu}
+            dataSource={services.dataSource}
+            dataSourceManagement={services.dataSourceManagement}
           />
         </services.i18n.Context>
       </OpenSearchDashboardsContextProvider>

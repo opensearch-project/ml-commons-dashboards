@@ -5,9 +5,10 @@
 
 import { schema } from '@osd/config-schema';
 import { MODEL_STATE } from '../../common';
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+import { IRouter } from '../../../../src/core/server';
 import { ModelService } from '../services';
 import { MODEL_API_ENDPOINT } from './constants';
+import { getOpenSearchClientTransport } from './utils';
 
 const modelSortQuerySchema = schema.oneOf([
   schema.literal('name-asc'),
@@ -43,14 +44,26 @@ export const modelRouter = (router: IRouter) => {
           states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
           nameOrId: schema.maybe(schema.string()),
           extra_query: schema.maybe(schema.recordOf(schema.string(), schema.any())),
+          data_source_id: schema.maybe(schema.string()),
         }),
       },
     },
-    async (context, request) => {
-      const { from, size, sort, states, nameOrId, extra_query: extraQuery } = request.query;
+    async (context, request, response) => {
+      const {
+        from,
+        size,
+        sort,
+        states,
+        nameOrId,
+        extra_query: extraQuery,
+        data_source_id: dataSourceId,
+      } = request.query;
       try {
         const payload = await ModelService.search({
-          client: context.core.opensearch.client,
+          transport: await getOpenSearchClientTransport({
+            dataSourceId,
+            context,
+          }),
           from,
           size,
           sort: typeof sort === 'string' ? [sort] : sort,
@@ -58,9 +71,9 @@ export const modelRouter = (router: IRouter) => {
           nameOrId,
           extraQuery,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
