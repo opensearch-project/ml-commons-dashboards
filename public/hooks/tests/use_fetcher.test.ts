@@ -4,7 +4,7 @@
  */
 
 import { act, renderHook } from '@testing-library/react-hooks';
-import { useFetcher } from '../use_fetcher';
+import { DO_NOT_FETCH, useFetcher } from '../use_fetcher';
 
 describe('useFetcher', () => {
   it('should call fetcher with consistent params and return consistent result', async () => {
@@ -18,7 +18,7 @@ describe('useFetcher', () => {
     expect(fetcher).toHaveBeenCalledWith('foo');
   });
 
-  it('should call fetcher only onece if params content not change', async () => {
+  it('should call fetcher only once if params content not change', async () => {
     const fetcher = jest.fn((_arg1: any) => Promise.resolve());
     const { result, waitFor, rerender } = renderHook(({ params }) => useFetcher(fetcher, params), {
       initialProps: { params: { foo: 'bar' } },
@@ -129,5 +129,43 @@ describe('useFetcher', () => {
     });
 
     expect(result.current.data).toBe('bar');
+  });
+
+  it('should not call fetcher when first parameter is DO_NOT_FETCH', () => {
+    const fetcher = jest.fn();
+    const { result } = renderHook(() => useFetcher(fetcher, DO_NOT_FETCH));
+
+    expect(result.current.loading).toBe(false);
+    expect(fetcher).not.toHaveBeenCalledWith();
+  });
+
+  it('should not call fetcher after reload called when first parameter is DO_NOT_FETCH', () => {
+    const fetcher = jest.fn();
+    const { result } = renderHook(() => useFetcher(fetcher, DO_NOT_FETCH));
+
+    result.current.reload();
+    expect(result.current.loading).toBe(false);
+    expect(fetcher).not.toHaveBeenCalledWith();
+  });
+
+  it('should call fetcher after first parameter changed from DO_NOT_FETCH', async () => {
+    const fetcher = jest.fn(async (...params) => params);
+    const { result, rerender, waitFor } = renderHook(
+      ({ params }) => useFetcher(fetcher, ...params),
+      {
+        initialProps: {
+          params: [DO_NOT_FETCH],
+        },
+      }
+    );
+
+    rerender({ params: [] });
+    expect(result.current.loading).toBe(true);
+    expect(fetcher).toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+      expect(result.current.data).toEqual([]);
+    });
   });
 });

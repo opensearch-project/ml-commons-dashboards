@@ -12,5 +12,5 @@
     "dashboard",
     "opensearchUiShared"
   ],
-  "optionalPlugins": []
+  "optionalPlugins": ["dataSource", "dataSourceManagement"]
 }

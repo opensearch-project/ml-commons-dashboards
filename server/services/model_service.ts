@@ -18,7 +18,7 @@
  *   permissions and limitations under the License.
  */
 
-import { IScopedClusterClient } from '../../../../src/core/server';
+import { OpenSearchClient } from '../../../../src/core/server';
 import { MODEL_STATE, ModelSearchSort } from '../../common';
 
 import { generateModelSearchQuery } from './utils/model';
@@ -34,10 +34,10 @@ export class ModelService {
     from,
     size,
     sort,
-    client,
+    transport,
     ...restParams
   }: {
-    client: IScopedClusterClient;
+    transport: OpenSearchClient['transport'];
     from: number;
     size: number;
     sort?: ModelSearchSort[];
@@ -47,7 +47,7 @@ export class ModelService {
   }) {
     const {
       body: { hits },
-    } = await client.asCurrentUser.transport.request({
+    } = await transport.request({
       method: 'POST',
       path: `${MODEL_BASE_API}/_search`,
       body: {

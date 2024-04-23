@@ -6,9 +6,14 @@
 import React, { FC, ReactElement } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { render, RenderOptions } from '@testing-library/react';
+import { DataSourceContextProvider } from '../public/contexts';
 
 const AllTheProviders: FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <I18nProvider>{children}</I18nProvider>;
+  return (
+    <I18nProvider>
+      <DataSourceContextProvider>{children}</DataSourceContextProvider>
+    </I18nProvider>
+  );
 };
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>

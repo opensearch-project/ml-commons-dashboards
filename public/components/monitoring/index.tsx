@@ -41,7 +41,10 @@ export const Monitoring = () => {
     searchByConnector,
     allExternalConnectors,
   } = useMonitoring();
-  const [previewModel, setPreviewModel] = useState<ModelDeploymentItem | null>(null);
+  const [preview, setPreview] = useState<{
+    model: ModelDeploymentItem;
+    dataSourceId: string | undefined;
+  } | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>();
 
   const setInputRef = useCallback((node: HTMLInputElement | null) => {
@@ -55,22 +58,28 @@ export const Monitoring = () => {
     resetSearch();
   }, [resetSearch]);
 
-  const handleViewDetail = useCallback((modelPreviewItem: ModelDeploymentItem) => {
-    setPreviewModel(modelPreviewItem);
-  }, []);
+  const handleViewDetail = useCallback(
+    (modelPreviewItem: ModelDeploymentItem) => {
+      // This check is for type safe, the data source id won't be invalid or fetching if model can be previewed.
+      if (typeof params.dataSourceId !== 'symbol') {
+        setPreview({ model: modelPreviewItem, dataSourceId: params.dataSourceId });
+      }
+    },
+    [params.dataSourceId]
+  );
 
   const onCloseModelPreview = useCallback(
     (modelProfile: ModelDeploymentProfile | null) => {
       if (
         modelProfile !== null &&
-        (previewModel?.planningNodesCount !== modelProfile.target_worker_nodes?.length ||
-          previewModel?.respondingNodesCount !== modelProfile.worker_nodes?.length)
+        (preview?.model?.planningNodesCount !== modelProfile.target_worker_nodes?.length ||
+          preview?.model?.respondingNodesCount !== modelProfile.worker_nodes?.length)
       ) {
         reload();
       }
-      setPreviewModel(null);
+      setPreview(null);
     },
-    [previewModel, reload]
+    [preview, reload]
   );
 
   return (
@@ -108,6 +117,7 @@ export const Monitoring = () => {
                     value={params.connector}
                     onChange={searchByConnector}
                     allExternalConnectors={allExternalConnectors}
+                    dataSourceId={params.dataSourceId}
                   />
                   <ModelStatusFilter selection={params.status} onChange={searchByStatus} />
                 </EuiFilterGroup>
@@ -127,7 +137,13 @@ export const Monitoring = () => {
           onViewDetail={handleViewDetail}
           onResetSearchClick={onResetSearch}
         />
-        {previewModel && <PreviewPanel model={previewModel} onClose={onCloseModelPreview} />}
+        {preview && (
+          <PreviewPanel
+            model={preview.model}
+            onClose={onCloseModelPreview}
+            dataSourceId={preview.dataSourceId}
+          />
+        )}
       </EuiPanel>
     </div>
   );
