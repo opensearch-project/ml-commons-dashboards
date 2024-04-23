@@ -157,8 +157,31 @@ describe('<DeployedModelTable />', () => {
       expect(within(cells[2] as HTMLElement).getByText('Not responding')).toBeInTheDocument();
     });
 
-    it('should render Action column and call onViewDetail with the model item of the current table row', async () => {
+    it('should render Model ID at fifth column and copy to clipboard after text clicked', async () => {
+      const execCommandOrigin = document.execCommand;
+      document.execCommand = jest.fn(() => true);
+
       const columnIndex = 4;
+      setup();
+      const header = screen.getAllByRole('columnheader')[columnIndex];
+      const columnContent = header
+        .closest('table')
+        ?.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
+      expect(within(header).getByText('Model ID')).toBeInTheDocument();
+      expect(columnContent?.length).toBe(3);
+      const cells = columnContent!;
+      expect(within(cells[0] as HTMLElement).getByText('model-1-id')).toBeInTheDocument();
+      expect(within(cells[1] as HTMLElement).getByText('model-2-id')).toBeInTheDocument();
+      expect(within(cells[2] as HTMLElement).getByText('model-3-id')).toBeInTheDocument();
+
+      await userEvent.click(within(cells[0] as HTMLElement).getByLabelText('Copy ID to clipboard'));
+      expect(document.execCommand).toHaveBeenCalledWith('copy');
+
+      document.execCommand = execCommandOrigin;
+    });
+
+    it('should render Action column and call onViewDetail with the model item of the current table row', async () => {
+      const columnIndex = 5;
       const onViewDetailMock = jest.fn();
       const { finalProps } = setup({
         onViewDetail: onViewDetailMock,
