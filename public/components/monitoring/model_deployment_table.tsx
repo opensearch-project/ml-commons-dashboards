@@ -17,6 +17,8 @@ import {
   EuiSpacer,
   EuiLink,
   EuiToolTip,
+  EuiCopy,
+  EuiText,
 } from '@elastic/eui';
 
 import { MODEL_STATE } from '../../../common';
@@ -76,14 +78,14 @@ export const ModelDeploymentTable = ({
       {
         field: 'name',
         name: 'Name',
-        width: '23.84%',
+        width: '26.13%',
         sortable: true,
         truncateText: true,
       },
       {
         field: 'id',
         name: 'Source',
-        width: '23.84%',
+        width: '14%',
         sortable: false,
         truncateText: true,
         render: (_id: string, modelDeploymentItem: ModelDeploymentItem) => {
@@ -93,7 +95,7 @@ export const ModelDeploymentTable = ({
       {
         field: 'id',
         name: 'Connector name',
-        width: '22.61%',
+        width: '22%',
         truncateText: true,
         textOnly: true,
         render: (_id: string, modelDeploymentItem: ModelDeploymentItem) => {
@@ -103,7 +105,7 @@ export const ModelDeploymentTable = ({
       {
         field: 'model_state',
         name: 'Status',
-        width: '23.84%',
+        width: '14%',
         sortable: true,
         truncateText: true,
         render: (
@@ -137,6 +139,34 @@ export const ModelDeploymentTable = ({
             </EuiHealth>
           );
         },
+      },
+      {
+        field: 'id',
+        name: 'Model ID',
+        width: '18%',
+        sortable: true,
+        render: (id: string) => (
+          <>
+            <EuiCopy
+              className="ml-modelModelIdCellTextWrapper"
+              textToCopy={id}
+              beforeMessage="Copy model ID"
+              anchorClassName="ml-modelModelIdCell"
+            >
+              {(copy) => (
+                <EuiButtonIcon
+                  aria-label="Copy ID to clipboard"
+                  color="text"
+                  iconType="copy"
+                  onClick={copy}
+                />
+              )}
+            </EuiCopy>
+            <EuiText className="eui-textTruncate ml-modelModelIdText" size="s">
+              {id}
+            </EuiText>
+          </>
+        ),
       },
       {
         field: 'id',
