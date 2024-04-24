@@ -217,6 +217,7 @@ export const useMonitoring = () => {
       currentPage: previousValue.currentPage,
       pageSize: previousValue.pageSize,
       sort: previousValue.sort,
+      nameOrId: '',
       source: [],
       connector: [],
       status: undefined,
@@ -280,6 +281,9 @@ export const useMonitoring = () => {
   );
 
   useEffect(() => {
+    if (!dataSourceEnabled) {
+      return;
+    }
     setParams((previousParams) => {
       const dataSourceId = getDataSourceId(dataSourceEnabled, selectedDataSourceOption);
       if (previousParams.dataSourceId === dataSourceId) {
@@ -287,6 +291,7 @@ export const useMonitoring = () => {
       }
       return {
         ...previousParams,
+        currentPage: 1,
         dataSourceId,
         connector: [],
       };
