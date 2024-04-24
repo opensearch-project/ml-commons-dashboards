@@ -507,7 +507,7 @@ describe('useMonitoring', () => {
     });
   });
 
-  it('should reset connector filter after selected data source option change', async () => {
+  it('should reset connector filter and current page after data source change', async () => {
     const {
       renderHookResult: { result, waitFor },
       setSelectedDataSourceOption,
@@ -518,9 +518,21 @@ describe('useMonitoring', () => {
     });
     act(() => {
       result.current.searchByConnector(['connector-1']);
+      result.current.handleTableChange({
+        pagination: {
+          currentPage: 2,
+          pageSize: 50,
+        },
+      });
     });
     await waitFor(() => {
       expect(Model.prototype.search).toHaveBeenCalledTimes(2);
+      expect(result.current.params).toEqual(
+        expect.objectContaining({
+          currentPage: 2,
+          connector: ['connector-1'],
+        })
+      );
     });
     act(() => {
       setSelectedDataSourceOption({ id: 'bar' });
@@ -528,7 +540,39 @@ describe('useMonitoring', () => {
     await waitFor(() => {
       expect(Model.prototype.search).toHaveBeenCalledTimes(3);
       expect(result.current.params.connector).toEqual([]);
+      expect(result.current.params.currentPage).toEqual(1);
     });
+  });
+
+  it('should reset connectors, status, source and nameOrId filter after resetSearch called', async () => {
+    const {
+      renderHookResult: { result },
+    } = setup();
+    act(() => {
+      result.current.searchByNameOrId('foo');
+      result.current.searchByConnector(['connector-1']);
+      result.current.searchBySource(['local']);
+      result.current.searchByStatus(['responding']);
+    });
+    expect(result.current.params).toEqual(
+      expect.objectContaining({
+        nameOrId: 'foo',
+        connector: ['connector-1'],
+        source: ['local'],
+        status: ['responding'],
+      })
+    );
+    act(() => {
+      result.current.resetSearch();
+    });
+    expect(result.current.params).toEqual(
+      expect.objectContaining({
+        nameOrId: '',
+        connector: [],
+        source: [],
+        status: undefined,
+      })
+    );
   });
 });
 
