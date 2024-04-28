@@ -32,7 +32,7 @@ const setup = ({
     wrapper: ({ children }) => (
       <DataSourceContextProvider
         initialValue={{
-          dataSourceEnabled: true,
+          dataSourceEnabled: false,
           selectedDataSourceOption: null,
           ...initDataSourceContextValue,
         }}
@@ -72,7 +72,7 @@ describe('useMonitoring', () => {
           planning_worker_nodes: ['node1', 'node2', 'node3'],
         },
       ],
-      total_models: 1,
+      total_models: 500,
     });
   });
 
@@ -481,6 +481,7 @@ describe('useMonitoring', () => {
       renderHookResult: { waitFor },
     } = setup({
       initDataSourceContextValue: {
+        dataSourceEnabled: true,
         selectedDataSourceOption: null,
       },
     });
@@ -495,6 +496,7 @@ describe('useMonitoring', () => {
       renderHookResult: { waitFor },
     } = setup({
       initDataSourceContextValue: {
+        dataSourceEnabled: true,
         selectedDataSourceOption: { id: 'foo' },
       },
     });
@@ -513,6 +515,7 @@ describe('useMonitoring', () => {
       setSelectedDataSourceOption,
     } = setup({
       initDataSourceContextValue: {
+        dataSourceEnabled: true,
         selectedDataSourceOption: { id: 'foo' },
       },
     });
@@ -546,7 +549,7 @@ describe('useMonitoring', () => {
 
   it('should reset connectors, status, source and nameOrId filter after resetSearch called', async () => {
     const {
-      renderHookResult: { result },
+      renderHookResult: { result, waitFor },
     } = setup();
     act(() => {
       result.current.searchByNameOrId('foo');
@@ -565,14 +568,60 @@ describe('useMonitoring', () => {
     act(() => {
       result.current.resetSearch();
     });
-    expect(result.current.params).toEqual(
-      expect.objectContaining({
-        nameOrId: '',
-        connector: [],
-        source: [],
-        status: undefined,
-      })
+    await waitFor(() => {
+      expect(result.current.params).toEqual(
+        expect.objectContaining({
+          nameOrId: '',
+          connector: [],
+          source: [],
+          status: undefined,
+        })
+      );
+      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  it('should reset to max page when current page greater than max page', async () => {
+    const {
+      renderHookResult: { result, waitFor },
+    } = setup();
+    await waitFor(() => {
+      expect(Model.prototype.search).toHaveBeenCalled();
+    });
+    jest.spyOn(Model.prototype, 'search').mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({
+              data: [
+                {
+                  id: 'model-1-id',
+                  name: 'model-1-name',
+                  algorithm: 'TEXT_EMBEDDING',
+                  model_state: 'DEPLOYED',
+                  model_version: '1.0.0',
+                  current_worker_node_count: 1,
+                  planning_worker_node_count: 3,
+                  planning_worker_nodes: ['node1', 'node2', 'node3'],
+                },
+              ],
+              total_models: 1,
+            });
+          }, 300);
+        })
     );
+    act(() => {
+      result.current.handleTableChange({
+        pagination: {
+          currentPage: 2,
+          pageSize: 50,
+        },
+      });
+    });
+    expect(result.current.params.currentPage).toEqual(2);
+    await waitFor(() => {
+      expect(result.current.params.currentPage).toEqual(1);
+    });
   });
 });
 
