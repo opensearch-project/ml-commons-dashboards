@@ -298,6 +298,21 @@ export const useMonitoring = () => {
     });
   }, [dataSourceEnabled, selectedDataSourceOption]);
 
+  useEffect(() => {
+    if (params.currentPage === 1 || !data) {
+      return;
+    }
+    const maxPage = Math.max(1, data.pagination.totalPages);
+    if (params.currentPage <= maxPage) {
+      return;
+    }
+
+    setParams((prevParams) => ({
+      ...prevParams,
+      currentPage: maxPage,
+    }));
+  }, [params, data]);
+
   return {
     params,
     pageStatus,
