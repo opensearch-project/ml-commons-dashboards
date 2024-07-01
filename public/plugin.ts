@@ -55,7 +55,7 @@ export class MlCommonsPluginPlugin
       },
     });
 
-    core.chrome.addNavLinksToGroup(DEFAULT_NAV_GROUPS.dataAdministration, [
+    core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.dataAdministration, [
       {
         id: PLUGIN_ID,
         category: {
