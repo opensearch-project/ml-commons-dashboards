@@ -11,6 +11,7 @@ import type {
   DataSourceSelectableConfig,
 } from '../../../../src/plugins/data_source_management/public';
 import { DataSourceContext } from '../contexts/data_source_context';
+import { isDataSourceCompatible } from '../utils/data_source';
 
 export interface DataSourceTopNavMenuProps {
   notifications: CoreStart['notifications'];
@@ -53,6 +54,7 @@ export const DataSourceTopNavMenu = ({
         savedObjects: savedObjects.client,
         onSelectedDataSources: handleDataSourcesSelected,
         activeOption,
+        dataSourceFilter: isDataSourceCompatible,
       }}
       setMenuMountPoint={setActionMenu}
     />
