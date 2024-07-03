@@ -58,9 +58,12 @@ export class MlCommonsPluginPlugin
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.dataAdministration, [
       {
         id: PLUGIN_ID,
+        title: i18n.translate('MLCommonsDashboards.NavLink.AIModelsStatus.title', {
+          defaultMessage: 'ai model status',
+        }),
         category: {
           id: 'ai-model',
-          label: i18n.translate('MLCommonsDashboards.AIModels.Category', {
+          label: i18n.translate('MLCommonsDashboards.Category.AIModels.label', {
             defaultMessage: 'ai models',
           }),
         },
