@@ -5,7 +5,7 @@
 import semver from 'semver';
 
 import { DataSourceOption } from '../contexts';
-import * as pluginManifest from '../../opensearch_dashboards.json';
+import pluginManifest from '../../opensearch_dashboards.json';
 import type { SavedObject } from '../../../../src/core/public';
 import type { DataSourceAttributes } from '../../../../src/plugins/data_source/common/data_sources';
 
