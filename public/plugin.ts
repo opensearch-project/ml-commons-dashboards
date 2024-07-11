@@ -3,7 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AppMountParameters, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
+import { i18n } from '@osd/i18n';
+import {
+  AppMountParameters,
+  CoreSetup,
+  CoreStart,
+  DEFAULT_NAV_GROUPS,
+  Plugin,
+} from '../../../src/core/public';
 import {
   MlCommonsPluginPluginSetup,
   MlCommonsPluginPluginStart,
@@ -47,6 +54,21 @@ export class MlCommonsPluginPlugin
         return renderApp(params, services);
       },
     });
+
+    core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.dataAdministration, [
+      {
+        id: PLUGIN_ID,
+        title: i18n.translate('MLCommonsDashboards.NavLink.AIModels.title', {
+          defaultMessage: 'AI models',
+        }),
+        category: {
+          id: 'ai-models',
+          label: i18n.translate('MLCommonsDashboards.Category.AIModels.label', {
+            defaultMessage: 'AI models',
+          }),
+        },
+      },
+    ]);
 
     // Return methods that should be available to other plugins
     return {};
