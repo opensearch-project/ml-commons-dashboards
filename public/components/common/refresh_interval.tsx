@@ -10,7 +10,7 @@ import {
   EuiPopover,
   EuiFlexGroup,
   EuiCompressedFieldNumber,
-  EuiSelect,
+  EuiCompressedSelect,
   EuiSmallButton,
   EuiFlexItem,
   EuiCompressedFormRow,
@@ -160,7 +160,7 @@ export const RefreshInterval = ({
                 />
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiSelect
+                <EuiCompressedSelect
                   aria-label="interval unit selector"
                   isInvalid={isInvalid}
                   value={intervalUnit}
