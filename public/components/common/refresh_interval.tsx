@@ -5,7 +5,7 @@
 
 import {
   EuiIcon,
-  EuiButtonEmpty,
+  EuiSmallButtonEmpty,
   EuiFieldText,
   EuiPopover,
   EuiFlexGroup,
@@ -116,14 +116,14 @@ export const RefreshInterval = ({
   }, [interval, isPaused, onRefresh, onRefreshChange]);
 
   const intervalButton = (
-    <EuiButtonEmpty
+    <EuiSmallButtonEmpty
       iconType="arrowDown"
       iconSide="right"
       onClick={() => setIsPopoverOpen(!isPopoverOpen)}
       aria-label="set refresh interval"
     >
       <EuiIcon type="clock" />
-    </EuiButtonEmpty>
+    </EuiSmallButtonEmpty>
   );
 
   let errors: string[] = [];
