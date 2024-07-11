@@ -3,7 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { DATA_SOURCE_FETCHING_ID, DATA_SOURCE_INVALID_ID, getDataSourceId } from '../data_source';
+import {
+  DATA_SOURCE_FETCHING_ID,
+  DATA_SOURCE_INVALID_ID,
+  getDataSourceId,
+  isDataSourceCompatible,
+} from '../data_source';
 
 describe('getDataSourceId', () => {
   it('should return undefined when data source not enabled', () => {
@@ -25,5 +30,66 @@ describe('getDataSourceId', () => {
 
   it('should return selected data source id', () => {
     expect(getDataSourceId(true, { id: 'foo' })).toBe('foo');
+  });
+});
+
+describe('isDataSourceCompatible', () => {
+  it('should return true for compatible data sources', () => {
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '2.9.0',
+        },
+      })
+    ).toBe(true);
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '2.11.0',
+        },
+      })
+    ).toBe(true);
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '2.13.0',
+        },
+      })
+    ).toBe(true);
+  });
+
+  it('should return false for un-compatible data sources', () => {
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: [],
+          dataSourceVersion: '2.13.0',
+        },
+      })
+    ).toBe(false);
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-jetty'],
+          dataSourceVersion: '2.13.0',
+        },
+      })
+    ).toBe(false);
+    expect(
+      isDataSourceCompatible({
+        attributes: {},
+      })
+    ).toBe(false);
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '2.7.0',
+        },
+      })
+    ).toBe(false);
   });
 });
