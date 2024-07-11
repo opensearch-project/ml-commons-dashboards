@@ -11,7 +11,7 @@ import {
   EuiFlexGroup,
   EuiFieldNumber,
   EuiSelect,
-  EuiButton,
+  EuiSmallButton,
   EuiFlexItem,
   EuiFormRow,
 } from '@elastic/eui';
@@ -169,14 +169,14 @@ export const RefreshInterval = ({
                 />
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiButton
+                <EuiSmallButton
                   aria-label={`${isPaused ? 'start' : 'stop'} refresh interval`}
                   disabled={isInvalid}
                   iconType={isPaused ? 'play' : 'stop'}
                   onClick={() => setIsPaused(!isPaused)}
                 >
                   {isPaused ? 'Start' : 'Stop'}
-                </EuiButton>
+                </EuiSmallButton>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFormRow>

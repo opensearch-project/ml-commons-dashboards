@@ -10,7 +10,7 @@ import {
   Criteria,
   Direction,
   EuiBasicTable,
-  EuiButton,
+  EuiSmallButton,
   EuiButtonIcon,
   EuiEmptyPrompt,
   EuiHealth,
@@ -276,9 +276,9 @@ export const ModelDeploymentTable = ({
                   actions={
                     <>
                       <EuiSpacer size="s" />
-                      <EuiButton role="button" onClick={onResetSearchClick} size="m">
+                      <EuiSmallButton role="button" onClick={onResetSearchClick} size="m">
                         Reset search
-                      </EuiButton>
+                      </EuiSmallButton>
                     </>
                   }
                   aria-label="no models results"
