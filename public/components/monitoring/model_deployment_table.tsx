@@ -11,7 +11,7 @@ import {
   Direction,
   EuiBasicTable,
   EuiSmallButton,
-  EuiButtonIcon,
+  EuiSmallButtonIcon,
   EuiEmptyPrompt,
   EuiHealth,
   EuiSpacer,
@@ -154,7 +154,7 @@ export const ModelDeploymentTable = ({
               anchorClassName="ml-modelModelIdCell"
             >
               {(copy) => (
-                <EuiButtonIcon
+                <EuiSmallButtonIcon
                   aria-label="Copy ID to clipboard"
                   color="text"
                   iconType="copy"
@@ -176,7 +176,7 @@ export const ModelDeploymentTable = ({
         render: (id: string, modelDeploymentItem: ModelDeploymentItem) => {
           return (
             <EuiToolTip content="View status details">
-              <EuiButtonIcon
+              <EuiSmallButtonIcon
                 onClick={() => {
                   onViewDetail?.(modelDeploymentItem);
                 }}
