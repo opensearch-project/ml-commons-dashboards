@@ -6,10 +6,10 @@
 import {
   EuiIcon,
   EuiSmallButtonEmpty,
-  EuiFieldText,
+  EuiCompressedFieldText,
   EuiPopover,
   EuiFlexGroup,
-  EuiFieldNumber,
+  EuiCompressedFieldNumber,
   EuiSelect,
   EuiSmallButton,
   EuiFlexItem,
@@ -132,7 +132,7 @@ export const RefreshInterval = ({
   }
 
   return (
-    <EuiFieldText
+    <EuiCompressedFieldText
       aria-label="current interval value"
       readOnly
       value={displayedIntervalValue}
@@ -152,7 +152,7 @@ export const RefreshInterval = ({
           >
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiFieldNumber
+                <EuiCompressedFieldNumber
                   aria-label="interval value input"
                   isInvalid={isInvalid}
                   value={intervalValue}
