@@ -13,7 +13,7 @@ import {
   EuiSelect,
   EuiSmallButton,
   EuiFlexItem,
-  EuiFormRow,
+  EuiCompressedFormRow,
 } from '@elastic/eui';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
@@ -142,7 +142,7 @@ export const RefreshInterval = ({
           isOpen={isPopoverOpen}
           closePopover={() => setIsPopoverOpen(false)}
         >
-          <EuiFormRow
+          <EuiCompressedFormRow
             label="Refresh every"
             helpText={
               errors.length > 0 ? '' : 'Enter an auto-refresh rate greater than 10 seconds.'
@@ -179,7 +179,7 @@ export const RefreshInterval = ({
                 </EuiSmallButton>
               </EuiFlexItem>
             </EuiFlexGroup>
-          </EuiFormRow>
+          </EuiCompressedFormRow>
         </EuiPopover>
       }
     />
