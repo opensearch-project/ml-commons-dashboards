@@ -63,8 +63,8 @@ export class MlCommonsPluginPlugin
         }),
         category: {
           id: 'ai-models',
-          label: i18n.translate('MLCommonsDashboards.Category.AIModels.label', {
-            defaultMessage: 'AI models',
+          label: i18n.translate('MLCommonsDashboards.Category.MachineLearning.label', {
+            defaultMessage: 'Machine learning',
           }),
         },
       },
