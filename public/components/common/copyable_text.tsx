@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback, useState, useRef } from 'react';
-import { EuiButtonIcon, copyToClipboard, EuiToolTip } from '@elastic/eui';
+import { EuiSmallButtonIcon, copyToClipboard, EuiToolTip } from '@elastic/eui';
 
 interface Props {
   text: string;
@@ -33,7 +33,7 @@ export const CopyableText = ({
     <div data-test-subj="copyable-text-div">
       {iconLeft ? null : text}
       <EuiToolTip content={isTextCopied ? copiedTooltipText : tooltipText}>
-        <EuiButtonIcon
+        <EuiSmallButtonIcon
           buttonRef={copyButtonRef}
           aria-label="Copy ID to clipboard"
           color="text"

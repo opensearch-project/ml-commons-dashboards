@@ -8,7 +8,7 @@ import {
   EuiPopover,
   EuiPopoverTitle,
   EuiFilterGroup,
-  EuiFilterButton,
+  EuiSmallFilterButton,
   EuiSelectable,
   EuiSelectableOption,
   EuiIcon,
@@ -66,7 +66,7 @@ export const StatusFilter = ({ onUpdateFilters, options, loading }: Props) => {
   );
 
   const button = (
-    <EuiFilterButton
+    <EuiSmallFilterButton
       iconType="arrowDown"
       onClick={onButtonClick}
       isSelected={isPopoverOpen}
@@ -76,7 +76,7 @@ export const StatusFilter = ({ onUpdateFilters, options, loading }: Props) => {
       isLoading={loading}
     >
       Status
-    </EuiFilterButton>
+    </EuiSmallFilterButton>
   );
 
   return (

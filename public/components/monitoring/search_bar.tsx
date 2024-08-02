@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import React, { useMemo, useCallback } from 'react';
-import { EuiFieldSearch } from '@elastic/eui';
+import { EuiCompressedFieldSearch } from '@elastic/eui';
 import { debounce } from 'lodash';
 interface SearchBarProps {
   onSearch: (value: string) => void;
@@ -20,7 +20,7 @@ export const SearchBar = ({ onSearch, inputRef }: SearchBarProps) => {
   );
 
   return (
-    <EuiFieldSearch
+    <EuiCompressedFieldSearch
       autoFocus
       inputRef={inputRef}
       placeholder="Search by model name or ID"
