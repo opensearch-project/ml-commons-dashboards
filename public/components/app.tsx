@@ -7,6 +7,7 @@ import React from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { EuiPage, EuiPageBody } from '@elastic/eui';
+import { useObservable } from 'react-use';
 import { ROUTES } from '../../common/router';
 import { routerPaths } from '../../common/router_paths';
 
@@ -37,6 +38,7 @@ interface MlCommonsPluginAppDeps {
   dataSource?: DataSourcePluginSetup;
   dataSourceManagement?: DataSourceManagementPluginSetup;
   setActionMenu: (menuMount: MountPoint | undefined) => void;
+  application: CoreStart['application'];
 }
 
 export interface ComponentsCommonProps {
@@ -55,8 +57,12 @@ export const MlCommonsPluginApp = ({
   dataSourceManagement,
   savedObjects,
   setActionMenu,
+  navigation,
+  uiSettingsClient,
+  application,
 }: MlCommonsPluginAppDeps) => {
   const dataSourceEnabled = !!dataSource;
+  const useNewPageHeader = useObservable(uiSettingsClient.get$('home:useNewHomePage'));
   return (
     <I18nProvider>
       <DataSourceContextProvider
@@ -73,7 +79,15 @@ export const MlCommonsPluginApp = ({
                     key={path}
                     path={path}
                     render={() => (
-                      <Component http={http} notifications={notifications} data={data} />
+                      <Component
+                        http={http}
+                        notifications={notifications}
+                        chrome={chrome}
+                        data={data}
+                        navigation={navigation}
+                        useNewPageHeader={useNewPageHeader}
+                        application={application}
+                      />
                     )}
                     exact={exact ?? false}
                   />
@@ -82,7 +96,8 @@ export const MlCommonsPluginApp = ({
               </Switch>
             </EuiPageBody>
           </EuiPage>
-          <GlobalBreadcrumbs chrome={chrome} basename={basename} />
+          {/* Breadcrumbs will contains dynamic content in new page header, should be provided by each page self*/}
+          {!useNewPageHeader && <GlobalBreadcrumbs chrome={chrome} basename={basename} />}
           {dataSourceEnabled && (
             <DataSourceTopNavMenu
               notifications={notifications}
