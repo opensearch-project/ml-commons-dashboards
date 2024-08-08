@@ -5,7 +5,6 @@
 
 import {
   EuiPanel,
-  EuiPageHeader,
   EuiSpacer,
   EuiTextColor,
   EuiFlexGroup,
@@ -14,10 +13,12 @@ import {
   EuiFilterGroup,
 } from '@elastic/eui';
 import React, { useState, useRef, useCallback } from 'react';
+import { FormattedMessage } from '@osd/i18n/react';
 
 import { ModelDeploymentProfile } from '../../apis/profile';
-import { RefreshInterval } from '../common/refresh_interval';
 import { PreviewPanel } from '../preview_panel';
+import { ApplicationStart, ChromeStart } from '../../../../../src/core/public';
+import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
 
 import { ModelDeploymentItem, ModelDeploymentTable } from './model_deployment_table';
 import { useMonitoring } from './use_monitoring';
@@ -25,8 +26,17 @@ import { ModelStatusFilter } from './model_status_filter';
 import { SearchBar } from './search_bar';
 import { ModelSourceFilter } from './model_source_filter';
 import { ModelConnectorFilter } from './model_connector_filter';
+import { MonitoringPageHeader } from './monitoring_page_header';
 
-export const Monitoring = () => {
+interface MonitoringProps {
+  chrome: ChromeStart;
+  navigation: NavigationPublicPluginStart;
+  application: ApplicationStart;
+  useNewPageHeader: boolean;
+}
+
+export const Monitoring = (props: MonitoringProps) => {
+  const { useNewPageHeader, chrome, application, navigation } = props;
   const {
     pageStatus,
     params,
@@ -83,25 +93,34 @@ export const Monitoring = () => {
   );
 
   return (
-    <div>
-      <EuiSpacer size="s" />
-      <EuiSpacer size="xs" />
-      <EuiPageHeader
-        pageTitle="Overview"
-        rightSideItems={[<RefreshInterval onRefresh={reload} />]}
+    <>
+      <MonitoringPageHeader
+        onRefresh={reload}
+        navigation={navigation}
+        setBreadcrumbs={chrome.setBreadcrumbs}
+        recordsCount={pagination?.totalRecords}
+        application={application}
+        useNewPageHeader={useNewPageHeader}
       />
-      <EuiSpacer size="m" />
       <EuiPanel>
-        <EuiText size="s">
-          <h2>
-            Models{' '}
-            {pageStatus !== 'empty' && (
-              <EuiTextColor aria-label="total number of results" color="subdued">
-                ({pagination?.totalRecords ?? 0})
-              </EuiTextColor>
-            )}
-          </h2>
-        </EuiText>
+        {!useNewPageHeader && (
+          <EuiText size="s">
+            <h2>
+              <FormattedMessage
+                id="machineLearning.aiModels.table.header.title"
+                defaultMessage="Models {records}"
+                values={{
+                  records:
+                    pageStatus === 'normal' ? (
+                      <EuiTextColor aria-label="total number of results" color="subdued">
+                        ({pagination?.totalRecords ?? 0})
+                      </EuiTextColor>
+                    ) : undefined,
+                }}
+              />
+            </h2>
+          </EuiText>
+        )}
 
         <EuiSpacer size="m" />
         {pageStatus !== 'empty' && (
@@ -145,6 +164,6 @@ export const Monitoring = () => {
           />
         )}
       </EuiPanel>
-    </div>
+    </>
   );
 };
