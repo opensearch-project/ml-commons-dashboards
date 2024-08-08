@@ -48,7 +48,7 @@ export const MonitoringPageHeader = ({
         {
           text: i18n.translate('machineLearning.AIModels.page.title', {
             defaultMessage:
-              'AI Models{recordsCount, select, undefined {} other {({recordsCount})}}',
+              'AI models {recordsCount, select, undefined {} other {({recordsCount})}}',
             values: {
               recordsCount,
             },
