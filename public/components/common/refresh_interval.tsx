@@ -5,15 +5,15 @@
 
 import {
   EuiIcon,
-  EuiButtonEmpty,
-  EuiFieldText,
+  EuiSmallButtonEmpty,
+  EuiCompressedFieldText,
   EuiPopover,
   EuiFlexGroup,
-  EuiFieldNumber,
-  EuiSelect,
-  EuiButton,
+  EuiCompressedFieldNumber,
+  EuiCompressedSelect,
+  EuiSmallButton,
   EuiFlexItem,
-  EuiFormRow,
+  EuiCompressedFormRow,
 } from '@elastic/eui';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
@@ -116,14 +116,14 @@ export const RefreshInterval = ({
   }, [interval, isPaused, onRefresh, onRefreshChange]);
 
   const intervalButton = (
-    <EuiButtonEmpty
+    <EuiSmallButtonEmpty
       iconType="arrowDown"
       iconSide="right"
       onClick={() => setIsPopoverOpen(!isPopoverOpen)}
       aria-label="set refresh interval"
     >
       <EuiIcon type="clock" />
-    </EuiButtonEmpty>
+    </EuiSmallButtonEmpty>
   );
 
   let errors: string[] = [];
@@ -132,7 +132,7 @@ export const RefreshInterval = ({
   }
 
   return (
-    <EuiFieldText
+    <EuiCompressedFieldText
       aria-label="current interval value"
       readOnly
       value={displayedIntervalValue}
@@ -142,7 +142,7 @@ export const RefreshInterval = ({
           isOpen={isPopoverOpen}
           closePopover={() => setIsPopoverOpen(false)}
         >
-          <EuiFormRow
+          <EuiCompressedFormRow
             label="Refresh every"
             helpText={
               errors.length > 0 ? '' : 'Enter an auto-refresh rate greater than 10 seconds.'
@@ -152,7 +152,7 @@ export const RefreshInterval = ({
           >
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiFieldNumber
+                <EuiCompressedFieldNumber
                   aria-label="interval value input"
                   isInvalid={isInvalid}
                   value={intervalValue}
@@ -160,7 +160,7 @@ export const RefreshInterval = ({
                 />
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiSelect
+                <EuiCompressedSelect
                   aria-label="interval unit selector"
                   isInvalid={isInvalid}
                   value={intervalUnit}
@@ -169,17 +169,17 @@ export const RefreshInterval = ({
                 />
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiButton
+                <EuiSmallButton
                   aria-label={`${isPaused ? 'start' : 'stop'} refresh interval`}
                   disabled={isInvalid}
                   iconType={isPaused ? 'play' : 'stop'}
                   onClick={() => setIsPaused(!isPaused)}
                 >
                   {isPaused ? 'Start' : 'Stop'}
-                </EuiButton>
+                </EuiSmallButton>
               </EuiFlexItem>
             </EuiFlexGroup>
-          </EuiFormRow>
+          </EuiCompressedFormRow>
         </EuiPopover>
       }
     />
