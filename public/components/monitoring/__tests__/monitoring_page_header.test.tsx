@@ -62,7 +62,7 @@ describe('<MonitoringPageHeader />', () => {
 
     expect(setBreadcrumbsMock).toHaveBeenCalledWith([
       {
-        text: 'AI Models(2)',
+        text: 'AI models (2)',
       },
     ]);
     expect(screen.getByLabelText('set refresh interval')).toBeInTheDocument();
