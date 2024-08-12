@@ -8,7 +8,7 @@ import {
   EuiPopover,
   EuiPopoverTitle,
   EuiFieldSearch,
-  EuiFilterButton,
+  EuiSmallFilterButton,
   EuiPopoverFooter,
   EuiFlexGroup,
   EuiFlexItem,
@@ -73,14 +73,14 @@ export const OptionsFilter = <T extends string | number = string>({
   return (
     <EuiPopover
       button={
-        <EuiFilterButton
+        <EuiSmallFilterButton
           iconType="arrowDown"
           onClick={handleButtonClick}
           isSelected={isPopoverOpen}
           {...(value.length > 0 ? { hasActiveFilters: true, numActiveFilters: value.length } : {})}
         >
           {name}
-        </EuiFilterButton>
+        </EuiSmallFilterButton>
       }
       isOpen={isPopoverOpen}
       closePopover={closePopover}
