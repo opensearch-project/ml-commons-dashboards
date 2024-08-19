@@ -35,6 +35,7 @@ export const renderApp = (
             setActionMenu={setHeaderActionMenu}
             dataSource={services.dataSource}
             dataSourceManagement={services.dataSourceManagement}
+            application={services.application}
           />
         </services.i18n.Context>
       </OpenSearchDashboardsContextProvider>
