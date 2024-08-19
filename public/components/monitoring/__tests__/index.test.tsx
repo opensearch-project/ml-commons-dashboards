@@ -10,6 +10,8 @@ import { render, screen, waitFor, within } from '../../../../test/test_utils';
 import { Monitoring } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
 import { APIProvider } from '../../../apis/api_provider';
+import { applicationServiceMock, chromeServiceMock } from '../../../../../../src/core/public/mocks';
+import { navigationPluginMock } from '../../../../../../src/plugins/navigation/public/mocks';
 
 jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', () => {
   return {
@@ -18,7 +20,8 @@ jest.mock('../../../../../../src/plugins/opensearch_dashboards_react/public', ()
 });
 
 const setup = (
-  monitoringReturnValue?: Partial<ReturnType<typeof useMonitoringExports.useMonitoring>>
+  monitoringReturnValue?: Partial<ReturnType<typeof useMonitoringExports.useMonitoring>>,
+  useNewPageHeader = false
 ) => {
   const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
   const finalMonitoringReturnValue = {
@@ -85,7 +88,18 @@ const setup = (
     ...monitoringReturnValue,
   } as ReturnType<typeof useMonitoringExports.useMonitoring>;
   jest.spyOn(useMonitoringExports, 'useMonitoring').mockReturnValue(finalMonitoringReturnValue);
-  render(<Monitoring />);
+  const applicationStartMock = applicationServiceMock.createStartContract();
+  const chromeStartMock = chromeServiceMock.createStartContract();
+  const navigationStartMock = navigationPluginMock.createStartContract();
+  navigationStartMock.ui.HeaderControl = () => null;
+  render(
+    <Monitoring
+      application={applicationStartMock}
+      chrome={chromeStartMock}
+      navigation={navigationStartMock}
+      useNewPageHeader={useNewPageHeader}
+    />
+  );
   return { finalMonitoringReturnValue, user };
 };
 
@@ -381,5 +395,11 @@ describe('<Monitoring />', () => {
     await user.click(screen.getAllByRole('button', { name: 'view detail' })[0]);
     await user.click(screen.getByLabelText('Close this dialog'));
     expect(reload).not.toHaveBeenCalled();
+  });
+
+  it('should NOT render table header title if useNewPageHeader equal true', () => {
+    setup({}, true);
+
+    expect(screen.queryByLabelText('total number of results')).toBe(null);
   });
 });
