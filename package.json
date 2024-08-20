@@ -4,7 +4,7 @@
   "config": {
     "id": "mlCommonsDashboards"
   },
-  "version": "2.16.0.0",
+  "version": "2.17.0.0",
   "scripts": {
     "build": "yarn plugin-helpers build",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
