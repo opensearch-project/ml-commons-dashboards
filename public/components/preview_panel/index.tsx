@@ -114,7 +114,7 @@ export const PreviewPanel = ({ onClose, model, dataSourceId }: Props) => {
   return (
     <EuiFlyout onClose={onCloseFlyout}>
       <EuiFlyoutHeader hasBorder>
-        <EuiTitle size="m">
+        <EuiTitle size="s">
           <h2>{name}</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
