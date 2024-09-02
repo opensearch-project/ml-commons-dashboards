@@ -226,7 +226,7 @@ export const ModelDeploymentTable = ({
           <EuiEmptyPrompt
             style={{ maxWidth: 528 }}
             body={
-              <>
+              <EuiText size="s">
                 <EuiSpacer size="l" />
                 Deployed models will appear here. For more information, see{' '}
                 <EuiLink
@@ -239,7 +239,7 @@ export const ModelDeploymentTable = ({
                 </EuiLink>
                 .
                 <EuiSpacer size="xl" />
-              </>
+              </EuiText>
             }
             aria-label="no deployed models"
           />
@@ -256,11 +256,11 @@ export const ModelDeploymentTable = ({
               {loading ? (
                 <EuiEmptyPrompt
                   body={
-                    <>
+                    <EuiText size="s">
                       <EuiSpacer size="l" />
                       Loading deployed models...
                       <EuiSpacer size="xl" />
-                    </>
+                    </EuiText>
                   }
                   aria-label="loading models"
                 />
@@ -268,10 +268,10 @@ export const ModelDeploymentTable = ({
                 <EuiEmptyPrompt
                   title={<EuiSpacer size="s" />}
                   body={
-                    <>
+                    <EuiText size="s">
                       There are no results to your search. Reset the search criteria to view the
                       deployed models.
-                    </>
+                    </EuiText>
                   }
                   actions={
                     <>

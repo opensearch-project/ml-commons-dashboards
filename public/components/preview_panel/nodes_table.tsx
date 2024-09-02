@@ -132,7 +132,12 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean; nodesStatu
         onChange={handleTableChange}
         loading={loading}
         noItemsMessage={
-          loading ? <EuiEmptyPrompt body={<>Loading...</>} aria-label="loading nodes" /> : undefined
+          loading ? (
+            <EuiEmptyPrompt
+              body={<EuiText size="s">Loading...</EuiText>}
+              aria-label="loading nodes"
+            />
+          ) : undefined
         }
       />
     </>
