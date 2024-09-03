@@ -7,11 +7,11 @@ import React from 'react';
 import {
   EuiDescriptionList,
   EuiDescriptionListTitle,
-  EuiTitle,
   EuiSpacer,
   EuiDescriptionListDescription,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiText,
 } from '@elastic/eui';
 import { CopyableText } from '../common';
 
@@ -20,9 +20,9 @@ export const ConnectorDetails = (props: { name?: string; id?: string; descriptio
   return (
     <>
       <EuiSpacer size="m" />
-      <EuiTitle size="s">
+      <EuiText size="s">
         <h3>Connector details</h3>
-      </EuiTitle>
+      </EuiText>
       <EuiSpacer size="m" />
       <EuiDescriptionList compressed>
         <EuiFlexGroup>
