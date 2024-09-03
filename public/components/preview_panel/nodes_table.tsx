@@ -16,7 +16,6 @@ import {
   EuiText,
   EuiDescriptionList,
   EuiDescriptionListTitle,
-  EuiTitle,
   EuiSpacer,
   EuiDescriptionListDescription,
 } from '@elastic/eui';
@@ -117,9 +116,9 @@ export function NodesTable(props: { nodes: INode[]; loading: boolean; nodesStatu
       <EuiSpacer size="l" />
       <EuiDescriptionList>
         <EuiDescriptionListTitle>
-          <EuiTitle size="s">
+          <EuiText size="s">
             <h3>Status by node</h3>
-          </EuiTitle>
+          </EuiText>
         </EuiDescriptionListTitle>
         <EuiDescriptionListDescription>{nodesStatus}</EuiDescriptionListDescription>
       </EuiDescriptionList>

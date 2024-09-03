@@ -8,7 +8,6 @@ import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
-  EuiTitle,
   EuiHealth,
   EuiDescriptionList,
   EuiDescriptionListTitle,
@@ -17,6 +16,7 @@ import {
   EuiTextColor,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiText,
 } from '@elastic/eui';
 import { APIProvider } from '../../apis/api_provider';
 import { useFetcher } from '../../hooks/use_fetcher';
@@ -114,9 +114,9 @@ export const PreviewPanel = ({ onClose, model, dataSourceId }: Props) => {
   return (
     <EuiFlyout onClose={onCloseFlyout}>
       <EuiFlyoutHeader hasBorder>
-        <EuiTitle size="s">
+        <EuiText size="s">
           <h2>{name}</h2>
-        </EuiTitle>
+        </EuiText>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         <EuiDescriptionList compressed>
