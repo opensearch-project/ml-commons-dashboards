@@ -6,20 +6,26 @@
 import { ResponseObject } from '@hapi/hapi';
 
 import { Router } from '../../../../../src/core/server/http/router';
+import { OpenSearchClient } from '../../../../../src/core/server';
 import { triggerHandler, createDataSourceEnhancedRouter } from '../router.mock';
 import { httpServerMock } from '../../../../../src/core/server/http/http_server.mocks';
 import { loggerMock } from '../../../../../src/core/server/logging/logger.mock';
 import { connectorRouter } from '../connector_router';
 import { CONNECTOR_API_ENDPOINT, INTERNAL_CONNECTOR_API_ENDPOINT } from '../constants';
 import { ConnectorService } from '../../services/connector_service';
+import { Boom } from '@hapi/boom';
 
-const setupRouter = () => {
+const setupRouter = ({
+  getClient,
+}: {
+  getClient?: (dataSourceId: string) => Promise<Pick<OpenSearchClient, 'transport'>>;
+} = {}) => {
   const mockedLogger = loggerMock.create();
   const {
     router,
     dataSourceTransportMock,
     getLatestCurrentUserTransport,
-  } = createDataSourceEnhancedRouter(mockedLogger);
+  } = createDataSourceEnhancedRouter(mockedLogger, getClient);
 
   connectorRouter(router);
   return {
@@ -85,6 +91,20 @@ describe('connector routers', () => {
         size: 10000,
       });
     });
+
+    it('should throw 400 error when failed to get data source', async () => {
+      const getClientMock = jest.fn().mockRejectedValue(new Error('Unknown error'));
+      const { router } = setupRouter({ getClient: getClientMock });
+
+      const result = (await triggerGetAllConnectors(router, 'foo')) as Boom;
+      expect(result.output.payload).toMatchInlineSnapshot(`
+        Object {
+          "error": "Bad Request",
+          "message": "Unknown error",
+          "statusCode": 400,
+        }
+      `);
+    });
   });
 
   describe('get all internal connector', () => {
@@ -112,6 +132,20 @@ describe('connector routers', () => {
         transport: dataSourceTransportMock,
         size: 10000,
       });
+    });
+
+    it('should throw 400 error when failed to get data source', async () => {
+      const getClientMock = jest.fn().mockRejectedValue(new Error('Unknown error'));
+      const { router } = setupRouter({ getClient: getClientMock });
+
+      const result = (await triggerGetAllInternalConnectors(router, 'foo')) as Boom;
+      expect(result.output.payload).toMatchInlineSnapshot(`
+        Object {
+          "error": "Bad Request",
+          "message": "Unknown error",
+          "statusCode": 400,
+        }
+      `);
     });
   });
 });

@@ -126,7 +126,10 @@ export const triggerHandler = async (
   return await findRoute?.handler(options.req, new MockResponseToolkit());
 };
 
-export const createDataSourceEnhancedRouter = (logger: Logger) => {
+export const createDataSourceEnhancedRouter = (
+  logger: Logger,
+  getClient?: (dataSourceId: string) => Promise<Pick<OpenSearchClient, 'transport'>>
+) => {
   const dataSourceTransportMock = {};
   let latestCurrentUserTransport: OpenSearchClient['transport'];
   const router = new Router('', logger, (fn) => (req, res) => {
@@ -138,7 +141,9 @@ export const createDataSourceEnhancedRouter = (logger: Logger) => {
         core,
         dataSource: {
           opensearch: {
-            getClient: async (_dataSourceId: string) => ({ transport: dataSourceTransportMock }),
+            getClient:
+              getClient ??
+              (async (_dataSourceId: string) => ({ transport: dataSourceTransportMock })),
           },
         },
       },
