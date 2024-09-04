@@ -19,17 +19,21 @@ export const connectorRouter = (router: IRouter) => {
         }),
       },
     },
-    router.handleLegacyErrors(async (context, request, res) => {
-      const payload = await ConnectorService.search({
-        transport: await getOpenSearchClientTransport({
-          dataSourceId: request.query.data_source_id,
-          context,
-        }),
-        from: 0,
-        size: 10000,
-      });
-      return res.ok({ body: payload });
-    })
+    async (context, request, res) => {
+      try {
+        const payload = await ConnectorService.search({
+          transport: await getOpenSearchClientTransport({
+            dataSourceId: request.query.data_source_id,
+            context,
+          }),
+          from: 0,
+          size: 10000,
+        });
+        return res.ok({ body: payload });
+      } catch (err) {
+        return res.badRequest({ body: err.message });
+      }
+    }
   );
   router.get(
     {
@@ -40,15 +44,19 @@ export const connectorRouter = (router: IRouter) => {
         }),
       },
     },
-    router.handleLegacyErrors(async (context, request, res) => {
-      const data = await ConnectorService.getUniqueInternalConnectorNames({
-        transport: await getOpenSearchClientTransport({
-          dataSourceId: request.query.data_source_id,
-          context,
-        }),
-        size: 10000,
-      });
-      return res.ok({ body: { data } });
-    })
+    async (context, request, res) => {
+      try {
+        const data = await ConnectorService.getUniqueInternalConnectorNames({
+          transport: await getOpenSearchClientTransport({
+            dataSourceId: request.query.data_source_id,
+            context,
+          }),
+          size: 10000,
+        });
+        return res.ok({ body: { data } });
+      } catch (err) {
+        return res.badRequest({ body: err.message });
+      }
+    }
   );
 };
