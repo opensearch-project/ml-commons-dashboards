@@ -30,6 +30,9 @@ export class MlCommonsPluginPlugin
     core.application.register({
       id: PLUGIN_ID,
       title: PLUGIN_NAME,
+      description: i18n.translate('MLCommonsDashboards.application.aiModels.description', {
+        defaultMessage: 'Review  the status of running AI models.',
+      }),
       category: {
         id: 'opensearch',
         label: 'OpenSearch Plugins',
@@ -66,6 +69,7 @@ export class MlCommonsPluginPlugin
           label: i18n.translate('MLCommonsDashboards.Category.MachineLearning.label', {
             defaultMessage: 'Machine learning',
           }),
+          order: 9999,
         },
       },
     ]);
