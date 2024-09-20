@@ -11,7 +11,6 @@ Compatible with OpenSearch 2.17.0
 
 ### Bug Fixes
 * Fix connector router response 500 ([#358](https://github.com/opensearch-project/ml-commons-dashboards/pull/358))
-* Fix category order and description in data administration landing page ([#369](https://github.com/opensearch-project/ml-commons-dashboards/pull/369))
 
 ### Maintenance
 * Increment version to 2.17.0.0 ([#353](https://github.com/opensearch-project/ml-commons-dashboards/pull/353))
