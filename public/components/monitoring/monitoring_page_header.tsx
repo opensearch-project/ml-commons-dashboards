@@ -35,7 +35,11 @@ export const MonitoringPageHeader = ({
     if (useNewPageHeader) {
       return [
         {
-          renderComponent: <RefreshInterval onRefresh={onRefresh} />,
+          renderComponent: (
+            <div style={{ width: 227 }}>
+              <RefreshInterval onRefresh={onRefresh} />
+            </div>
+          ),
         },
       ];
     }
