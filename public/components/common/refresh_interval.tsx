@@ -98,9 +98,14 @@ export const RefreshInterval = ({
       }
     } else {
       if (interval !== null) {
+        /**
+         * According https://developer.mozilla.org/en-US/docs/Web/API/setInterval#return_value
+         * the max delayed value of setInterval is 2147483647, the inner function will be executed immediately
+         * if the delayed value is greater than 2147483647. Add a Math.min here to avoid been executed immediately.
+         **/
         intervalId = window.setInterval(() => {
           onRefresh();
-        }, interval);
+        }, Math.min(interval, 2147483647));
       }
     }
 
