@@ -38,6 +38,8 @@ const intervalUnitOptions = [
   { text: 'hours', value: 'h' },
 ];
 
+const MAX_SIGNED_32_BIT_INTEGER = 2147483647;
+
 export const RefreshInterval = ({
   onRefresh,
   onRefreshChange,
@@ -98,9 +100,14 @@ export const RefreshInterval = ({
       }
     } else {
       if (interval !== null) {
+        /**
+         * According https://developer.mozilla.org/en-US/docs/Web/API/setInterval#return_value
+         * the max delayed value of setInterval is MAX_SIGNED_32_BIT_INTEGER, the inner function will be executed immediately
+         * if the delayed value is greater than MAX_SIGNED_32_BIT_INTEGER. Add a Math.min here to avoid been executed immediately.
+         **/
         intervalId = window.setInterval(() => {
           onRefresh();
-        }, interval);
+        }, Math.min(interval, MAX_SIGNED_32_BIT_INTEGER));
       }
     }
 
