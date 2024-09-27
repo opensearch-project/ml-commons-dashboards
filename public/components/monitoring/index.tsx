@@ -104,28 +104,29 @@ export const Monitoring = (props: MonitoringProps) => {
       />
       <EuiPanel>
         {!useNewPageHeader && (
-          <EuiText size="s">
-            <h2>
-              <FormattedMessage
-                id="machineLearning.aiModels.table.header.title"
-                defaultMessage="Models {records}"
-                values={{
-                  records:
-                    pageStatus === 'normal' ? (
-                      <EuiTextColor aria-label="total number of results" color="subdued">
-                        ({pagination?.totalRecords ?? 0})
-                      </EuiTextColor>
-                    ) : undefined,
-                }}
-              />
-            </h2>
-          </EuiText>
+          <>
+            <EuiText size="s">
+              <h2>
+                <FormattedMessage
+                  id="machineLearning.aiModels.table.header.title"
+                  defaultMessage="Models {records}"
+                  values={{
+                    records:
+                      pageStatus === 'normal' ? (
+                        <EuiTextColor aria-label="total number of results" color="subdued">
+                          ({pagination?.totalRecords ?? 0})
+                        </EuiTextColor>
+                      ) : undefined,
+                  }}
+                />
+              </h2>
+            </EuiText>
+            <EuiSpacer size="m" />
+          </>
         )}
-
-        <EuiSpacer size="m" />
         {pageStatus !== 'empty' && (
           <>
-            <EuiFlexGroup gutterSize="l">
+            <EuiFlexGroup gutterSize={useNewPageHeader ? 's' : 'l'}>
               <EuiFlexItem>
                 <SearchBar inputRef={setInputRef} onSearch={searchByNameOrId} />
               </EuiFlexItem>
