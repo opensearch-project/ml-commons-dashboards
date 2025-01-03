@@ -21,7 +21,7 @@
 import { IScopedClusterClient, OpenSearchClient } from '../../../../src/core/server';
 import { MODEL_VERSION_STATE } from '../../common';
 
-import { generateModelSearchQuery } from './utils/model';
+import { generateModelVersionSearchQuery } from './utils/model_version';
 import { RecordNotFoundError } from './errors';
 import {
   MODEL_BASE_API,
@@ -90,7 +90,7 @@ export class ModelVersionService {
       method: 'POST',
       path: `${MODEL_BASE_API}/_search`,
       body: {
-        query: generateModelSearchQuery(restParams),
+        query: generateModelVersionSearchQuery(restParams),
         from,
         size,
         ...(sort

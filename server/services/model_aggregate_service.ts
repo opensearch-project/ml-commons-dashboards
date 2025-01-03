@@ -31,7 +31,7 @@ import {
 import { ModelService } from './model_service';
 import { ModelVersionService } from './model_version_service';
 import { MODEL_SEARCH_API } from './utils/constants';
-import { generateModelSearchQuery } from './utils/model';
+import { generateModelVersionSearchQuery } from './utils/model';
 
 const MAX_MODEL_BUCKET_NUM = 10000;
 const getModelSort = (sort: ModelAggregateSort): ModelSort => {
@@ -65,7 +65,7 @@ export class ModelAggregateService {
       path: MODEL_SEARCH_API,
       body: {
         size: 0,
-        query: generateModelSearchQuery({ states }),
+        query: generateModelVersionSearchQuery({ states }),
         aggs: {
           models: {
             terms: {
