@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ModelService } from '../model_service';
+import { ModelVersionService } from '../model_version_service';
 
 const createTransportMock = () => ({
   request: jest.fn().mockResolvedValue({
@@ -18,10 +18,10 @@ const createTransportMock = () => ({
   }),
 });
 
-describe('ModelService', () => {
+describe('ModelVersionService', () => {
   it('should call transport request with consistent params', () => {
     const mockTransport = createTransportMock();
-    ModelService.search({
+    ModelVersionService.search({
       from: 0,
       size: 1,
       transport: mockTransport,
@@ -54,7 +54,7 @@ describe('ModelService', () => {
 
   it('should call transport request with sort params', () => {
     const mockTransport = createTransportMock();
-    ModelService.search({
+    ModelVersionService.search({
       from: 0,
       size: 1,
       transport: mockTransport,
@@ -71,7 +71,7 @@ describe('ModelService', () => {
   });
 
   it('should return consistent results', async () => {
-    const result = await ModelService.search({
+    const result = await ModelVersionService.search({
       from: 0,
       size: 1,
       transport: createTransportMock(),
@@ -82,10 +82,11 @@ describe('ModelService', () => {
         "data": Array [
           Object {
             "id": "model-1",
+            "model_id": undefined,
             "name": "Model 1",
           },
         ],
-        "total_models": 1,
+        "total_model_versions": 1,
       }
     `);
   });
