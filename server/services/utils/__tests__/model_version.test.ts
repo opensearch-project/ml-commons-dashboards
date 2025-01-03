@@ -3,13 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE } from '../../../../common';
-import { generateModelSearchQuery } from '../model';
+import { MODEL_VERSION_STATE } from '../../../../common';
+import { generateModelVersionSearchQuery } from '../model_version';
 
-describe('generateModelSearchQuery', () => {
+describe('generateModelVersionSearchQuery', () => {
   it('should generate consistent query when states provided', () => {
-    expect(generateModelSearchQuery({ states: [MODEL_STATE.loaded, MODEL_STATE.partiallyLoaded] }))
-      .toMatchInlineSnapshot(`
+    expect(
+      generateModelVersionSearchQuery({
+        states: [MODEL_VERSION_STATE.deployed, MODEL_VERSION_STATE.partiallyDeployed],
+      })
+    ).toMatchInlineSnapshot(`
       Object {
         "bool": Object {
           "must": Array [
@@ -32,7 +35,7 @@ describe('generateModelSearchQuery', () => {
     `);
   });
   it('should generate consistent query when nameOrId provided', () => {
-    expect(generateModelSearchQuery({ nameOrId: 'foo' })).toMatchInlineSnapshot(`
+    expect(generateModelVersionSearchQuery({ nameOrId: 'foo' })).toMatchInlineSnapshot(`
       Object {
         "bool": Object {
           "must": Array [
@@ -69,7 +72,7 @@ describe('generateModelSearchQuery', () => {
   });
   it('should generate consistent query when extraQuery provided', () => {
     expect(
-      generateModelSearchQuery({
+      generateModelVersionSearchQuery({
         extraQuery: {
           bool: {
             must: [
