@@ -5,7 +5,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { within } from '@testing-library/dom';
+import { fireEvent, within } from '@testing-library/dom';
 
 import { render, screen, waitFor } from '../../../../../test/test_utils';
 import { ModelVersionTable } from '../model_version_table';
@@ -66,7 +66,7 @@ describe('<ModelVersionTable />', () => {
           timeout: 2000,
         }
       );
-      await user.click(screen.getByText('Version'));
+      await fireEvent.click(screen.getByText('Version'));
       await waitFor(async () => {
         expect(screen.getByText('Sort A-Z').closest('li')).toHaveClass(
           'euiDataGridHeader__action--selected'
@@ -83,13 +83,12 @@ describe('<ModelVersionTable />', () => {
   it(
     'should NOT render sort button for state and status column',
     async () => {
-      const user = userEvent.setup();
       render(<ModelVersionTable versions={[]} tags={[]} />);
 
-      await user.click(screen.getByText('State'));
+      await fireEvent.click(screen.getByText('State'));
       expect(screen.queryByTitle('Sort A-Z')).toBeNull();
 
-      await user.click(screen.getByText('Status'));
+      await fireEvent.click(screen.getByText('Status'));
       expect(screen.queryByTitle('Sort A-Z')).toBeNull();
     },
     20 * 1000
