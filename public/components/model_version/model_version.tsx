@@ -197,7 +197,7 @@ export const ModelVersion = () => {
           modelVersionId={modelVersionData?.id}
           createdTime={modelVersionData?.created_time}
           lastUpdatedTime={modelVersionData?.last_updated_time}
-          owner={modelData?.owner.name}
+          owner={modelData?.owner?.name}
         />
       )}
       <EuiSpacer size="m" />
