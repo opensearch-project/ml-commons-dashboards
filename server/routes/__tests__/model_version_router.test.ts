@@ -10,9 +10,9 @@ import { Router } from '../../../../../src/core/server/http/router';
 import { triggerHandler, createDataSourceEnhancedRouter } from '../router.mock';
 import { httpServerMock } from '../../../../../src/core/server/http/http_server.mocks';
 import { loggerMock } from '../../../../../src/core/server/logging/logger.mock';
-import { MODEL_API_ENDPOINT } from '../constants';
-import { modelRouter } from '../model_router';
-import { ModelService } from '../../services';
+import { MODEL_VERSION_API_ENDPOINT } from '../constants';
+import { modelVersionRouter } from '../model_version_router';
+import { ModelVersionService } from '../../services';
 
 const setupRouter = () => {
   const mockedLogger = loggerMock.create();
@@ -22,7 +22,7 @@ const setupRouter = () => {
     getLatestCurrentUserTransport,
   } = createDataSourceEnhancedRouter(mockedLogger);
 
-  modelRouter(router);
+  modelVersionRouter(router);
   return {
     router,
     dataSourceTransportMock,
@@ -36,29 +36,29 @@ const triggerModelSearch = (
 ) =>
   triggerHandler(router, {
     method: 'GET',
-    path: MODEL_API_ENDPOINT,
+    path: MODEL_VERSION_API_ENDPOINT,
     req: httpServerMock.createRawRequest({
       query: { data_source_id: dataSourceId, from, size },
     }),
   });
 
-jest.mock('../../services/model_service');
+jest.mock('../../services/model_version_service');
 
-describe('model routers', () => {
+describe('model version routers', () => {
   beforeEach(() => {
-    jest.spyOn(ModelService, 'search');
+    jest.spyOn(ModelVersionService, 'search');
   });
   afterEach(() => {
     jest.resetAllMocks();
   });
 
-  describe('model search', () => {
+  describe('model version search', () => {
     it('should call connector search and return consistent result', async () => {
-      expect(ModelService.search).not.toHaveBeenCalled();
+      expect(ModelVersionService.search).not.toHaveBeenCalled();
       const { router, getLatestCurrentUserTransport } = setupRouter();
 
       const result = (await triggerModelSearch(router, { from: 0, size: 50 })) as ResponseObject;
-      expect(ModelService.search).toHaveBeenCalledWith(
+      expect(ModelVersionService.search).toHaveBeenCalledWith(
         expect.objectContaining({
           transport: getLatestCurrentUserTransport(),
           from: 0,
@@ -78,11 +78,11 @@ describe('model routers', () => {
     });
 
     it('should call model search with data source transport', async () => {
-      expect(ModelService.search).not.toHaveBeenCalled();
+      expect(ModelVersionService.search).not.toHaveBeenCalled();
       const { router, dataSourceTransportMock } = setupRouter();
 
       await triggerModelSearch(router, { dataSourceId: 'foo', from: 0, size: 50 });
-      expect(ModelService.search).toHaveBeenCalledWith({
+      expect(ModelVersionService.search).toHaveBeenCalledWith({
         transport: dataSourceTransportMock,
         from: 0,
         size: 50,
@@ -90,13 +90,13 @@ describe('model routers', () => {
     });
 
     it('should response error message after model search throw error', async () => {
-      jest.spyOn(ModelService, 'search').mockImplementationOnce(() => {
+      jest.spyOn(ModelVersionService, 'search').mockImplementationOnce(() => {
         throw new Error('foo');
       });
       const { router, getLatestCurrentUserTransport } = setupRouter();
 
       const result = (await triggerModelSearch(router, { from: 0, size: 50 })) as Boom;
-      expect(ModelService.search).toHaveBeenCalledWith(
+      expect(ModelVersionService.search).toHaveBeenCalledWith(
         expect.objectContaining({
           transport: getLatestCurrentUserTransport(),
           from: 0,
