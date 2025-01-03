@@ -105,7 +105,7 @@ export class ModelAggregateService {
     });
     const modelIds = models.map(({ id }) => id);
     const { data: deployedModels } = await ModelVersionService.search({
-      client,
+      transport: client.asCurrentUser.transport,
       from: 0,
       size: MAX_MODEL_BUCKET_NUM,
       modelIds,
