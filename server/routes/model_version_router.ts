@@ -5,7 +5,7 @@
 
 import { schema } from '@osd/config-schema';
 import { MAX_MODEL_CHUNK_SIZE, MODEL_VERSION_STATE } from '../../common';
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+import { IRouter } from '../../../../src/core/server';
 import { ModelVersionService, RecordNotFoundError } from '../services';
 import {
   MODEL_VERSION_API_ENDPOINT,
@@ -101,7 +101,7 @@ export const modelVersionRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       const {
         algorithms,
         ids,
@@ -134,9 +134,9 @@ export const modelVersionRouter = (router: IRouter) => {
           versionOrKeyword,
           extraQuery,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -150,15 +150,15 @@ export const modelVersionRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const model = await ModelVersionService.getOne({
           client: context.core.opensearch.client,
           id: request.params.id,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: model });
+        return response.ok({ body: model });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -172,18 +172,18 @@ export const modelVersionRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         await ModelVersionService.delete({
           client: context.core.opensearch.client,
           id: request.params.id,
         });
-        return opensearchDashboardsResponseFactory.ok();
+        return response.ok();
       } catch (err) {
         if (err instanceof RecordNotFoundError) {
-          return opensearchDashboardsResponseFactory.notFound();
+          return response.notFound();
         }
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -197,15 +197,15 @@ export const modelVersionRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const result = await ModelVersionService.load({
           client: context.core.opensearch.client,
           id: request.params.id,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: result });
+        return response.ok({ body: result });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -219,15 +219,15 @@ export const modelVersionRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const result = await ModelVersionService.unload({
           client: context.core.opensearch.client,
           id: request.params.id,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: result });
+        return response.ok({ body: result });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -241,15 +241,15 @@ export const modelVersionRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const result = await ModelVersionService.profile({
           client: context.core.opensearch.client,
           id: request.params.id,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: result });
+        return response.ok({ body: result });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -265,18 +265,18 @@ export const modelVersionRouter = (router: IRouter) => {
         ]),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const body = await ModelVersionService.upload({
           client: context.core.opensearch.client,
           model: request.body,
         });
 
-        return opensearchDashboardsResponseFactory.ok({
+        return response.ok({
           body,
         });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -297,7 +297,7 @@ export const modelVersionRouter = (router: IRouter) => {
         },
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         await ModelVersionService.uploadModelChunk({
           client: context.core.opensearch.client,
@@ -305,9 +305,9 @@ export const modelVersionRouter = (router: IRouter) => {
           chunkId: request.params.chunkId,
           chunk: request.body,
         });
-        return opensearchDashboardsResponseFactory.ok();
+        return response.ok();
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest(err.message);
+        return response.badRequest(err.message);
       }
     }
   );

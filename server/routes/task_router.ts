@@ -4,7 +4,7 @@
  */
 
 import { schema } from '@osd/config-schema';
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+import { IRouter } from '../../../../src/core/server';
 import { TaskService } from '../services';
 import { TASK_API_ENDPOINT } from './constants';
 
@@ -23,15 +23,15 @@ export const taskRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const body = await TaskService.getOne({
           client: context.core.opensearch.client,
           taskId: request.params.taskId,
         });
-        return opensearchDashboardsResponseFactory.ok({ body });
+        return response.ok({ body });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );
@@ -54,7 +54,7 @@ export const taskRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       const { model_id: modelId, task_type: taskType, sort, ...restQuery } = request.query;
       try {
         const body = await TaskService.search({
@@ -67,9 +67,9 @@ export const taskRouter = (router: IRouter) => {
               : (sort as ['last_update_time-desc' | 'last_update_time-asc']),
           ...restQuery,
         });
-        return opensearchDashboardsResponseFactory.ok({ body });
+        return response.ok({ body });
       } catch (err) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: err.message });
+        return response.badRequest({ body: err.message });
       }
     }
   );

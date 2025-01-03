@@ -13,9 +13,9 @@ import {
 
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
 import {
+  modelVersionRouter,
   connectorRouter,
   modelRouter,
-  modelVersionRouter,
   modelAggregateRouter,
   profileRouter,
   securityRouter,
