@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+import { IRouter } from '../../../../src/core/server';
 import { SecurityService } from '../services/security_service';
 import { SECURITY_ACCOUNT_API_ENDPOINT } from './constants';
 
@@ -13,14 +13,14 @@ export const securityRouter = (router: IRouter) => {
       path: SECURITY_ACCOUNT_API_ENDPOINT,
       validate: false,
     },
-    async (context) => {
+    async (context, _request, response) => {
       try {
         const body = await SecurityService.getAccount({
           client: context.core.opensearch.client,
         });
-        return opensearchDashboardsResponseFactory.ok({ body });
+        return response.ok({ body });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: error as Error });
+        return response.badRequest({ body: error as Error });
       }
     }
   );

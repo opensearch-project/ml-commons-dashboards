@@ -7,7 +7,7 @@ import { schema } from '@osd/config-schema';
 // @ts-ignore
 import fetch from 'node-fetch';
 
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+import { IRouter } from '../../../../src/core/server';
 import {
   MODEL_REPOSITORY_API_ENDPOINT,
   MODEL_REPOSITORY_CONFIG_URL_API_ENDPOINT,
@@ -19,14 +19,17 @@ const PRE_TRAINED_MODELS_URL =
 const fetchURLAsJSONData = (url: string) => fetch(url).then((response: any) => response.json());
 
 export const modelRepositoryRouter = (router: IRouter) => {
-  router.get({ path: MODEL_REPOSITORY_API_ENDPOINT, validate: false }, async () => {
-    try {
-      const data = await fetchURLAsJSONData(PRE_TRAINED_MODELS_URL);
-      return opensearchDashboardsResponseFactory.ok({ body: data });
-    } catch (error) {
-      return opensearchDashboardsResponseFactory.badRequest({ body: error.message });
+  router.get(
+    { path: MODEL_REPOSITORY_API_ENDPOINT, validate: false },
+    async (_context, _request, response) => {
+      try {
+        const data = await fetchURLAsJSONData(PRE_TRAINED_MODELS_URL);
+        return response.ok({ body: data });
+      } catch (error) {
+        return response.badRequest({ body: error.message });
+      }
     }
-  });
+  );
 
   router.get(
     {
@@ -37,12 +40,12 @@ export const modelRepositoryRouter = (router: IRouter) => {
         }),
       },
     },
-    async (_context, request) => {
+    async (_context, request, response) => {
       try {
         const data = await fetchURLAsJSONData(request.params.configURL);
-        return opensearchDashboardsResponseFactory.ok({ body: data });
+        return response.ok({ body: data });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({ body: error.message });
+        return response.badRequest({ body: error.message });
       }
     }
   );

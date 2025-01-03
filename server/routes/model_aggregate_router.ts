@@ -4,7 +4,7 @@
  */
 
 import { schema } from '@osd/config-schema';
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+import { IRouter } from '../../../../src/core/server';
 import { ModelAggregateService } from '../services/model_aggregate_service';
 import { MODEL_AGGREGATE_API_ENDPOINT } from './constants';
 import { modelStateSchema } from './model_version_router';
@@ -37,7 +37,7 @@ export const modelAggregateRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       const { states, extraQuery, ...restQuery } = request.query;
       try {
         const payload = await ModelAggregateService.search({
@@ -46,9 +46,9 @@ export const modelAggregateRouter = (router: IRouter) => {
           extraQuery,
           ...restQuery,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({
+        return response.badRequest({
           body: error instanceof Error ? error.message : JSON.stringify(error),
         });
       }

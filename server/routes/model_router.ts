@@ -5,7 +5,7 @@
 
 import { schema } from '@osd/config-schema';
 
-import { IRouter, opensearchDashboardsResponseFactory } from '../../../../src/core/server';
+import { IRouter } from '../../../../src/core/server';
 import { ModelService } from '../services';
 
 import { MODEL_API_ENDPOINT } from './constants';
@@ -28,7 +28,7 @@ export const modelRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       const { name, description, modelAccessMode, backendRoles, addAllBackendRoles } = request.body;
       try {
         const payload = await ModelService.register({
@@ -39,9 +39,9 @@ export const modelRouter = (router: IRouter) => {
           backendRoles,
           addAllBackendRoles,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({
+        return response.badRequest({
           body: error instanceof Error ? error.message : JSON.stringify(error),
         });
       }
@@ -73,9 +73,9 @@ export const modelRouter = (router: IRouter) => {
           name,
           description,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({
+        return response.badRequest({
           body: error instanceof Error ? error.message : JSON.stringify(error),
         });
       }
@@ -91,15 +91,15 @@ export const modelRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       try {
         const payload = await ModelService.delete({
           client: context.core.opensearch.client,
           id: request.params.id,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({
+        return response.badRequest({
           body: error instanceof Error ? error.message : JSON.stringify(error),
         });
       }
@@ -119,7 +119,7 @@ export const modelRouter = (router: IRouter) => {
         }),
       },
     },
-    async (context, request) => {
+    async (context, request, response) => {
       const { ids, name, from, size, extraQuery } = request.query;
       try {
         const payload = await ModelService.search({
@@ -130,9 +130,9 @@ export const modelRouter = (router: IRouter) => {
           size,
           extraQuery,
         });
-        return opensearchDashboardsResponseFactory.ok({ body: payload });
+        return response.ok({ body: payload });
       } catch (error) {
-        return opensearchDashboardsResponseFactory.badRequest({
+        return response.badRequest({
           body: error instanceof Error ? error.message : JSON.stringify(error),
         });
       }
