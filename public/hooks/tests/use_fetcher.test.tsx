@@ -6,13 +6,13 @@ import React from 'react';
 
 import { act, renderHook } from '@testing-library/react-hooks';
 import { DO_NOT_FETCH, useFetcher } from '../use_fetcher';
-import { render, waitFor } from '../../../test/test_utils';
+import { render, waitFor as testUtilWaitFor } from '../../../test/test_utils';
 
 describe('useFetcher', () => {
   it('should call fetcher with consistent params and return consistent result', async () => {
     const data = { foo: 'bar' };
     const fetcher = jest.fn((_arg1: string) => Promise.resolve(data));
-    const { result } = renderHook(() => useFetcher(fetcher, 'foo'));
+    const { result, waitFor } = renderHook(() => useFetcher(fetcher, 'foo'));
 
     await waitFor(() => result.current.data !== null);
     expect(result.current.data).toBe(data);
@@ -22,7 +22,7 @@ describe('useFetcher', () => {
 
   it('should call fetcher only once if params content not change', async () => {
     const fetcher = jest.fn((_arg1: any) => Promise.resolve());
-    const { result, rerender } = renderHook(({ params }) => useFetcher(fetcher, params), {
+    const { result, waitFor, rerender } = renderHook(({ params }) => useFetcher(fetcher, params), {
       initialProps: { params: { foo: 'bar' } },
     });
 
@@ -109,7 +109,7 @@ describe('useFetcher', () => {
   it('should return consistent updated data', async () => {
     const fetcher = () => Promise.resolve('foo');
 
-    const { result } = renderHook(() => useFetcher(fetcher));
+    const { result, waitFor } = renderHook(() => useFetcher(fetcher));
 
     await waitFor(() => result.current.data === 'foo');
     await act(async () => {
@@ -122,7 +122,7 @@ describe('useFetcher', () => {
   it('should return consistent mutated data', async () => {
     const fetcher = () => Promise.resolve('foo');
 
-    const { result } = renderHook(() => useFetcher(fetcher));
+    const { result, waitFor } = renderHook(() => useFetcher(fetcher));
 
     await waitFor(() => result.current.data === 'foo');
 
@@ -152,7 +152,7 @@ describe('useFetcher', () => {
 
   it('should call fetcher after first parameter changed from DO_NOT_FETCH', async () => {
     const fetcher = jest.fn(async (...params) => params);
-    const { result, rerender, waitFor: hookWaitFor } = renderHook(
+    const { result, rerender, waitFor } = renderHook(
       ({ params }) => useFetcher(fetcher, ...params),
       {
         initialProps: {
@@ -165,7 +165,7 @@ describe('useFetcher', () => {
     expect(result.current.loading).toBe(true);
     expect(fetcher).toHaveBeenCalled();
 
-    await hookWaitFor(() => {
+    await waitFor(() => {
       expect(result.current.loading).toBe(false);
       expect(result.current.data).toEqual([]);
     });
@@ -193,11 +193,11 @@ describe('useFetcher', () => {
     const { getByText, rerender } = render(
       <TestLoading params="foo" onRender={collectLoadingAndParams} />
     );
-    await waitFor(() => {
+    await testUtilWaitFor(() => {
       expect(getByText('false')).toBeInTheDocument();
     });
     rerender(<TestLoading params="bar" onRender={collectLoadingAndParams} />);
-    await waitFor(() => {
+    await testUtilWaitFor(() => {
       expect(getByText('false')).toBeInTheDocument();
     });
 
