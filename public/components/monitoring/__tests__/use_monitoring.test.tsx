@@ -5,7 +5,7 @@
 import React, { useContext } from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 
-import { Model, ModelSearchResponse } from '../../../apis/model';
+import { ModelVersion, ModelVersionSearchResponse } from '../../../apis/model_version';
 import { Connector } from '../../../apis/connector';
 import { useMonitoring } from '../use_monitoring';
 import {
@@ -52,14 +52,14 @@ const setup = ({
 jest.mock('../../../apis/connector');
 
 const mockEmptyRecords = () =>
-  jest.spyOn(Model.prototype, 'search').mockResolvedValueOnce({
+  jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValueOnce({
     data: [],
-    total_models: 0,
+    total_model_versions: 0,
   });
 
 describe('useMonitoring', () => {
   beforeEach(() => {
-    jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+    jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
       data: [
         {
           id: 'model-1-id',
@@ -72,7 +72,7 @@ describe('useMonitoring', () => {
           planning_worker_nodes: ['node1', 'node2', 'node3'],
         },
       ],
-      total_models: 500,
+      total_model_versions: 500,
     });
   });
 
@@ -89,7 +89,7 @@ describe('useMonitoring', () => {
       result.current.searchByNameOrId('foo');
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
           states: ['DEPLOY_FAILED', 'DEPLOYED', 'PARTIALLY_DEPLOYED'],
@@ -101,7 +101,7 @@ describe('useMonitoring', () => {
       result.current.searchByStatus(['responding']);
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           nameOrId: 'foo',
           states: ['DEPLOYED'],
@@ -118,7 +118,7 @@ describe('useMonitoring', () => {
       result.current.searchByStatus(['partial-responding']);
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           states: ['PARTIALLY_DEPLOYED'],
         })
@@ -130,7 +130,7 @@ describe('useMonitoring', () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: ['model_state-asc'],
           from: 0,
@@ -146,7 +146,7 @@ describe('useMonitoring', () => {
       });
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: ['name-desc'],
           from: 10,
@@ -159,17 +159,17 @@ describe('useMonitoring', () => {
   it('should call search API twice after reload called', async () => {
     const { result, waitFor } = renderHook(() => useMonitoring());
 
-    await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(1));
 
     act(() => {
       result.current.reload();
     });
-    await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(2));
   });
 
   it('should return consistent deployedModels', async () => {
-    jest.spyOn(Model.prototype, 'search').mockRestore();
-    const searchMock = jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+    jest.spyOn(ModelVersion.prototype, 'search').mockRestore();
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
       data: [
         {
           id: 'model-1-id',
@@ -206,7 +206,7 @@ describe('useMonitoring', () => {
           },
         },
       ],
-      total_models: 3,
+      total_model_versions: 3,
     });
     const { result, waitFor } = renderHook(() => useMonitoring());
 
@@ -239,8 +239,8 @@ describe('useMonitoring', () => {
   });
 
   it('should return empty connector if connector id not exists in all connectors', async () => {
-    jest.spyOn(Model.prototype, 'search').mockRestore();
-    const searchMock = jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+    jest.spyOn(ModelVersion.prototype, 'search').mockRestore();
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
       data: [
         {
           id: 'model-1-id',
@@ -254,7 +254,7 @@ describe('useMonitoring', () => {
           connector_id: 'not-exists-external-connector-id',
         },
       ],
-      total_models: 1,
+      total_model_versions: 1,
     });
     const { result, waitFor } = renderHook(() => useMonitoring());
 
@@ -272,13 +272,13 @@ describe('useMonitoring', () => {
   });
 
   it('should return empty connector if failed to load all external connectors', async () => {
-    jest.spyOn(Model.prototype, 'search').mockRestore();
+    jest.spyOn(ModelVersion.prototype, 'search').mockRestore();
     const getAllExternalConnectorsMock = jest
       .spyOn(Connector.prototype, 'getAll')
       .mockImplementation(async () => {
         throw new Error();
       });
-    const searchMock = jest.spyOn(Model.prototype, 'search').mockResolvedValue({
+    const searchMock = jest.spyOn(ModelVersion.prototype, 'search').mockResolvedValue({
       data: [
         {
           id: 'model-1-id',
@@ -292,7 +292,7 @@ describe('useMonitoring', () => {
           connector_id: 'not-exists-external-connector-id',
         },
       ],
-      total_models: 1,
+      total_model_versions: 1,
     });
     const { result, waitFor } = renderHook(() => useMonitoring());
 
@@ -331,8 +331,8 @@ describe('useMonitoring', () => {
     });
 
     await waitFor(() => {
-      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
-      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(3);
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
           from: 0,
         })
@@ -361,8 +361,8 @@ describe('useMonitoring', () => {
     });
 
     await waitFor(() => {
-      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
-      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(3);
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
           from: 0,
         })
@@ -379,7 +379,7 @@ describe('useMonitoring', () => {
       result.current.searchBySource(['local']);
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
           extraQuery: {
             bool: {
@@ -402,7 +402,7 @@ describe('useMonitoring', () => {
       result.current.searchBySource(['external']);
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
           extraQuery: {
             bool: {
@@ -425,7 +425,7 @@ describe('useMonitoring', () => {
       result.current.searchBySource(['external', 'local']);
     });
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
           extraQuery: undefined,
         })
@@ -442,7 +442,7 @@ describe('useMonitoring', () => {
     });
 
     await waitFor(() =>
-      expect(Model.prototype.search).toHaveBeenLastCalledWith(
+      expect(ModelVersion.prototype.search).toHaveBeenLastCalledWith(
         expect.objectContaining({
           extraQuery: {
             bool: {
@@ -486,7 +486,7 @@ describe('useMonitoring', () => {
       },
     });
     await waitFor(() => {
-      expect(Model.prototype.search).not.toHaveBeenCalled();
+      expect(ModelVersion.prototype.search).not.toHaveBeenCalled();
     });
   });
 
@@ -504,7 +504,7 @@ describe('useMonitoring', () => {
       dataSourceId: 'foo',
     });
     await waitFor(() => {
-      expect(Model.prototype.search).toHaveBeenCalledWith(dataSourceIdExpect);
+      expect(ModelVersion.prototype.search).toHaveBeenCalledWith(dataSourceIdExpect);
       expect(getAllConnectorMock).toHaveBeenCalledWith(dataSourceIdExpect);
     });
   });
@@ -529,7 +529,7 @@ describe('useMonitoring', () => {
       });
     });
     await waitFor(() => {
-      expect(Model.prototype.search).toHaveBeenCalledTimes(2);
+      expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(2);
       expect(result.current.params).toEqual(
         expect.objectContaining({
           currentPage: 2,
@@ -541,7 +541,7 @@ describe('useMonitoring', () => {
       setSelectedDataSourceOption({ id: 'bar' });
     });
     await waitFor(() => {
-      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
+      expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(3);
       expect(result.current.params.connector).toEqual([]);
       expect(result.current.params.currentPage).toEqual(1);
     });
@@ -577,7 +577,7 @@ describe('useMonitoring', () => {
           status: undefined,
         })
       );
-      expect(Model.prototype.search).toHaveBeenCalledTimes(3);
+      expect(ModelVersion.prototype.search).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -586,9 +586,9 @@ describe('useMonitoring', () => {
       renderHookResult: { result, waitFor },
     } = setup();
     await waitFor(() => {
-      expect(Model.prototype.search).toHaveBeenCalled();
+      expect(ModelVersion.prototype.search).toHaveBeenCalled();
     });
-    jest.spyOn(Model.prototype, 'search').mockImplementationOnce(
+    jest.spyOn(ModelVersion.prototype, 'search').mockImplementationOnce(
       () =>
         new Promise((resolve) => {
           setTimeout(() => {
@@ -605,7 +605,7 @@ describe('useMonitoring', () => {
                   planning_worker_nodes: ['node1', 'node2', 'node3'],
                 },
               ],
-              total_models: 1,
+              total_model_versions: 1,
             });
           }, 300);
         })
@@ -628,7 +628,7 @@ describe('useMonitoring', () => {
 describe('useMonitoring.pageStatus', () => {
   it("should return 'loading' if data loading and will back to 'normal' after data loaded", async () => {
     let resolveFn: Function;
-    const promise = new Promise<ModelSearchResponse>((resolve) => {
+    const promise = new Promise<ModelVersionSearchResponse>((resolve) => {
       resolveFn = () => {
         resolve({
           data: [
@@ -643,11 +643,11 @@ describe('useMonitoring.pageStatus', () => {
               planning_worker_nodes: ['node1', 'node2', 'node3'],
             },
           ],
-          total_models: 1,
+          total_model_versions: 1,
         });
       };
     });
-    jest.spyOn(Model.prototype, 'search').mockReturnValueOnce(promise);
+    jest.spyOn(ModelVersion.prototype, 'search').mockReturnValueOnce(promise);
     const { result } = renderHook(() => useMonitoring());
 
     expect(result.current.pageStatus).toBe('loading');
