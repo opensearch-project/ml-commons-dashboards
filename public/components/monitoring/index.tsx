@@ -131,8 +131,8 @@ export const Monitoring = (props: MonitoringProps) => {
                 <DebouncedSearchBar
                   inputRef={setInputRef}
                   onSearch={searchByNameOrId}
-                  placeholder="Search by name or ID"
-                  aria-label="Search by name or ID"
+                  placeholder="Search by model name or ID"
+                  aria-label="Search by model name or ID"
                 />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
