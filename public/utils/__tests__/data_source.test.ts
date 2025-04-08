@@ -59,6 +59,22 @@ describe('isDataSourceCompatible', () => {
         },
       })
     ).toBe(true);
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '3.0.0-alpha1',
+        },
+      })
+    ).toBe(true);
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '3.0.0-beta1',
+        },
+      })
+    ).toBe(true);
   });
 
   it('should return false for un-compatible data sources', () => {
