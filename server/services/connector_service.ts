@@ -19,6 +19,7 @@
  */
 
 import { OpenSearchClient } from '../../../../src/core/server';
+import { ModelService } from './model_service';
 
 import { CONNECTOR_SEARCH_API, MODEL_SEARCH_API } from './utils/constants';
 
@@ -72,18 +73,19 @@ export class ConnectorService {
   }) {
     let result;
     try {
-      result = await transport.request({
-        method: 'POST',
-        path: MODEL_SEARCH_API,
-        body: {
-          size: 0,
-          aggs: {
-            unique_connector_names: {
-              terms: {
-                field: 'connector.name.keyword',
-                size,
+      result = await ModelService.search({
+        from: 0,
+        size: 10000,
+        transport,
+        extraQuery: {
+          bool: {
+            must: [
+              {
+                exists: {
+                  field: 'connector.name',
+                },
               },
-            },
+            ],
           },
         },
       });
@@ -93,9 +95,15 @@ export class ConnectorService {
       }
       throw e;
     }
-    if (!result.body.aggregations) {
+    if (!result.data) {
       return [];
     }
-    return result.body.aggregations.unique_connector_names.buckets.map(({ key }) => key);
+    return Array.from(
+      new Set(
+        result.data
+          .map((item: { connector?: { name: string } }) => item?.connector?.name)
+          .filter((connectorName: string | undefined) => !!connectorName)
+      )
+    );
   }
 }
