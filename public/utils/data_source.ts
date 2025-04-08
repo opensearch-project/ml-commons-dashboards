@@ -49,7 +49,10 @@ export const isDataSourceCompatible = (dataSource: SavedObject<DataSourceAttribu
     'supportedOSDataSourceVersions' in pluginManifest &&
     !semver.satisfies(
       dataSource.attributes.dataSourceVersion,
-      pluginManifest.supportedOSDataSourceVersions
+      pluginManifest.supportedOSDataSourceVersions,
+      {
+        includePrerelease: true,
+      }
     )
   ) {
     return false;
