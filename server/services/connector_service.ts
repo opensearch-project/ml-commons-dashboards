@@ -104,6 +104,6 @@ export class ConnectorService {
           .map((item: { connector?: { name: string } }) => item?.connector?.name)
           .filter((connectorName: string | undefined) => !!connectorName)
       )
-    );
+    ).slice(0, size);
   }
 }

@@ -16,11 +16,45 @@ const CONNECTOR_SEARCH_RESULT_MOCK = {
   },
 };
 
-const INTERNAL_CONNECTOR_AGGS_RESULT_MOCK = {
+const MODEL_SEARCH_RESULT_MOCK = {
   body: {
-    aggregations: {
-      unique_connector_names: {
-        buckets: ['Internal connector 1'],
+    hits: {
+      hits: [
+        {
+          _id: 'model-1',
+          _source: {
+            connector: {
+              name: 'Connector 1',
+            },
+          },
+        },
+        {
+          _id: 'model-2',
+          _source: {
+            connector: {
+              name: 'Connector 2',
+            },
+          },
+        },
+        {
+          _id: 'model-3',
+          _source: {
+            connector: {
+              name: 'Connector 2',
+            },
+          },
+        },
+        {
+          _id: 'model-4',
+          _source: {
+            connector: {
+              name: 'Connector 3',
+            },
+          },
+        },
+      ],
+      total: {
+        value: 4,
       },
     },
   },
@@ -130,15 +164,30 @@ describe('ConnectorService', () => {
         Array [
           Object {
             "body": Object {
-              "aggs": Object {
-                "unique_connector_names": Object {
-                  "terms": Object {
-                    "field": "connector.name.keyword",
-                    "size": 1,
+              "from": 0,
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "connector.name",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  "must_not": Object {
+                    "exists": Object {
+                      "field": "chunk_number",
+                    },
                   },
                 },
               },
-              "size": 0,
+              "size": 10000,
             },
             "method": "POST",
             "path": "/_plugins/_ml/models/_search",
@@ -149,13 +198,14 @@ describe('ConnectorService', () => {
 
     it('should return consistent results', async () => {
       const result = await ConnectorService.getUniqueInternalConnectorNames({
-        size: 1,
-        transport: createMockTransport(INTERNAL_CONNECTOR_AGGS_RESULT_MOCK),
+        size: 2,
+        transport: createMockTransport(MODEL_SEARCH_RESULT_MOCK),
       });
 
       expect(result).toMatchInlineSnapshot(`
         Array [
-          undefined,
+          "Connector 1",
+          "Connector 2",
         ]
       `);
     });
@@ -177,7 +227,7 @@ describe('ConnectorService', () => {
     });
 
     it('should return empty results when transport request throw index_not_found_exception', async () => {
-      const mockTransport = createMockTransport(INTERNAL_CONNECTOR_AGGS_RESULT_MOCK);
+      const mockTransport = createMockTransport(MODEL_SEARCH_RESULT_MOCK);
       mockTransport.request.mockImplementationOnce(() => {
         throw new Error('index_not_found_exception');
       });
