@@ -5,7 +5,7 @@
 
 import { MlCommonsPlugin } from '../plugin';
 import { coreMock, httpServiceMock } from '../../../../src/core/server/mocks';
-import * as modelRouterExports from '../routes/model_router';
+import * as modelVersionRouterExports from '../routes/model_version_router';
 import * as connectorRouterExports from '../routes/connector_router';
 import * as profileRouterExports from '../routes/profile_router';
 
@@ -22,10 +22,10 @@ describe('MlCommonsPlugin', () => {
       initContext = coreMock.createPluginInitializerContext();
     });
 
-    it('should register model routers', () => {
-      jest.spyOn(modelRouterExports, 'modelRouter');
+    it('should register model version routers', () => {
+      jest.spyOn(modelVersionRouterExports, 'modelVersionRouter');
       new MlCommonsPlugin(initContext).setup(mockCoreSetup);
-      expect(modelRouterExports.modelRouter).toHaveBeenCalledWith(routerMock);
+      expect(modelVersionRouterExports.modelVersionRouter).toHaveBeenCalledWith(routerMock);
     });
 
     it('should register connector routers', () => {
