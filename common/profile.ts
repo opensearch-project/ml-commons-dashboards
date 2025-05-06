@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MODEL_STATE } from './model';
+import { MODEL_VERSION_STATE } from './model';
 
 export interface OpenSearchMLCommonsProfile {
   nodes: {
@@ -12,7 +12,7 @@ export interface OpenSearchMLCommonsProfile {
         [key: string]: {
           worker_nodes: string[];
           predictor: string;
-          model_state: MODEL_STATE;
+          model_state: MODEL_VERSION_STATE;
           predict_request_stats: {
             count: number;
             max: number;
