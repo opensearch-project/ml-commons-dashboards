@@ -5,14 +5,17 @@
 
 import { CoreStart } from '../../../../src/core/public';
 
-let httpSotre: CoreStart['http'] | undefined;
+let httpClient: CoreStart['http'] | undefined;
 
 export class InnerHttpProvider {
   public static setHttp(http: CoreStart['http'] | undefined) {
-    httpSotre = http;
+    httpClient = http;
   }
 
   public static getHttp() {
-    return httpSotre!;
+    if (!httpClient) {
+      throw Error('Http Client not set');
+    }
+    return httpClient;
   }
 }
