@@ -9,7 +9,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/test/setup.jest.ts'],
   roots: ['<rootDir>'],
   moduleNameMapper: {
-    '\\.(css|less|scss)$': '<rootDir>/test/mocks/styleMock.ts',
+    '\\.(css|less|scss|svg)$': '<rootDir>/test/mocks/styleMock.ts',
     '^ui/(.*)': '<rootDir>/../../src/legacy/ui/public/$1/',
   },
   testMatch: ['**/*.test.{js,mjs,ts,tsx}'],
@@ -28,4 +28,8 @@ module.exports = {
     '^.+\\.(js|tsx?)$': '<rootDir>/../../src/dev/jest/babel_transform.js',
   },
   testEnvironment: 'jsdom',
+  globals: {
+    // Add this variable here, to avoid EuiDataGrid render failed. See more: https://github.com/opensearch-project/oui/blob/2229dd44ca4d1270b4b8d95c5ffbf5d99297a253/scripts/jest/setup/polyfills.js#L17
+    _isJest: true,
+  },
 };
