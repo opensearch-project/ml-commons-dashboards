@@ -12,7 +12,16 @@ import {
 } from '../../../src/core/server';
 
 import { MlCommonsPluginSetup, MlCommonsPluginStart } from './types';
-import { connectorRouter, modelRouter, profileRouter } from './routes';
+import {
+  modelVersionRouter,
+  connectorRouter,
+  modelRouter,
+  modelAggregateRouter,
+  profileRouter,
+  securityRouter,
+  taskRouter,
+  modelRepositoryRouter,
+} from './routes';
 
 export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPluginStart> {
   private readonly logger: Logger;
@@ -25,9 +34,14 @@ export class MlCommonsPlugin implements Plugin<MlCommonsPluginSetup, MlCommonsPl
     this.logger.debug('mlCommons: Setup');
     const router = core.http.createRouter();
 
-    modelRouter(router);
+    modelVersionRouter(router);
+    modelAggregateRouter(router);
     profileRouter(router);
     connectorRouter(router);
+    securityRouter(router);
+    taskRouter(router);
+    modelRepositoryRouter(router);
+    modelRouter(router);
 
     return {};
   }
