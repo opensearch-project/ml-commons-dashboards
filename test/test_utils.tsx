@@ -6,18 +6,83 @@
 import React, { FC, ReactElement } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { render, RenderOptions } from '@testing-library/react';
+import { renderHook, RenderHookOptions } from '@testing-library/react-hooks';
+import { createBrowserHistory } from 'history';
+import { Router } from 'react-router-dom';
 import { DataSourceContextProvider } from '../public/contexts';
 
-const AllTheProviders: FC<{ children: React.ReactNode }> = ({ children }) => {
+export interface RenderWithRouteProps {
+  route: string;
+}
+
+export const history = {
+  current: createBrowserHistory(),
+};
+
+const AllTheProviders: FC = ({ children }) => {
   return (
-    <I18nProvider>
-      <DataSourceContextProvider>{children}</DataSourceContextProvider>
-    </I18nProvider>
+    <Router history={history.current}>
+      <I18nProvider>
+        <DataSourceContextProvider>{children}</DataSourceContextProvider>
+      </I18nProvider>
+    </Router>
   );
 };
 
-const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
-  render(ui, { wrapper: AllTheProviders, ...options });
+/**
+ * Example 1: render with a route
+ * customRender(<App />, {route: '/app'})
+ *
+ */
+const customRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'> & RenderWithRouteProps
+) => {
+  const currentHistory = createBrowserHistory();
+  history.current = currentHistory;
+
+  if (options?.route) {
+    currentHistory.push(options?.route);
+  }
+
+  return render(ui, { wrapper: AllTheProviders, ...options });
+};
+
+const customRenderHook = <TProps, TResult>(
+  callback: (props: TProps) => TResult,
+  options?: RenderHookOptions<TProps>
+) => {
+  return renderHook(callback, { wrapper: AllTheProviders, ...options });
+};
 
 export * from '@testing-library/react';
 export { customRender as render };
+export { customRenderHook as renderHook };
+
+export const mockOffsetMethods = () => {
+  const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: 600,
+  });
+  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+    configurable: true,
+    value: 600,
+  });
+  return () => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight as PropertyDescriptor
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth as PropertyDescriptor
+    );
+  };
+};

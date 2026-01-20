@@ -3,46 +3,64 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { OpenSearchModel } from '../../common';
 import { MODEL_API_ENDPOINT } from '../../server/routes/constants';
-import { MODEL_STATE, ModelSearchSort } from '../../common';
 import { InnerHttpProvider } from './inner_http_provider';
 
-export interface ModelSearchItem {
-  id: string;
-  name: string;
-  algorithm: string;
-  model_state: string;
-  model_version: string;
-  current_worker_node_count: number;
-  planning_worker_node_count: number;
-  planning_worker_nodes: string[];
-  connector_id?: string;
-  connector?: {
-    name: string;
-    description?: string;
-  };
-}
-
 export interface ModelSearchResponse {
-  data: ModelSearchItem[];
+  data: OpenSearchModel[];
   total_models: number;
 }
 
 export class Model {
-  public search(query: {
-    sort?: ModelSearchSort[];
-    from: number;
-    size: number;
-    states?: MODEL_STATE[];
-    nameOrId?: string;
-    extraQuery?: Record<string, any>;
-    dataSourceId?: string;
+  public register(body: {
+    name: string;
+    description?: string;
+    modelAccessMode: 'public' | 'restricted' | 'private';
+    backendRoles?: string[];
+    addAllBackendRoles?: boolean;
   }) {
-    const { extraQuery, dataSourceId, ...restQuery } = query;
-    return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
-      query: extraQuery
-        ? { ...restQuery, extra_query: JSON.stringify(extraQuery), data_source_id: dataSourceId }
-        : { ...restQuery, data_source_id: dataSourceId },
+    return InnerHttpProvider.getHttp().post<{ model_id: string; status: string }>(
+      MODEL_API_ENDPOINT,
+      {
+        body: JSON.stringify(body),
+      }
+    );
+  }
+
+  public update({ id, name, description }: { id: string; name?: string; description?: string }) {
+    return InnerHttpProvider.getHttp().put<{ status: 'success' }>(`${MODEL_API_ENDPOINT}/${id}`, {
+      body: JSON.stringify({
+        name,
+        description,
+      }),
     });
   }
+
+  public delete(id: string) {
+    return InnerHttpProvider.getHttp().delete<{ status: 'success' }>(`${MODEL_API_ENDPOINT}/${id}`);
+  }
+
+  public search(query: {
+    ids?: string[];
+    name?: string;
+    from: number;
+    size: number;
+    extraQuery?: string;
+  }) {
+    const { extraQuery, ...restQuery } = query;
+    return InnerHttpProvider.getHttp().get<ModelSearchResponse>(MODEL_API_ENDPOINT, {
+      query: extraQuery ? { ...restQuery, extra_query: JSON.stringify(extraQuery) } : restQuery,
+    });
+  }
+
+  public getOne = async (id: string) => {
+    return (
+      await this.search({
+        ids: [id],
+        from: 0,
+        size: 1,
+      })
+    ).data[0];
+  };
 }

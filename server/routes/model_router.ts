@@ -4,76 +4,137 @@
  */
 
 import { schema } from '@osd/config-schema';
-import { MODEL_STATE } from '../../common';
+
 import { IRouter } from '../../../../src/core/server';
 import { ModelService } from '../services';
+
 import { MODEL_API_ENDPOINT } from './constants';
-import { getOpenSearchClientTransport } from './utils';
-
-const modelSortQuerySchema = schema.oneOf([
-  schema.literal('name-asc'),
-  schema.literal('name-desc'),
-  schema.literal('model_state-asc'),
-  schema.literal('model_state-desc'),
-  schema.literal('id-asc'),
-  schema.literal('id-desc'),
-]);
-
-const modelStateSchema = schema.oneOf([
-  schema.literal(MODEL_STATE.loadFailed),
-  schema.literal(MODEL_STATE.loaded),
-  schema.literal(MODEL_STATE.loading),
-  schema.literal(MODEL_STATE.partiallyLoaded),
-  schema.literal(MODEL_STATE.trained),
-  schema.literal(MODEL_STATE.uploaded),
-  schema.literal(MODEL_STATE.unloaded),
-  schema.literal(MODEL_STATE.uploading),
-]);
 
 export const modelRouter = (router: IRouter) => {
-  router.get(
+  router.post(
     {
       path: MODEL_API_ENDPOINT,
       validate: {
-        query: schema.object({
-          from: schema.number({ min: 0 }),
-          size: schema.number({ max: 50 }),
-          sort: schema.maybe(
-            schema.oneOf([modelSortQuerySchema, schema.arrayOf(modelSortQuerySchema)])
-          ),
-          states: schema.maybe(schema.oneOf([schema.arrayOf(modelStateSchema), modelStateSchema])),
-          nameOrId: schema.maybe(schema.string()),
-          extra_query: schema.maybe(schema.recordOf(schema.string(), schema.any())),
-          data_source_id: schema.maybe(schema.string()),
+        body: schema.object({
+          name: schema.string(),
+          description: schema.maybe(schema.string()),
+          modelAccessMode: schema.oneOf([
+            schema.literal('public'),
+            schema.literal('private'),
+            schema.literal('restricted'),
+          ]),
+          backendRoles: schema.maybe(schema.arrayOf(schema.string())),
+          addAllBackendRoles: schema.maybe(schema.boolean()),
+        }),
+      },
+    },
+    async (context, request, response) => {
+      const { name, description, modelAccessMode, backendRoles, addAllBackendRoles } = request.body;
+      try {
+        const payload = await ModelService.register({
+          client: context.core.opensearch.client,
+          name,
+          description,
+          modelAccessMode,
+          backendRoles,
+          addAllBackendRoles,
+        });
+        return response.ok({ body: payload });
+      } catch (error) {
+        return response.badRequest({
+          body: error instanceof Error ? error.message : JSON.stringify(error),
+        });
+      }
+    }
+  );
+
+  router.put(
+    {
+      path: `${MODEL_API_ENDPOINT}/{id}`,
+      validate: {
+        params: schema.object({
+          id: schema.string(),
+        }),
+        body: schema.object({
+          name: schema.maybe(schema.string()),
+          description: schema.maybe(schema.string()),
         }),
       },
     },
     async (context, request, response) => {
       const {
-        from,
-        size,
-        sort,
-        states,
-        nameOrId,
-        extra_query: extraQuery,
-        data_source_id: dataSourceId,
-      } = request.query;
+        params: { id },
+        body: { name, description },
+      } = request;
+      try {
+        const payload = await ModelService.update({
+          client: context.core.opensearch.client,
+          id,
+          name,
+          description,
+        });
+        return response.ok({ body: payload });
+      } catch (error) {
+        return response.badRequest({
+          body: error instanceof Error ? error.message : JSON.stringify(error),
+        });
+      }
+    }
+  );
+
+  router.delete(
+    {
+      path: `${MODEL_API_ENDPOINT}/{id}`,
+      validate: {
+        params: schema.object({
+          id: schema.string(),
+        }),
+      },
+    },
+    async (context, request, response) => {
+      try {
+        const payload = await ModelService.delete({
+          client: context.core.opensearch.client,
+          id: request.params.id,
+        });
+        return response.ok({ body: payload });
+      } catch (error) {
+        return response.badRequest({
+          body: error instanceof Error ? error.message : JSON.stringify(error),
+        });
+      }
+    }
+  );
+
+  router.get(
+    {
+      path: MODEL_API_ENDPOINT,
+      validate: {
+        query: schema.object({
+          ids: schema.maybe(schema.oneOf([schema.string(), schema.arrayOf(schema.string())])),
+          name: schema.maybe(schema.string()),
+          from: schema.number({ min: 0 }),
+          size: schema.number({ max: 100 }),
+          extraQuery: schema.maybe(schema.recordOf(schema.string(), schema.any())),
+        }),
+      },
+    },
+    async (context, request, response) => {
+      const { ids, name, from, size, extraQuery } = request.query;
       try {
         const payload = await ModelService.search({
-          transport: await getOpenSearchClientTransport({
-            dataSourceId,
-            context,
-          }),
+          client: context.core.opensearch.client,
+          ids: typeof ids === 'string' ? [ids] : ids,
+          name,
           from,
           size,
-          sort: typeof sort === 'string' ? [sort] : sort,
-          states: typeof states === 'string' ? [states] : states,
-          nameOrId,
           extraQuery,
         });
         return response.ok({ body: payload });
-      } catch (err) {
-        return response.badRequest({ body: err.message });
+      } catch (error) {
+        return response.badRequest({
+          body: error instanceof Error ? error.message : JSON.stringify(error),
+        });
       }
     }
   );

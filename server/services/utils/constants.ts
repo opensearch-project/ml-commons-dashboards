@@ -18,12 +18,32 @@
  *   permissions and limitations under the License.
  */
 
-export const API_ROUTE_PREFIX = '/_plugins/_ml';
-export const PROFILE_BASE_API = `${API_ROUTE_PREFIX}/profile`;
-export const MODEL_BASE_API = `${API_ROUTE_PREFIX}/models`;
+export const ML_COMMONS_API_PREFIX = '/_plugins/_ml';
+export const PROFILE_BASE_API = `${ML_COMMONS_API_PREFIX}/profile`;
+export const MODEL_BASE_API = `${ML_COMMONS_API_PREFIX}/models`;
 export const MODEL_SEARCH_API = `${MODEL_BASE_API}/_search`;
+export const MODEL_UPLOAD_API = `${MODEL_BASE_API}/_upload`;
+export const MODEL_META_API = `${MODEL_BASE_API}/meta`;
+export const MODEL_PROFILE_API = `${PROFILE_BASE_API}/models`;
+export const PREDICT_BASE_API = `${ML_COMMONS_API_PREFIX}/_predict`;
+export const MODEL_GROUP_BASE_API = `${ML_COMMONS_API_PREFIX}/model_groups`;
+export const MODEL_GROUP_REGISTER_API = `${MODEL_GROUP_BASE_API}/_register`;
+export const MODEL_GROUP_UPDATE_API = `${MODEL_GROUP_BASE_API}/<model_group_id>/_update`;
+export const MODEL_GROUP_SEARCH_API = `${MODEL_GROUP_BASE_API}/_search`;
 
-export const CONNECTOR_BASE_API = `${API_ROUTE_PREFIX}/connectors`;
+export const SECURITY_API_PREFIX = '/_plugins/_security/api';
+export const SECURITY_ACCOUNT_API = `${SECURITY_API_PREFIX}/account`;
+
+export const TASK_BASE_API = `${ML_COMMONS_API_PREFIX}/tasks`;
+
+export const CLUSTER = {
+  TRAIN: 'opensearch_mlCommonsTrain',
+  MODEL: 'opensearch_mlCommonsModel',
+  TASK: 'opensearch_mlCommonsTask',
+  PREDICT: 'opensearch_mlCommonsPredict',
+};
+
+export const CONNECTOR_BASE_API = `${ML_COMMONS_API_PREFIX}/connectors`;
 export const CONNECTOR_SEARCH_API = `${CONNECTOR_BASE_API}/_search`;
 
 export const MODEL_INDEX = '.plugins-ml-model';

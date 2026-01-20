@@ -11,6 +11,10 @@ interface RouteConfig {
   Component: React.ComponentType<any>;
   label: string;
   exact?: boolean;
+  /**
+   * true: display route in nav bar
+   */
+  nav: boolean;
 }
 
 export const ROUTES: RouteConfig[] = [
@@ -18,5 +22,6 @@ export const ROUTES: RouteConfig[] = [
     path: routerPaths.overview,
     Component: Monitoring,
     label: 'Overview',
+    nav: true,
   },
 ];
