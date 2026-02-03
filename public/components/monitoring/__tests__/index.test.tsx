@@ -132,16 +132,6 @@ const mockOffsetMethods = () => {
 };
 
 describe('<Monitoring />', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
-    jest.clearAllMocks();
-  });
-
   describe('pageStatus', () => {
     it('should render empty monitoring without filter and total count', () => {
       setup({
@@ -250,6 +240,7 @@ describe('<Monitoring />', () => {
   });
 
   it('should reload table data at 10s interval by default when starts auto refresh', async () => {
+    jest.useFakeTimers();
     const {
       finalMonitoringReturnValue: { reload },
       user,
@@ -269,6 +260,10 @@ describe('<Monitoring />', () => {
     // Reload at the 2nd time
     jest.advanceTimersByTime(10000);
     expect(reload).toHaveBeenCalledTimes(2);
+
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+    jest.clearAllMocks();
   });
 
   it('should display total number of results', async () => {

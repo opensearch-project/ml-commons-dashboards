@@ -18,15 +18,6 @@ async function setup({ minInterval = 3000, onRefresh = jest.fn() }) {
 }
 
 describe('<RefreshInterval />', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
-  });
-
   it('should render a paused RefreshInterval by default', async () => {
     await setup({ minInterval: 3000 });
     const currentIntervalInput = screen.getByLabelText(/current interval value/i);
@@ -92,63 +83,74 @@ describe('<RefreshInterval />', () => {
     expect(screen.getByLabelText(/current interval value/i)).toHaveValue('Off');
   });
 
-  it('should call `onRefresh` callback by default with minInterval when interval started', async () => {
-    const onRefresh = jest.fn();
-    const { user } = await setup({ minInterval: 3000, onRefresh });
-    expect(onRefresh).not.toHaveBeenCalled();
+  describe('onRefresh functionality', () => {
+    beforeAll(() => {
+      jest.useFakeTimers();
+    });
 
-    await user.click(screen.getByLabelText(/start refresh interval/i));
-    jest.advanceTimersByTime(3000);
-    expect(onRefresh).toHaveBeenCalled();
-  });
+    afterAll(() => {
+      jest.useRealTimers();
+    });
 
-  it('should call `onRefresh` callback with user set interval when interval started', async () => {
-    const onRefresh = jest.fn();
-    const { user } = await setup({ minInterval: 3000, onRefresh });
-    expect(onRefresh).not.toHaveBeenCalled();
+    it('should call `onRefresh` callback by default with minInterval when interval started', async () => {
+      const onRefresh = jest.fn();
+      const { user } = await setup({ minInterval: 3000, onRefresh });
+      expect(onRefresh).not.toHaveBeenCalled();
 
-    // user set interval to 10s
-    await user.clear(screen.getByLabelText(/interval value input/i));
-    await user.type(screen.getByLabelText(/interval value input/i), '10');
+      await user.click(screen.getByLabelText(/start refresh interval/i));
+      jest.advanceTimersByTime(3000);
+      expect(onRefresh).toHaveBeenCalled();
+    });
 
-    await user.click(screen.getByLabelText(/start refresh interval/i));
-    jest.advanceTimersByTime(10000);
-    expect(onRefresh).toHaveBeenCalled();
-  });
+    it('should call `onRefresh` callback with user set interval when interval started', async () => {
+      const onRefresh = jest.fn();
+      const { user } = await setup({ minInterval: 3000, onRefresh });
+      expect(onRefresh).not.toHaveBeenCalled();
 
-  it('should NOT call `onRefresh` callback when interval stopped', async () => {
-    const onRefresh = jest.fn();
-    const { user } = await setup({ minInterval: 3000, onRefresh });
-    expect(onRefresh).not.toHaveBeenCalled();
+      // user set interval to 10s
+      await user.clear(screen.getByLabelText(/interval value input/i));
+      await user.type(screen.getByLabelText(/interval value input/i), '10');
 
-    await user.click(screen.getByLabelText(/start refresh interval/i));
-    jest.advanceTimersByTime(3000);
-    expect(onRefresh).toHaveBeenCalledTimes(1);
+      await user.click(screen.getByLabelText(/start refresh interval/i));
+      jest.advanceTimersByTime(10000);
+      expect(onRefresh).toHaveBeenCalled();
+    });
 
-    await user.click(screen.getByLabelText(/stop refresh interval/i));
-    jest.advanceTimersByTime(10000);
-    // only called once, it should not be called after `stop refresh interval`
-    expect(onRefresh).toHaveBeenCalledTimes(1);
-  });
+    it('should NOT call `onRefresh` callback when interval stopped', async () => {
+      const onRefresh = jest.fn();
+      const { user } = await setup({ minInterval: 3000, onRefresh });
+      expect(onRefresh).not.toHaveBeenCalled();
 
-  it('should pause the current interval if user set an invalid interval value', async () => {
-    const onRefresh = jest.fn();
-    const { user } = await setup({ minInterval: 3000, onRefresh });
-    expect(onRefresh).not.toHaveBeenCalled();
+      await user.click(screen.getByLabelText(/start refresh interval/i));
+      jest.advanceTimersByTime(3000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
 
-    // user start interval
-    await user.click(screen.getByLabelText(/start refresh interval/i));
-    jest.advanceTimersByTime(3000);
-    expect(onRefresh).toHaveBeenCalledTimes(1);
+      await user.click(screen.getByLabelText(/stop refresh interval/i));
+      jest.advanceTimersByTime(10000);
+      // only called once, it should not be called after `stop refresh interval`
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
 
-    // user set a invalid interval value on the fly
-    await user.clear(screen.getByLabelText(/interval value input/i));
-    await user.type(screen.getByLabelText(/interval value input/i), '1');
-    jest.advanceTimersByTime(3000);
-    // only called once, it should not be called when invalid value is set
-    expect(onRefresh).toHaveBeenCalledTimes(1);
+    it('should pause the current interval if user set an invalid interval value', async () => {
+      const onRefresh = jest.fn();
+      const { user } = await setup({ minInterval: 3000, onRefresh });
+      expect(onRefresh).not.toHaveBeenCalled();
 
-    // The start button is disabled
-    expect(screen.getByLabelText(/start refresh interval/i)).toBeDisabled();
+      // user start interval
+      await user.click(screen.getByLabelText(/start refresh interval/i));
+      jest.advanceTimersByTime(3000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+
+      // user set a invalid interval value on the fly
+      await user.clear(screen.getByLabelText(/interval value input/i));
+      await user.type(screen.getByLabelText(/interval value input/i), '1');
+      jest.advanceTimersByTime(3000);
+      jest.runOnlyPendingTimers();
+      // only called once, it should not be called when invalid value is set
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+
+      // The start button is disabled
+      expect(screen.getByLabelText(/start refresh interval/i)).toBeDisabled();
+    });
   });
 });
