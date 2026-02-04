@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act } from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { DO_NOT_FETCH, useFetcher } from '../use_fetcher';
 
 describe('useFetcher', () => {
   it('should call fetcher with consistent params and return consistent result', async () => {
     const data = { foo: 'bar' };
     const fetcher = jest.fn((_arg1: string) => Promise.resolve(data));
-    const { result, waitFor } = renderHook(() => useFetcher(fetcher, 'foo'));
+    const { result } = renderHook(() => useFetcher(fetcher, 'foo'));
 
     await waitFor(() => result.current.data !== null);
     expect(result.current.data).toBe(data);
@@ -20,7 +21,7 @@ describe('useFetcher', () => {
 
   it('should call fetcher only once if params content not change', async () => {
     const fetcher = jest.fn((_arg1: any) => Promise.resolve());
-    const { result, waitFor, rerender } = renderHook(({ params }) => useFetcher(fetcher, params), {
+    const { result, rerender } = renderHook(({ params }) => useFetcher(fetcher, params), {
       initialProps: { params: { foo: 'bar' } },
     });
 
@@ -107,7 +108,7 @@ describe('useFetcher', () => {
   it('should return consistent updated data', async () => {
     const fetcher = () => Promise.resolve('foo');
 
-    const { result, waitFor } = renderHook(() => useFetcher(fetcher));
+    const { result } = renderHook(() => useFetcher(fetcher));
 
     await waitFor(() => result.current.data === 'foo');
     await act(async () => {
@@ -120,7 +121,7 @@ describe('useFetcher', () => {
   it('should return consistent mutated data', async () => {
     const fetcher = () => Promise.resolve('foo');
 
-    const { result, waitFor } = renderHook(() => useFetcher(fetcher));
+    const { result } = renderHook(() => useFetcher(fetcher));
 
     await waitFor(() => result.current.data === 'foo');
 
@@ -150,14 +151,11 @@ describe('useFetcher', () => {
 
   it('should call fetcher after first parameter changed from DO_NOT_FETCH', async () => {
     const fetcher = jest.fn(async (...params) => params);
-    const { result, rerender, waitFor } = renderHook(
-      ({ params }) => useFetcher(fetcher, ...params),
-      {
-        initialProps: {
-          params: [DO_NOT_FETCH],
-        },
-      }
-    );
+    const { result, rerender } = renderHook(({ params }) => useFetcher(fetcher, ...params), {
+      initialProps: {
+        params: [DO_NOT_FETCH],
+      },
+    });
 
     rerender({ params: [] });
     expect(result.current.loading).toBe(true);

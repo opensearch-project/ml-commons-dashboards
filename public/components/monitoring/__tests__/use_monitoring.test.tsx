@@ -2,8 +2,8 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
-import React, { useContext } from 'react';
-import { act, renderHook } from '@testing-library/react-hooks';
+import React, { useContext, act } from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
 
 import { Model, ModelSearchResponse } from '../../../apis/model';
 import { Connector } from '../../../apis/connector';
@@ -81,7 +81,7 @@ describe('useMonitoring', () => {
   });
 
   it('should call search API with consistent nameOrId and states after filter applied', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => result.current.pageStatus === 'normal');
 
@@ -127,7 +127,7 @@ describe('useMonitoring', () => {
   });
 
   it('should call search API with consistent sort and pagination after table change', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() =>
       expect(Model.prototype.search).toHaveBeenCalledWith(
@@ -157,7 +157,7 @@ describe('useMonitoring', () => {
   });
 
   it('should call search API twice after reload called', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => expect(Model.prototype.search).toHaveBeenCalledTimes(1));
 
@@ -208,7 +208,7 @@ describe('useMonitoring', () => {
       ],
       total_models: 3,
     });
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => {
       expect(result.current.deployedModels).toEqual(
@@ -256,7 +256,7 @@ describe('useMonitoring', () => {
       ],
       total_models: 1,
     });
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => {
       expect(result.current.deployedModels).toEqual(
@@ -294,7 +294,7 @@ describe('useMonitoring', () => {
       ],
       total_models: 1,
     });
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => {
       expect(result.current.deployedModels).toEqual(
@@ -311,7 +311,7 @@ describe('useMonitoring', () => {
   });
 
   it('should call searchByNameOrId with from 0 after page changed', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     act(() => {
       result.current.handleTableChange({
@@ -341,7 +341,7 @@ describe('useMonitoring', () => {
   });
 
   it('should call searchByStatus with from 0 after page changed', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     act(() => {
       result.current.handleTableChange({
@@ -371,7 +371,7 @@ describe('useMonitoring', () => {
   });
 
   it('should call search API with consistent extraQuery after source filter applied', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => result.current.pageStatus === 'normal');
 
@@ -434,7 +434,7 @@ describe('useMonitoring', () => {
   });
 
   it('should call search API with consistent extraQuery after connector filter applied', async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => result.current.pageStatus === 'normal');
     act(() => {
@@ -477,9 +477,7 @@ describe('useMonitoring', () => {
   });
 
   it('should not call model search if selected data source is null', async () => {
-    const {
-      renderHookResult: { waitFor },
-    } = setup({
+    setup({
       initDataSourceContextValue: {
         dataSourceEnabled: true,
         selectedDataSourceOption: null,
@@ -492,9 +490,7 @@ describe('useMonitoring', () => {
 
   it('should call model search and connector get all with data source id', async () => {
     const getAllConnectorMock = jest.spyOn(Connector.prototype, 'getAll');
-    const {
-      renderHookResult: { waitFor },
-    } = setup({
+    setup({
       initDataSourceContextValue: {
         dataSourceEnabled: true,
         selectedDataSourceOption: { id: 'foo' },
@@ -511,7 +507,7 @@ describe('useMonitoring', () => {
 
   it('should reset connector filter and current page after data source change', async () => {
     const {
-      renderHookResult: { result, waitFor },
+      renderHookResult: { result },
       setSelectedDataSourceOption,
     } = setup({
       initDataSourceContextValue: {
@@ -549,7 +545,7 @@ describe('useMonitoring', () => {
 
   it('should reset connectors, status, source and nameOrId filter after resetSearch called', async () => {
     const {
-      renderHookResult: { result, waitFor },
+      renderHookResult: { result },
     } = setup();
     act(() => {
       result.current.searchByNameOrId('foo');
@@ -583,7 +579,7 @@ describe('useMonitoring', () => {
 
   it('should reset to max page when current page greater than max page', async () => {
     const {
-      renderHookResult: { result, waitFor },
+      renderHookResult: { result },
     } = setup();
     await waitFor(() => {
       expect(Model.prototype.search).toHaveBeenCalled();
@@ -661,7 +657,7 @@ describe('useMonitoring.pageStatus', () => {
   });
 
   it("should return 'reset-filter' when search by name or id but no result was found", async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     // Page status is normal for the initial run(search returns mocked results)
     await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
@@ -675,7 +671,7 @@ describe('useMonitoring.pageStatus', () => {
   });
 
   it("should return 'reset-filter' when filter by status but no result was found", async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     // Page status is normal for the initial run(search returns mocked results)
     await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
@@ -689,7 +685,7 @@ describe('useMonitoring.pageStatus', () => {
   });
 
   it("should return 'reset-filter' when filter by source but no result was found", async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     // Page status is normal for the initial run(search returns mocked results)
     await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
@@ -703,7 +699,7 @@ describe('useMonitoring.pageStatus', () => {
   });
 
   it("should return 'reset-filter' when filter by connector but no result was found", async () => {
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     // Page status is normal for the initial run(search returns mocked results)
     await waitFor(() => expect(result.current.pageStatus).toBe('normal'));
@@ -718,14 +714,14 @@ describe('useMonitoring.pageStatus', () => {
 
   it("should return 'empty' if empty data return", async () => {
     mockEmptyRecords();
-    const { result, waitFor } = renderHook(() => useMonitoring());
+    const { result } = renderHook(() => useMonitoring());
 
     await waitFor(() => expect(result.current.pageStatus).toBe('empty'));
   });
 
   it('should return "loading" and not call model search when data source id is fetching', async () => {
     const {
-      renderHookResult: { result, waitFor },
+      renderHookResult: { result },
     } = setup();
 
     await waitFor(() => {
