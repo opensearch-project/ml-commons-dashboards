@@ -14,5 +14,6 @@
   ],
   "optionalPlugins": ["dataSource", "dataSourceManagement"],
   "supportedOSDataSourceVersions": ">=2.9.0",
-  "requiredOSDataSourcePlugins": ["opensearch-ml"]
+  "requiredOSDataSourcePlugins": ["opensearch-ml"],
+  "unsupportedOSDataSourceEngineTypes": ["AnalyticEngine"]
 }

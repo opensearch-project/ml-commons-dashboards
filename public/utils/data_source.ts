@@ -57,5 +57,17 @@ export const isDataSourceCompatible = (dataSource: SavedObject<DataSourceAttribu
   ) {
     return false;
   }
+
+  // filter out data sources with unsupported engine types
+  if (
+    'unsupportedOSDataSourceEngineTypes' in pluginManifest &&
+    dataSource.attributes.dataSourceEngineType &&
+    pluginManifest.unsupportedOSDataSourceEngineTypes.includes(
+      dataSource.attributes.dataSourceEngineType
+    )
+  ) {
+    return false;
+  }
+
   return true;
 };
