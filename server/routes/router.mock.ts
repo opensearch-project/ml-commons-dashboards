@@ -12,8 +12,6 @@ import {
   ServerRealm,
   ServerStateCookieOptions,
 } from '@hapi/hapi';
-// @ts-ignore
-import Response from '@hapi/hapi/lib/response';
 import { ProxyHandlerOptions } from '@hapi/h2o2';
 import { ReplyFileHandlerOptions } from '@hapi/inert';
 import { httpServerMock } from '../../../../src/core/server/http/http_server.mocks';
@@ -89,8 +87,12 @@ export class MockResponseToolkit implements ResponseToolkit {
   proxy(options: ProxyHandlerOptions): Promise<ResponseObject> {
     throw new Error('Method not implemented.');
   }
-  response(payload: unknown) {
-    return new Response(payload);
+  response(payload: unknown): ResponseObject {
+    const obj = { source: payload } as ResponseObject;
+    obj.code = () => obj;
+    obj.header = () => obj;
+    obj.type = () => obj;
+    return obj;
   }
 }
 
