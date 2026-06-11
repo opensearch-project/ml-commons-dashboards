@@ -77,6 +77,30 @@ describe('isDataSourceCompatible', () => {
     ).toBe(true);
   });
 
+  it('should return false for data sources with unsupported engine type', () => {
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '2.13.0',
+          dataSourceEngineType: 'AnalyticEngine',
+        },
+      })
+    ).toBe(false);
+  });
+
+  it('should return true for data sources with supported engine type', () => {
+    expect(
+      isDataSourceCompatible({
+        attributes: {
+          installedPlugins: ['opensearch-ml'],
+          dataSourceVersion: '2.13.0',
+          dataSourceEngineType: 'OpenSearch',
+        },
+      })
+    ).toBe(true);
+  });
+
   it('should return false for un-compatible data sources', () => {
     expect(
       isDataSourceCompatible({
