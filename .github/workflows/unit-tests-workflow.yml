@@ -27,13 +27,13 @@ jobs:
 
     steps:
       - name: Checkout OpenSearch Dashboards
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
         with:
           repository: opensearch-project/OpenSearch-Dashboards
           ref: ${{ env.OPENSEARCH_DASHBOARDS_VERSION }}
           path: OpenSearch-Dashboards
       - name: Checkout ML Commons OpenSearch Dashboards plugin
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
         with:
           path: OpenSearch-Dashboards/plugins/ml-commons-dashboards
       - name: Bootstrap / build / unittest
@@ -44,4 +44,4 @@ jobs:
                                cd ./plugins/ml-commons-dashboards &&
                                whoami && yarn osd bootstrap && yarn run test:jest --silent --coverage"
       - name: Uploads coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@29386c70ef20e286228c72b668a06fd0e8399192 # v1
