@@ -18,5 +18,9 @@
     "@testing-library/user-event": "^14.4.3",
     "husky": "^8.0.0",
     "lint-staged": "^10.0.0"
+  },
+  "resolutions": {
+    "picomatch": "^2.3.2",
+    "yaml": "^1.10.3"
   }
 }
