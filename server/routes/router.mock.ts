@@ -96,19 +96,19 @@ export class MockResponseToolkit implements ResponseToolkit {
   }
 }
 
-const enhanceWithContext = (((coreContext: CoreRouteHandlerContext, otherContext?: object) => (
-  fn: (...args: unknown[]) => unknown
-) => (req: OpenSearchDashboardsRequest, res: OpenSearchDashboardsResponseFactory) => {
-  return fn.call(
-    null,
-    {
-      core: coreContext,
-      ...otherContext,
-    },
-    req,
-    res
-  );
-}) as unknown) as (
+const enhanceWithContext = ((coreContext: CoreRouteHandlerContext, otherContext?: object) =>
+  (fn: (...args: unknown[]) => unknown) =>
+  (req: OpenSearchDashboardsRequest, res: OpenSearchDashboardsResponseFactory) => {
+    return fn.call(
+      null,
+      {
+        core: coreContext,
+        ...otherContext,
+      },
+      req,
+      res
+    );
+  }) as unknown as (
   otherContext?: object
 ) => ContextEnhancer<unknown, unknown, unknown, RouteMethod>;
 

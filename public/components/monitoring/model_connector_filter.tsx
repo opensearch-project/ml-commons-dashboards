@@ -9,11 +9,10 @@ import { DO_NOT_FETCH, useFetcher } from '../../hooks';
 import { APIProvider } from '../../apis/api_provider';
 import { DataSourceId } from '../../utils/data_source';
 
-interface ModelConnectorFilterProps
-  extends Omit<
-    OptionsFilterProps,
-    'name' | 'options' | 'searchPlaceholder' | 'loading' | 'value' | 'onChange'
-  > {
+interface ModelConnectorFilterProps extends Omit<
+  OptionsFilterProps,
+  'name' | 'options' | 'searchPlaceholder' | 'loading' | 'value' | 'onChange'
+> {
   allExternalConnectors?: Array<{ id: string; name: string }>;
   value: string[];
   onChange: (value: string[]) => void;

@@ -105,9 +105,12 @@ export const RefreshInterval = ({
          * the max delayed value of setInterval is MAX_SIGNED_32_BIT_INTEGER, the inner function will be executed immediately
          * if the delayed value is greater than MAX_SIGNED_32_BIT_INTEGER. Add a Math.min here to avoid been executed immediately.
          **/
-        intervalId = window.setInterval(() => {
-          onRefresh();
-        }, Math.min(interval, MAX_SIGNED_32_BIT_INTEGER));
+        intervalId = window.setInterval(
+          () => {
+            onRefresh();
+          },
+          Math.min(interval, MAX_SIGNED_32_BIT_INTEGER)
+        );
       }
     }
 
@@ -129,7 +132,7 @@ export const RefreshInterval = ({
       onClick={() => setIsPopoverOpen(!isPopoverOpen)}
       aria-label="set refresh interval"
     >
-      <EuiIcon type="clock" />
+      <EuiIcon type="clock" aria-hidden={true} />
     </EuiSmallButtonEmpty>
   );
 
