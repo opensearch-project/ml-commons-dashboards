@@ -44,4 +44,4 @@ jobs:
       - name: Run lint
         run: |
           cd OpenSearch-Dashboards/plugins/ml-commons-dashboards
-          yarn run lint:es --ext .tsx --ext .ts .
+          yarn run lint:es

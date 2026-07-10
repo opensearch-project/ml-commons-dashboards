@@ -41,7 +41,7 @@ export const StatusFilter = ({ onUpdateFilters, options, loading }: Props) => {
       return {
         ...item,
         label: status!.label,
-        prepend: <EuiIcon type="dot" color={status!.color} />,
+        prepend: <EuiIcon type="dot" color={status!.color} aria-hidden={true} />,
       };
     });
   }, [options]);

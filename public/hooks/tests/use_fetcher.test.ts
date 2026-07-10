@@ -84,7 +84,7 @@ describe('useFetcher', () => {
         resolve('bar');
       };
     });
-    const fetcher = jest.fn((id: 'foo' | 'bar') => ({ foo: fooResult, bar: barResult }[id]));
+    const fetcher = jest.fn((id: 'foo' | 'bar') => ({ foo: fooResult, bar: barResult })[id]);
     const { result, rerender } = renderHook(
       ({ id }: { id: 'foo' | 'bar' }) => useFetcher(fetcher, id),
       {

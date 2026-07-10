@@ -21,11 +21,8 @@ const setupRouter = ({
   getClient?: (dataSourceId: string) => Promise<Pick<OpenSearchClient, 'transport'>>;
 } = {}) => {
   const mockedLogger = loggerMock.create();
-  const {
-    router,
-    dataSourceTransportMock,
-    getLatestCurrentUserTransport,
-  } = createDataSourceEnhancedRouter(mockedLogger, getClient);
+  const { router, dataSourceTransportMock, getLatestCurrentUserTransport } =
+    createDataSourceEnhancedRouter(mockedLogger, getClient);
 
   connectorRouter(router);
   return {

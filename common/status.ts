@@ -13,4 +13,4 @@ export const STATUS_FILTER = [
   { label: 'Not responding', color: '#BD271E', value: 'not-responding' },
 ] as const;
 
-export type STATUS_VALUE = typeof STATUS_FILTER[number]['value'];
+export type STATUS_VALUE = (typeof STATUS_FILTER)[number]['value'];

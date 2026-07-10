@@ -16,11 +16,8 @@ import { ModelService } from '../../services';
 
 const setupRouter = () => {
   const mockedLogger = loggerMock.create();
-  const {
-    router,
-    dataSourceTransportMock,
-    getLatestCurrentUserTransport,
-  } = createDataSourceEnhancedRouter(mockedLogger);
+  const { router, dataSourceTransportMock, getLatestCurrentUserTransport } =
+    createDataSourceEnhancedRouter(mockedLogger);
 
   modelRouter(router);
   return {

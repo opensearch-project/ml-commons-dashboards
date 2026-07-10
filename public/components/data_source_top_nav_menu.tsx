@@ -26,13 +26,15 @@ export const DataSourceTopNavMenu = ({
   setActionMenu,
   dataSourceManagement,
 }: DataSourceTopNavMenuProps) => {
-  const DataSourceMenu = useMemo(() => dataSourceManagement?.ui.getDataSourceMenu(), [
-    dataSourceManagement,
-  ]);
+  const DataSourceMenu = useMemo(
+    () => dataSourceManagement?.ui.getDataSourceMenu(),
+    [dataSourceManagement]
+  );
   const { selectedDataSourceOption, setSelectedDataSourceOption } = useContext(DataSourceContext);
-  const activeOption = useMemo(() => (selectedDataSourceOption ? [selectedDataSourceOption] : []), [
-    selectedDataSourceOption,
-  ]);
+  const activeOption = useMemo(
+    () => (selectedDataSourceOption ? [selectedDataSourceOption] : []),
+    [selectedDataSourceOption]
+  );
 
   const handleDataSourcesSelected = useCallback<
     DataSourceSelectableConfig['onSelectedDataSources']

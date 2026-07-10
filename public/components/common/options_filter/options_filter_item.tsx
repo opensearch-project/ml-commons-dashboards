@@ -6,8 +6,10 @@
 import React, { useCallback } from 'react';
 import { EuiFilterSelectItem, EuiFilterSelectItemProps } from '@elastic/eui';
 
-export interface OptionsFilterItemProps<T extends string | number>
-  extends Pick<EuiFilterSelectItemProps, 'checked' | 'children'> {
+export interface OptionsFilterItemProps<T extends string | number> extends Pick<
+  EuiFilterSelectItemProps,
+  'checked' | 'children'
+> {
   value: T;
   onClick: (value: T) => void;
 }

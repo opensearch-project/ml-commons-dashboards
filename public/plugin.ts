@@ -20,8 +20,10 @@ import {
 } from './types';
 import { PLUGIN_NAME, PLUGIN_ID } from '../common';
 
-export class MlCommonsPluginPlugin
-  implements Plugin<MlCommonsPluginPluginSetup, MlCommonsPluginPluginStart> {
+export class MlCommonsPluginPlugin implements Plugin<
+  MlCommonsPluginPluginSetup,
+  MlCommonsPluginPluginStart
+> {
   public setup(
     core: CoreSetup<AppPluginStartDependencies, AppPluginStartDependencies>,
     { dataSource, dataSourceManagement }: MlCommonsPluginPluginSetupDependencies

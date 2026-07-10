@@ -16,11 +16,8 @@ import { profileRouter } from '../profile_router';
 
 const setupRouter = () => {
   const mockedLogger = loggerMock.create();
-  const {
-    router,
-    dataSourceTransportMock,
-    getLatestCurrentUserTransport,
-  } = createDataSourceEnhancedRouter(mockedLogger);
+  const { router, dataSourceTransportMock, getLatestCurrentUserTransport } =
+    createDataSourceEnhancedRouter(mockedLogger);
 
   profileRouter(router);
   return {
