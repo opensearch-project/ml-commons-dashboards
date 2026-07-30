@@ -14,6 +14,7 @@ module.exports = {
     // query-string v9 is pure ESM; this shim restores the default-import shape
     // (`import qs from 'query-string'`) under Jest's CJS transform.
     '^query-string$': '<rootDir>/test/mocks/queryStringMock.js',
+    '^uuid$': '<rootDir>/../../node_modules/uuid/dist/cjs/index.js',
   },
   testMatch: ['**/*.test.{js,mjs,ts,tsx}'],
   testPathIgnorePatterns: ['<rootDir>/target/', '<rootDir>/node_modules/', '<rootDir>/build/'],
