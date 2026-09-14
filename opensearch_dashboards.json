@@ -12,7 +12,7 @@
     "dashboard",
     "opensearchUiShared"
   ],
-  "optionalPlugins": ["dataSource", "dataSourceManagement", "securityDashboards"],
+  "optionalPlugins": ["dataSource", "dataSourceManagement"],
   "supportedOSDataSourceVersions": ">=2.9.0",
   "requiredOSDataSourcePlugins": ["opensearch-ml"],
   "unsupportedOSDataSourceEngineTypes": ["AnalyticEngine"]
