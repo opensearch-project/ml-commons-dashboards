@@ -419,9 +419,7 @@ describe('<Monitoring />', () => {
       jest.spyOn(InnerHttpProvider, 'getHttp').mockReturnValue({ get } as any);
       jest.spyOn(SecurityDashboardsProvider, 'getSecurityDashboards').mockReturnValue({
         ui: {
-          isResourceSharingAvailable: jest.fn((type: string) =>
-            Promise.resolve(spiConfirms(type))
-          ),
+          isResourceSharingAvailable: jest.fn((type: string) => Promise.resolve(spiConfirms(type))),
         },
       } as any);
       return get;
