@@ -44,7 +44,7 @@ export class MlCommonsPluginPlugin implements Plugin<
         const { renderApp } = await import('./application');
         // Get start services as specified in opensearch_dashboards.json
         const [coreStart, pluginsStart] = await core.getStartServices();
-        const { data, navigation } = pluginsStart;
+        const { data, navigation, securityDashboards } = pluginsStart;
 
         const services: MLServices = {
           ...coreStart,
@@ -53,6 +53,7 @@ export class MlCommonsPluginPlugin implements Plugin<
           history: params.history,
           dataSource,
           dataSourceManagement,
+          securityDashboards,
           setHeaderActionMenu: params.setHeaderActionMenu,
         };
         // Render the application

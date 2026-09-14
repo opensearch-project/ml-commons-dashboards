@@ -11,6 +11,7 @@ import { Monitoring, getResourceSharingAvailableTypes } from '../index';
 import * as useMonitoringExports from '../use_monitoring';
 import { APIProvider } from '../../../apis/api_provider';
 import { InnerHttpProvider } from '../../../apis/inner_http_provider';
+import { SecurityDashboardsProvider } from '../../../apis/security_dashboards_provider';
 import { applicationServiceMock, chromeServiceMock } from '../../../../../../src/core/public/mocks';
 import { navigationPluginMock } from '../../../../../../src/plugins/navigation/public/mocks';
 
@@ -404,7 +405,11 @@ describe('<Monitoring />', () => {
       jest.restoreAllMocks();
     });
 
-    const mockResourceSharingResponses = (enabled: boolean, types: string[]) => {
+    const mockResourceSharingResponses = (
+      enabled: boolean,
+      types: string[],
+      spiConfirms: (type: string) => boolean = () => true
+    ) => {
       const get = jest.fn(async (path: string) => {
         if (path === '/api/v1/auth/resource_sharing_enabled') {
           return { enabled };
@@ -412,6 +417,13 @@ describe('<Monitoring />', () => {
         return { types: types.map((type) => ({ type })) };
       });
       jest.spyOn(InnerHttpProvider, 'getHttp').mockReturnValue({ get } as any);
+      jest.spyOn(SecurityDashboardsProvider, 'getSecurityDashboards').mockReturnValue({
+        ui: {
+          isResourceSharingAvailable: jest.fn((type: string) =>
+            Promise.resolve(spiConfirms(type))
+          ),
+        },
+      } as any);
       return get;
     };
 
@@ -436,6 +448,30 @@ describe('<Monitoring />', () => {
       await waitFor(() => expect(get).toHaveBeenCalledWith('/api/resource/types', { query: {} }));
       expect(screen.queryByRole('columnheader', { name: 'Access' })).not.toBeInTheDocument();
     });
+
+    it('should NOT render the Access column when security-dashboards-plugin is not installed', async () => {
+      const get = jest.fn(async () => ({ enabled: true, types: [{ type: 'ml-model-group' }] }));
+      jest.spyOn(InnerHttpProvider, 'getHttp').mockReturnValue({ get } as any);
+      jest.spyOn(SecurityDashboardsProvider, 'getSecurityDashboards').mockReturnValue(undefined);
+      setup();
+      await waitFor(() =>
+        expect(screen.queryByRole('columnheader', { name: 'Access' })).not.toBeInTheDocument()
+      );
+      expect(get).not.toHaveBeenCalledWith(
+        '/api/v1/auth/resource_sharing_enabled',
+        expect.anything()
+      );
+    });
+
+    it('should NOT render the Access column when the local resource-sharing SPI does not confirm the type, even though the selected data source reports it registered', async () => {
+      // Simulates: local cluster has resource sharing disabled (so the SPI
+      // never started) while the selected data source reports it enabled.
+      mockResourceSharingResponses(true, ['ml-model-group'], () => false);
+      setup();
+      await waitFor(() =>
+        expect(screen.queryByRole('columnheader', { name: 'Access' })).not.toBeInTheDocument()
+      );
+    });
   });
 });
 
@@ -446,11 +482,20 @@ describe('getResourceSharingAvailableTypes', () => {
     return get;
   };
 
+  const mockSecurityDashboards = (spiConfirms: (type: string) => boolean = () => true) => {
+    jest.spyOn(SecurityDashboardsProvider, 'getSecurityDashboards').mockReturnValue({
+      ui: {
+        isResourceSharingAvailable: jest.fn((type: string) => Promise.resolve(spiConfirms(type))),
+      },
+    } as any);
+  };
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
   it('returns an empty list when resource sharing is disabled on the data source', async () => {
+    mockSecurityDashboards();
     mockHttpGet(async (path) => {
       if (path === '/api/v1/auth/resource_sharing_enabled') {
         return { enabled: false };
@@ -460,7 +505,8 @@ describe('getResourceSharingAvailableTypes', () => {
     expect(await getResourceSharingAvailableTypes()).toEqual([]);
   });
 
-  it('returns the registered types when resource sharing is enabled', async () => {
+  it('returns the registered types when resource sharing is enabled and the local SPI confirms each one', async () => {
+    mockSecurityDashboards();
     mockHttpGet(async (path) => {
       if (path === '/api/v1/auth/resource_sharing_enabled') {
         return { enabled: true };
@@ -471,6 +517,7 @@ describe('getResourceSharingAvailableTypes', () => {
   });
 
   it('supports a bare array response from the types endpoint', async () => {
+    mockSecurityDashboards();
     mockHttpGet(async (path) => {
       if (path === '/api/v1/auth/resource_sharing_enabled') {
         return { enabled: true };
@@ -481,6 +528,7 @@ describe('getResourceSharingAvailableTypes', () => {
   });
 
   it('passes the data source id as a query parameter to both endpoints', async () => {
+    mockSecurityDashboards();
     const get = mockHttpGet(async (path) => {
       if (path === '/api/v1/auth/resource_sharing_enabled') {
         return { enabled: true };
@@ -497,15 +545,35 @@ describe('getResourceSharingAvailableTypes', () => {
   });
 
   it('omits the data source id from the query when not provided', async () => {
+    mockSecurityDashboards();
     const get = mockHttpGet(async () => ({ enabled: false }));
     await getResourceSharingAvailableTypes();
     expect(get).toHaveBeenCalledWith('/api/v1/auth/resource_sharing_enabled', { query: {} });
   });
 
   it('returns an empty list when the probe fails', async () => {
+    mockSecurityDashboards();
     mockHttpGet(async () => {
       throw new Error('network error');
     });
     expect(await getResourceSharingAvailableTypes()).toEqual([]);
+  });
+
+  it('returns an empty list without probing when security-dashboards-plugin is not installed', async () => {
+    jest.spyOn(SecurityDashboardsProvider, 'getSecurityDashboards').mockReturnValue(undefined);
+    const get = mockHttpGet(async () => ({ enabled: true, types: [{ type: 'ml-model-group' }] }));
+    expect(await getResourceSharingAvailableTypes()).toEqual([]);
+    expect(get).not.toHaveBeenCalled();
+  });
+
+  it('drops a type that the backend reports as registered but the local SPI does not confirm', async () => {
+    mockSecurityDashboards((type) => type === 'workflow');
+    mockHttpGet(async (path) => {
+      if (path === '/api/v1/auth/resource_sharing_enabled') {
+        return { enabled: true };
+      }
+      return { types: [{ type: 'ml-model-group' }, { type: 'workflow' }] };
+    });
+    expect(await getResourceSharingAvailableTypes()).toEqual(['workflow']);
   });
 });

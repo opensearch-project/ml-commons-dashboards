@@ -11,6 +11,7 @@ import { MLServices } from './types';
 import { MlCommonsPluginApp } from './components/app';
 import { InnerHttpProvider } from './apis/inner_http_provider';
 import { APIProvider } from './apis/api_provider';
+import { SecurityDashboardsProvider } from './apis/security_dashboards_provider';
 import { OpenSearchDashboardsContextProvider } from '../../../src/plugins/opensearch_dashboards_react/public';
 
 export const renderApp = (
@@ -18,6 +19,7 @@ export const renderApp = (
   services: MLServices
 ) => {
   InnerHttpProvider.setHttp(services.http);
+  SecurityDashboardsProvider.setSecurityDashboards(services.securityDashboards);
 
   ReactDOM.render(
     <Router history={history}>
@@ -46,6 +48,7 @@ export const renderApp = (
   return () => {
     ReactDOM.unmountComponentAtNode(element);
     InnerHttpProvider.setHttp(undefined);
+    SecurityDashboardsProvider.setSecurityDashboards(undefined);
     APIProvider.clear();
   };
 };
