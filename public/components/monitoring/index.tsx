@@ -12,13 +12,14 @@ import {
   EuiText,
   EuiFilterGroup,
 } from '@elastic/eui';
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 
 import { ModelDeploymentProfile } from '../../apis/profile';
 import { PreviewPanel } from '../preview_panel';
 import { ApplicationStart, ChromeStart } from '../../../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
+import { InnerHttpProvider } from '../../apis/inner_http_provider';
 
 import {
   ML_MODEL_GROUP_RESOURCE_TYPE,
@@ -28,17 +29,30 @@ import {
 import { useMonitoring } from './use_monitoring';
 
 /**
- * Whether resource sharing is available for model groups, via the core
- * capability registered by security-dashboards-plugin. False when that plugin
- * is not installed, the feature is disabled, or the ml-model-group type is
- * not registered — no plugin dependency involved.
+ * Resource-sharing types available on the given data source (feature flag +
+ * per-type list). Returns [] when disabled or on error.
  */
-export function isResourceSharingAvailableForModelGroups(application: ApplicationStart): boolean {
-  const caps = (application.capabilities as any)?.resourceSharing;
-  if (!caps?.enabled) return false;
-  const types: string = caps.availableTypes ?? '';
-  return types.split(',').includes(ML_MODEL_GROUP_RESOURCE_TYPE);
-}
+export const getResourceSharingAvailableTypes = async (
+  resourceDataSourceId?: string
+): Promise<string[]> => {
+  try {
+    const http = InnerHttpProvider.getHttp();
+    const query = resourceDataSourceId ? { dataSourceId: resourceDataSourceId } : {};
+    // Global gate: resource sharing must be enabled on the selected data source.
+    const info: any = await http.get('/api/v1/auth/dashboardsinfo', { query });
+    if (!info?.resource_sharing_enabled) {
+      return [];
+    }
+    // Per-type gate: the registered/protected shareable types on that source.
+    const typesResp: any = await http.get('/api/resource/types', { query });
+    const rawTypes = Array.isArray(typesResp) ? typesResp : (typesResp?.types ?? []);
+    return rawTypes
+      .map((entry: { type: string }) => entry?.type)
+      .filter((type: string | undefined): type is string => Boolean(type));
+  } catch (e) {
+    return [];
+  }
+};
 import { ModelStatusFilter } from './model_status_filter';
 import { SearchBar } from './search_bar';
 import { ModelSourceFilter } from './model_source_filter';
@@ -72,7 +86,35 @@ export const Monitoring = (props: MonitoringProps) => {
     model: ModelDeploymentItem;
     dataSourceId: string | undefined;
   } | null>(null);
+  const [resourceSharing, setResourceSharing] = useState<{
+    dataSourceId: string | undefined | symbol;
+    types: string[];
+  }>({ dataSourceId: undefined, types: [] });
   const searchInputRef = useRef<HTMLInputElement | null>();
+
+  // Probe the shareable resource types on mount and whenever the selected
+  // data source changes, so the Access column reflects the selected source.
+  useEffect(() => {
+    // Skip while the data source id is still being resolved or is invalid.
+    if (typeof params.dataSourceId === 'symbol') {
+      return;
+    }
+    let ignore = false;
+    getResourceSharingAvailableTypes(params.dataSourceId).then((types) => {
+      if (!ignore) {
+        setResourceSharing((previous) =>
+          previous.dataSourceId === params.dataSourceId &&
+          previous.types.length === 0 &&
+          types.length === 0
+            ? previous
+            : { dataSourceId: params.dataSourceId, types }
+        );
+      }
+    });
+    return () => {
+      ignore = true;
+    };
+  }, [params.dataSourceId]);
 
   const setInputRef = useCallback((node: HTMLInputElement | null) => {
     searchInputRef.current = node;
@@ -173,7 +215,10 @@ export const Monitoring = (props: MonitoringProps) => {
           onChange={handleTableChange}
           onViewDetail={handleViewDetail}
           onResetSearchClick={onResetSearch}
-          resourceSharingEnabled={isResourceSharingAvailableForModelGroups(application)}
+          resourceSharingEnabled={
+            resourceSharing.dataSourceId === params.dataSourceId &&
+            resourceSharing.types.includes(ML_MODEL_GROUP_RESOURCE_TYPE)
+          }
         />
         {preview && (
           <PreviewPanel
