@@ -86,7 +86,10 @@ export const Monitoring = (props: MonitoringProps) => {
     model: ModelDeploymentItem;
     dataSourceId: string | undefined;
   } | null>(null);
-  const [resourceSharingAvailableTypes, setResourceSharingAvailableTypes] = useState<string[]>([]);
+  const [resourceSharing, setResourceSharing] = useState<{
+    dataSourceId: string | undefined | symbol;
+    types: string[];
+  }>({ dataSourceId: undefined, types: [] });
   const searchInputRef = useRef<HTMLInputElement | null>();
 
   // Probe the shareable resource types on mount and whenever the selected
@@ -99,8 +102,12 @@ export const Monitoring = (props: MonitoringProps) => {
     let ignore = false;
     getResourceSharingAvailableTypes(params.dataSourceId).then((types) => {
       if (!ignore) {
-        setResourceSharingAvailableTypes((previousTypes) =>
-          previousTypes.length === 0 && types.length === 0 ? previousTypes : types
+        setResourceSharing((previous) =>
+          previous.dataSourceId === params.dataSourceId &&
+          previous.types.length === 0 &&
+          types.length === 0
+            ? previous
+            : { dataSourceId: params.dataSourceId, types }
         );
       }
     });
@@ -208,9 +215,10 @@ export const Monitoring = (props: MonitoringProps) => {
           onChange={handleTableChange}
           onViewDetail={handleViewDetail}
           onResetSearchClick={onResetSearch}
-          resourceSharingEnabled={resourceSharingAvailableTypes.includes(
-            ML_MODEL_GROUP_RESOURCE_TYPE
-          )}
+          resourceSharingEnabled={
+            resourceSharing.dataSourceId === params.dataSourceId &&
+            resourceSharing.types.includes(ML_MODEL_GROUP_RESOURCE_TYPE)
+          }
         />
         {preview && (
           <PreviewPanel
