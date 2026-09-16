@@ -32,6 +32,22 @@ import { useMonitoring } from './use_monitoring';
  * Resource-sharing types available on the given data source (feature flag +
  * per-type list). Returns [] when disabled or on error.
  */
+/**
+ * Whether the Access column may be shown for a resource type on the currently selected data source.
+ *
+ * The probed types are only trustworthy when they were resolved for the data source that is
+ * selected now: {@link getResourceSharingAvailableTypes} is async, so during a switch the previous
+ * source's result is still in state until the new probe settles. Exported so the component and its
+ * tests share one definition rather than each carrying a copy that can drift.
+ */
+export const isResourceSharingEnabledForDataSource = (
+  resourceSharing: { dataSourceId: string | undefined | symbol; types: string[] },
+  selectedDataSourceId: string | undefined | symbol,
+  resourceType: string
+): boolean =>
+  resourceSharing.dataSourceId === selectedDataSourceId &&
+  resourceSharing.types.includes(resourceType);
+
 export const getResourceSharingAvailableTypes = async (
   resourceDataSourceId?: string
 ): Promise<string[]> => {
@@ -215,10 +231,11 @@ export const Monitoring = (props: MonitoringProps) => {
           onChange={handleTableChange}
           onViewDetail={handleViewDetail}
           onResetSearchClick={onResetSearch}
-          resourceSharingEnabled={
-            resourceSharing.dataSourceId === params.dataSourceId &&
-            resourceSharing.types.includes(ML_MODEL_GROUP_RESOURCE_TYPE)
-          }
+          resourceSharingEnabled={isResourceSharingEnabledForDataSource(
+            resourceSharing,
+            params.dataSourceId,
+            ML_MODEL_GROUP_RESOURCE_TYPE
+          )}
         />
         {preview && (
           <PreviewPanel
