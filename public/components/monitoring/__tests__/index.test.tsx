@@ -7,7 +7,11 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { render, screen, waitFor, within } from '../../../../test/test_utils';
-import { Monitoring, getResourceSharingAvailableTypes } from '../index';
+import {
+  Monitoring,
+  getResourceSharingAvailableTypes,
+  isResourceSharingEnabledForDataSource,
+} from '../index';
 import * as useMonitoringExports from '../use_monitoring';
 import { APIProvider } from '../../../apis/api_provider';
 import { InnerHttpProvider } from '../../../apis/inner_http_provider';
@@ -517,31 +521,31 @@ describe('Access column staleness guard logic', () => {
   // selected data source. getResourceSharingAvailableTypes(...) is async,
   // so on a data-source switch, `resourceSharing.types` still holds the
   // previous data source's result until the new probe resolves.
-  const computeEnabled = (
-    resourceSharing: { dataSourceId: string | undefined | symbol; types: string[] },
-    selectedDataSourceId: string | undefined | symbol,
-    resourceType: string
-  ) =>
-    resourceSharing.dataSourceId === selectedDataSourceId &&
-    resourceSharing.types.includes(resourceType);
-
   it('is enabled once types resolve for the currently selected data source', () => {
     const resourceSharing = { dataSourceId: 'ds-a', types: ['ml-model-group'] };
-    expect(computeEnabled(resourceSharing, 'ds-a', 'ml-model-group')).toBe(true);
+    expect(isResourceSharingEnabledForDataSource(resourceSharing, 'ds-a', 'ml-model-group')).toBe(
+      true
+    );
   });
 
   it('is disabled while a resolved result belongs to a data source other than the one now selected', () => {
     const resourceSharing = { dataSourceId: 'ds-a', types: ['ml-model-group'] };
-    expect(computeEnabled(resourceSharing, 'ds-b', 'ml-model-group')).toBe(false);
+    expect(isResourceSharingEnabledForDataSource(resourceSharing, 'ds-b', 'ml-model-group')).toBe(
+      false
+    );
   });
 
   it('is disabled before any result has resolved for the currently selected data source', () => {
     const resourceSharing = { dataSourceId: undefined, types: [] };
-    expect(computeEnabled(resourceSharing, 'ds-a', 'ml-model-group')).toBe(false);
+    expect(isResourceSharingEnabledForDataSource(resourceSharing, 'ds-a', 'ml-model-group')).toBe(
+      false
+    );
   });
 
   it('is disabled once the current data source resolves but does not register the resource type', () => {
     const resourceSharing = { dataSourceId: 'ds-a', types: ['workflow'] };
-    expect(computeEnabled(resourceSharing, 'ds-a', 'ml-model-group')).toBe(false);
+    expect(isResourceSharingEnabledForDataSource(resourceSharing, 'ds-a', 'ml-model-group')).toBe(
+      false
+    );
   });
 });
